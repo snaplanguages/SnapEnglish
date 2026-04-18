@@ -1,1 +1,264 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Grammar Journey</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* GIỮ NGUYÊN CSS CŨ */
+        :root {
+            --primary-color: #ffb7b2;   /* pastel peach */
+            --secondary-color: #b5a6ff; /* lavender sáng */
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-color: #3f3f46;
+            --hover-shadow: 0 12px 25px rgba(255, 183, 178, 0.4);
+        }
 
+        body { 
+            font-family: 'Quicksand', sans-serif; 
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(to top, #caffbf 0%, #d0cfff 100%);
+            min-height: 100vh;
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        h1 { 
+            color: #6a5acd; 
+            font-size: 28px;
+            margin-bottom: 5px;
+            font-weight: 800;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.5);
+        }
+
+        p.subtitle {
+            color: #7f8c8d;
+            font-size: 15px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* SEARCH BAR */
+        .search-wrapper {
+            max-width: 500px;
+            margin: 0 auto 30px auto;
+            position: relative;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 14px 50px 14px 25px;
+            border-radius: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.9);
+            font-family: 'Quicksand', sans-serif;
+            font-size: 16px;
+            color: #4a4a4a;
+            outline: none;
+            box-shadow: 0 5px 15px rgba(156, 137, 184, 0.15);
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        #searchInput:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 20px rgba(223, 166, 191, 0.4);
+            transform: scale(1.02);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-color);
+            font-size: 18px;
+            pointer-events: none;
+        }
+
+        .container { 
+            max-width: 900px; 
+            margin: auto; 
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        /* CARD STYLE - Dùng thẻ A trực tiếp */
+        a.unit-card { 
+            background: var(--card-bg);
+            padding: 20px 25px;
+            border-radius: 20px;
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.6);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none; /* Bỏ gạch chân */
+            color: inherit;
+        }
+
+        a.unit-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 6px;
+            background: linear-gradient(to bottom, #ff9a9e, #fecfef);
+            transition: width 0.3s ease;
+        }
+        
+        a.unit-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(181, 166, 255, 0.35);
+        }
+
+        a.unit-card:hover::before {
+            width: 10px;
+        }
+
+        .unit-info {
+            text-align: left;
+            flex-grow: 1;
+            padding-left: 15px;
+        }
+
+        .unit-number {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #9c89b8;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .unit-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #4a4a4a;
+            margin: 0;
+        }
+
+        .hidden { display: none !important; }
+        
+        #noResults {
+            text-align: center;
+            grid-column: 1 / -1;
+            color: #888;
+            font-style: italic;
+            display: none;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>✨ Grammar Collection</h1>
+    <p class="subtitle">Hành trình chinh phục ngữ pháp từ con số 0 với SnapEnglish</p>
+    
+    <div class="search-wrapper">
+        <input type="text" id="searchInput" placeholder="Tìm kiếm bài học (VD: 12 hoặc Tương lai)...">
+        <span class="search-icon">🔍</span>
+    </div>
+
+    <div class="container" id="unitContainer">
+        <div id="noResults">Không tìm thấy bài học nào phù hợp nè... 🥺</div>
+    </div>
+
+   <script>
+    const titles = [
+        "Cấu trúc câu trong tiếng Anh", "Danh từ & Đại từ", "Mạo từ", "Lượng từ", 
+        "Thì hiện tại đơn", "Thì hiện tại tiếp diễn", "Thì hiện tại hoàn thành", 
+        "Thì quá khứ đơn", "Thì quá khứ tiếp diễn", "Thì quá khứ hoàn thành", 
+        "Thì tương lai đơn", "Tương lai gần", "Sự hòa hợp giữa chủ ngữ và động từ", 
+        "Trật tự của tính từ trước danh từ", "Giới từ", "Danh động từ và động từ nguyên mẫu", 
+        "Cấu tạo từ", "Liên từ", "Động từ khuyết thiếu", "Câu tường thuật (Phần 1)", 
+        "Câu tường thuật (Phần 2)", "Câu bị động", "Câu điều kiện", "Mệnh đề quan hệ", 
+        "Các dạng so sánh", "So sánh kép", "Giả định thức", "Những câu thường gặp trong giao tiếp", 
+        "Tình huống giao tiếp & cách đáp lại", "Thành ngữ, tục ngữ trong giao tiếp"
+    ];
+
+    // Cập nhật toàn bộ link sang định dạng .html
+    const links = [
+        "unit-1.html", "unit-2.html", "unit-3.html", "unit-4.html", "unit-5.html", 
+        "unit-6.html", "unit-7.html", "unit-8.html", "unit-9.html", "unit-10.html", 
+        "unit-11.html", "unit-12.html", "unit-13.html", "unit-14.html", "unit-15.html", 
+        "unit-16.html", "unit-17.html", "unit-18.html", "unit-19.html", "unit-20.html", 
+        "unit-21.html", "unit-22.html", "unit-23.html", "unit-24.html", "unit-25.html", 
+        "unit-26.html", "unit-27.html", "unit-28.html", "unit-29.html", "unit-30.html"
+    ];
+
+    const container = document.getElementById('unitContainer');
+    const searchInput = document.getElementById('searchInput');
+    const noResultsMsg = document.getElementById('noResults');
+
+    function renderUnits() {
+        titles.forEach((title, index) => {
+            const unitNum = index + 1;
+            const link = links[index] || "#"; 
+
+            const card = document.createElement('a');
+            card.className = 'unit-card';
+            card.setAttribute('data-search', `unit ${unitNum} ${title.toLowerCase()}`);
+            
+            // Cập nhật điều kiện check: chỉ cần link khác "#" là hợp lệ
+            if (link !== "#") {
+                card.href = link;
+                // Đã bỏ card.target = "_blank" để các bài học mở nội bộ mượt mà hơn
+            } else {
+                card.href = "javascript:void(0)";
+                card.onclick = function() {
+                    alert("🚧 Bài này chưa được gắn link (cần sửa trong code)!");
+                };
+            }
+
+            card.innerHTML = `
+                <div class="unit-info">
+                    <span class="unit-number">Unit ${unitNum}</span>
+                    <h3 class="unit-title">${title}</h3>
+                </div>
+                <div style="color: #dfa6bf; font-size: 20px;">➔</div>
+            `;
+            container.insertBefore(card, noResultsMsg);
+        });
+    }
+
+    // Phần tìm kiếm
+    searchInput.addEventListener('keyup', function() {
+        const filter = this.value.toLowerCase().trim();
+        const cards = document.querySelectorAll('.unit-card');
+        let hasResult = false;
+
+        cards.forEach(card => {
+            const searchText = card.getAttribute('data-search');
+            if (searchText.includes(filter)) {
+                card.classList.remove('hidden');
+                hasResult = true;
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        if (!hasResult) {
+            noResultsMsg.style.display = 'block';
+        } else {
+            noResultsMsg.style.display = 'none';
+        }
+    });
+
+    renderUnits();
+   </script>
+
+</body>
+</html>
