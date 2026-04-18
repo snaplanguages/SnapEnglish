@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOEIC Reading Practice</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: transparent;
+            color: #4a4a4a;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+            margin: 0;
+        }
+
+        .quiz-container {
+            background-color: #fffaf0; 
+            width: 100%;
+            max-width: 650px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            padding: 40px;
+            box-sizing: border-box;
+            border: 2px solid #fce4ec; 
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed #ffcdd2;
+            padding-bottom: 15px;
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #d88c9a; 
+            margin: 0;
+        }
+
+        .progress {
+            font-size: 16px;
+            font-weight: 600;
+            color: #8da399; 
+            background-color: #e8f5e9;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            line-height: 1.6;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        .option {
+            background-color: #ffffff;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            background-color: #f0f8ff;
+            border-color: #bde0fe;
+        }
+
+        .option.selected {
+            background-color: #e8f4f8; 
+            border-color: #a2d2ff;
+            color: #2b6cb0;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(162, 210, 255, 0.3);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .btn-prev {
+            background-color: #f1f3f5;
+            color: #868e96;
+        }
+
+        .btn-prev:hover {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        .btn-next {
+            background-color: #ffb4a2; 
+            color: #fff;
+            margin-left: auto;
+        }
+
+        .btn-next:hover {
+            background-color: #e5989b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(229, 152, 155, 0.4);
+        }
+
+        .btn-submit {
+            background-color: #b5e2fa; 
+            color: #0f4c75;
+            margin-left: auto;
+            display: none;
+        }
+
+        .btn-submit:hover {
+            background-color: #8bbce1;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 188, 225, 0.4);
+        }
+
+        .btn-explain {
+            background-color: #cdb4db; 
+            color: #fff;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .btn-explain:hover {
+            background-color: #b089c7;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(176, 137, 199, 0.4);
+        }
+
+        #result-container {
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #ffc3a0 0%, #ffafbd 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 20px auto;
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            box-shadow: 0 10px 20px rgba(255, 175, 189, 0.4);
+        }
+
+        .result-message {
+            font-size: 20px;
+            color: #d88c9a;
+            margin-bottom: 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz-app">
+    <div id="question-container">
+        <div class="header">
+            <h2 class="title">Part 5 Practice</h2>
+            <div class="progress" id="progress-text">Câu 1 / 30</div>
+        </div>
+        
+        <div class="question-text" id="question-text">
+            Đang tải câu hỏi...
+        </div>
+        
+        <div class="options" id="options-container">
+            </div>
+
+        <div class="controls">
+            <button class="btn btn-prev hidden" id="btn-prev" onclick="prevQuestion()">Quay lại</button>
+            <button class="btn btn-next" id="btn-next" onclick="nextQuestion()">Tiếp theo</button>
+            <button class="btn btn-submit" id="btn-submit" onclick="submitQuiz()">Nộp bài</button>
+        </div>
+    </div>
+
+    <div id="result-container">
+        <h2 class="title" style="margin-bottom: 25px;">Kết quả của bạn</h2>
+        <div class="score-circle" id="score-display">0/30</div>
+        <div class="result-message" id="result-message">Chúc mừng bạn đã hoàn thành bài thi!</div>
+        <a href="https://sites.google.com/view/snapenglish/toeic-reading/part-5-2018-answers" target="_blank" class="btn btn-explain">Xem Giải Thích Chi Tiết</a>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "Dr.Braun will write —--- letters only for interns who master every task expected of a junior copy editor.", options: ["recommends", "recommendation", "recommended", "recommending"], a: "recommendation" },
+        { q: "The —----- of a new chief financial officer at Veracore Industries was announced on April 6.", options: ["appoint", "appoints", "appointed", "appointment"], a: "appointment" },
+        { q: "After a six-month probationary period, city employees are —- to take vacation days.", options: ["beneficial", "eligible", "convenient", "relevant"], a: "eligible" },
+        { q: "Ms. Larensky is applying with several different agencies to obtain the permits ----- for the outdoor art event.", options: ["required", "requiring", "requires", "will require"], a: "required" },
+        { q: "This letter serves as ----that we have received and processed your credit-card cancellation request.", options: ["confirm", "confirmed", "confirmable", "confirmation"], a: "confirmation" },
+        { q: "Many people at the company have industry experience, but only a handful of —--- can see the future importance of current trends.", options: ["we", "us", "our", "ourselves"], a: "us" },
+        { q: "The new furniture for the conference room is scheduled to be delivered —--- on Tuesday.", options: ["hardly", "comfortably", "early", "eagerly"], a: "early" },
+        { q: "After working in Canada for ten years, Cha Joon has —-------- to Seoul to plan the opening of an upscale restaurant.", options: ["visited", "returned", "occurred", "related"], a: "returned" },
+        { q: "Toucan Database System is designed to perform a detailed financial analysis—---------.", options: ["automate", "automatic", "automated", "automatically"], a: "automatically" },
+        { q: "The city council approved the bill to increase funding for its road improvement —----------.", options: ["statement", "permission", "project", "ability"], a: "project" },
+        { q: "The Neighborhood Involvement Program honors residents —-- volunteer their time to help Egin City.", options: ["for", "who", "those", "as"], a: "who" },
+        { q: "Several architects —--- intriguing design plans for the Hadler Building’s addition.", options: ["proposing", "proposed", "proposal", "proposals"], a: "proposed" },
+        { q: "The updated training program is limited to site supervisors —---- the Casey Medical Care system.", options: ["within", "until", "during", "since"], a: "within" },
+        { q: "Mr.Koizumi must complete the cost estimate before he —--- for the conference.", options: ["will leave", "leaves", "leaving", "left"], a: "leaves" },
+        { q: "Although the new X150 printer is —---- to other models, it costs only half as much.", options: ["similar", "likable", "reflected", "considerate"], a: "similar" },
+        { q: "To address budget deficits, Lunere County plans to limit spending and —--- tourism.", options: ["promote", "declare", "obtain", "benefit"], a: "promote" },
+        { q: "Operating instructions are posted above the printer so you can —--- refer to them.", options: ["consecutively", "standardly", "namely", "easily"], a: "easily" },
+        { q: "The Vickwell Historical Museum will be closed for renovations —-- on Monday, September 10.", options: ["will begin", "has begun", "beginner", "beginning"], a: "beginning" },
+        { q: "Finley Plant Nursery implements the —--- latest agricultural techniques.", options: ["so", "more", "very", "much"], a: "very" },
+        { q: "According to the compensation guidelines, employees who regularly complete their work —-- it is due may receive bonuses.", options: ["before", "how", "why", "either"], a: "before" },
+        { q: "Thank you for your —---- in the Foxdale Apartments community enhancement survey.", options: ["participant", "participation", "participate", "participated"], a: "participation" },
+        { q: "Solar energy has become a key —---- in the development of additional energy resources throughout the region.", options: ["factor", "position", "instructor", "composition"], a: "factor" },
+        { q: "The LPN auto company has issued a special report to address concerns —--- the fuel efficiency of its vehicles.", options: ["excluding", "during", "following", "regarding"], a: "regarding" },
+        { q: "This year’s company retreat will focus on techniques that help people think more —--.", options: ["create", "creative", "creativity", "creatively"], a: "creatively" },
+        { q: "Employees must —--- requests for time off to Ms.Cheung for approval.", options: ["apply", "submit", "vacate", "oppose"], a: "submit" },
+        { q: "Board members are free to discuss the issues among —-- before the formal votes are taken.", options: ["themselves", "theirs", "their", "they"], a: "themselves" },
+        { q: "Judging by ticket sales, Fen Jiang’s first attempt at directing a film was —--- a success.", options: ["clear", "clearly", "clearer", "clearing"], a: "clearly" },
+        { q: "—--- the Nolan Credit Union parking area is now open to the public, a section has been reserved for credit union employees.", options: ["While", "When", "For", "But"], a: "While" },
+        { q: "Pharmacy technicians are responsible for verifying and processing prescriptions —-- they are requested by a physician.", options: ["as well as", "as soon as", "in regard to", "in addition to"], a: "as soon as" },
+        { q: "All laboratory personnel must attend the clinical safety workshop to ensure —-- with new regulations.", options: ["activation", "fulfillment", "compliance", "indication"], a: "compliance" }
+    ];
+
+    let currentQuestionIndex = 0;
+    const userAnswers = new Array(questions.length).fill(null);
+
+    const questionTextEl = document.getElementById("question-text");
+    const optionsContainerEl = document.getElementById("options-container");
+    const progressTextEl = document.getElementById("progress-text");
+    const btnPrev = document.getElementById("btn-prev");
+    const btnNext = document.getElementById("btn-next");
+    const btnSubmit = document.getElementById("btn-submit");
+
+    function loadQuestion() {
+        const currentQ = questions[currentQuestionIndex];
+        questionTextEl.textContent = `${currentQuestionIndex + 1}. ${currentQ.q}`;
+        progressTextEl.textContent = `Câu ${currentQuestionIndex + 1} / ${questions.length}`;
+
+        optionsContainerEl.innerHTML = "";
+
+        currentQ.options.forEach(option => {
+            const div = document.createElement("div");
+            div.className = "option";
+            if (userAnswers[currentQuestionIndex] === option) {
+                div.classList.add("selected");
+            }
+            div.textContent = option;
+            div.onclick = () => selectOption(option);
+            optionsContainerEl.appendChild(div);
+        });
+
+        if (currentQuestionIndex === 0) {
+            btnPrev.classList.add("hidden");
+        } else {
+            btnPrev.classList.remove("hidden");
+        }
+
+        if (currentQuestionIndex === questions.length - 1) {
+            btnNext.classList.add("hidden");
+            btnSubmit.style.display = "block";
+        } else {
+            btnNext.classList.remove("hidden");
+            btnSubmit.style.display = "none";
+        }
+    }
+
+    function selectOption(option) {
+        userAnswers[currentQuestionIndex] = option;
+        loadQuestion(); 
+    }
+
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            loadQuestion();
+        }
+    }
+
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+    }
+
+    function submitQuiz() {
+        let correctCount = 0;
+        for (let i = 0; i < questions.length; i++) {
+            if (userAnswers[i] === questions[i].a) {
+                correctCount++;
+            }
+        }
+
+        document.getElementById("question-container").style.display = "none";
+        document.getElementById("result-container").style.display = "block";
+        document.getElementById("score-display").textContent = `${correctCount}/${questions.length}`;
+        
+        let message = "Tuyệt vời! Bạn đã làm rất tốt.";
+        if (correctCount < 15) message = "Hãy cố gắng ôn tập thêm nhé!";
+        else if (correctCount < 25) message = "Khá lắm, tiếp tục phát huy nha!";
+        document.getElementById("result-message").textContent = message;
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
