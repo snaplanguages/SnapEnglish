@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listening: A request from your boss | SnapEnglish</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #a29bfe; /* Tím pastel */
+            --primary-dark: #6c5ce7;
+            --secondary: #c8c2f2;
+            --accent: #e7a87c; /* Cam đất */
+            --accent-dark: #d99668;
+            --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            --text-main: #4a4a4a;
+            --correct: #55efc4;
+            --correct-text: #00b894;
+            --wrong: #ff7675;
+            --wrong-text: #d63031;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        body { 
+            font-family: 'Quicksand', sans-serif; 
+            margin: 0;
+            padding: 0;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        /* --- Modal Khởi Động --- */
+        #start-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 400px;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-content h2 { color: var(--primary-dark); margin-top: 0; }
+        .modal-content p { color: #666; margin-bottom: 30px; line-height: 1.5; }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(162, 155, 254, 0.4);
+        }
+
+        .btn:hover { background: var(--primary-dark); transform: translateY(-3px); }
+        .btn-accent { background: var(--accent); box-shadow: 0 5px 15px rgba(231, 168, 124, 0.4); }
+        .btn-accent:hover { background: var(--accent-dark); }
+
+        /* --- Nội dung chính --- */
+        #main-content {
+            display: none; 
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .header-box {
+            text-align: center;
+            background: var(--glass-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            border-top: 5px solid var(--primary);
+        }
+
+        .header-box h1 { margin: 0 0 10px 0; color: var(--primary-dark); }
+        .level-tag { background: var(--secondary); color: var(--primary-dark); padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 14px; }
+
+        /* Audio Player */
+        .audio-container {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+        }
+        audio {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 30px;
+            outline: none;
+        }
+
+        /* --- Sections Bài Tập --- */
+        .task-section {
+            background: var(--glass-bg);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .task-title {
+            color: var(--accent);
+            border-bottom: 2px dashed var(--secondary);
+            padding-bottom: 10px;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            border-left: 4px solid var(--secondary);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .q-text { font-weight: 600; font-size: 16px; flex-grow: 1; }
+
+        select, input[type="text"], input[type="number"] {
+            font-family: 'Quicksand', sans-serif;
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 2px solid #eee;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+        
+        select:focus, input[type="text"]:focus, input[type="number"]:focus { border-color: var(--primary); background: #fff; }
+        
+        /* Layout Task 1: 2 Cột */
+        .task1-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            align-items: start;
+            margin-top: 20px;
+        }
+
+        .word-bank-column {
+            background: #f8f7ff;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px dashed var(--secondary);
+        }
+
+        .word-bank-column h4 {
+            margin-top: 0;
+            color: var(--primary-dark);
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        #word-bank-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .word-item {
+            background: #fff;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-weight: 600;
+            color: var(--text-main);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.04);
+            font-size: 15px;
+            transition: transform 0.2s;
+        }
+
+        .word-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .word-item span {
+            color: var(--accent);
+            font-weight: 700;
+            margin-right: 5px;
+            font-size: 16px;
+        }
+
+        input.letter-input { 
+            width: 60px; 
+            text-align: center; 
+            text-transform: uppercase; 
+            font-weight: bold; 
+            color: var(--primary-dark);
+        }
+
+        /* Feedback Styles */
+        .feedback-box {
+            width: 100%;
+            margin-top: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14.5px;
+            display: none;
+            line-height: 1.5;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .correct-ans { border-color: var(--correct) !important; background-color: #f0fff4 !important; }
+        .wrong-ans { border-color: var(--wrong) !important; background-color: #fff5f5 !important; }
+
+        .feedback-box.correct-fb { background: #e6fffa; color: var(--correct-text); border-left: 3px solid var(--correct); display: block; }
+        .feedback-box.wrong-fb { background: #fff5f5; color: var(--wrong-text); border-left: 3px solid var(--wrong); display: block; }
+
+        .explanation-quote {
+            font-style: italic;
+            color: #666;
+            background: rgba(0,0,0,0.05);
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        /* Result Panel */
+        #result-panel {
+            text-align: center;
+            background: var(--glass-bg);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: none;
+            border-top: 5px solid var(--accent);
+        }
+        
+        #result-score { font-size: 32px; font-weight: 700; color: var(--primary-dark); margin: 10px 0; }
+
+        .submit-container { text-align: center; margin-top: 20px; padding-bottom: 50px; }
+        
+        /* Cảnh báo lỗi */
+        #warning-msg {
+            color: var(--wrong-text);
+            background: #fff5f5;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            display: none;
+            border: 1px solid var(--wrong);
+        }
+
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes fadeIn { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            .task1-layout { grid-template-columns: 1fr; }
+            .question-row { flex-direction: column; align-items: flex-start; }
+            select, input[type="text"], input[type="number"] { width: 100%; box-sizing: border-box; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="start-modal">
+        <div class="modal-content">
+            <h2>🎧 SnapEnglish</h2>
+            <p><strong>A request from your boss</strong><br><br>Bài học này sẽ giúp bạn luyện nghe cách sắp xếp công việc và thứ tự ưu tiên. Bạn đã sẵn sàng chưa?</p>
+            <button class="btn" onclick="startExercise()">Bắt đầu làm bài</button>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <div class="header-box">
+            <span class="level-tag">Listening A1</span>
+            <h1>A request from your boss</h1>
+        </div>
+</div>
+        <div id="result-panel">
+            <h2>Kết quả của bạn</h2>
+            <div id="result-score">0 / 16</div>
+            <p id="result-message">Hãy xem lại các lỗi sai ở bên dưới nhé!</p>
+            <button class="btn btn-accent" onclick="window.scrollTo({top: 0, behavior: 'smooth'});">Xem lại bài giải</button>
+        </div>
+
+        <div class="task-section">
+            <h3 class="task-title">💡 Preparation Task: Urgent or Not Urgent?</h3>
+            <p>Phân loại các cụm từ sau vào nhóm "Khẩn cấp" (Urgent) hoặc "Không khẩn cấp" (Not urgent).</p>
+            <div id="prep-container"></div>
+        </div>
+
+<div class="task-section" style="text-align: center; border-top: 3px solid var(--primary);">
+            <h3 class="task-title" style="justify-content: center; border-bottom: none; margin-bottom: 5px;">🎧 Audio File</h3>
+            <p style="color: #777; margin-bottom: 15px;">Nghe đoạn hội thoại và hoàn thành các bài tập bên dưới nhé.</p>
+            <div class="audio-container" style="margin-top: 0;">
+                <audio controls id="main-audio">
+                    <source src="https://learnenglish.britishcouncil.org/sites/podcasts/files/LE_listening_A1_A_request_from_your_boss.mp3" type="audio/mpeg">
+                    Trình duyệt của bạn không hỗ trợ thẻ audio.
+                </audio>
+            </div>
+        </div>
+
+        <div class="task-section">
+            <h3 class="task-title">🧩 Task 1: Matching</h3>
+            <p>Nhìn vào danh sách từ vựng bên dưới và <strong>gõ chữ cái tương ứng (A, B, C...)</strong> vào ô trống để tạo thành cụm từ đúng theo đoạn hội thoại.</p>
+            
+            <div class="task1-layout">
+                <div class="word-bank-column">
+                    <h4>Lựa chọn (A-F)</h4>
+                    <div id="word-bank-container"></div>
+                </div>
+                
+                <div class="questions-column">
+                    <div id="task1-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-section">
+            <h3 class="task-title">🔢 Task 2: Priority Order</h3>
+            <p>Đánh số thứ tự ưu tiên từ 1 đến 4 cho các công việc Susanne giao cho Mario.</p>
+            <div id="task2-container"></div>
+        </div>
+
+        <div class="submit-container">
+            <div id="warning-msg">⚠️ Bạn ơi, hãy điền đầy đủ các câu hỏi (các ô màu đỏ) trước khi nộp bài nhé!</div>
+            <button class="btn btn-accent" id="submit-btn" onclick="checkAnswers()" style="font-size: 18px; padding: 15px 40px;">Nộp Bài Chấm Điểm</button>
+        </div>
+    </div>
+
+    <script>
+        // DỮ LIỆU BÀI TẬP & ĐÁP ÁN
+        const prepData = [
+            { id: "p1", text: "There's no hurry.", ans: "not", exp: "Mang nghĩa 'Không cần vội'.", quote: "Susanne: There's no hurry. Take your time." },
+            { id: "p2", text: "Do it when you have time.", ans: "not", exp: "Mang nghĩa 'Làm khi nào rảnh'.", quote: "Please do it when you have time... It's not too urgent." },
+            { id: "p3", text: "It's important.", ans: "urgent", exp: "Mang nghĩa 'Rất quan trọng' (Cần ưu tiên).", quote: "I need to visit the customer... It's important." },
+            { id: "p4", text: "Take your time.", ans: "not", exp: "Mang nghĩa 'Cứ từ từ mà làm'.", quote: "Take your time." },
+            { id: "p5", text: "Do this first.", ans: "urgent", exp: "Mang nghĩa 'Làm cái này đầu tiên'.", quote: "Please do this first. It's a priority and very urgent." },
+            { id: "p6", text: "This is a priority.", ans: "urgent", exp: "Mang nghĩa 'Đây là ưu tiên hàng đầu'.", quote: "It's a priority and very urgent." }
+        ];
+
+        const task1OptionsUI = [
+            { letter: "A", text: "the customer" },
+            { letter: "B", text: "to the customer" },
+            { letter: "C", text: "a meeting room" },
+            { letter: "D", text: "to the meeting" },
+            { letter: "E", text: "a report" },
+            { letter: "F", text: "a presentation" }
+        ];
+
+        const task1Data = [
+            { id: "t1_1", verb: "1. send an email", ans: "B", exp: "Gửi email cho khách hàng.", quote: "Can you send an email to the customer?" },
+            { id: "t1_2", verb: "2. visit", ans: "A", exp: "Thăm khách hàng.", quote: "I need to visit the customer in Germany." },
+            { id: "t1_3", verb: "3. reserve", ans: "C", exp: "Đặt phòng họp.", quote: "But first you need to book (reserve) a meeting room." },
+            { id: "t1_4", verb: "4. invite people", ans: "D", exp: "Mời mọi người đến cuộc họp.", quote: "Can you invite everyone to the next team meeting?" },
+            { id: "t1_5", verb: "5. write", ans: "E", exp: "Viết báo cáo.", quote: "can you write a short report about our new project?" },
+            { id: "t1_6", verb: "6. give", ans: "F", exp: "Thực hiện bài thuyết trình.", quote: "I have to give a presentation to our managers next month." }
+        ];
+
+        const task2Data = [
+            { id: "t2_visit", text: "Visit the customer.", ans: "2", exp: "Mario phải gửi email hỏi lịch trước, sau đó Susanne mới đi thăm khách hàng.", quote: "Ask them when I can visit them next week." },
+            { id: "t2_email", text: "Send an email to the customer.", ans: "1", exp: "Đây là việc khẩn cấp nhất, Susanne yêu cầu làm đầu tiên.", quote: "Can you send an email... Please do this first." },
+            { id: "t2_reserve", text: "Reserve a meeting room.", ans: "3", exp: "Trước khi gửi email mời họp, phải đặt phòng trước.", quote: "But first you need to book a meeting room." },
+            { id: "t2_invite", text: "Invite people to the meeting.", ans: "4", exp: "Sau khi đặt phòng xong mới mời mọi người.", quote: "After that, please send everyone an email about it." }
+        ];
+
+        let totalQuestions = prepData.length + task1Data.length + task2Data.length;
+
+        // KHỞI TẠO GIAO DIỆN
+        function initApp() {
+            const prepCont = document.getElementById('prep-container');
+            prepData.forEach(q => {
+                prepCont.innerHTML += `
+                    <div class="question-row">
+                        <div class="q-text">${q.text}</div>
+                        <select id="${q.id}">
+                            <option value="">-- Chọn --</option>
+                            <option value="urgent">Urgent</option>
+                            <option value="not">Not urgent</option>
+                        </select>
+                        <div class="feedback-box" id="fb_${q.id}"></div>
+                    </div>
+                `;
+            });
+
+            const wordBankCont = document.getElementById('word-bank-container');
+            task1OptionsUI.forEach(opt => {
+                wordBankCont.innerHTML += `<div class="word-item"><span>${opt.letter}.</span> ${opt.text}</div>`;
+            });
+
+            const t1Cont = document.getElementById('task1-container');
+            task1Data.forEach(q => {
+                t1Cont.innerHTML += `
+                    <div class="question-row">
+                        <div class="q-text">${q.verb}</div>
+                        <input type="text" id="${q.id}" class="letter-input" maxlength="1" placeholder="A-F">
+                        <div class="feedback-box" id="fb_${q.id}"></div>
+                    </div>
+                `;
+            });
+
+            const t2Cont = document.getElementById('task2-container');
+            task2Data.forEach(q => {
+                t2Cont.innerHTML += `
+                    <div class="question-row">
+                        <div class="q-text">${q.text}</div>
+                        <input type="number" id="${q.id}" min="1" max="4" placeholder="1-4">
+                        <div class="feedback-box" id="fb_${q.id}"></div>
+                    </div>
+                `;
+            });
+        }
+
+        // START BUTTON
+        function startExercise() {
+            document.getElementById('start-modal').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('start-modal').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                document.getElementById('main-audio').play().catch(e => console.log("Cần tương tác để phát audio"));
+            }, 500);
+        }
+
+        // CHẤM ĐIỂM
+        function checkAnswers() {
+            let isAllAnswered = true;
+            const warningMsg = document.getElementById('warning-msg');
+
+            // 1. Kiểm tra điền đủ
+            function checkCompletion(dataArray) {
+                dataArray.forEach(q => {
+                    const el = document.getElementById(q.id);
+                    if (el.value.trim() === "") {
+                        isAllAnswered = false;
+                        el.style.borderColor = "var(--wrong)"; // Đổi màu viền cảnh báo
+                        el.style.backgroundColor = "#fff5f5";
+                    } else {
+                        el.style.borderColor = ""; // Trả lại màu viền bình thường
+                        el.style.backgroundColor = "";
+                    }
+                });
+            }
+
+            checkCompletion(prepData);
+            checkCompletion(task1Data);
+            checkCompletion(task2Data);
+
+            if (!isAllAnswered) {
+                warningMsg.style.display = 'block';
+                return; // Ngừng chấm điểm nếu chưa làm xong
+            } else {
+                warningMsg.style.display = 'none';
+            }
+
+            // 2. Chấm điểm trực tiếp (Bỏ qua confirm box để tránh lỗi trên Google Sites)
+            let score = 0;
+
+            function evaluate(dataArray) {
+                dataArray.forEach(q => {
+                    const el = document.getElementById(q.id);
+                    const fb = document.getElementById('fb_' + q.id);
+                    
+                    // Chuyển tất cả về chữ hoa để so khớp chính xác, không bị lỗi hoa/thường
+                    const userVal = el.value.trim().toUpperCase();
+                    const correctVal = q.ans.toUpperCase(); 
+
+                    // Reset style
+                    el.classList.remove('correct-ans', 'wrong-ans');
+                    el.style.borderColor = "";
+                    el.style.backgroundColor = "";
+                    fb.className = 'feedback-box'; 
+
+                    if (userVal === correctVal) {
+                        score++;
+                        el.classList.add('correct-ans');
+                        fb.classList.add('correct-fb');
+                        fb.innerHTML = `<strong>✔ Chính xác!</strong> ${q.exp}<br><span class="explanation-quote">"${q.quote}"</span>`;
+                    } else {
+                        el.classList.add('wrong-ans');
+                        fb.classList.add('wrong-fb');
+                        
+                        let correctText = q.ans;
+                        if(q.ans === "urgent") correctText = "Urgent";
+                        if(q.ans === "not") correctText = "Not urgent";
+                        if(q.id.startsWith("t1_")) {
+                            const optObj = task1OptionsUI.find(o => o.letter.toUpperCase() === q.ans.toUpperCase());
+                            correctText = `${optObj.letter}. ${optObj.text}`;
+                        }
+
+                        fb.innerHTML = `<strong>✘ Chưa đúng.</strong> Đáp án phải là: <b>${correctText}</b>.<br><i>Giải thích:</i> ${q.exp}<br><span class="explanation-quote">"${q.quote}"</span>`;
+                    }
+                });
+            }
+
+            evaluate(prepData);
+            evaluate(task1Data);
+            evaluate(task2Data);
+
+            // 3. Hiển thị kết quả
+            const panel = document.getElementById('result-panel');
+            const scoreText = document.getElementById('result-score');
+            const msg = document.getElementById('result-message');
+            const submitBtn = document.getElementById('submit-btn');
+
+            panel.style.display = 'block';
+            scoreText.innerHTML = `${score} / ${totalQuestions}`;
+            
+            if (score === totalQuestions) {
+                msg.innerHTML = "🎉 Xuất sắc! Bạn đã làm đúng hoàn toàn 100%.";
+                msg.style.color = "var(--correct-text)";
+            } else if (score >= totalQuestions * 0.7) {
+                msg.innerHTML = "👍 Rất tốt! Bạn nghe khá ổn đấy, hãy xem lại một vài lỗi nhỏ bên dưới nhé.";
+            } else {
+                msg.innerHTML = "💪 Đừng nản chí! Hãy kiên nhẫn nghe lại audio và đọc giải thích chi tiết bên dưới nhé.";
+            }
+
+            submitBtn.innerHTML = "Làm lại bài";
+            submitBtn.onclick = function() { location.reload(); };
+            
+            panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        window.onload = initApp;
+
+    </script>
+</body>
+</html>
