@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snap English - Checking Understanding</title>
+<link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --pastel-pink: #ffd1dc;
+            --pastel-blue: #aec6cf;
+            --pastel-green: #b7e4c7;
+            --pastel-yellow: #fdfd96;
+            --pastel-purple: #c3b1e1;
+            --text-main: #4a4a4a;
+            --text-light: #7a7a7a;
+            --bg-color: #faf8f5;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .app-container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 800px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--pastel-pink), var(--pastel-purple));
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .header p {
+            font-size: 16px;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-title {
+            font-size: 22px;
+            color: var(--pastel-blue);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Video Section */
+        .video-container {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #e0e0e0;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .video-container video {
+            width: 100%;
+            display: block;
+        }
+
+        /* Speaking Tasks */
+        .task-item {
+            background: #fdfdfd;
+            border: 2px dashed var(--pastel-blue);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .task-item:hover {
+            border-color: var(--pastel-purple);
+            box-shadow: 0 4px 12px rgba(195, 177, 225, 0.2);
+        }
+
+        .jumbled-words {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--pastel-purple);
+            margin-bottom: 15px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .speaking-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .mic-btn {
+            background: var(--pastel-pink);
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 209, 220, 0.6);
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .mic-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .mic-btn.recording {
+            background: #ff6b6b;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 107, 107, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+        }
+
+        .speech-result {
+            font-size: 16px;
+            color: var(--text-light);
+            min-height: 24px;
+            font-style: italic;
+        }
+
+        /* Checkbox Task */
+        .checkbox-list {
+            list-style: none;
+        }
+
+        .checkbox-list li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: #f9f9f9;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            border-left: 5px solid var(--pastel-green);
+        }
+
+        .tf-options {
+            display: flex;
+            gap: 15px;
+        }
+
+        .tf-options label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 600;
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-prev {
+            background: #e0e0e0;
+            color: var(--text-main);
+        }
+
+        .btn-next {
+            background: var(--pastel-blue);
+            color: white;
+            box-shadow: 0 4px 10px rgba(174, 198, 207, 0.4);
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* --- MODAL (POPUP) STYLES --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .modal-body {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-main);
+        }
+
+        .modal-body strong {
+            color: var(--pastel-purple);
+        }
+
+        .success-color { color: #4caf50; }
+        .error-color { color: #f44336; }
+
+        /* Fill in blanks reading text */
+        .reading-sentence {
+            font-size: 18px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .blank {
+            display: inline-block;
+            border-bottom: 2px solid var(--pastel-blue);
+            min-width: 60px;
+            text-align: center;
+            color: var(--pastel-blue);
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="header">
+            <h1><i class="fa-solid fa-microphone-lines"></i> Speaking: A1</h1>
+            <p>Checking Understanding</p>
+        </div>
+
+        <div class="content">
+            <div class="step active" id="step-1">
+                <h2 class="step-title"><i class="fa-solid fa-video"></i> Video Lesson</h2>
+                <div class="video-container">
+                    <video controls poster="https://via.placeholder.com/800x450/aec6cf/ffffff?text=Video:+Checking+Understanding">
+                        <source src="your_video_link.mp4" type="video/mp4">
+                        Trình duyệt của bạn không hỗ trợ thẻ video.
+                    </video>
+                </div>
+                <p style="text-align: center; color: var(--text-light); font-size: 15px;">
+                    Trong video này, Paul gặp vấn đề trong việc hiểu Bob. Hãy lắng nghe ngôn ngữ họ sử dụng để kiểm tra mức độ hiểu và thực hành nói các cụm từ hữu ích nhé.
+                </p>
+            </div>
+
+            <div class="step" id="step-2">
+                <h2 class="step-title"><i class="fa-solid fa-puzzle-piece"></i> Preparation Task</h2>
+                <p style="margin-bottom: 20px; color: var(--text-light);">Sắp xếp các từ thành câu hoàn chỉnh. Bấm nút Micro và <strong>ĐỌC</strong> câu trả lời của bạn.</p>
+                
+                <div id="prep-tasks-container">
+                    </div>
+            </div>
+
+            <div class="step" id="step-3">
+                <h2 class="step-title"><i class="fa-solid fa-check-double"></i> Task 1</h2>
+                <p style="margin-bottom: 20px; color: var(--text-light);">Are the sentences True or False?</p>
+                <ul class="checkbox-list" id="task1-container">
+                    </ul>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-next" onclick="checkTask1()" style="background: var(--pastel-green);">Kiểm tra đáp án</button>
+                </div>
+            </div>
+
+            <div class="step" id="step-4">
+                <h2 class="step-title"><i class="fa-solid fa-comment-dots"></i> Task 2 & 3: Speaking Practice</h2>
+                <p style="margin-bottom: 20px; color: var(--text-light);">Đọc to toàn bộ câu đã được điền từ hoàn chỉnh để luyện tập phát âm. Bấm Micro để bắt đầu.</p>
+                
+                <div id="speaking-tasks-container">
+                    </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-prev" id="btnPrev" onclick="navigate(-1)" style="visibility: hidden;">Quay lại</button>
+                <button class="btn btn-next" id="btnNext" onclick="navigate(1)">Tiếp theo</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="feedbackModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header" id="modalHeader">
+                </div>
+            <div class="modal-body" id="modalBody">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA STATE ---
+        const prepTasks = [
+            { id: 1, jumbled: "sorry. / I'm", answer: "I'm sorry", 
+              expRight: "Xuất sắc! <strong>'I'm sorry'</strong> là cách lịch sự nhất để bắt đầu khi bạn không nghe rõ hoặc không hiểu ý người khác.<br><br>👉 <em>Ngữ pháp:</em> Chủ ngữ (I) + to be (am) + Tính từ (sorry).",
+              expWrong: "Chưa chính xác! Trật tự đúng là <strong>\"I'm sorry\"</strong>. Hãy nhớ luôn đặt Chủ ngữ (I'm) trước tính từ (sorry) nhé." },
+            { id: 2, jumbled: "very well. / hear you / I can't", answer: "I can't hear you very well", 
+              expRight: "Rất chuẩn! <strong>'hear somebody well'</strong> nghĩa là nghe rõ ai đó.<br><br>👉 <em>Ngữ pháp:</em> Dùng modal verb <strong>'can't'</strong> (không thể) đi với động từ nguyên thể 'hear' để diễn tả khả năng ở hiện tại.",
+              expWrong: "Chưa đúng rồi! Bạn cần đọc là: <strong>\"I can't hear you very well\"</strong>.<br><br>👉 Trật tự: S (I) + can't + V (hear) + O (you) + Adv (very well)." },
+            { id: 3, jumbled: "that / Could / say / again, please? / you", answer: "Could you say that again please", 
+              expRight: "Tuyệt vời! Dùng <strong>'Could you...?'</strong> là một cách cực kỳ trưởng thành và lịch sự để yêu cầu ai đó làm gì.<br><br>👉 <em>Từ vựng:</em> 'say that again' = lặp lại điều đó.",
+              expWrong: "Bạn đọc lại nhé: <strong>\"Could you say that again, please?\"</strong>.<br><br>👉 'Could' đứng đầu câu để tạo câu hỏi yêu cầu lịch sự." }
+        ];
+
+        const task1Data = [
+            { id: 1, q: "Bob wants the hammer.", ans: "true", exp: "Đúng! Trong đoạn hội thoại Bob nói: 'could you pass me the hammer?'" },
+            { id: 2, q: "Paul is ill.", ans: "true", exp: "Đúng! Paul nói 'my ears are blocked' (tai bị ù), chứng tỏ anh ấy đang không khỏe." },
+            { id: 3, q: "The hammer is on the right.", ans: "false", exp: "Sai! Bob nói chiếc búa ở 'on the left' (bên trái), không phải bên phải." }
+        ];
+
+        const speakingTasks = [
+            { id: 1, text: "I'm {sorry}, Bob, my ears are blocked. I can't {hear} you very {well}.", fullAnswer: "I'm sorry Bob my ears are blocked I can't hear you very well",
+              expRight: "Phát âm rất tốt! Chú ý ngữ điệu ngắt nghỉ ở dấu phẩy nhé.",
+              expWrong: "Hệ thống chưa nhận diện chính xác. Hãy cố gắng phát âm rõ các từ trong ngoặc nhé: <strong>sorry</strong>, <strong>hear</strong>, <strong>well</strong>." },
+            { id: 2, text: "Sorry, Bob. Can you {repeat} that more {slowly}, please?", fullAnswer: "Sorry Bob can you repeat that more slowly please",
+              expRight: "Rất hay! 'repeat' (nhấn âm 2) và 'slowly' (nhấn âm 1).",
+              expWrong: "Bạn chú ý đọc trôi chảy câu yêu cầu: <strong>\"Can you repeat that more slowly, please?\"</strong>" }
+        ];
+
+        let currentStep = 1;
+        const totalSteps = 4;
+
+        // --- SPEECH RECOGNITION SETUP ---
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+        }
+
+        // --- INITIALIZE UI ---
+        function initApp() {
+            // Render Prep Tasks
+            const prepContainer = document.getElementById('prep-tasks-container');
+            prepTasks.forEach((task, index) => {
+                prepContainer.innerHTML += `
+                    <div class="task-item">
+                        <div class="jumbled-words">${task.jumbled}</div>
+                        <div class="speaking-area">
+                            <button class="mic-btn" id="mic-prep-${index}" onclick="startSpeaking('prep', ${index})">
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+                            <div class="speech-result" id="result-prep-${index}">Nhấn micro để đọc đáp án...</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Render Task 1
+            const task1Container = document.getElementById('task1-container');
+            task1Data.forEach((task, index) => {
+                task1Container.innerHTML += `
+                    <li>
+                        <span>${task.id}. ${task.q}</span>
+                        <div class="tf-options">
+                            <label><input type="radio" name="t1-q${index}" value="true"> True</label>
+                            <label><input type="radio" name="t1-q${index}" value="false"> False</label>
+                        </div>
+                    </li>
+                `;
+            });
+
+            // Render Speaking Tasks
+            const speakingContainer = document.getElementById('speaking-tasks-container');
+            speakingTasks.forEach((task, index) => {
+                let formattedText = task.text.replace(/\{([^}]+)\}/g, '<span class="blank">$1</span>');
+                speakingContainer.innerHTML += `
+                    <div class="task-item">
+                        <div class="reading-sentence">"${formattedText}"</div>
+                        <div class="speaking-area">
+                            <button class="mic-btn" id="mic-speak-${index}" onclick="startSpeaking('speak', ${index})">
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+                            <div class="speech-result" id="result-speak-${index}">Nhấn micro để đọc cả câu...</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- NAVIGATION LOGIC ---
+        function navigate(direction) {
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            currentStep += direction;
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+
+            document.getElementById('btnPrev').style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+            
+            const btnNext = document.getElementById('btnNext');
+            if (currentStep === totalSteps) {
+                btnNext.style.display = 'none';
+            } else {
+                btnNext.style.display = 'block';
+            }
+        }
+
+        // --- MODAL LOGIC (Giải quyết yêu cầu không trượt trang) ---
+        function showModal(isCorrect, titleText, bodyText) {
+            const modal = document.getElementById('feedbackModal');
+            const header = document.getElementById('modalHeader');
+            const body = document.getElementById('modalBody');
+
+            if (isCorrect) {
+                header.innerHTML = `<i class="fa-solid fa-circle-check success-color"></i> <span class="success-color">${titleText}</span>`;
+            } else {
+                header.innerHTML = `<i class="fa-solid fa-circle-xmark error-color"></i> <span class="error-color">${titleText}</span>`;
+            }
+
+            body.innerHTML = bodyText;
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('feedbackModal').classList.remove('active');
+        }
+
+        // Normalize text for comparison
+        function normalizeText(text) {
+            return text.toLowerCase().replace(/[.,?!]/g, '').trim();
+        }
+
+        // --- SPEECH HANDLING ---
+        let currentRecordingType = '';
+        let currentRecordingIndex = -1;
+
+        function startSpeaking(type, index) {
+            if (!recognition) {
+                alert("Trình duyệt của bạn không hỗ trợ tính năng nhận diện giọng nói. Vui lòng sử dụng Google Chrome.");
+                return;
+            }
+
+            // Reset buttons styling
+            document.querySelectorAll('.mic-btn').forEach(btn => btn.classList.remove('recording'));
+            
+            const btn = document.getElementById(`mic-${type}-${index}`);
+            const resultBox = document.getElementById(`result-${type}-${index}`);
+            
+            currentRecordingType = type;
+            currentRecordingIndex = index;
+
+            btn.classList.add('recording');
+            resultBox.innerText = "Đang nghe...";
+
+            try {
+                recognition.start();
+            } catch (e) {
+                recognition.stop();
+                setTimeout(() => recognition.start(), 100);
+            }
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                resultBox.innerText = `Bạn nói: "${transcript}"`;
+                btn.classList.remove('recording');
+                checkSpeechResult(transcript, type, index);
+            };
+
+            recognition.onerror = function(event) {
+                resultBox.innerText = "Không nghe rõ, vui lòng thử lại!";
+                btn.classList.remove('recording');
+            };
+
+            recognition.onend = function() {
+                btn.classList.remove('recording');
+            };
+        }
+
+        function checkSpeechResult(transcript, type, index) {
+            const spokenText = normalizeText(transcript);
+            let targetText = '';
+            let expRight = '';
+            let expWrong = '';
+
+            if (type === 'prep') {
+                targetText = normalizeText(prepTasks[index].answer);
+                expRight = prepTasks[index].expRight;
+                expWrong = prepTasks[index].expWrong;
+            } else if (type === 'speak') {
+                targetText = normalizeText(speakingTasks[index].fullAnswer);
+                expRight = speakingTasks[index].expRight;
+                expWrong = speakingTasks[index].expWrong;
+            }
+
+            // A1 level: allow partial matching if they got the key parts
+            const isCorrect = spokenText === targetText || targetText.includes(spokenText) && spokenText.length > targetText.length * 0.7;
+
+            setTimeout(() => {
+                if (isCorrect) {
+                    showModal(true, "Tuyệt vời!", expRight);
+                } else {
+                    showModal(false, "Cần luyện tập thêm", `Hệ thống nghe được: <em>"${transcript}"</em>.<br><br>` + expWrong);
+                }
+            }, 500);
+        }
+
+        // --- CHECK TASK 1 ---
+        function checkTask1() {
+            let allCorrect = true;
+            let feedbackHTML = "";
+
+            task1Data.forEach((task, index) => {
+                const selected = document.querySelector(`input[name="t1-q${index}"]:checked`);
+                if (!selected) {
+                    allCorrect = false;
+                    feedbackHTML += `<li><strong>Câu ${task.id}:</strong> Bạn chưa chọn đáp án.</li>`;
+                } else if (selected.value === task.ans) {
+                    feedbackHTML += `<li><span class="success-color">✔ Câu ${task.id}: Đúng!</span> <br><small>${task.exp}</small></li>`;
+                } else {
+                    allCorrect = false;
+                    feedbackHTML += `<li><span class="error-color">✘ Câu ${task.id}: Sai.</span> <br><small>${task.exp}</small></li>`;
+                }
+            });
+
+            showModal(allCorrect, allCorrect ? "Làm tốt lắm!" : "Sửa bài tập Task 1", `<ul style="list-style:none; padding:0; display:flex; flex-direction:column; gap:10px;">${feedbackHTML}</ul>`);
+        }
+
+        // Initialize on load
+        window.onload = initApp;
+
+    </script>
+</body>
+</html>
