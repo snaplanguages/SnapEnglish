@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kỹ năng đọc | SnapChinese</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Bảng màu HSK Pastel --- */
+        :root {
+            --primary-hsk: #7dbfb8; /* Xanh Mint chủ đạo */
+            --secondary-hsk: #93b5cf; /* Xanh dương nhạt */
+            --accent-hsk: #f4d06f; /* Vàng pastel */
+            --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            --text-main: #4a4a4a;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.9);
+        }
+
+        body { 
+            font-family: 'Quicksand', 'Noto Sans SC', sans-serif; 
+            margin: 0;
+            padding: 50px 20px;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: var(--text-main);
+        }
+
+        /* --- Background trang trí --- */
+        .shape {
+            position: fixed;
+            z-index: -1;
+            filter: blur(60px);
+            opacity: 0.4;
+        }
+        .shape-1 { width: 300px; height: 300px; background: var(--primary-hsk); top: -50px; right: -50px; border-radius: 50%; }
+        .shape-2 { width: 400px; height: 400px; background: var(--secondary-hsk); bottom: -100px; left: -100px; border-radius: 30% 70% 70% 30%; }
+
+        /* --- Header --- */
+        .header-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 { 
+            font-size: 38px; 
+            margin-bottom: 5px;
+            color: #5a7d7a;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-name { color: var(--primary-hsk); font-weight: 700; }
+
+        p.subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        /* --- Thanh Tìm Kiếm --- */
+        .search-wrapper {
+            max-width: 500px;
+            margin: 0 auto 50px auto;
+            position: relative;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 15px 25px;
+            border-radius: 15px;
+            border: 2px solid transparent;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            font-size: 16px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            box-sizing: border-box; 
+            transition: all 0.3s ease;
+        }
+
+        #searchInput:focus {
+            border-color: var(--primary-hsk);
+            outline: none;
+            background: #fff;
+        }
+
+        /* --- Grid --- */
+        .container { 
+            max-width: 1100px; 
+            margin: auto; 
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* --- Card HSK --- */
+        .unit-card { 
+            background: var(--glass-bg);
+            padding: 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease backwards;
+        }
+
+        .unit-card:hover {
+            transform: translateY(-5px);
+            background: #fff;
+            box-shadow: 0 12px 25px rgba(125, 191, 184, 0.2);
+            border-color: var(--primary-hsk);
+        }
+
+        .unit-icon {
+            font-size: 32px;
+            margin-right: 15px;
+            width: 60px;
+            height: 60px;
+            background: #f0f7f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            transition: 0.3s;
+        }
+
+        .unit-card:hover .unit-icon {
+            background: var(--primary-hsk);
+            color: white;
+        }
+
+        .unit-content { flex-grow: 1; }
+
+        .hsk-tag {
+            font-size: 10px;
+            background: var(--secondary-hsk);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .unit-title {
+            margin: 5px 0 0 0;
+            font-size: 17px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .hidden { display: none !important; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+
+    <div class="header-section">
+        <h1>🌸 Snap<span class="brand-name">Chinese</span></h1>
+        <p class="subtitle">Chinh phục HSK với lộ trình thông minh</p>
+    </div>
+    
+    <div class="search-wrapper">
+        <input type="text" id="searchInput" placeholder="Tìm tên bài, HSK (VD: Công việc, HSK 1)...">
+    </div>
+
+    <div class="container" id="unitContainer">
+        </div>
+
+    <script>
+        /**
+         * DANH SÁCH BÀI HỌC - BẠN THAY ĐỔI Ở ĐÂY
+         * icon: Có thể dùng Emoji hoặc chữ Hán
+         * hsk: Ghi rõ cấp độ để người dùng dễ tìm kiếm
+         */
+        const unitsData = [
+            { title: "Tôi không cười", hsk: "HSK 1", icon: "😐", url: "toi-khong-cuoi.html" },
+            { title: "Công việc của ba", hsk: "HSK 1", icon: "👷", url: "cong-viec-cua-ba.html" },
+            { title: "Tôi là ai", hsk: "HSK 1", icon: "👤", url: "toi-la-ai.html" },
+            { title: "Bạn có biết họ không?", hsk: "HSK 1", icon: " 👥❓", url: "ban-co-biet-ho-khong.html" },
+            { title: "Bạn đã lớn lên", hsk: "HSK 1", icon: " 🌿", url: "ban-da-lon-len.html" },
+            { title: "Tết Nguyên Tiêu", hsk: "HSK 2", icon: "🌕", url: "tet-nguyen-tieu.html" },
+            { title: "Tết Nguyên Đán", hsk: "HSK 2", icon: "🧧", url: "tet-nguyen-dan.html" }
+        ];
+
+        const container = document.getElementById('unitContainer');
+        const searchInput = document.getElementById('searchInput');
+
+        function renderUnits() {
+            container.innerHTML = '';
+            unitsData.forEach((unit, index) => {
+                const card = document.createElement('a');
+                card.className = 'unit-card';
+                card.href = unit.url;
+                // Đã gỡ bỏ card.target = "_blank";
+                card.setAttribute('data-search', `${unit.title} ${unit.hsk}`.toLowerCase());
+                card.style.animationDelay = `${index * 0.05}s`;
+
+                card.innerHTML = `
+                    <div class="unit-icon">${unit.icon}</div>
+                    <div class="unit-content">
+                        <span class="hsk-tag">${unit.hsk}</span>
+                        <h3 class="unit-title">${unit.title}</h3>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Search logic
+        searchInput.addEventListener('input', function() {
+            const filter = this.value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.unit-card');
+            
+            cards.forEach(card => {
+                const text = card.getAttribute('data-search');
+                card.classList.toggle('hidden', !text.includes(filter));
+            });
+        });
+
+        // Khởi tạo lần đầu
+        renderUnits();
+    </script>
+
+</body>
+</html>
