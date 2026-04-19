@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Bạn có biết họ không? </title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-main: #fcfcfc;
+            --box-bg: #ffffff;
+            --pastel-blue: #f1f5f9;
+            --pastel-pink: #fff0f5;
+            --text-main: #334155;
+            --text-pinyin: #eab308;
+            --highlight: #ec4899;
+            --tooltip-bg: #1e293b;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: transparent; 
+            color: var(--text-main);
+            margin: 0;
+            padding: 5px; 
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: 0 auto;
+            background: var(--box-bg);
+            border-radius: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04); 
+            padding: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: var(--highlight);
+            font-size: 26px;
+            margin: 0 0 5px 0;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin: 0;
+            font-style: italic;
+        }
+
+        /* KHUNG ĐIỀU KHIỂN ÂM THANH */
+        .audio-player {
+            background: #f8fafc;
+            padding: 12px 20px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            border: 1px solid #f1f5f9;
+        }
+
+        .btn-audio {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 14px;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-audio:hover { 
+            background: var(--highlight); 
+            color: white; 
+            border-color: var(--highlight); 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(236, 72, 153, 0.2);
+        }
+
+        .speed-control { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            font-size: 14px; 
+            color: #64748b;
+            font-weight: 600; 
+        }
+
+        select { 
+            padding: 6px 10px; 
+            border-radius: 8px; 
+            border: 1px solid #cbd5e1; 
+            font-family: inherit;
+            color: #334155;
+            cursor: pointer;
+            outline: none;
+        }
+        
+        select:focus { border-color: var(--highlight); }
+
+        /* KHUNG ĐỌC 2 CỘT */
+        .reader-wrapper {
+            display: flex;
+            gap: 20px;
+            height: 460px; 
+            margin-bottom: 30px;
+        }
+
+        .column {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 25px;
+            background: #fafaf9;
+            border-radius: 16px;
+            border: 1px solid #f3f4f6;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+
+        .column::-webkit-scrollbar { width: 5px; }
+        .column::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .column::-webkit-scrollbar-track { background: transparent; }
+
+        /* CỘT TIẾNG TRUNG */
+        .chinese-content {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end; 
+            gap: 15px 8px; 
+            line-height: 2.2;
+        }
+
+        .word-group {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .pinyin {
+            font-size: 12px; 
+            color: var(--text-pinyin);
+            font-weight: 600;
+            margin-bottom: -2px;
+        }
+
+        .char {
+            font-size: 26px; 
+            color: var(--text-main);
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding-bottom: 2px; 
+        }
+
+        /* TOOLTIP CHUYÊN NGHIỆP */
+        .word-group::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            top: 105%;
+            left: 50%;
+            transform: translateX(-50%) translateY(8px);
+            background: var(--tooltip-bg);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease;
+            z-index: 10;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .word-group:hover::after {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .word-group:hover .char {
+            color: var(--highlight);
+            transform: scale(1.08);
+        }
+        
+        .word-group:active .char {
+            transform: scale(0.95);
+        }
+
+        /* CỘT TIẾNG VIỆT */
+        .viet-content {
+            font-size: 16px; 
+            color: #475569;
+            line-height: 1.8;
+            text-align: justify;
+        }
+
+        .viet-content p {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        /* KHUNG KIẾN THỨC BÊN DƯỚI */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .info-box {
+            padding: 20px 25px;
+            border-radius: 16px;
+            font-size: 14.5px;
+            line-height: 1.6;
+        }
+
+        .grammar-box {
+            background: var(--pastel-blue);
+            color: #334155;
+        }
+
+        .tip-box {
+            background: var(--pastel-pink);
+            border: 1px dashed #f9a8d4;
+            color: #831843;
+        }
+
+        .info-box h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box p { margin: 8px 0; }
+
+        /* NÚT ĐIỀU HƯỚNG CỐ ĐỊNH */
+        .nav-fixed {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .btn-list { 
+            background: #ffffff; 
+            color: #64748b; 
+            border: 1px solid #e2e8f0; 
+        }
+        
+        .btn-next { 
+            background: var(--highlight); 
+            color: white; 
+        }
+
+        .btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1); 
+        }
+
+        @media (max-width: 768px) {
+            .reader-wrapper { flex-direction: column; height: auto; }
+            .column { height: 350px; }
+            .info-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>你认识他们吗</h1>
+        <p>Bạn Có Biết Họ Không?</p>
+    </div>
+
+    <div class="audio-player">
+        <button class="btn-audio" onclick="playAll()">▶ Nghe toàn bài</button>
+        <button class="btn-audio" onclick="pauseSpeech()">⏸ Tạm dừng</button>
+        <button class="btn-audio" onclick="stopSpeech()">⏹ Dừng lại</button>
+        <div class="speed-control">
+            <span>Tốc độ đọc:</span>
+            <select id="speedSelect">
+                <option value="0.6">Rất chậm (0.6x)</option>
+                <option value="0.85" selected>Vừa phải (0.85x)</option>
+                <option value="1">Bình thường (1.0x)</option>
+                <option value="1.2">Nhanh (1.2x)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="reader-wrapper">
+        <div class="column">
+            <div class="chinese-content" id="chineseContainer">
+                <div class="word-group" data-tooltip="Bạn"><span class="pinyin">nǐ</span><span class="char">你</span></div>
+                <div class="word-group" data-tooltip="Quen biết"><span class="pinyin">rèn shí</span><span class="char">认识</span></div>
+                <div class="word-group" data-tooltip="Này"><span class="pinyin">zhè</span><span class="char">这</span></div>
+                <div class="word-group" data-tooltip="Hai"><span class="pinyin">liǎng</span><span class="char">两</span></div>
+                <div class="word-group" data-tooltip="(Lượng từ)"><span class="pinyin">gè</span><span class="char">个</span></div>
+                <div class="word-group" data-tooltip="Người"><span class="pinyin">rén</span><span class="char">人</span></div>
+                <div class="word-group" data-tooltip="Không"><span class="pinyin">ma</span><span class="char">吗</span></div>
+                <span class="char">？</span>
+                <div class="word-group" data-tooltip="Cô ấy"><span class="pinyin">tā</span><span class="char">她</span></div>
+                <div class="word-group" data-tooltip="Là"><span class="pinyin">shì</span><span class="char">是</span></div>
+                <div class="word-group" data-tooltip="Của tôi"><span class="pinyin">wǒ de</span><span class="char">我的</span></div>
+                <div class="word-group" data-tooltip="Tiếng Trung"><span class="pinyin">zhōng wén</span><span class="char">中文</span></div>
+                <div class="word-group" data-tooltip="Giáo viên"><span class="pinyin">lǎo shī</span><span class="char">老师</span></div>
+                <span class="char">，</span>
+                <div class="word-group" data-tooltip="Họ"><span class="pinyin">xìng</span><span class="char">姓</span></div>
+                <div class="word-group" data-tooltip="Vương"><span class="pinyin">Wáng</span><span class="char">王</span></div>
+                <span class="char">；</span>
+                <div class="word-group" data-tooltip="Anh ấy"><span class="pinyin">tā</span><span class="char">他</span></div>
+                <div class="word-group" data-tooltip="Là"><span class="pinyin">shì</span><span class="char">是</span></div>
+                <div class="word-group" data-tooltip="Tôi"><span class="pinyin">wǒ</span><span class="char">我</span></div>
+                <div class="word-group" data-tooltip="Em trai"><span class="pinyin">dì di</span><span class="char">弟弟</span></div>
+                <div class="word-group" data-tooltip="Của (Trợ từ)"><span class="pinyin">de</span><span class="char">的</span></div>
+                <div class="word-group" data-tooltip="Tiếng Anh"><span class="pinyin">yīng wén</span><span class="char">英文</span></div>
+                <div class="word-group" data-tooltip="Giáo viên"><span class="pinyin">lǎo shī</span><span class="char">老师</span></div>
+                <span class="char">，</span>
+                <div class="word-group" data-tooltip="Họ"><span class="pinyin">xìng</span><span class="char">姓</span></div>
+                <div class="word-group" data-tooltip="Lý"><span class="pinyin">Lǐ</span><span class="char">李</span></div>
+                <span class="char">。</span>
+
+                <div style="width: 100%; height: 10px;"></div>
+
+                <div class="word-group" data-tooltip="Vương"><span class="pinyin">Wáng</span><span class="char">王</span></div>
+                <div class="word-group" data-tooltip="Giáo viên"><span class="pinyin">lǎo shī</span><span class="char">老师</span></div>
+                <div class="word-group" data-tooltip="Rất"><span class="pinyin">hěn</span><span class="char">很</span></div>
+                <div class="word-group" data-tooltip="Xinh đẹp"><span class="pinyin">piào liàng</span><span class="char">漂亮</span></div>
+                <span class="char">，</span>
+                <div class="word-group" data-tooltip="Cô ấy"><span class="pinyin">tā</span><span class="char">她</span></div>
+                <div class="word-group" data-tooltip="Năm nay"><span class="pinyin">jīn nián</span><span class="char">今年</span></div>
+                <div class="word-group" data-tooltip="28"><span class="pinyin">èr shí bā</span><span class="char">二十八</span></div>
+                <div class="word-group" data-tooltip="Tuổi"><span class="pinyin">suì</span><span class="char">岁</span></div>
+                <span class="char">，</span>
+                <div class="word-group" data-tooltip="Thích"><span class="pinyin">xǐ huān</span><span class="char">喜欢</span></div>
+                <div class="word-group" data-tooltip="Du lịch"><span class="pinyin">lǚ yóu</span><span class="char">旅游</span></div>
+                <div class="word-group" data-tooltip="Và"><span class="pinyin">hé</span><span class="char">和</span></div>
+                <div class="word-group" data-tooltip="Chạy bộ"><span class="pinyin">pǎo bù</span><span class="char">跑步</span></div>
+                <span class="char">。</span>
+                
+                <div class="word-group" data-tooltip="Lý"><span class="pinyin">Lǐ</span><span class="char">李</span></div>
+                <div class="word-group" data-tooltip="Giáo viên"><span class="pinyin">lǎo shī</span><span class="char">老师</span></div>
+                <div class="word-group" data-tooltip="Rất"><span class="pinyin">hěn</span><span class="char">很</span></div>
+                <div class="word-group" data-tooltip="Cao"><span class="pinyin">gāo</span><span class="char">高</span></div>
+                <span class="char">，</span>
+                <div class="word-group" data-tooltip="Năm nay"><span class="pinyin">jīn nián</span><span class="char">今年</span></div>
+                <div class="word-group" data-tooltip="32"><span class="pinyin">sān shí èr</span><span class="char">三十二</span></div>
+                <div class="word-group" data-tooltip="Tuổi"><span class="pinyin">suì</span><span class="char">岁</span></div>
+                <span class="char">，</span>
+                <div class="word-group" data-tooltip="Ở"><span class="pinyin">zài</span><span class="char">在</span></div>
+                <div class="word-group" data-tooltip="Đại học"><span class="pinyin">dà xué</span><span class="char">大学</span></div>
+                <div class="word-group" data-tooltip="Làm việc"><span class="pinyin">gōng zuò</span><span class="char">工作</span></div>
+                <span class="char">。</span>
+
+                <div style="width: 100%; height: 10px;"></div>
+
+                <div class="word-group" data-tooltip="Bọn họ"><span class="pinyin">tā men</span><span class="char">他们</span></div>
+                <div class="word-group" data-tooltip="Hai"><span class="pinyin">liǎng</span><span class="char">两</span></div>
+                <div class="word-group" data-tooltip="(Lượng từ)"><span class="pinyin">gè</span><span class="char">个</span></div>
+                <div class="word-group" data-tooltip="Người"><span class="pinyin">rén</span><span class="char">人</span></div>
+                <div class="word-group" data-tooltip="Quen biết"><span class="pinyin">rèn shí</span><span class="char">认识</span></div>
+                <div class="word-group" data-tooltip="Năm (5)"><span class="pinyin">wǔ</span><span class="char">五</span></div>
+                <div class="word-group" data-tooltip="Năm"><span class="pinyin">nián</span><span class="char">年</span></div>
+                <div class="word-group" data-tooltip="Rồi"><span class="pinyin">le</span><span class="char">了</span></div>
+                <span class="char">，</span>
+                <div class="word-group" data-tooltip="Có"><span class="pinyin">yǒu</span><span class="char">有</span></div>
+                <div class="word-group" data-tooltip="Một"><span class="pinyin">yī</span><span class="char">一</span></div>
+                <div class="word-group" data-tooltip="(Lượng từ)"><span class="pinyin">gè</span><span class="char">个</span></div>
+                <div class="word-group" data-tooltip="Con gái"><span class="pinyin">nǚ ér</span><span class="char">女儿</span></div>
+                <div class="word-group" data-tooltip="Và"><span class="pinyin">hé</span><span class="char">和</span></div>
+                <div class="word-group" data-tooltip="Một"><span class="pinyin">yī</span><span class="char">一</span></div>
+                <div class="word-group" data-tooltip="(Lượng từ)"><span class="pinyin">gè</span><span class="char">个</span></div>
+                <div class="word-group" data-tooltip="Con trai"><span class="pinyin">ér zi</span><span class="char">儿子</span></div>
+                <span class="char">。</span>
+                
+                <div class="word-group" data-tooltip="Con gái"><span class="pinyin">nǚ ér</span><span class="char">女儿</span></div>
+                <div class="word-group" data-tooltip="Một"><span class="pinyin">yī</span><span class="char">一</span></div>
+                <div class="word-group" data-tooltip="Tuổi"><span class="pinyin">suì</span><span class="char">岁</span></div>
+                <span class="char">，</span>
+                <div class="word-group" data-tooltip="Con trai"><span class="pinyin">ér zi</span><span class="char">儿子</span></div>
+                <div class="word-group" data-tooltip="Ba"><span class="pinyin">sān</span><span class="char">三</span></div>
+                <div class="word-group" data-tooltip="Tuổi"><span class="pinyin">suì</span><span class="char">岁</span></div>
+                <span class="char">，</span>
+                <div class="word-group" data-tooltip="Bọn họ"><span class="pinyin">tā men</span><span class="char">他们</span></div>
+                <div class="word-group" data-tooltip="Biết"><span class="pinyin">huì</span><span class="char">会</span></div>
+                <div class="word-group" data-tooltip="Nói"><span class="pinyin">shuō</span><span class="char">说</span></div>
+                <div class="word-group" data-tooltip="Tiếng Trung"><span class="pinyin">zhōng wén</span><span class="char">中文</span></div>
+                <span class="char">，</span>
+                <div class="word-group" data-tooltip="Cũng"><span class="pinyin">yě</span><span class="char">也</span></div>
+                <div class="word-group" data-tooltip="Biết"><span class="pinyin">huì</span><span class="char">会</span></div>
+                <div class="word-group" data-tooltip="Nói"><span class="pinyin">shuō</span><span class="char">说</span></div>
+                <div class="word-group" data-tooltip="Tiếng Anh"><span class="pinyin">yīng wén</span><span class="char">英文</span></div>
+                <span class="char">。</span>
+
+                <div style="width: 100%; height: 10px;"></div>
+
+                <div class="word-group" data-tooltip="Vương"><span class="pinyin">Wáng</span><span class="char">王</span></div>
+                <div class="word-group" data-tooltip="Giáo viên"><span class="pinyin">lǎo shī</span><span class="char">老师</span></div>
+                <div class="word-group" data-tooltip="Và"><span class="pinyin">hé</span><span class="char">和</span></div>
+                <div class="word-group" data-tooltip="Lý"><span class="pinyin">Lǐ</span><span class="char">李</span></div>
+                <div class="word-group" data-tooltip="Giáo viên"><span class="pinyin">lǎo shī</span><span class="char">老师</span></div>
+                <div class="word-group" data-tooltip="Đều"><span class="pinyin">dōu</span><span class="char">都</span></div>
+                <div class="word-group" data-tooltip="Là"><span class="pinyin">shì</span><span class="char">是</span></div>
+                <div class="word-group" data-tooltip="Rất"><span class="pinyin">hěn</span><span class="char">很</span></div>
+                <div class="word-group" data-tooltip="Tốt"><span class="pinyin">hǎo</span><span class="char">好</span></div>
+                <div class="word-group" data-tooltip="Của (Trợ từ)"><span class="pinyin">de</span><span class="char">的</span></div>
+                <div class="word-group" data-tooltip="Người"><span class="pinyin">rén</span><span class="char">人</span></div>
+                <span class="char">，</span>
+                <div class="word-group" data-tooltip="Tôi"><span class="pinyin">wǒ</span><span class="char">我</span></div>
+                <div class="word-group" data-tooltip="Và"><span class="pinyin">hé</span><span class="char">和</span></div>
+                <div class="word-group" data-tooltip="Em trai"><span class="pinyin">dì di</span><span class="char">弟弟</span></div>
+                <div class="word-group" data-tooltip="Đều"><span class="pinyin">dōu</span><span class="char">都</span></div>
+                <div class="word-group" data-tooltip="Rất"><span class="pinyin">hěn</span><span class="char">很</span></div>
+                <div class="word-group" data-tooltip="Thích"><span class="pinyin">xǐ huān</span><span class="char">喜欢</span></div>
+                <div class="word-group" data-tooltip="Bọn họ"><span class="pinyin">tā men</span><span class="char">他们</span></div>
+                <span class="char">。</span>
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="viet-content">
+                <p>Bạn có quen biết hai người này không? Cô ấy là giáo viên tiếng Trung của tôi, họ Vương; thầy ấy là giáo viên tiếng Anh của em trai tôi, họ Lý.</p>
+                <p>Cô Vương rất xinh đẹp, cô ấy năm nay 28 tuổi, thích đi du lịch và chạy bộ. Thầy Lý rất cao, năm nay 32 tuổi, làm việc tại trường đại học.</p>
+                <p>Hai người họ quen biết nhau 5 năm rồi, có một người con gái và một người con trai. Con gái 1 tuổi, con trai 3 tuổi, chúng biết nói tiếng Trung, cũng biết nói tiếng Anh.</p>
+                <p>Cô Vương và thầy Lý đều là những người rất tốt, tôi và em trai đều rất thích họ.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-grid">
+        <div class="info-box grammar-box">
+            <h3 style="color: #0284c7;">📘 Ngữ pháp chi tiết</h3>
+            <p>• <b>认识 (rèn shí)</b>: "Quen biết, nhận biết" một người hoặc một mặt chữ. (Khác với <b>知道 zhī dào</b> là biết một thông tin, sự việc).</p>
+            <p>• <b>会 + Động từ (huì...)</b>: Biết làm gì đó thông qua quá trình học tập, rèn luyện. Ví dụ: <b>会说中文</b> (Biết nói tiếng Trung).</p>
+            <p>• <b>都 + Động từ/Tính từ (dōu)</b>: Phó từ mang nghĩa "Đều". Lưu ý: "Đều là" sẽ nói là <b>都是</b>, "Đều rất" là <b>都很</b>.</p>
+        </div>
+        <div class="info-box tip-box">
+            <h3>✨ Mẹo nhớ hay</h3>
+            <p>Phân biệt <b>男 (Nam)</b> và <b>女 (Nữ)</b>: Chữ <b>男</b> gồm bộ <b>田 (Điền - ruộng)</b> và bộ <b>力 (Lực - sức mạnh)</b> -> Người đàn ông dùng sức làm ruộng. Chữ <b>女</b> mang hình dáng mềm mại của người phụ nữ.</p>
+            <p>Từ <b>旅游 (Du lịch)</b>: Cả hai chữ đều có bộ <b>方 (Phương - phương hướng)</b>, thể hiện việc đi lại khắp bốn phương.</p>
+        </div>
+    </div>
+</div>
+
+<div class="nav-fixed">
+    <a href="doc-hsk.html" class="btn btn-list">🏠 Danh sách</a>
+    <a href="ban-da-lon-len.html" class="btn btn-next">Bài tiếp theo ➜</a>
+</div>
+
+<script>
+    const synth = window.speechSynthesis;
+    let premiumVoice = null;
+
+    // Hàm chọn lọc giọng đọc tự nhiên nhất có sẵn trên thiết bị
+    function setBestVoice() {
+        const voices = synth.getVoices();
+        const zhVoices = voices.filter(v => v.lang.includes('zh'));
+        
+        if (zhVoices.length > 0) {
+            // Ưu tiên các giọng đọc AI của Microsoft Edge (Xiaoxiao, Yunjian), Google Cloud, hoặc Siri (Ting-Ting)
+            premiumVoice = zhVoices.find(v => 
+                v.name.includes('Xiaoxiao') || 
+                v.name.includes('Yunjian') || 
+                v.name.includes('Google') || 
+                v.name.includes('Ting-Ting') ||
+                v.name.includes('Premium')
+            ) || zhVoices[0]; // Nếu không có giọng xịn thì lấy giọng tiếng Trung đầu tiên tìm thấy
+        }
+    }
+
+    // Chrome/Edge cần sự kiện này để load danh sách giọng đọc
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = setBestVoice;
+    }
+
+    // Hàm phát âm cốt lõi
+    function speak(text) {
+        if (synth.speaking) synth.cancel(); // Ngắt giọng cũ nếu đang đọc dở
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        if (premiumVoice) {
+            utterance.voice = premiumVoice;
+        }
+        utterance.lang = 'zh-CN';
+        utterance.rate = parseFloat(document.getElementById('speedSelect').value);
+        utterance.pitch = 1.05; // Tăng nhẹ độ cao âm thanh để nghe thanh thoát hơn
+
+        synth.speak(utterance);
+    }
+
+    // Tự động gắn chức năng đọc cho từng từ vựng trong bài
+    document.addEventListener("DOMContentLoaded", () => {
+        const wordGroups = document.querySelectorAll('.word-group');
+        wordGroups.forEach(group => {
+            group.addEventListener('click', function() {
+                const charText = this.querySelector('.char').innerText;
+                speak(charText);
+            });
+        });
+    });
+
+    // Hàm đọc toàn bộ bài
+    function playAll() {
+        const container = document.getElementById('chineseContainer');
+        // Lấy toàn bộ chữ Hán, bao gồm cả dấu câu để AI ngắt nghỉ đúng chỗ
+        let fullText = "";
+        container.childNodes.forEach(node => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                if (node.classList.contains('word-group')) {
+                    fullText += node.querySelector('.char').innerText;
+                } else if (node.classList.contains('char')) {
+                    fullText += node.innerText; // Lấy dấu câu
+                }
+            } else if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== "") {
+                fullText += node.textContent.trim();
+            }
+        });
+        
+        speak(fullText.trim());
+    }
+
+    function pauseSpeech() {
+        if (synth.speaking && !synth.paused) synth.pause();
+        else if (synth.paused) synth.resume();
+    }
+
+    function stopSpeech() {
+        synth.cancel();
+    }
+</script>
+
+</body>
+</html>
