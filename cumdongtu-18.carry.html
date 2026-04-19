@@ -1,0 +1,544 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 18: CARRY - Travel Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette: Vintage Travel */
+            --passport-blue: #1A365D;
+            --stamp-red: #E53E3E;
+            --paper-cream: #FFF5F5;
+            --luggage-brown: #7B341E;
+            --map-beige: #FDF6E3;
+            --ocean-teal: #38B2AC;
+            
+            --success: #48BB78;
+            --error: #F56565;
+            --shadow: 4px 4px 0px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--map-beige);
+            color: var(--passport-blue);
+            margin: 0;
+            padding: 40px 20px;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.5) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(255,255,255,0.5) 2px, transparent 2px);
+            background-size: 40px 40px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+            background: white;
+            padding: 30px;
+            border: 2px dashed var(--passport-blue);
+            border-radius: 20px;
+            transform: rotate(-1deg);
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-family: 'Caveat', cursive;
+            font-size: 4rem;
+            color: var(--luggage-brown);
+            margin: 0;
+            line-height: 1;
+        }
+
+        .stamp-icon {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 3rem;
+            transform: rotate(20deg);
+            opacity: 0.8;
+        }
+
+        .subtitle {
+            margin-top: 10px;
+            font-weight: 700;
+            color: var(--ocean-teal);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* LUGGAGE GRID (THEORY) */
+        .luggage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 60px;
+        }
+
+        .luggage-tag {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border-top: 8px solid var(--luggage-brown);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            position: relative;
+            transition: transform 0.3s;
+        }
+
+        .luggage-tag:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Hole for tag string */
+        .luggage-tag::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 15px;
+            height: 15px;
+            background: var(--map-beige);
+            border-radius: 50%;
+            border: 2px solid #DDD;
+        }
+
+        .phrasal-verb {
+            font-family: 'Caveat', cursive;
+            font-size: 2rem;
+            color: var(--passport-blue);
+            margin-top: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .meaning-group {
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #EEE;
+            padding-bottom: 10px;
+        }
+
+        .meaning-group:last-child {
+            border-bottom: none;
+        }
+
+        .meaning {
+            font-weight: 700;
+            color: var(--stamp-red);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .eng-def {
+            font-size: 0.9rem;
+            color: #888;
+            font-style: italic;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .example {
+            background: #F0FFF4;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #2F855A;
+        }
+
+        /* BOARDING PASS (EXERCISE) */
+        .boarding-pass {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        .pass-header {
+            background: var(--passport-blue);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-family: 'Caveat', cursive;
+            font-size: 2.5rem;
+        }
+
+        .pass-body {
+            padding: 40px;
+        }
+
+        .question-item {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px dashed #E2E8F0;
+        }
+
+        .q-text {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background: #F7FAFC;
+            border: 2px solid #CBD5E0;
+            padding: 12px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1rem;
+            transition: all 0.2s;
+            color: var(--passport-blue);
+        }
+
+        .option-btn:hover {
+            border-color: var(--ocean-teal);
+            background: #E6FFFA;
+        }
+
+        .option-btn.correct {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .option-btn.incorrect {
+            background: var(--error);
+            color: white;
+            border-color: var(--error);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            background: #FFF5F5;
+            border-radius: 10px;
+            border-left: 5px solid var(--stamp-red);
+            display: none;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="stamp-icon">✈️</div>
+        <h1>Unit 18: CARRY</h1>
+        <div class="subtitle">Pack Your Knowledge & Go</div>
+    </header>
+
+    <div class="luggage-grid">
+        
+        <div class="luggage-tag" style="border-top-color: var(--ocean-teal);">
+            <div class="phrasal-verb">Carry on</div>
+            
+            <div class="meaning-group">
+                <span class="meaning">Tiếp tục</span>
+                <span class="eng-def">= continue</span>
+                <div class="example">"You've got to <b>carry on</b> as though nothing happened."</div>
+            </div>
+
+            <div class="meaning-group">
+                <span class="meaning">Cư xử không đúng / Dan díu</span>
+                <span class="eng-def">= behave badly / have a sexual relationship</span>
+                <div class="example">"Is it true that Rachel and Marcus have been <b>carrying on</b>?"</div>
+            </div>
+        </div>
+
+        <div class="luggage-tag" style="border-top-color: var(--stamp-red);">
+            <div class="phrasal-verb">Carry out</div>
+            
+            <div class="meaning-group">
+                <span class="meaning">Tiến hành / Thực hiện</span>
+                <span class="eng-def">= conduct / perform / complete / fulfill</span>
+                <div class="example">"The attacks were <b>carried out</b> by nationalists."</div>
+            </div>
+        </div>
+
+        <div class="luggage-tag" style="border-top-color: var(--passport-blue);">
+            <div class="phrasal-verb">Carry off</div>
+            
+            <div class="meaning-group">
+                <span class="meaning">Thành công (việc khó) / Chiến thắng</span>
+                <span class="eng-def">= succeed / win</span>
+                <div class="example">"He <b>carried off</b> all the prizes."</div>
+            </div>
+
+            <div class="meaning-group">
+                <span class="meaning">Mang đi / Giết chết</span>
+                <span class="eng-def">= remove / cause to die</span>
+                <div class="example">"He was <b>carried off</b> by pneumonia."</div>
+            </div>
+        </div>
+
+        <div class="luggage-tag" style="border-top-color: var(--luggage-brown);">
+            <div class="phrasal-verb">Carry over</div>
+            
+            <div class="meaning-group">
+                <span class="meaning">Chuyển sang / Kéo dài sang</span>
+                <span class="eng-def">= move to or come from a place/time</span>
+                <div class="example">"Problems at work <b>carry over</b> into my private life."</div>
+            </div>
+        </div>
+
+        <div class="luggage-tag" style="border-top-color: #F6AD55;">
+            <div class="phrasal-verb">Carry through</div>
+            
+            <div class="meaning-group">
+                <span class="meaning">Hoàn thành</span>
+                <span class="eng-def">= complete</span>
+                <div class="example">"Determined to <b>carry</b> our plans <b>through</b> to completion."</div>
+            </div>
+
+            <div class="meaning-group">
+                <span class="meaning">Giúp vượt qua khó khăn</span>
+                <span class="eng-def">= help to continue</span>
+                <div class="example">"My savings <b>carried me through</b> that difficult time."</div>
+            </div>
+        </div>
+
+        <div class="luggage-tag" style="border-top-color: #9B2C2C;">
+            <div class="phrasal-verb">Others</div>
+            
+            <div class="meaning-group">
+                <span class="meaning">Carry back: Gợi nhớ / Mang trả lại</span>
+                <span class="eng-def">= remind / take back</span>
+                <div class="example">"The smell <b>carried her back</b> to her childhood."</div>
+            </div>
+
+            <div class="meaning-group">
+                <span class="meaning">Carry forward: Cộng vào / Tiến bộ</span>
+                <span class="eng-def">= add on / make progress</span>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="boarding-pass">
+        <div class="pass-header">
+            🛫 Boarding Pass: Exercise 18 🛬
+        </div>
+        <div class="pass-body">
+
+            <div class="question-item" id="q148">
+                <div class="q-text">148. The championship game was so intense that I really had to rely on my mental toughness to carry me _______.</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="check(148, 'A')">A. through</button>
+                    <button class="option-btn" onclick="check(148, 'B')">B. over</button>
+                    <button class="option-btn" onclick="check(148, 'C')">C. back</button>
+                    <button class="option-btn" onclick="check(148, 'D')">D. forward</button>
+                </div>
+                <div class="feedback" id="fb-148"></div>
+            </div>
+
+            <div class="question-item" id="q149">
+                <div class="q-text">149. I am very upset because I have just discovered that my daughter _______ with a married man.</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="check(149, 'A')">A. has been carrying through</button>
+                    <button class="option-btn" onclick="check(149, 'B')">B. is carrying on</button>
+                    <button class="option-btn" onclick="check(149, 'C')">C. has carried over</button>
+                    <button class="option-btn" onclick="check(149, 'D')">D. is carrying forward</button>
+                </div>
+                <div class="feedback" id="fb-149"></div>
+            </div>
+
+            <div class="question-item" id="q150">
+                <div class="q-text">150. I wouldn't dare wear anything that outrageous, but Michelle _______ wonderfully.</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="check(150, 'A')">A. carried it off</button>
+                    <button class="option-btn" onclick="check(150, 'B')">B. carried out it</button>
+                    <button class="option-btn" onclick="check(150, 'C')">C. carried it back</button>
+                    <button class="option-btn" onclick="check(150, 'D')">D. carried it over</button>
+                </div>
+                <div class="feedback" id="fb-150"></div>
+            </div>
+
+            <div class="question-item" id="q151">
+                <div class="q-text">151. Stresses at work can often be _______ into your home life.</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="check(151, 'A')">A. carried through</button>
+                    <button class="option-btn" onclick="check(151, 'B')">B. carried over</button>
+                    <button class="option-btn" onclick="check(151, 'C')">C. carried back</button>
+                    <button class="option-btn" onclick="check(151, 'D')">D. carried off</button>
+                </div>
+                <div class="feedback" id="fb-151"></div>
+            </div>
+
+            <div class="question-item" id="q152">
+                <div class="q-text">152. The average assets _______ from season to season varied from minus $630,000 to plus $770,000.</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="check(152, 'A')">A. carry back</button>
+                    <button class="option-btn" onclick="check(152, 'B')">B. carried forward</button>
+                    <button class="option-btn" onclick="check(152, 'C')">C. carry off</button>
+                    <button class="option-btn" onclick="check(152, 'D')">D. carried out</button>
+                </div>
+                <div class="feedback" id="fb-152"></div>
+            </div>
+
+            <div class="question-item" id="q153">
+                <div class="q-text">153. Everyone was shocked when that little-known band _______ the night's biggest award.</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="check(153, 'A')">A. carried on</button>
+                    <button class="option-btn" onclick="check(153, 'B')">B. carried out</button>
+                    <button class="option-btn" onclick="check(153, 'C')">C. carried back</button>
+                    <button class="option-btn" onclick="check(153, 'D')">D. carried off</button>
+                </div>
+                <div class="feedback" id="fb-153"></div>
+            </div>
+
+            <div class="question-item" id="q154">
+                <div class="q-text">154. Dianne _______ the family tradition by becoming a lawyer.</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="check(154, 'A')">A. carry over</button>
+                    <button class="option-btn" onclick="check(154, 'B')">B. was carrying back</button>
+                    <button class="option-btn" onclick="check(154, 'C')">C. is carrying on</button>
+                    <button class="option-btn" onclick="check(154, 'D')">D. is carrying out</button>
+                </div>
+                <div class="feedback" id="fb-154"></div>
+            </div>
+
+            <div class="question-item" id="q155">
+                <div class="q-text">155. We don't have the confidence that the UN will _______ a sustained program.</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="check(155, 'A')">A. carry up</button>
+                    <button class="option-btn" onclick="check(155, 'B')">B. carry back</button>
+                    <button class="option-btn" onclick="check(155, 'C')">C. carry though (through)</button>
+                    <button class="option-btn" onclick="check(155, 'D')">D. carry on</button>
+                </div>
+                <div class="feedback" id="fb-155"></div>
+            </div>
+
+            <div class="question-item" id="q156">
+                <div class="q-text">156. This carries me _______ to the times of knights and jousting.</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="check(156, 'A')">A. through</button>
+                    <button class="option-btn" onclick="check(156, 'B')">B. over</button>
+                    <button class="option-btn" onclick="check(156, 'C')">C. back</button>
+                    <button class="option-btn" onclick="check(156, 'D')">D. forward</button>
+                </div>
+                <div class="feedback" id="fb-156"></div>
+            </div>
+
+            <div class="question-item" id="q157">
+                <div class="q-text">157. Good quality, well integrated staff will carry the company _______.</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="check(157, 'A')">A. out</button>
+                    <button class="option-btn" onclick="check(157, 'B')">B. over</button>
+                    <button class="option-btn" onclick="check(157, 'C')">C. on</button>
+                    <button class="option-btn" onclick="check(157, 'D')">D. forward</button>
+                </div>
+                <div class="feedback" id="fb-157"></div>
+            </div>
+
+            <div class="question-item" id="q158">
+                <div class="q-text">158. Ethel forgot to put that expensive necklace in the safe, and one of the party guests _______.</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="check(158, 'A')">A. carried it forward</button>
+                    <button class="option-btn" onclick="check(158, 'B')">B. carried it off</button>
+                    <button class="option-btn" onclick="check(158, 'C')">C. carried it through</button>
+                    <button class="option-btn" onclick="check(158, 'D')">D. carried it over</button>
+                </div>
+                <div class="feedback" id="fb-158"></div>
+            </div>
+
+            <div class="question-item" id="q159">
+                <div class="q-text">159. A survey is now being carried _______ nationwide.</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="check(159, 'A')">A. out</button>
+                    <button class="option-btn" onclick="check(159, 'B')">B. over</button>
+                    <button class="option-btn" onclick="check(159, 'C')">C. on</button>
+                    <button class="option-btn" onclick="check(159, 'D')">D. forward</button>
+                </div>
+                <div class="feedback" id="fb-159"></div>
+            </div>
+
+            <div class="question-item" id="q160">
+                <div class="q-text">160. Unfortunately, the injuries from the accident were so severe that they _______.</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="check(160, 'A')">A. carried him off</button>
+                    <button class="option-btn" onclick="check(160, 'B')">B. put him off</button>
+                    <button class="option-btn" onclick="check(160, 'C')">C. took him off</button>
+                    <button class="option-btn" onclick="check(160, 'D')">D. called him off</button>
+                </div>
+                <div class="feedback" id="fb-160"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    const answers = {
+        148: { key: 'A', note: "<b>Carry sb through:</b> Giúp ai vượt qua khó khăn (mental toughness - sự dẻo dai tinh thần giúp vượt qua trận đấu)." },
+        149: { key: 'B', note: "<b>Carry on with:</b> Có mối quan hệ lén lút/dan díu với ai." },
+        150: { key: 'A', note: "<b>Carry it off:</b> Thành công trong việc gì khó khăn (mặc bộ đồ kì quặc mà vẫn đẹp)." },
+        151: { key: 'B', note: "<b>Carry over:</b> Chuyển sang, lan sang (áp lực công việc lan sang đời sống gia đình)." },
+        152: { key: 'B', note: "<b>Carry forward:</b> Cộng vào/Chuyển sang (kế toán, tài chính - assets)." },
+        153: { key: 'D', note: "<b>Carry off:</b> Đoạt giải, chiến thắng (the night's biggest award)." },
+        154: { key: 'C', note: "<b>Carry on:</b> Tiếp tục (truyền thống gia đình)." },
+        155: { key: 'C', note: "<b>Carry through:</b> Hoàn thành (một chương trình bền vững). *Lưu ý: Đáp án C trong sách là 'carry though' (lỗi chính tả của 'through')." },
+        156: { key: 'C', note: "<b>Carry back:</b> Gợi nhớ về quá khứ (times of knights)." },
+        157: { key: 'D', note: "<b>Carry forward:</b> Giúp tiến bộ, phát triển (đưa công ty đi lên)." },
+        158: { key: 'B', note: "<b>Carry off:</b> Mang đi, đánh cắp (trang sức)." },
+        159: { key: 'A', note: "<b>Carry out:</b> Tiến hành (khảo sát/survey)." },
+        160: { key: 'A', note: "<b>Carry sb off:</b> Giết chết ai (vì bệnh tật/tai nạn)." }
+    };
+
+    const answered = new Set();
+
+    function check(qId, choice) {
+        if (answered.has(qId)) return;
+        
+        const correct = answers[qId].key;
+        const note = answers[qId].note;
+        const feedbackEl = document.getElementById(`fb-${qId}`);
+        const buttons = document.querySelectorAll(`#q${qId} .option-btn`);
+
+        answered.add(qId);
+
+        buttons.forEach(btn => {
+            const txt = btn.innerText.split('.')[0].trim();
+            if (txt === correct) {
+                btn.classList.add('correct');
+            } else if (txt === choice) {
+                btn.classList.add('incorrect');
+            }
+            btn.style.cursor = 'default';
+        });
+
+        feedbackEl.style.display = 'block';
+        if (choice === correct) {
+            feedbackEl.innerHTML = `<span style="color: var(--success); font-weight: bold;">✔ Chính xác!</span> ${note}`;
+        } else {
+            feedbackEl.innerHTML = `<span style="color: var(--error); font-weight: bold;">✘ Sai rồi.</span> Đáp án là <b>${correct}</b>.<br>${note}`;
+        }
+    }
+</script>
+
+</body>
+</html>

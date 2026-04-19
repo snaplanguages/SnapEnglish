@@ -1,0 +1,738 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 12: BRING - Vintage Postal Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Special+Elite&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper-bg: #F4E4BC;
+            --ink-blue: #2C3E50;
+            --stamp-red: #C0392B;
+            --envelope-border: #D35400;
+            --postmark-grey: #7F8C8D;
+            --highlight: #E67E22;
+            --shadow: 4px 4px 10px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #EFE6D5;
+            color: var(--ink-blue);
+            margin: 0;
+            padding: 40px 20px;
+            background-image: repeating-linear-gradient(45deg, #E8DCC2 0px, #E8DCC2 10px, #EFE6D5 10px, #EFE6D5 20px);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            border: 5px double var(--ink-blue);
+            padding: 30px;
+            background: var(--paper-bg);
+            box-shadow: var(--shadow);
+            position: relative;
+            transform: rotate(-1deg);
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 3.5rem;
+            margin: 0;
+            color: var(--ink-blue);
+            border-bottom: 2px solid var(--ink-blue);
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        .stamp {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            border: 3px dashed var(--stamp-red);
+            color: var(--stamp-red);
+            padding: 10px 15px;
+            font-family: 'Special Elite', cursive;
+            font-weight: bold;
+            transform: rotate(15deg);
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .subtitle {
+            font-family: 'Special Elite', cursive;
+            margin-top: 15px;
+            font-size: 1.2rem;
+        }
+
+        /* PARCEL GRID (THEORY) */
+        .parcel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .parcel {
+            background: #FFFBF0;
+            border: 1px solid #CCC;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+            border-top: 5px solid var(--envelope-border);
+        }
+
+        .parcel:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+        }
+
+        .parcel-icon {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--ink-blue);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border: 3px solid #FFFBF0;
+        }
+
+        .phrasal-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem;
+            color: var(--envelope-border);
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #CCC;
+            padding-bottom: 10px;
+        }
+
+        .def-group {
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .meaning {
+            font-weight: 700;
+            color: var(--ink-blue);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .eng-def {
+            font-size: 0.85rem;
+            color: var(--postmark-grey);
+            font-style: italic;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .example {
+            background: #F2F2F2;
+            padding: 8px;
+            border-left: 3px solid var(--ink-blue);
+            font-size: 0.9rem;
+            color: #444;
+        }
+
+        /* EXERCISE SECTION */
+        .sorting-office {
+            background: var(--paper-bg);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            border: 2px dashed var(--ink-blue);
+        }
+
+        .office-title {
+            font-family: 'Special Elite', cursive;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--ink-blue);
+            text-transform: uppercase;
+            text-decoration: underline wavy var(--stamp-red);
+        }
+
+        .question-box {
+            background: white;
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid var(--postmark-grey);
+        }
+
+        .q-text {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .opt-btn {
+            padding: 12px;
+            border: 1px solid #AAA;
+            background: #F9F9F9;
+            cursor: pointer;
+            text-align: left;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .opt-btn:hover {
+            background: var(--ink-blue);
+            color: white;
+            border-color: var(--ink-blue);
+        }
+
+        .opt-btn.correct {
+            background: #27AE60;
+            color: white;
+            border-color: #27AE60;
+        }
+
+        .opt-btn.incorrect {
+            background: var(--stamp-red);
+            color: white;
+            border-color: var(--stamp-red);
+        }
+
+        .feedback {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            display: none;
+            padding: 10px;
+            background: #ECF0F1;
+            border-left: 4px solid var(--highlight);
+            font-family: 'Roboto', sans-serif;
+        }
+
+        @media (max-width: 700px) {
+            .options { grid-template-columns: 1fr; }
+            h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="stamp">AIR MAIL<br>PRIORITY</div>
+        <h1>Unit 12: BRING</h1>
+        <div class="subtitle">Special Delivery of Knowledge</div>
+    </header>
+
+    <div class="parcel-grid">
+        
+        <div class="parcel">
+            <div class="parcel-icon">🌪️</div>
+            <div class="phrasal-title">Bring about</div>
+            <div class="def-group">
+                <span class="meaning">Gây ra, đem lại</span>
+                <span class="eng-def">= cause</span>
+                <div class="example">"How can we bring about a change in attitudes?"</div>
+            </div>
+        </div>
+
+        <div class="parcel">
+            <div class="parcel-icon">🔙</div>
+            <div class="phrasal-title">Bring back</div>
+            <div class="def-group">
+                <span class="meaning">1. Giới thiệu lại</span>
+                <span class="eng-def">= reintroduce</span>
+                <div class="example">"The council has decided to bring back the old trams."</div>
+            </div>
+            <div class="def-group">
+                <span class="meaning">2. Gợi nhớ</span>
+                <span class="eng-def">= remind sb of sb/st</span>
+                <div class="example">"The trip brought back a lot of happy memories."</div>
+            </div>
+        </div>
+
+        <div class="parcel">
+            <div class="parcel-icon">⬇️</div>
+            <div class="phrasal-title">Bring down</div>
+            <div class="def-group">
+                <span class="meaning">1. Đánh bại, hạ bệ</span>
+                <span class="eng-def">= make sb lose power</span>
+            </div>
+            <div class="def-group">
+                <span class="meaning">2. Làm ai ngã (thể thao)</span>
+                <span class="eng-def">= make sb fall over</span>
+            </div>
+            <div class="def-group">
+                <span class="meaning">3. Làm hạ, tụt giảm (mức độ/tỉ lệ)</span>
+                <span class="eng-def">= reduce the level/rate</span>
+            </div>
+            <div class="def-group">
+                <span class="meaning">4. Hạ cánh</span>
+                <span class="eng-def">= land</span>
+            </div>
+        </div>
+
+        <div class="parcel">
+            <div class="parcel-icon">⏩</div>
+            <div class="phrasal-title">Bring forward</div>
+            <div class="def-group">
+                <span class="meaning">1. Diễn ra sớm hơn</span>
+                <span class="eng-def">= cause to happen earlier</span>
+            </div>
+            <div class="def-group">
+                <span class="meaning">2. Đề ra, nêu ra, đề xuất</span>
+                <span class="eng-def">= suggest st for discussion</span>
+            </div>
+        </div>
+
+        <div class="parcel">
+            <div class="parcel-icon">📥</div>
+            <div class="phrasal-title">Bring in</div>
+            <div class="def-group">
+                <span class="meaning">1. Nhờ ai đưa lời khuyên/giúp đỡ</span>
+                <span class="eng-def">= ask sb to do a particular job</span>
+            </div>
+            <div class="def-group">
+                <span class="meaning">2. (Cảnh sát) bắt giữ/đưa về đồn</span>
+                <span class="eng-def">= bring sb to police station</span>
+            </div>
+            <div class="def-group">
+                <span class="meaning">3. Ban hành luật mới</span>
+                <span class="eng-def">= introduce a new law</span>
+            </div>
+            <div class="def-group">
+                <span class="meaning">4. Làm ra tiền, thu nhập</span>
+                <span class="eng-def">= make/earn money</span>
+            </div>
+            <div class="def-group">
+                <span class="meaning">5. Đưa ra phán quyết tại toà</span>
+                <span class="eng-def">= give a decision in court</span>
+            </div>
+            <div class="def-group">
+                <span class="meaning">6. Thu hút khách hàng</span>
+                <span class="eng-def">= attract customers</span>
+            </div>
+        </div>
+
+        <div class="parcel">
+            <div class="parcel-icon">🏆</div>
+            <div class="phrasal-title">Bring off</div>
+            <div class="def-group">
+                <span class="meaning">Thành công (trong việc khó)</span>
+                <span class="eng-def">= succeed</span>
+                <div class="example">"It was a difficult task but we brought it off."</div>
+            </div>
+        </div>
+
+        <div class="parcel">
+            <div class="parcel-icon">⚡</div>
+            <div class="phrasal-title">Bring on</div>
+            <div class="def-group">
+                <span class="meaning">1. Gây ra (điều tệ, xấu)</span>
+                <span class="eng-def">= cause st (bad)</span>
+            </div>
+            <div class="def-group">
+                <span class="meaning">2. Giúp phát triển, cải thiện</span>
+                <span class="eng-def">= help to develop/improve</span>
+            </div>
+            <div class="def-group">
+                <span class="meaning">3. Đưa cầu thủ vào sân</span>
+                <span class="eng-def">= bring a player onto the field</span>
+            </div>
+        </div>
+
+        <div class="parcel">
+            <div class="parcel-icon">✨</div>
+            <div class="phrasal-title">Bring out</div>
+            <div class="def-group">
+                <span class="meaning">1. Đưa ra, xuất bản</span>
+                <span class="eng-def">= produce/publish to sell</span>
+            </div>
+            <div class="def-group">
+                <span class="meaning">2. Tôn lên, làm bật lên</span>
+                <span class="eng-def">= make quality/detail noticeable</span>
+                <div class="example">"That dress really brings out the color of your eyes."</div>
+            </div>
+        </div>
+
+        <div class="parcel">
+            <div class="parcel-icon">🚑</div>
+            <div class="phrasal-title">Bring round</div>
+            <div class="def-group">
+                <span class="meaning">1. Đưa ai đi chơi/về nhà</span>
+                <span class="eng-def">= bring sb to somewhere</span>
+            </div>
+            <div class="def-group">
+                <span class="meaning">2. Làm ai tỉnh lại</span>
+                <span class="eng-def">= make sb conscious again</span>
+            </div>
+            <div class="def-group">
+                <span class="meaning">3. Thuyết phục</span>
+                <span class="eng-def">= persuade</span>
+            </div>
+        </div>
+
+        <div class="parcel">
+            <div class="parcel-icon">👶</div>
+            <div class="phrasal-title">Bring up</div>
+            <div class="def-group">
+                <span class="meaning">1. Nuôi nấng, dạy dỗ</span>
+                <span class="eng-def">= care for a child</span>
+            </div>
+            <div class="def-group">
+                <span class="meaning">2. Đề cập tới</span>
+                <span class="eng-def">= mention a subject</span>
+            </div>
+            <div class="def-group">
+                <span class="meaning">3. Làm ai hầu tòa</span>
+                <span class="eng-def">= make sb appear for trial</span>
+            </div>
+            <div class="def-group">
+                <span class="meaning">4. Nôn, mửa</span>
+                <span class="eng-def">= vomit</span>
+            </div>
+        </div>
+
+        <div class="parcel">
+            <div class="parcel-icon">📦</div>
+            <div class="phrasal-title">Other Brings</div>
+            <div class="def-group">
+                <span class="meaning">Bring over</span>: Mang ai/cái gì từ nơi này sang nơi khác (về nhà).
+            </div>
+            <div class="def-group">
+                <span class="meaning">Bring forth</span>: Khiến cho cái gì xảy ra/được biết đến.
+            </div>
+            <div class="def-group">
+                <span class="meaning">Bring through</span>: Giúp ai vượt qua khó khăn.
+            </div>
+            <div class="def-group">
+                <span class="meaning">Bring before</span>: Giới thiệu cái gì để thảo luận.
+            </div>
+        </div>
+
+    </div>
+
+    <div class="sorting-office">
+        <h2 class="office-title">📮 Sorting Office (Q85-106)</h2>
+
+        <div class="question-box" id="q85">
+            <div class="q-text">85. A huge amount of environmental damage has been _______ by the destruction of the rainforests.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(85, 'A')">A. brought about</button>
+                <button class="opt-btn" onclick="check(85, 'B')">B. brought round</button>
+                <button class="opt-btn" onclick="check(85, 'C')">C. brought up</button>
+                <button class="opt-btn" onclick="check(85, 'D')">D. brought off</button>
+            </div>
+            <div class="feedback" id="fb-85"></div>
+        </div>
+
+        <div class="question-box" id="q86">
+            <div class="q-text">86. I slapped his face a couple of times to try to bring him _______.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(86, 'B')">A. over</button>
+                <button class="opt-btn" onclick="check(86, 'B')">B. round</button>
+                <button class="opt-btn" onclick="check(86, 'C')">C. through</button>
+                <button class="opt-btn" onclick="check(86, 'D')">D. out</button>
+            </div>
+            <div class="feedback" id="fb-86"></div>
+        </div>
+
+        <div class="question-box" id="q87">
+            <div class="q-text">87. _______ the death penalty has done absolutely nothing to reduce crime.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(87, 'C')">A. Bringing forth</button>
+                <button class="opt-btn" onclick="check(87, 'B')">B. Bringing on</button>
+                <button class="opt-btn" onclick="check(87, 'C')">C. Bringing in</button>
+                <button class="opt-btn" onclick="check(87, 'D')">D. Bringing over</button>
+            </div>
+            <div class="feedback" id="fb-87"></div>
+        </div>
+
+        <div class="question-box" id="q88">
+            <div class="q-text">88. The Prime Minister will bring the crisis _______ the cabinet meeting.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(88, 'D')">A. after</button>
+                <button class="opt-btn" onclick="check(88, 'B')">B. when</button>
+                <button class="opt-btn" onclick="check(88, 'C')">C. during</button>
+                <button class="opt-btn" onclick="check(88, 'D')">D. before</button>
+            </div>
+            <div class="feedback" id="fb-88"></div>
+        </div>
+
+        <div class="question-box" id="q89">
+            <div class="q-text">89. He was _______ by the defender and awarded a penalty.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(89, 'C')">A. brought about</button>
+                <button class="opt-btn" onclick="check(89, 'B')">B. brought round</button>
+                <button class="opt-btn" onclick="check(89, 'C')">C. brought down</button>
+                <button class="opt-btn" onclick="check(89, 'D')">D. brought back</button>
+            </div>
+            <div class="feedback" id="fb-89"></div>
+        </div>
+
+        <div class="question-box" id="q90">
+            <div class="q-text">90. If I had a place of my own I'd have to bring Louisa _______ here.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(90, 'D')">A. to</button>
+                <button class="opt-btn" onclick="check(90, 'B')">B. up</button>
+                <button class="opt-btn" onclick="check(90, 'C')">C. on</button>
+                <button class="opt-btn" onclick="check(90, 'D')">D. around</button>
+            </div>
+            <div class="feedback" id="fb-90"></div>
+        </div>
+
+        <div class="question-box" id="q91">
+            <div class="q-text">91. The government has _______ new proposals to tackle the problem of increasing crime.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(91, 'B')">A. brought about</button>
+                <button class="opt-btn" onclick="check(91, 'B')">B. brought forward</button>
+                <button class="opt-btn" onclick="check(91, 'C')">C. brought forth</button>
+                <button class="opt-btn" onclick="check(91, 'D')">D. brought back</button>
+            </div>
+            <div class="feedback" id="fb-91"></div>
+        </div>
+
+        <div class="question-box" id="q92">
+            <div class="q-text">92. An outside adviser has been brought _______ to arbitrate the dispute.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(92, 'C')">A. off</button>
+                <button class="opt-btn" onclick="check(92, 'B')">B. round</button>
+                <button class="opt-btn" onclick="check(92, 'C')">C. in</button>
+                <button class="opt-btn" onclick="check(92, 'D')">D. out</button>
+            </div>
+            <div class="feedback" id="fb-92"></div>
+        </div>
+
+        <div class="question-box" id="q93">
+            <div class="q-text">93. The Clinton administration would not release oil... to help bring prices _______.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(93, 'A')">A. down</button>
+                <button class="opt-btn" onclick="check(93, 'B')">B. forth</button>
+                <button class="opt-btn" onclick="check(93, 'C')">C. in</button>
+                <button class="opt-btn" onclick="check(93, 'D')">D. on</button>
+            </div>
+            <div class="feedback" id="fb-93"></div>
+        </div>
+
+        <div class="question-box" id="q94">
+            <div class="q-text">94. That music always _______ happy memories.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(94, 'A')">A. brings back</button>
+                <button class="opt-btn" onclick="check(94, 'B')">B. brings out</button>
+                <button class="opt-btn" onclick="check(94, 'C')">C. brings off</button>
+                <button class="opt-btn" onclick="check(94, 'D')">D. brings around</button>
+            </div>
+            <div class="feedback" id="fb-94"></div>
+        </div>
+
+        <div class="question-box" id="q95">
+            <div class="q-text">95. I'm sure I can _______ him around to our point of view.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(95, 'B')">A. get</button>
+                <button class="opt-btn" onclick="check(95, 'B')">B. bring</button>
+                <button class="opt-btn" onclick="check(95, 'C')">C. make</button>
+                <button class="opt-btn" onclick="check(95, 'D')">D. put</button>
+            </div>
+            <div class="feedback" id="fb-95"></div>
+        </div>
+
+        <div class="question-box" id="q96">
+            <div class="q-text">96. The government hopes these measures will help to _______ inflation.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(96, 'C')">A. bring about</button>
+                <button class="opt-btn" onclick="check(96, 'B')">B. bring to</button>
+                <button class="opt-btn" onclick="check(96, 'C')">C. bring down</button>
+                <button class="opt-btn" onclick="check(96, 'D')">D. bring forward</button>
+            </div>
+            <div class="feedback" id="fb-96"></div>
+        </div>
+
+        <div class="question-box" id="q97">
+            <div class="q-text">97. He agreed to _______ deadlines for reducing phosphates in the lake.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(97, 'D')">A. bring out</button>
+                <button class="opt-btn" onclick="check(97, 'B')">B. bring down</button>
+                <button class="opt-btn" onclick="check(97, 'C')">C. bring in</button>
+                <button class="opt-btn" onclick="check(97, 'D')">D. bring forward</button>
+            </div>
+            <div class="feedback" id="fb-97"></div>
+        </div>
+
+        <div class="question-box" id="q98">
+            <div class="q-text">98. Harsh anti-trade union laws were _______ in the early 1980s.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(98, 'B')">A. brought about</button>
+                <button class="opt-btn" onclick="check(98, 'B')">B. brought in</button>
+                <button class="opt-btn" onclick="check(98, 'C')">C. brought on</button>
+                <button class="opt-btn" onclick="check(98, 'D')">D. brought to</button>
+            </div>
+            <div class="feedback" id="fb-98"></div>
+        </div>
+
+        <div class="question-box" id="q99">
+            <div class="q-text">99. They managed to _______ the most daring jewelry robbery in history.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(99, 'C')">A. bring on</button>
+                <button class="opt-btn" onclick="check(99, 'B')">B. bring out</button>
+                <button class="opt-btn" onclick="check(99, 'C')">C. bring off</button>
+                <button class="opt-btn" onclick="check(99, 'D')">D. bring around</button>
+            </div>
+            <div class="feedback" id="fb-99"></div>
+        </div>
+
+        <div class="question-box" id="q100">
+            <div class="q-text">100. Teachers have to _______ the bright children and... give extra help to those who need it.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(100, 'A')">A. bring on</button>
+                <button class="opt-btn" onclick="check(100, 'B')">B. bring up</button>
+                <button class="opt-btn" onclick="check(100, 'C')">C. bring in</button>
+                <button class="opt-btn" onclick="check(100, 'D')">D. bring out</button>
+            </div>
+            <div class="feedback" id="fb-100"></div>
+        </div>
+
+        <div class="question-box" id="q101">
+            <div class="q-text">101. The spices really _______ the flavour of the meat.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(101, 'A')">A. bring out</button>
+                <button class="opt-btn" onclick="check(101, 'B')">B. bring round</button>
+                <button class="opt-btn" onclick="check(101, 'C')">C. bring down</button>
+                <button class="opt-btn" onclick="check(101, 'D')">D. bring back</button>
+            </div>
+            <div class="feedback" id="fb-101"></div>
+        </div>
+
+        <div class="question-box" id="q102">
+            <div class="q-text">102. Both my children have brought me _______ extremely difficult times since my husband died.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(102, 'C')">A. about</button>
+                <button class="opt-btn" onclick="check(102, 'B')">B. forth</button>
+                <button class="opt-btn" onclick="check(102, 'C')">C. through</button>
+                <button class="opt-btn" onclick="check(102, 'D')">D. out</button>
+            </div>
+            <div class="feedback" id="fb-102"></div>
+        </div>
+
+        <div class="question-box" id="q103">
+            <div class="q-text">103. I'd like to _______ Doctor Hall here and ask him his views.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(103, 'A')">A. bring in</button>
+                <button class="opt-btn" onclick="check(103, 'B')">B. bring up</button>
+                <button class="opt-btn" onclick="check(103, 'C')">C. bring back</button>
+                <button class="opt-btn" onclick="check(103, 'D')">D. bring before</button>
+            </div>
+            <div class="feedback" id="fb-103"></div>
+        </div>
+
+        <div class="question-box" id="q104">
+            <div class="q-text">104. Stress can _______ an asthma attack.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(104, 'C')">A. bring about</button>
+                <button class="opt-btn" onclick="check(104, 'B')">B. bring up</button>
+                <button class="opt-btn" onclick="check(104, 'C')">C. bring on</button>
+                <button class="opt-btn" onclick="check(104, 'D')">D. bring over</button>
+            </div>
+            <div class="feedback" id="fb-104"></div>
+        </div>
+
+        <div class="question-box" id="q105">
+            <div class="q-text">105. The sale of the house only brought _______ about £45,000.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(105, 'C')">A. down</button>
+                <button class="opt-btn" onclick="check(105, 'B')">B. forth</button>
+                <button class="opt-btn" onclick="check(105, 'C')">C. in</button>
+                <button class="opt-btn" onclick="check(105, 'D')">D. on</button>
+            </div>
+            <div class="feedback" id="fb-105"></div>
+        </div>
+
+        <div class="question-box" id="q106">
+            <div class="q-text">106. They've just brought _______ a new record.</div>
+            <div class="options">
+                <button class="opt-btn" onclick="check(106, 'B')">A. down</button>
+                <button class="opt-btn" onclick="check(106, 'B')">B. out</button>
+                <button class="opt-btn" onclick="check(106, 'C')">C. back</button>
+                <button class="opt-btn" onclick="check(106, 'D')">D. in</button>
+            </div>
+            <div class="feedback" id="fb-106"></div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const answerKey = {
+        85: {key: 'A', note: "<b>Bring about:</b> Gây ra, đem lại (thiệt hại môi trường bị gây ra bởi...)"},
+        86: {key: 'B', note: "<b>Bring sb round:</b> Làm ai tỉnh lại (sau khi ngất)."},
+        87: {key: 'C', note: "<b>Bring in:</b> Ban hành/áp dụng (luật, hình phạt tử hình)."},
+        88: {key: 'D', note: "<b>Bring before:</b> Giới thiệu để thảo luận (trước cuộc họp nội các)."},
+        89: {key: 'C', note: "<b>Bring down:</b> Đánh bại/Làm ngã (cầu thủ bị làm ngã bởi hậu vệ)."},
+        90: {key: 'D', note: "<b>Bring sb around:</b> Đưa ai về nhà/nơi ở."},
+        91: {key: 'B', note: "<b>Bring forward:</b> Đề xuất/Đưa ra (kế hoạch mới)."},
+        92: {key: 'C', note: "<b>Bring in:</b> Mời ai đến giúp/tư vấn (cố vấn bên ngoài)."},
+        93: {key: 'A', note: "<b>Bring down:</b> Làm hạ (giá cả)."},
+        94: {key: 'A', note: "<b>Bring back:</b> Gợi nhớ (kỷ niệm)."},
+        95: {key: 'B', note: "<b>Bring sb round (around):</b> Thuyết phục ai theo quan điểm của mình."},
+        96: {key: 'C', note: "<b>Bring down:</b> Làm giảm (lạm phát)."},
+        97: {key: 'D', note: "<b>Bring forward:</b> Đẩy lịch lên sớm hơn (hạn chót)."},
+        98: {key: 'B', note: "<b>Bring in:</b> Ban hành (luật chống công đoàn)."},
+        99: {key: 'C', note: "<b>Bring off:</b> Thành công (trong việc khó khăn - vụ trộm)."},
+        100: {key: 'A', note: "<b>Bring on:</b> Giúp phát triển/cải thiện (học sinh giỏi)."},
+        101: {key: 'A', note: "<b>Bring out:</b> Làm bật lên/Tôn lên (hương vị)."},
+        102: {key: 'C', note: "<b>Bring through:</b> Giúp vượt qua khó khăn (thời gian khó khăn sau khi chồng mất)."},
+        103: {key: 'A', note: "<b>Bring in:</b> Mời vào/Đưa vào (để hỏi ý kiến)."},
+        104: {key: 'C', note: "<b>Bring on:</b> Gây ra (cơn hen suyễn)."},
+        105: {key: 'C', note: "<b>Bring in:</b> Kiếm được/Mang lại (tiền bạc)."},
+        106: {key: 'B', note: "<b>Bring out:</b> Xuất bản/Phát hành (đĩa nhạc mới)."}
+    };
+
+    const answered = new Set();
+
+    function check(qId, choice) {
+        if(answered.has(qId)) return;
+        
+        const correct = answerKey[qId].key;
+        const note = answerKey[qId].note;
+        const feedbackEl = document.getElementById(`fb-${qId}`);
+        const buttons = document.querySelectorAll(`#q${qId} .opt-btn`);
+
+        answered.add(qId);
+
+        buttons.forEach(btn => {
+            const txt = btn.innerText.split('.')[0].trim();
+            if(txt === correct) btn.classList.add('correct');
+            else if(txt === choice) btn.classList.add('incorrect');
+            btn.style.cursor = 'default';
+        });
+
+        feedbackEl.style.display = 'block';
+        if(choice === correct) {
+            feedbackEl.innerHTML = `<span style="color: #27AE60;">📬 <b>Chính xác!</b> ${note}</span>`;
+        } else {
+            feedbackEl.innerHTML = `<span style="color: #C0392B;">📪 <b>Sai rồi.</b> Đáp án là <b>${correct}</b>.<br>${note}</span>`;
+        }
+    }
+</script>
+
+</body>
+</html>

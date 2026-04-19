@@ -1,0 +1,470 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 23: COUNT - Cosmic Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette: Deep Space */
+            --space-bg: #0B0C10;
+            --star-white: #C5C6C7;
+            --neon-cyan: #45A29E;
+            --neon-green: #66FCF1;
+            --neon-magenta: #FF0055;
+            --neon-yellow: #F2FF49;
+            --panel-bg: rgba(31, 40, 51, 0.9);
+            --shadow-glow: 0 0 10px rgba(102, 252, 241, 0.5);
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--space-bg);
+            color: var(--star-white);
+            margin: 0;
+            padding: 40px 20px;
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 4px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            margin: 0;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px var(--neon-cyan);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--neon-green);
+            margin-top: 10px;
+            border: 1px solid var(--neon-green);
+            display: inline-block;
+            padding: 5px 20px;
+            border-radius: 5px;
+            box-shadow: var(--shadow-glow);
+        }
+
+        /* THEORY SYSTEM */
+        .galaxy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 60px;
+        }
+
+        .star-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+            transition: transform 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+        }
+
+        .star-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 0 20px rgba(69, 162, 158, 0.4);
+            border-color: var(--neon-green);
+        }
+
+        /* Decorative Number */
+        .star-card::before {
+            content: attr(data-index);
+            position: absolute;
+            top: -20px;
+            right: -10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 5rem;
+            color: rgba(255, 255, 255, 0.05);
+            pointer-events: none;
+        }
+
+        .phrasal-verb {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--neon-yellow);
+            margin-bottom: 15px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
+            padding-bottom: 5px;
+        }
+
+        .def-box {
+            margin-bottom: 15px;
+        }
+
+        .meaning {
+            font-weight: 700;
+            color: var(--neon-green);
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .eng-def {
+            font-size: 0.9rem;
+            color: #888;
+            font-style: italic;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .example {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.95rem;
+            border-left: 3px solid var(--neon-magenta);
+            color: #DDD;
+        }
+
+        /* EXERCISE CONTROL PANEL */
+        .control-panel {
+            background: var(--panel-bg);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid var(--neon-magenta);
+            box-shadow: 0 0 30px rgba(255, 0, 85, 0.2);
+        }
+
+        .panel-title {
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: var(--neon-magenta);
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px var(--neon-magenta);
+        }
+
+        .question-block {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .q-text {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .opt-btn {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--star-white);
+            padding: 15px;
+            color: var(--star-white);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            border-radius: 5px;
+        }
+
+        .opt-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        .opt-btn.correct {
+            background: rgba(102, 252, 241, 0.2);
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            box-shadow: 0 0 10px rgba(102, 252, 241, 0.3);
+        }
+
+        .opt-btn.incorrect {
+            background: rgba(255, 0, 85, 0.2);
+            border-color: var(--neon-magenta);
+            color: var(--neon-magenta);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border-left: 4px solid var(--neon-yellow);
+            display: none;
+            animation: fadeIn 0.4s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Unit 23: COUNT</h1>
+        <div class="subtitle">Phrasal Verbs Calculation</div>
+    </header>
+
+    <div class="galaxy-grid">
+        
+        <div class="star-card" data-index="01">
+            <div class="phrasal-verb">Count against</div>
+            <div class="def-box">
+                <span class="meaning">Là bất lợi cho ai</span>
+                <span class="eng-def">= be a disadvantage to sb</span>
+                <div class="example">"For that job her lack of experience may <b>count against</b> her."</div>
+            </div>
+        </div>
+
+        <div class="star-card" data-index="02">
+            <div class="phrasal-verb">Count among</div>
+            <div class="def-box">
+                <span class="meaning">Tính/xếp vào nhóm</span>
+                <span class="eng-def">= include sb/st in a group</span>
+                <div class="example">"I <b>count</b> her <b>among</b> my closest friends."</div>
+            </div>
+        </div>
+
+        <div class="star-card" data-index="03">
+            <div class="phrasal-verb">Count for</div>
+            <div class="def-box">
+                <span class="meaning">Có giá trị / Quan trọng</span>
+                <span class="eng-def">= be worth st</span>
+                <div class="example">"Your promise <b>counted for</b> nothing to me."</div>
+            </div>
+        </div>
+
+        <div class="star-card" data-index="04">
+            <div class="phrasal-verb">Count in</div>
+            <div class="def-box">
+                <span class="meaning">Tính cả vào / Bao gồm</span>
+                <span class="eng-def">= include sb/st in an activity</span>
+                <div class="example">"<b>Count</b> this old tray <b>in</b> with the other things to be sold."</div>
+            </div>
+        </div>
+
+        <div class="star-card" data-index="05">
+            <div class="phrasal-verb">Count on</div>
+            <div class="def-box">
+                <span class="meaning">1. Tin cậy / Dựa vào</span>
+                <span class="eng-def">= rely on sb</span>
+                <div class="example">"I can <b>count on</b> my parents to help me."</div>
+            </div>
+            <div class="def-box">
+                <span class="meaning">2. Mong đợi / Tính đến</span>
+                <span class="eng-def">= expect st to happen</span>
+                <div class="example">"I didn't <b>count on</b> being held up in the traffic."</div>
+            </div>
+        </div>
+
+        <div class="star-card" data-index="06">
+            <div class="phrasal-verb">Count out</div>
+            <div class="def-box">
+                <span class="meaning">1. Không tính / Loại ra</span>
+                <span class="eng-def">= not include / eliminate possibility</span>
+                <div class="example">"Scuba diving? Oh no, <b>count</b> me <b>out</b>!"</div>
+            </div>
+            <div class="def-box">
+                <span class="meaning">2. Đếm từng cái một</span>
+                <span class="eng-def">= count one by one</span>
+                <div class="example">"She <b>counted</b> the cookies <b>out</b>."</div>
+            </div>
+            <div class="def-box">
+                <span class="meaning">3. Tuyên bố thua (đấm bốc)</span>
+                <span class="eng-def">= counted out (boxing)</span>
+                <div class="example">"Cooper was <b>counted out</b> in the final round."</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="control-panel">
+        <h2 class="panel-title">🧮 Calculation Quiz (Q193-202)</h2>
+
+        <div class="question-block" id="q193">
+            <div class="q-text">193. If you're going to watch the football, you can count me _______. It's not my cup of tea.</div>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(193, 'B')">A. in</button>
+                <button class="opt-btn" onclick="check(193, 'B')">B. out</button>
+                <button class="opt-btn" onclick="check(193, 'B')">C. among</button>
+                <button class="opt-btn" onclick="check(193, 'B')">D. on</button>
+            </div>
+            <div class="feedback" id="fb-193"></div>
+        </div>
+
+        <div class="question-block" id="q194">
+            <div class="q-text">194. He is a reliable man, so you can count _______ him for his support.</div>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(194, 'D')">A. in</button>
+                <button class="opt-btn" onclick="check(194, 'D')">B. out</button>
+                <button class="opt-btn" onclick="check(194, 'D')">C. among</button>
+                <button class="opt-btn" onclick="check(194, 'D')">D. on</button>
+            </div>
+            <div class="feedback" id="fb-194"></div>
+        </div>
+
+        <div class="question-block" id="q195">
+            <div class="q-text">195. He has a criminal record but we hope that prospective employers won't _______ it _______ him.</div>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(195, 'A')">A. count against</button>
+                <button class="opt-btn" onclick="check(195, 'A')">B. count among</button>
+                <button class="opt-btn" onclick="check(195, 'A')">C. count for</button>
+                <button class="opt-btn" onclick="check(195, 'A')">D. count out</button>
+            </div>
+            <div class="feedback" id="fb-195"></div>
+        </div>
+
+        <div class="question-block" id="q196">
+            <div class="q-text">196. She pulled out her wallet and slowly _______ what money she had.</div>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(196, 'C')">A. counted in</button>
+                <button class="opt-btn" onclick="check(196, 'C')">B. counted on</button>
+                <button class="opt-btn" onclick="check(196, 'C')">C. counted out</button>
+                <button class="opt-btn" onclick="check(196, 'C')">D. counted among</button>
+            </div>
+            <div class="feedback" id="fb-196"></div>
+        </div>
+
+        <div class="question-block" id="q197">
+            <div class="q-text">197. I certainly _______ my daughter _______ my life's greatest blessings.</div>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(197, 'B')">A. count against</button>
+                <button class="opt-btn" onclick="check(197, 'B')">B. count among</button>
+                <button class="opt-btn" onclick="check(197, 'B')">C. count for</button>
+                <button class="opt-btn" onclick="check(197, 'B')">D. count on</button>
+            </div>
+            <div class="feedback" id="fb-197"></div>
+        </div>
+
+        <div class="question-block" id="q198">
+            <div class="q-text">198. If I fail the test after weeks of studying, all of that effort will _______ nothing.</div>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(198, 'A')">A. count for</button>
+                <button class="opt-btn" onclick="check(198, 'A')">B. count among</button>
+                <button class="opt-btn" onclick="check(198, 'A')">C. count in</button>
+                <button class="opt-btn" onclick="check(198, 'A')">D. count out</button>
+            </div>
+            <div class="feedback" id="fb-198"></div>
+        </div>
+
+        <div class="question-block" id="q199">
+            <div class="q-text">199. After the boxer collapsed to the mat, the referee counted him _______ and ended the bout.</div>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(199, 'B')">A. in</button>
+                <button class="opt-btn" onclick="check(199, 'B')">B. out</button>
+                <button class="opt-btn" onclick="check(199, 'B')">C. among</button>
+                <button class="opt-btn" onclick="check(199, 'B')">D. on</button>
+            </div>
+            <div class="feedback" id="fb-199"></div>
+        </div>
+
+        <div class="question-block" id="q200">
+            <div class="q-text">200. I hear you're organizing a trip to the game next week? _______ me _______!</div>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(200, 'C')">A. Count - against</button>
+                <button class="opt-btn" onclick="check(200, 'C')">B. Count - among</button>
+                <button class="opt-btn" onclick="check(200, 'C')">C. Count - in</button>
+                <button class="opt-btn" onclick="check(200, 'C')">D. Count - out</button>
+            </div>
+            <div class="feedback" id="fb-200"></div>
+        </div>
+
+        <div class="question-block" id="q201">
+            <div class="q-text">201. I'm _______ the meeting ending on time, or I'll miss my bus.</div>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(201, 'B')">A. counting in</button>
+                <button class="opt-btn" onclick="check(201, 'B')">B. counting on</button>
+                <button class="opt-btn" onclick="check(201, 'B')">C. counting among</button>
+                <button class="opt-btn" onclick="check(201, 'B')">D. counting out</button>
+            </div>
+            <div class="feedback" id="fb-201"></div>
+        </div>
+
+        <div class="question-block" id="q202">
+            <div class="q-text">202. Don't _______ our dream of buying this home just yet - we still have time to make a counteroffer.</div>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(202, 'A')">A. count out</button>
+                <button class="opt-btn" onclick="check(202, 'A')">B. count on</button>
+                <button class="opt-btn" onclick="check(202, 'A')">C. count in</button>
+                <button class="opt-btn" onclick="check(202, 'A')">D. count with</button>
+            </div>
+            <div class="feedback" id="fb-202"></div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const answers = {
+        193: {key: 'B', note: "<b>Count sb out:</b> Không tính ai tham gia (vì tôi không thích bóng đá)."},
+        194: {key: 'D', note: "<b>Count on sb:</b> Tin cậy, dựa dẫm vào ai."},
+        195: {key: 'A', note: "<b>Count against:</b> Là bất lợi cho ai (tiền án sẽ là bất lợi)."},
+        196: {key: 'C', note: "<b>Count out:</b> Đếm từng cái một (đếm tiền)."},
+        197: {key: 'B', note: "<b>Count among:</b> Tính vào, xếp vào hàng (những phước lành lớn nhất)."},
+        198: {key: 'A', note: "<b>Count for nothing:</b> Không có giá trị gì, coi như bỏ đi."},
+        199: {key: 'B', note: "<b>Count out:</b> (Boxing) Đếm đến 10 tuyên bố thua."},
+        200: {key: 'C', note: "<b>Count me in:</b> Tính cả tôi vào nhé (tôi muốn tham gia)."},
+        201: {key: 'B', note: "<b>Count on st:</b> Mong đợi, tính đến việc gì sẽ xảy ra."},
+        202: {key: 'A', note: "<b>Count out:</b> Loại bỏ khả năng (đừng vội gạt bỏ giấc mơ)."}
+    };
+
+    function check(qId, choice) {
+        const correct = answers[qId].key;
+        const note = answers[qId].note;
+        const feedbackEl = document.getElementById(`fb-${qId}`);
+        const btns = document.querySelectorAll(`#q${qId} .opt-btn`);
+
+        btns.forEach(btn => {
+            const txt = btn.innerText.split('.')[0].trim();
+            // Match letter A, B, C, D
+            const btnLetter = btn.innerText.charAt(0);
+            
+            if (btnLetter === correct) btn.classList.add('correct');
+            else if (btnLetter === choice) btn.classList.add('incorrect');
+            btn.style.cursor = 'default';
+            btn.onclick = null;
+        });
+
+        feedbackEl.style.display = 'block';
+        if (choice === correct) {
+            feedbackEl.innerHTML = `<span style="color: var(--neon-green)">★ CHÍNH XÁC!</span> ${note}`;
+        } else {
+            feedbackEl.innerHTML = `<span style="color: var(--neon-magenta)">✖ SAI RỒI.</span> Đáp án đúng là <b>${correct}</b>.<br>${note}`;
+        }
+    }
+</script>
+
+</body>
+</html>

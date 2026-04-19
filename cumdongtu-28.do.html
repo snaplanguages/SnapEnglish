@@ -1,0 +1,636 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 28: DO - Robot Workshop Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette: Robot Workshop */
+            --metal-grey: #455A64;
+            --light-metal: #CFD8DC;
+            --neon-green: #00E676;
+            --neon-blue: #2979FF;
+            --neon-orange: #FF9100;
+            --alert-red: #FF1744;
+            --bg-color: #263238;
+            --panel-bg: #37474F;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--light-metal);
+            margin: 0;
+            padding: 40px 20px;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            border: 2px solid var(--neon-blue);
+            padding: 30px;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 20px rgba(41, 121, 255, 0.3);
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 4rem;
+            color: var(--neon-green);
+            margin: 0;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .robot-icon {
+            font-size: 3rem;
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-color);
+            padding: 0 15px;
+            border-radius: 50%;
+            border: 2px solid var(--neon-blue);
+        }
+
+        .subtitle {
+            margin-top: 15px;
+            color: var(--neon-blue);
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 2px;
+        }
+
+        /* THEORY PANEL */
+        .robot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 60px;
+        }
+
+        .module-card {
+            background: var(--panel-bg);
+            border-left: 5px solid;
+            border-radius: 5px;
+            padding: 20px;
+            position: relative;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .module-card:hover {
+            transform: scale(1.03);
+            z-index: 10;
+            background: #455A64;
+        }
+
+        /* Status Colors */
+        .status-green { border-color: var(--neon-green); }
+        .status-blue { border-color: var(--neon-blue); }
+        .status-orange { border-color: var(--neon-orange); }
+        .status-red { border-color: var(--alert-red); }
+
+        .phrasal-verb {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.6rem;
+            color: white;
+            margin-bottom: 10px;
+            border-bottom: 1px dashed rgba(255,255,255,0.2);
+            padding-bottom: 5px;
+        }
+
+        .definition-box {
+            margin-bottom: 15px;
+        }
+
+        .meaning {
+            font-weight: 700;
+            color: var(--neon-orange);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .eng-def {
+            font-size: 0.85rem;
+            color: #B0BEC5;
+            font-style: italic;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .example {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: var(--neon-green);
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* EXERCISE CONSOLE */
+        .console {
+            background: #212121;
+            border: 2px solid var(--neon-orange);
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 0 30px rgba(255, 145, 0, 0.1);
+        }
+
+        .console-title {
+            text-align: center;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 2.2rem;
+            color: var(--neon-orange);
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+
+        .question-item {
+            margin-bottom: 25px;
+            border-bottom: 1px solid #424242;
+            padding-bottom: 15px;
+        }
+
+        .q-text {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn-opt {
+            background: #424242;
+            border: 1px solid #616161;
+            color: #E0E0E0;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: left;
+            font-family: 'Roboto', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .btn-opt:hover {
+            background: var(--neon-blue);
+            color: white;
+            border-color: var(--neon-blue);
+        }
+
+        .btn-opt.correct {
+            background: rgba(0, 230, 118, 0.2);
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .btn-opt.incorrect {
+            background: rgba(255, 23, 68, 0.2);
+            border-color: var(--alert-red);
+            color: var(--alert-red);
+        }
+
+        .log-output {
+            margin-top: 10px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--neon-blue);
+            display: none;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-left: 3px solid var(--neon-blue);
+        }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="robot-icon">🤖</div>
+        <h1>Unit 28: DO</h1>
+        <div class="subtitle">System Operational... Processing Phrasal Verbs</div>
+    </header>
+
+    <div class="robot-grid">
+        
+        <div class="module-card status-red">
+            <div class="phrasal-verb">Do away with</div>
+            <div class="definition-box">
+                <span class="meaning">Xóa bỏ / Thủ tiêu</span>
+                <span class="eng-def">= abolish / get rid of / kill</span>
+                <div class="example">> The company did away with free lunches.</div>
+            </div>
+        </div>
+
+        <div class="module-card status-orange">
+            <div class="phrasal-verb">Do down</div>
+            <div class="definition-box">
+                <span class="meaning">Chỉ trích / Hạ bệ</span>
+                <span class="eng-def">= criticize / humiliate</span>
+                <div class="example">> Stop doing him down in front of others.</div>
+            </div>
+            <div class="definition-box">
+                <span class="meaning">Gian lận (lừa ai)</span>
+                <span class="eng-def">= cheat sb</span>
+                <div class="example">> That guy did me down.</div>
+            </div>
+        </div>
+
+        <div class="module-card status-red">
+            <div class="phrasal-verb">Do for</div>
+            <div class="definition-box">
+                <span class="meaning">Phá hủy / Giết / Làm hỏng</span>
+                <span class="eng-def">= ruin / kill / damage seriously</span>
+                <div class="example">> The rough roads did for my car.</div>
+            </div>
+            <div class="definition-box">
+                <span class="meaning">Dọn dẹp cho ai</span>
+                <span class="eng-def">= do cleaning for sb</span>
+            </div>
+        </div>
+
+        <div class="module-card status-red">
+            <div class="phrasal-verb">Do in</div>
+            <div class="definition-box">
+                <span class="meaning">Giết / Thủ tiêu</span>
+                <span class="eng-def">= kill</span>
+            </div>
+            <div class="definition-box">
+                <span class="meaning">Làm ai kiệt sức (do sb in)</span>
+                <span class="eng-def">= make sb extremely tired</span>
+                <div class="example">> The long walk really did me in.</div>
+            </div>
+        </div>
+
+        <div class="module-card status-green">
+            <div class="phrasal-verb">Do out</div>
+            <div class="definition-box">
+                <span class="meaning">Dọn dẹp / Trang trí</span>
+                <span class="eng-def">= decorate / clean</span>
+                <div class="example">> They did the room out with balloons.</div>
+            </div>
+        </div>
+
+        <div class="module-card status-orange">
+            <div class="phrasal-verb">Do out of</div>
+            <div class="definition-box">
+                <span class="meaning">Ngăn cản / Lừa lấy mất</span>
+                <span class="eng-def">= prevent sb from getting st (by cheating)</span>
+                <div class="example">> He was done out of his inheritance.</div>
+            </div>
+        </div>
+
+        <div class="module-card status-blue">
+            <div class="phrasal-verb">Do over</div>
+            <div class="definition-box">
+                <span class="meaning">Làm lại từ đầu</span>
+                <span class="eng-def">= do again</span>
+                <div class="example">> OK, we'll do it over.</div>
+            </div>
+            <div class="definition-box">
+                <span class="meaning">Tấn công / Đánh nhừ tử</span>
+                <span class="eng-def">= attack</span>
+                <div class="example">> He was done over by a gang.</div>
+            </div>
+            <div class="definition-box">
+                <span class="meaning">Trang trí lại</span>
+                <span class="eng-def">= redecorate</span>
+            </div>
+        </div>
+
+        <div class="module-card status-green">
+            <div class="phrasal-verb">Do up</div>
+            <div class="definition-box">
+                <span class="meaning">Cài, thắt (dây an toàn, áo)</span>
+                <span class="eng-def">= fasten</span>
+                <div class="example">> Do up your coat!</div>
+            </div>
+            <div class="definition-box">
+                <span class="meaning">Sửa sang / Tân trang</span>
+                <span class="eng-def">= repair / renovate</span>
+                <div class="example">> We are doing up an old house.</div>
+            </div>
+            <div class="definition-box">
+                <span class="meaning">Gói quà</span>
+                <span class="eng-def">= wrap</span>
+            </div>
+        </div>
+
+        <div class="module-card status-blue">
+            <div class="phrasal-verb">Do with / without</div>
+            <div class="definition-box">
+                <span class="meaning">Do with: Cần / Muốn / Liên quan</span>
+                <span class="eng-def">= need / want / relate to</span>
+                <div class="example">> I could do with a cup of tea.</div>
+            </div>
+            <div class="definition-box">
+                <span class="meaning">Do without: Xoay xở mà không có</span>
+                <span class="eng-def">= manage without</span>
+                <div class="example">> We'll have to do without a car.</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="console">
+        <h2 class="console-title">🖥️ Simulation Exercise (Q254-273)</h2>
+
+        <div class="question-item" id="q254">
+            <div class="q-text">254. He does _______ old houses and sells them at a profit.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(254, 'D')">A. in</button>
+                <button class="btn-opt" onclick="check(254, 'D')">B. with</button>
+                <button class="btn-opt" onclick="check(254, 'D')">C. without</button>
+                <button class="btn-opt" onclick="check(254, 'D')">D. up</button>
+            </div>
+            <div class="log-output" id="fb-254"></div>
+        </div>
+
+        <div class="question-item" id="q255">
+            <div class="q-text">255. I know you don't like him, but there's no need to keep doing him _______.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(255, 'C')">A. over</button>
+                <button class="btn-opt" onclick="check(255, 'C')">B. off</button>
+                <button class="btn-opt" onclick="check(255, 'C')">C. down</button>
+                <button class="btn-opt" onclick="check(255, 'C')">D. up</button>
+            </div>
+            <div class="log-output" id="fb-255"></div>
+        </div>
+
+        <div class="question-item" id="q256">
+            <div class="q-text">256. What are you going to _______ all that junk, Larry?</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(256, 'B')">A. do away with</button>
+                <button class="btn-opt" onclick="check(256, 'B')">B. do with</button>
+                <button class="btn-opt" onclick="check(256, 'B')">C. do up</button>
+                <button class="btn-opt" onclick="check(256, 'B')">D. do out of</button>
+            </div>
+            <div class="log-output" id="fb-256"></div>
+        </div>
+
+        <div class="question-item" id="q257">
+            <div class="q-text">257. It was climbing that last hill that really did them _______. (Exhausted)</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(257, 'D')">A. out</button>
+                <button class="btn-opt" onclick="check(257, 'D')">B. off</button>
+                <button class="btn-opt" onclick="check(257, 'D')">C. over</button>
+                <button class="btn-opt" onclick="check(257, 'D')">D. in</button>
+            </div>
+            <div class="log-output" id="fb-257"></div>
+        </div>
+
+        <div class="question-item" id="q258">
+            <div class="q-text">258. The alternative is to sue the school, which parents regularly _______ matters of questionable significance. (Attack)</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(258, 'A')">A. do over</button>
+                <button class="btn-opt" onclick="check(258, 'A')">B. do for</button>
+                <button class="btn-opt" onclick="check(258, 'A')">C. do in</button>
+                <button class="btn-opt" onclick="check(258, 'A')">D. do up</button>
+            </div>
+            <div class="log-output" id="fb-258"></div>
+        </div>
+
+        <div class="question-item" id="q259">
+            <div class="q-text">259. He sees himself as the little man being done _______ by the powerful. (Cheated/Treated unfairly)</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(259, 'A')">A. down</button>
+                <button class="btn-opt" onclick="check(259, 'A')">B. out</button>
+                <button class="btn-opt" onclick="check(259, 'A')">C. off</button>
+                <button class="btn-opt" onclick="check(259, 'A')">D. in</button>
+            </div>
+            <div class="log-output" id="fb-259"></div>
+        </div>
+
+        <div class="question-item" id="q260">
+            <div class="q-text">260. You'll be gone for six days? I think we can do _______ you for that long.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(260, 'B')">A. with</button>
+                <button class="btn-opt" onclick="check(260, 'B')">B. without</button>
+                <button class="btn-opt" onclick="check(260, 'B')">C. up with</button>
+                <button class="btn-opt" onclick="check(260, 'B')">D. away with</button>
+            </div>
+            <div class="log-output" id="fb-260"></div>
+        </div>
+
+        <div class="question-item" id="q261">
+            <div class="q-text">261. He held a small parcel done _______ in colored paper and ribbon.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(261, 'D')">A. out of</button>
+                <button class="btn-opt" onclick="check(261, 'D')">B. with</button>
+                <button class="btn-opt" onclick="check(261, 'D')">C. for</button>
+                <button class="btn-opt" onclick="check(261, 'D')">D. up</button>
+            </div>
+            <div class="log-output" id="fb-261"></div>
+        </div>
+
+        <div class="question-item" id="q262">
+            <div class="q-text">262. That no-good rotten lawyer did me _______ thousands of dollars from my grandfather's will!</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(262, 'A')">A. out of</button>
+                <button class="btn-opt" onclick="check(262, 'A')">B. out</button>
+                <button class="btn-opt" onclick="check(262, 'A')">C. off</button>
+                <button class="btn-opt" onclick="check(262, 'A')">D. in</button>
+            </div>
+            <div class="log-output" id="fb-262"></div>
+        </div>
+
+        <div class="question-item" id="q263">
+            <div class="q-text">263. If you put any more in that suitcase you won't be able to _______ it.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(263, 'B')">A. do - over</button>
+                <button class="btn-opt" onclick="check(263, 'B')">B. do - up</button>
+                <button class="btn-opt" onclick="check(263, 'B')">C. do - for</button>
+                <button class="btn-opt" onclick="check(263, 'B')">D. do - off</button>
+            </div>
+            <div class="log-output" id="fb-263"></div>
+        </div>
+
+        <div class="question-item" id="q264">
+            <div class="q-text">264. Most of the articles have to _______ America's role in the world since the end of the Cold War.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(264, 'B')">A. do away with</button>
+                <button class="btn-opt" onclick="check(264, 'B')">B. do with</button>
+                <button class="btn-opt" onclick="check(264, 'B')">C. do up</button>
+                <button class="btn-opt" onclick="check(264, 'B')">D. do for</button>
+            </div>
+            <div class="log-output" id="fb-264"></div>
+        </div>
+
+        <div class="question-item" id="q265">
+            <div class="q-text">265. People thought that the use of robots would _______ boring low-paid factory jobs.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(265, 'A')">A. do away with</button>
+                <button class="btn-opt" onclick="check(265, 'A')">B. do with</button>
+                <button class="btn-opt" onclick="check(265, 'A')">C. do up</button>
+                <button class="btn-opt" onclick="check(265, 'A')">D. do for</button>
+            </div>
+            <div class="log-output" id="fb-265"></div>
+        </div>
+
+        <div class="question-item" id="q266">
+            <div class="q-text">266. We plan to do _______ the kitchen next year. (Redecorate)</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(266, 'A')">A. over</button>
+                <button class="btn-opt" onclick="check(266, 'A')">B. off</button>
+                <button class="btn-opt" onclick="check(266, 'A')">C. out of</button>
+                <button class="btn-opt" onclick="check(266, 'A')">D. in</button>
+            </div>
+            <div class="log-output" id="fb-266"></div>
+        </div>
+
+        <div class="question-item" id="q267">
+            <div class="q-text">267. Should they be slowing down because sooner or later their hectic pace will do them _______?</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(267, 'C')">A. for</button>
+                <button class="btn-opt" onclick="check(267, 'C')">B. out</button>
+                <button class="btn-opt" onclick="check(267, 'C')">C. in</button>
+                <button class="btn-opt" onclick="check(267, 'C')">D. over</button>
+            </div>
+            <div class="log-output" id="fb-267"></div>
+        </div>
+
+        <div class="question-item" id="q268">
+            <div class="q-text">268. Reynolds has always claimed that he had nothing to do _______ her disappearance.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(268, 'B')">A. over</button>
+                <button class="btn-opt" onclick="check(268, 'B')">B. with</button>
+                <button class="btn-opt" onclick="check(268, 'B')">C. off</button>
+                <button class="btn-opt" onclick="check(268, 'B')">D. in</button>
+            </div>
+            <div class="log-output" id="fb-268"></div>
+        </div>
+
+        <div class="question-item" id="q269">
+            <div class="q-text">269. They've had their kitchen _______ in light wood and blue tiles.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(269, 'D')">A. done off</button>
+                <button class="btn-opt" onclick="check(269, 'D')">B. done in</button>
+                <button class="btn-opt" onclick="check(269, 'D')">C. done with</button>
+                <button class="btn-opt" onclick="check(269, 'D')">D. done out</button>
+            </div>
+            <div class="log-output" id="fb-269"></div>
+        </div>
+
+        <div class="question-item" id="q270">
+            <div class="q-text">270. I could do _______ a few days off work. (Need)</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(270, 'B')">A. without</button>
+                <button class="btn-opt" onclick="check(270, 'B')">B. with</button>
+                <button class="btn-opt" onclick="check(270, 'B')">C. away with</button>
+                <button class="btn-opt" onclick="check(270, 'B')">D. do over</button>
+            </div>
+            <div class="log-output" id="fb-270"></div>
+        </div>
+
+        <div class="question-item" id="q271">
+            <div class="q-text">271. Joe had been _______ by his teacher so often that he had lost all confidence.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(271, 'C')">A. done over</button>
+                <button class="btn-opt" onclick="check(271, 'C')">B. done for</button>
+                <button class="btn-opt" onclick="check(271, 'C')">C. done down</button>
+                <button class="btn-opt" onclick="check(271, 'C')">D. done up</button>
+            </div>
+            <div class="log-output" id="fb-271"></div>
+        </div>
+
+        <div class="question-item" id="q272">
+            <div class="q-text">272. It was the flu that did _______ her in the end.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(272, 'A')">A. for</button>
+                <button class="btn-opt" onclick="check(272, 'A')">B. out</button>
+                <button class="btn-opt" onclick="check(272, 'A')">C. off</button>
+                <button class="btn-opt" onclick="check(272, 'A')">D. in</button>
+            </div>
+            <div class="log-output" id="fb-272"></div>
+        </div>
+
+        <div class="question-item" id="q273">
+            <div class="q-text">273. I'm sure James could _______ some help.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(273, 'B')">A. do away with</button>
+                <button class="btn-opt" onclick="check(273, 'B')">B. do with</button>
+                <button class="btn-opt" onclick="check(273, 'B')">C. do up</button>
+                <button class="btn-opt" onclick="check(273, 'B')">D. do for</button>
+            </div>
+            <div class="log-output" id="fb-273"></div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const answerKey = {
+        254: {key: 'D', note: "<b>Do up:</b> Sửa sang, tân trang lại (nhà cửa)."},
+        255: {key: 'C', note: "<b>Do sb down:</b> Chỉ trích, hạ bệ ai đó."},
+        256: {key: 'B', note: "<b>Do with:</b> Xử lý, làm gì với cái gì (junk). Cấu trúc 'What are you going to do with...?'"},
+        257: {key: 'D', note: "<b>Do sb in:</b> Làm ai kiệt sức (leo đồi)."},
+        258: {key: 'A', note: "<b>Do over:</b> Tấn công, làm hại (kiện tụng tấn công nhà trường)."},
+        259: {key: 'A', note: "<b>Done down:</b> Bị chơi xấu, bị đối xử không công bằng."},
+        260: {key: 'B', note: "<b>Do without:</b> Xoay xở mà không có ai/cái gì."},
+        261: {key: 'D', note: "<b>Done up:</b> Được gói lại (quà)."},
+        262: {key: 'A', note: "<b>Do sb out of:</b> Lừa/Gian lận để lấy mất của ai cái gì (tiền thừa kế)."},
+        263: {key: 'B', note: "<b>Do up:</b> Cài, thắt, đóng lại (vali)."},
+        264: {key: 'B', note: "<b>Have to do with:</b> Có liên quan tới."},
+        265: {key: 'A', note: "<b>Do away with:</b> Xóa bỏ, loại bỏ (công việc nhàm chán)."},
+        266: {key: 'A', note: "<b>Do over:</b> Trang trí lại (redecorate) căn phòng/nhà."},
+        267: {key: 'C', note: "<b>Do sb in:</b> Làm kiệt sức hoặc giết chết (nhịp độ làm việc nhanh)."},
+        268: {key: 'B', note: "<b>Have nothing to do with:</b> Không liên quan gì tới."},
+        269: {key: 'D', note: "<b>Done out:</b> Được trang trí (in light wood)."},
+        270: {key: 'B', note: "<b>Could do with:</b> Cần, muốn có (một vài ngày nghỉ)."},
+        271: {key: 'C', note: "<b>Done down:</b> Bị hạ bệ, chỉ trích (bởi giáo viên)."},
+        272: {key: 'A', note: "<b>Do for:</b> Giết chết, phá hủy (bệnh cúm đã giết chết bà ấy)."},
+        273: {key: 'B', note: "<b>Could do with:</b> Cần (sự giúp đỡ)."}
+    };
+
+    function check(qId, choice) {
+        const correct = answerKey[qId].key;
+        const note = answerKey[qId].note;
+        const feedbackEl = document.getElementById(`fb-${qId}`);
+        const btns = document.querySelectorAll(`#q${qId} .btn-opt`);
+
+        btns.forEach(btn => {
+            const txt = btn.innerText.split('.')[0].trim();
+            if(txt === correct) btn.classList.add('correct');
+            else if(txt === choice) btn.classList.add('incorrect');
+            btn.style.cursor = 'default';
+            btn.onclick = null;
+        });
+
+        feedbackEl.style.display = 'block';
+        if(choice === correct) {
+            feedbackEl.innerHTML = `> SYSTEM: CORRECT. ${note}`;
+            feedbackEl.style.color = 'var(--neon-green)';
+            feedbackEl.style.borderLeftColor = 'var(--neon-green)';
+        } else {
+            feedbackEl.innerHTML = `> SYSTEM: ERROR. Correct answer: ${correct}. ${note}`;
+            feedbackEl.style.color = 'var(--alert-red)';
+            feedbackEl.style.borderLeftColor = 'var(--alert-red)';
+        }
+    }
+</script>
+
+</body>
+</html>

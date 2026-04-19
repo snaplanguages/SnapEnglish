@@ -1,0 +1,534 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 17: CALL - Vintage Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette: Retro Phone Booth */
+            --booth-red: #C0392B;
+            --phone-cream: #FDF2E9;
+            --dial-black: #2C3E50;
+            --coin-gold: #F1C40F;
+            --teal-accent: #16A085;
+            --shadow: 6px 6px 0px rgba(0,0,0,0.2);
+        }
+
+        body {
+            font-family: 'DM Mono', monospace;
+            background-color: var(--phone-cream);
+            color: var(--dial-black);
+            margin: 0;
+            padding: 40px 20px;
+            background-image: 
+                linear-gradient(45deg, #EADBC8 25%, transparent 25%, transparent 75%, #EADBC8 75%, #EADBC8),
+                linear-gradient(45deg, #EADBC8 25%, transparent 25%, transparent 75%, #EADBC8 75%, #EADBC8);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            background: var(--booth-red);
+            padding: 40px;
+            border-radius: 20px;
+            border: 4px solid var(--dial-black);
+            box-shadow: var(--shadow);
+            color: var(--phone-cream);
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Abril Fatface', cursive;
+            font-size: 3.5rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 4px 4px 0px var(--dial-black);
+        }
+
+        .subtitle {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            background: var(--dial-black);
+            color: var(--coin-gold);
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+
+        /* PHONE BOOK (THEORY) */
+        .phone-book {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 70px;
+        }
+
+        .entry-card {
+            background: white;
+            border: 3px solid var(--dial-black);
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            transition: transform 0.2s;
+            box-shadow: var(--shadow);
+        }
+
+        .entry-card:hover {
+            transform: translateY(-5px);
+            background: #FFF9F0;
+        }
+
+        .card-icon {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            background: var(--teal-accent);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--dial-black);
+            font-size: 1.2rem;
+        }
+
+        .phrasal-verb {
+            font-family: 'Abril Fatface', cursive;
+            font-size: 1.5rem;
+            color: var(--booth-red);
+            margin-bottom: 10px;
+            border-bottom: 2px dashed var(--dial-black);
+            padding-bottom: 5px;
+        }
+
+        .meaning {
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .eng-def {
+            font-size: 0.85rem;
+            color: #7F8C8D;
+            font-style: italic;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .example {
+            background: #ECF0F1;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            border-left: 4px solid var(--coin-gold);
+        }
+
+        /* DIAL PAD (EXERCISE) */
+        .dial-pad {
+            background: var(--dial-black);
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            color: var(--phone-cream);
+        }
+
+        .section-title {
+            text-align: center;
+            font-family: 'Abril Fatface', cursive;
+            font-size: 2.2rem;
+            color: var(--coin-gold);
+            margin-bottom: 40px;
+        }
+
+        .question-block {
+            background: rgba(255,255,255,0.1);
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .q-text {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn-opt {
+            background: var(--phone-cream);
+            border: 3px solid #BDC3C7;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'DM Mono', monospace;
+            font-size: 1rem;
+            color: var(--dial-black);
+            transition: all 0.2s;
+            text-align: left;
+            position: relative;
+        }
+
+        .btn-opt:hover {
+            background: var(--teal-accent);
+            color: white;
+            border-color: var(--teal-accent);
+        }
+
+        .btn-opt.correct {
+            background: #27AE60;
+            color: white;
+            border-color: #27AE60;
+        }
+
+        .btn-opt.incorrect {
+            background: var(--booth-red);
+            color: white;
+            border-color: var(--booth-red);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 10px;
+            background: var(--phone-cream);
+            color: var(--dial-black);
+            border-radius: 5px;
+            font-size: 0.9rem;
+            display: none;
+            border-left: 5px solid var(--booth-red);
+        }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Unit 17: CALL</h1>
+        <div class="subtitle">Please Hold The Line...</div>
+    </header>
+
+    <div class="phone-book">
+        
+        <div class="entry-card">
+            <div class="card-icon">📢</div>
+            <div class="phrasal-verb">Call out</div>
+            <span class="meaning">1. Hét lớn / Chỉ trích công khai</span>
+            <span class="eng-def">= shout / criticize publicly</span>
+            <span class="meaning">2. Gọi đến (khẩn cấp)</span>
+            <span class="eng-def">= ask sb to come (emergency)</span>
+            <div class="example">"The governor called out the National Guard."</div>
+        </div>
+
+        <div class="entry-card">
+            <div class="card-icon">🎩</div>
+            <div class="phrasal-verb">Call on/upon</div>
+            <span class="meaning">1. Yêu cầu/Đòi hỏi ai làm gì</span>
+            <span class="eng-def">= officially ask sb to do st</span>
+            <span class="meaning">2. Ghé thăm / Mời phát biểu</span>
+            <span class="eng-def">= visit / ask to speak</span>
+            <div class="example">"They called on the company to reverse its decision."</div>
+        </div>
+
+        <div class="entry-card">
+            <div class="card-icon">❗</div>
+            <div class="phrasal-verb">Call for</div>
+            <span class="meaning">1. Cần / Xứng đáng</span>
+            <span class="eng-def">= need / deserve</span>
+            <span class="meaning">2. Đòi hỏi công khai / Đón ai</span>
+            <span class="eng-def">= demand publicly / pick sb up</span>
+            <div class="example">"This calls for a celebration!"</div>
+        </div>
+
+        <div class="entry-card">
+            <div class="card-icon">📻</div>
+            <div class="phrasal-verb">Call in</div>
+            <span class="meaning">1. Gọi điện (đến đài/chỗ làm)</span>
+            <span class="eng-def">= phone a program / workplace</span>
+            <span class="meaning">2. Mời đến / Đòi tiền</span>
+            <span class="eng-def">= ask to come / demand repayment</span>
+            <div class="example">"Call in to this radio station."</div>
+        </div>
+
+        <div class="entry-card">
+            <div class="card-icon">❌</div>
+            <div class="phrasal-verb">Call off</div>
+            <span class="meaning">Hủy bỏ / Dừng tấn công</span>
+            <span class="eng-def">= cancel / stop attacking</span>
+            <div class="example">"The game was called off due to rain."</div>
+        </div>
+
+        <div class="entry-card">
+            <div class="card-icon">🔄</div>
+            <div class="phrasal-verb">Call back</div>
+            <span class="meaning">Gọi lại / Quay lại</span>
+            <span class="eng-def">= phone again / return</span>
+            <div class="example">"She said she'd call back later."</div>
+        </div>
+
+        <div class="entry-card">
+            <div class="card-icon">💻</div>
+            <div class="phrasal-verb">Call up</div>
+            <span class="meaning">1. Gọi điện / Gợi nhớ</span>
+            <span class="eng-def">= phone / remind</span>
+            <span class="meaning">2. Gọi nhập ngũ / Mở (trên máy tính)</span>
+            <span class="eng-def">= join army / find on screen</span>
+            <div class="example">"I called his address up on the computer."</div>
+        </div>
+
+        <div class="entry-card">
+            <div class="card-icon">🚉</div>
+            <div class="phrasal-verb">Call at / Call by</div>
+            <span class="meaning">Ghé qua / Dừng lại (tàu xe)</span>
+            <span class="eng-def">= stop at a place / visit briefly</span>
+            <div class="example">"This train calls at Didcot."</div>
+        </div>
+
+    </div>
+
+    <div class="dial-pad">
+        <h2 class="section-title">📞 Dialing Exercise (Q133-147)</h2>
+
+        <div class="question-block" id="q133">
+            <div class="q-text">133. I knew about the public outcry against my article, so I was not surprised when the editor called me _______ to chat.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(133, 'D')">A. in</button>
+                <button class="btn-opt" onclick="check(133, 'D')">B. on</button>
+                <button class="btn-opt" onclick="check(133, 'D')">C. over</button>
+                <button class="btn-opt" onclick="check(133, 'D')">D. up</button>
+            </div>
+            <div class="feedback" id="fb-133"></div>
+        </div>
+
+        <div class="question-block" id="q134">
+            <div class="q-text">134. He was _______ at the beginning of the war.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(134, 'A')">A. called up</button>
+                <button class="btn-opt" onclick="check(134, 'A')">B. called in</button>
+                <button class="btn-opt" onclick="check(134, 'A')">C. called on</button>
+                <button class="btn-opt" onclick="check(134, 'A')">D. called out</button>
+            </div>
+            <div class="feedback" id="fb-134"></div>
+        </div>
+
+        <div class="question-block" id="q135">
+            <div class="q-text">135. It would be unusual for a company going into receivership not to _______ Loans to settle creditors.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(135, 'B')">A. call for</button>
+                <button class="btn-opt" onclick="check(135, 'B')">B. call in</button>
+                <button class="btn-opt" onclick="check(135, 'B')">C. call up</button>
+                <button class="btn-opt" onclick="check(135, 'B')">D. call back</button>
+            </div>
+            <div class="feedback" id="fb-135"></div>
+        </div>
+
+        <div class="question-block" id="q136">
+            <div class="q-text">136. It's the sort of work that _______ a high level of concentration.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(136, 'C')">A. calls at</button>
+                <button class="btn-opt" onclick="check(136, 'C')">B. calls in</button>
+                <button class="btn-opt" onclick="check(136, 'C')">C. calls for</button>
+                <button class="btn-opt" onclick="check(136, 'C')">D. calls off</button>
+            </div>
+            <div class="feedback" id="fb-136"></div>
+        </div>
+
+        <div class="question-block" id="q137">
+            <div class="q-text">137. She _______ local employers to commit themselves to equal opportunities.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(137, 'C')">A. called at</button>
+                <button class="btn-opt" onclick="check(137, 'C')">B. called in</button>
+                <button class="btn-opt" onclick="check(137, 'C')">C. called on</button>
+                <button class="btn-opt" onclick="check(137, 'C')">D. called out</button>
+            </div>
+            <div class="feedback" id="fb-137"></div>
+        </div>
+
+        <div class="question-block" id="q138">
+            <div class="q-text">138. People were _______ to report suspicious activity.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(138, 'C')">A. calling up</button>
+                <button class="btn-opt" onclick="check(138, 'C')">B. calling at</button>
+                <button class="btn-opt" onclick="check(138, 'C')">C. calling in</button>
+                <button class="btn-opt" onclick="check(138, 'C')">D. calling out</button>
+            </div>
+            <div class="feedback" id="fb-138"></div>
+        </div>
+
+        <div class="question-block" id="q139">
+            <div class="q-text">139. You can use the search facility to _______ all the occurrences of a particular word in a document.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(139, 'C')">A. call for</button>
+                <button class="btn-opt" onclick="check(139, 'C')">B. call in</button>
+                <button class="btn-opt" onclick="check(139, 'C')">C. call up</button>
+                <button class="btn-opt" onclick="check(139, 'C')">D. call back</button>
+            </div>
+            <div class="feedback" id="fb-139"></div>
+        </div>
+
+        <div class="question-block" id="q140">
+            <div class="q-text">140. Can you ask John to call me _______ when he gets in?</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(140, 'D')">A. out</button>
+                <button class="btn-opt" onclick="check(140, 'D')">B. back</button>
+                <button class="btn-opt" onclick="check(140, 'D')">C. in</button>
+                <button class="btn-opt" onclick="check(140, 'D')">D. back</button>
+                </div>
+            <div class="feedback" id="fb-140"></div>
+        </div>
+
+        <div class="question-block" id="q141">
+            <div class="q-text">141. The army was _______ to help fight fires.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(141, 'B')">A. called up</button>
+                <button class="btn-opt" onclick="check(141, 'B')">B. called out</button>
+                <button class="btn-opt" onclick="check(141, 'B')">C. called for</button>
+                <button class="btn-opt" onclick="check(141, 'B')">D. called off</button>
+            </div>
+            <div class="feedback" id="fb-141"></div>
+        </div>
+
+        <div class="question-block" id="q142">
+            <div class="q-text">142. I knew the task would _______ my every resource.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(142, 'A')">A. call on</button>
+                <button class="btn-opt" onclick="check(142, 'A')">B. call in</button>
+                <button class="btn-opt" onclick="check(142, 'A')">C. call out</button>
+                <button class="btn-opt" onclick="check(142, 'A')">D. call back</button>
+            </div>
+            <div class="feedback" id="fb-142"></div>
+        </div>
+
+        <div class="question-block" id="q143">
+            <div class="q-text">143. Social institutions are often _______ to assist the poor.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(143, 'D')">A. called off</button>
+                <button class="btn-opt" onclick="check(143, 'D')">B. called up</button>
+                <button class="btn-opt" onclick="check(143, 'D')">C. called for</button>
+                <button class="btn-opt" onclick="check(143, 'D')">D. called upon</button>
+            </div>
+            <div class="feedback" id="fb-143"></div>
+        </div>
+
+        <div class="question-block" id="q144">
+            <div class="q-text">144. They _______ an investigation into how the investments were made.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(144, 'C')">A. called off</button>
+                <button class="btn-opt" onclick="check(144, 'C')">B. called up</button>
+                <button class="btn-opt" onclick="check(144, 'C')">C. called for</button>
+                <button class="btn-opt" onclick="check(144, 'C')">D. called upon</button>
+            </div>
+            <div class="feedback" id="fb-144"></div>
+        </div>
+
+        <div class="question-block" id="q145">
+            <div class="q-text">145. People were asked to _______ if they wanted further information on the proposal.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(145, 'B')">A. call upon</button>
+                <button class="btn-opt" onclick="check(145, 'B')">B. call in</button>
+                <button class="btn-opt" onclick="check(145, 'B')">C. call out</button>
+                <button class="btn-opt" onclick="check(145, 'B')">D. call back</button>
+            </div>
+            <div class="feedback" id="fb-145"></div>
+        </div>
+
+        <div class="question-block" id="q146">
+            <div class="q-text">146. The police have _______ the search for the missing child until dawn tomorrow.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(146, 'A')">A. called off</button>
+                <button class="btn-opt" onclick="check(146, 'A')">B. called up</button>
+                <button class="btn-opt" onclick="check(146, 'A')">C. called for</button>
+                <button class="btn-opt" onclick="check(146, 'A')">D. called upon</button>
+            </div>
+            <div class="feedback" id="fb-146"></div>
+        </div>
+
+        <div class="question-block" id="q147">
+            <div class="q-text">147. Something about her manner _______ an old school teacher I used to have.</div>
+            <div class="options-grid">
+                <button class="btn-opt" onclick="check(147, 'C')">A. calls at</button>
+                <button class="btn-opt" onclick="check(147, 'C')">B. calls in</button>
+                <button class="btn-opt" onclick="check(147, 'C')">C. calls up</button>
+                <button class="btn-opt" onclick="check(147, 'C')">D. calls off</button>
+            </div>
+            <div class="feedback" id="fb-147"></div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const answerKey = {
+        133: {key: 'D', note: "<b>Call sb up:</b> Gọi điện thoại cho ai. (Biên tập viên gọi tôi để trò chuyện)."},
+        134: {key: 'A', note: "<b>Call up:</b> Gọi nhập ngũ. (Anh ấy bị gọi nhập ngũ khi chiến tranh bắt đầu)."},
+        135: {key: 'B', note: "<b>Call in:</b> Đòi tiền/Thu hồi nợ (loans)."},
+        136: {key: 'C', note: "<b>Call for:</b> Cần/Đòi hỏi (Công việc đòi hỏi sự tập trung cao độ)."},
+        137: {key: 'C', note: "<b>Call on sb:</b> Yêu cầu/Kêu gọi ai làm gì (Kêu gọi các nhà tuyển dụng cam kết...)."},
+        138: {key: 'C', note: "<b>Call in:</b> Gọi điện đến (cơ quan/cảnh sát) để báo cáo/thông báo."},
+        139: {key: 'C', note: "<b>Call up:</b> Tìm và hiển thị thông tin trên màn hình máy tính."},
+        140: {key: 'D', note: "<b>Call back:</b> Gọi lại."}, // Assuming D is 'back' based on context
+        141: {key: 'B', note: "<b>Call out:</b> Huy động/Yêu cầu ai đến giúp trong trường hợp khẩn cấp (quân đội chữa cháy)."},
+        142: {key: 'A', note: "<b>Call on:</b> Tận dụng/Sử dụng nguồn lực (Make use of)."},
+        143: {key: 'D', note: "<b>Call upon (on):</b> Yêu cầu chính thức/Mời ai làm gì."},
+        144: {key: 'C', note: "<b>Call for:</b> Đòi hỏi công khai (yêu cầu điều tra)."},
+        145: {key: 'B', note: "<b>Call in:</b> Gọi điện thoại đến chương trình/nơi nào đó để hỏi thông tin."},
+        146: {key: 'A', note: "<b>Call off:</b> Hủy bỏ/Ngừng (ngừng tìm kiếm cho đến sáng mai)."},
+        147: {key: 'C', note: "<b>Call up:</b> Gợi nhớ (ký ức/hình ảnh). (Dáng vẻ cô ấy gợi nhớ đến giáo viên cũ)."}
+    };
+
+    const answered = new Set();
+
+    function check(qId, choice) {
+        if (answered.has(qId)) return;
+        
+        // Handle custom logic for Q140 where options might be tricky in display
+        // Assuming standard ABCD order logic for script
+        const correct = answerKey[qId].key;
+        const note = answerKey[qId].note;
+        const feedbackEl = document.getElementById(`fb-${qId}`);
+        const buttons = document.querySelectorAll(`#q${qId} .btn-opt`);
+
+        answered.add(qId);
+
+        buttons.forEach(btn => {
+            const txt = btn.innerText.split('.')[0].trim();
+            if(txt === correct) btn.classList.add('correct');
+            else if(txt === choice) btn.classList.add('incorrect');
+            btn.style.cursor = 'default';
+        });
+
+        feedbackEl.style.display = 'block';
+        if (choice === correct) {
+            feedbackEl.innerHTML = `📞 <b>Chính xác!</b> ${note}`;
+            feedbackEl.style.borderLeftColor = "#27AE60";
+        } else {
+            feedbackEl.innerHTML = `☎️ <b>Sai rồi.</b> Đáp án là <b>${correct}</b>.<br>${note}`;
+            feedbackEl.style.borderLeftColor = "#C0392B";
+        }
+    }
+</script>
+
+</body>
+</html>

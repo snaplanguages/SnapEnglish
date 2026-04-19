@@ -1,0 +1,589 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 29: DRAW - Sketchbook Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Patrick+Hand&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette: Sketchbook */
+            --paper-bg: #FDFBF7;
+            --grid-line: #E1E8ED;
+            --pencil-grey: #555555;
+            --highlight-yellow: #FFF9C4;
+            --ink-blue: #1A237E;
+            --eraser-pink: #F8BBD0;
+            --ruler-orange: #FFCC80;
+        }
+
+        body {
+            font-family: 'Patrick Hand', cursive;
+            background-color: var(--paper-bg);
+            color: var(--pencil-grey);
+            margin: 0;
+            padding: 40px 20px;
+            /* Grid paper background */
+            background-image: 
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 20px 20px;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+            transform: rotate(-1deg);
+        }
+
+        h1 {
+            font-family: 'Architects Daughter', cursive;
+            font-size: 4rem;
+            color: var(--ink-blue);
+            margin: 0;
+            text-decoration: underline wavy var(--ruler-orange);
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: var(--pencil-grey);
+            margin-top: 10px;
+            background: var(--highlight-yellow);
+            display: inline-block;
+            padding: 5px 20px;
+            box-shadow: 3px 3px 0 rgba(0,0,0,0.1);
+        }
+
+        /* SKETCH GRID (THEORY) */
+        .sketch-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .sketch-card {
+            background: white;
+            border: 2px solid var(--pencil-grey);
+            border-radius: 2px 2px 20px 2px; /* Folded corner */
+            padding: 20px;
+            box-shadow: 5px 5px 0 rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        .sketch-card:hover {
+            transform: scale(1.02) rotate(1deg);
+            z-index: 10;
+        }
+
+        /* Tape effect */
+        .sketch-card::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 25px;
+            background-color: rgba(255, 255, 255, 0.6);
+            border: 1px solid #ddd;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .phrasal-verb {
+            font-family: 'Architects Daughter', cursive;
+            font-size: 1.8rem;
+            color: var(--ink-blue);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--pencil-grey);
+        }
+
+        .def-group {
+            margin-bottom: 15px;
+        }
+
+        .meaning {
+            font-weight: 700;
+            color: #D84315;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.2rem;
+        }
+
+        .eng-def {
+            font-size: 1rem;
+            color: #78909C;
+            font-style: italic;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .example {
+            background: #F5F5F5;
+            padding: 8px 12px;
+            border-left: 4px solid var(--ruler-orange);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        /* EXERCISE NOTEBOOK */
+        .notebook {
+            background: white;
+            padding: 40px;
+            border-left: 20px solid var(--eraser-pink);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .notebook-title {
+            font-family: 'Architects Daughter', cursive;
+            font-size: 2.5rem;
+            color: var(--ink-blue);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .question-item {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--pencil-grey);
+        }
+
+        .q-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .sketch-btn {
+            background: transparent;
+            border: 2px solid var(--pencil-grey);
+            padding: 10px 15px;
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px; /* Sketchy border */
+            cursor: pointer;
+            font-family: 'Patrick Hand', cursive;
+            font-size: 1.1rem;
+            text-align: left;
+            transition: all 0.2s;
+            color: var(--pencil-grey);
+        }
+
+        .sketch-btn:hover {
+            border-color: var(--ink-blue);
+            color: var(--ink-blue);
+            background: var(--highlight-yellow);
+        }
+
+        .sketch-btn.correct {
+            border-color: #2E7D32;
+            color: #2E7D32;
+            background: #C8E6C9;
+        }
+
+        .sketch-btn.incorrect {
+            border-color: #C62828;
+            color: #C62828;
+            background: #FFCDD2;
+        }
+
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.95rem;
+            display: none;
+            background: #E8EAF6;
+            border-left: 4px solid var(--ink-blue);
+        }
+
+        /* STICKY NOTES */
+        .sticky-note {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            background: var(--highlight-yellow);
+            padding: 15px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            font-family: 'Patrick Hand', cursive;
+            transform: rotate(-2deg);
+            z-index: 100;
+            display: none; /* Show only on desktop */
+        }
+        
+        @media (min-width: 1000px) {
+            .sticky-note { display: block; }
+        }
+
+        @media (max-width: 700px) {
+            .options-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Unit 29: DRAW</h1>
+        <div class="subtitle">Sketching out the meanings...</div>
+    </header>
+
+    <div class="sketch-grid">
+        
+        <div class="sketch-card">
+            <div class="phrasal-verb">Draw aside</div>
+            <div class="def-group">
+                <span class="meaning">Kéo ai sang một bên</span>
+                <span class="eng-def">= pull sb aside (to talk privately)</span>
+                <div class="example">"The teacher drew Bob aside to have a word with him."</div>
+            </div>
+        </div>
+
+        <div class="sketch-card">
+            <div class="phrasal-verb">Draw down</div>
+            <div class="def-group">
+                <span class="meaning">Sử dụng hết (nguồn dự trữ)</span>
+                <span class="eng-def">= use up / deplete resources</span>
+                <div class="example">"We've drawn down our supply of firewood."</div>
+            </div>
+            <div class="def-group">
+                <span class="meaning">Giảm bớt</span>
+                <span class="eng-def">= reduce</span>
+            </div>
+        </div>
+
+        <div class="sketch-card">
+            <div class="phrasal-verb">Draw in</div>
+            <div class="def-group">
+                <span class="meaning">Thu hút / Lôi kéo vào</span>
+                <span class="eng-def">= attract / involve sb</span>
+                <div class="example">"They tried to draw in new members."</div>
+            </div>
+            <div class="def-group">
+                <span class="meaning">(Ngày) ngắn lại / Trời tối sớm</span>
+                <span class="eng-def">= become darker earlier</span>
+                <div class="example">"The days draw in as winter approaches."</div>
+            </div>
+        </div>
+
+        <div class="sketch-card">
+            <div class="phrasal-verb">Draw on</div>
+            <div class="def-group">
+                <span class="meaning">Sử dụng (kinh nghiệm/nguồn lực)</span>
+                <span class="eng-def">= use a resource/experience</span>
+                <div class="example">"She drew on her wealth of experience."</div>
+            </div>
+            <div class="def-group">
+                <span class="meaning">Trôi qua (thời gian)</span>
+                <span class="eng-def">= pass slowly</span>
+                <div class="example">"As the lecture drew on, students dozed off."</div>
+            </div>
+        </div>
+
+        <div class="sketch-card">
+            <div class="phrasal-verb">Draw out</div>
+            <div class="def-group">
+                <span class="meaning">Kéo dài (thời gian/sự việc)</span>
+                <span class="eng-def">= make st longer</span>
+                <div class="example">"He drew the meeting out for an hour."</div>
+            </div>
+            <div class="def-group">
+                <span class="meaning">Rút tiền</span>
+                <span class="eng-def">= withdraw money</span>
+            </div>
+            <div class="def-group">
+                <span class="meaning">Động viên ai nói chuyện</span>
+                <span class="eng-def">= encourage sb to talk</span>
+                <div class="example">"She tried to draw him out."</div>
+            </div>
+        </div>
+
+        <div class="sketch-card">
+            <div class="phrasal-verb">Draw up</div>
+            <div class="def-group">
+                <span class="meaning">Soạn thảo (văn bản/kế hoạch)</span>
+                <span class="eng-def">= prepare/write a document</span>
+                <div class="example">"Guidelines have been drawn up."</div>
+            </div>
+            <div class="def-group">
+                <span class="meaning">(Xe cộ) Đỗ lại / Dừng lại</span>
+                <span class="eng-def">= (vehicle) stop</span>
+                <div class="example">"The cab drew up outside the house."</div>
+            </div>
+            <div class="def-group">
+                <span class="meaning">Kéo lại gần (ghế)</span>
+                <span class="eng-def">= move closer</span>
+                <div class="example">"He drew up a chair."</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="notebook">
+        <h2 class="notebook-title">✏️ Practice Sketch (Q274-290)</h2>
+
+        <div class="question-item" id="q274">
+            <div class="q-text">274. She waved to me and called out my name as I _______. (Arrived/Stopped in vehicle)</div>
+            <div class="options-grid">
+                <button class="sketch-btn" onclick="check(274, 'B')">A. drew on</button>
+                <button class="sketch-btn" onclick="check(274, 'B')">B. drew up</button>
+                <button class="sketch-btn" onclick="check(274, 'C')">C. drew down</button>
+                <button class="sketch-btn" onclick="check(274, 'D')">D. drew in</button>
+            </div>
+            <div class="feedback" id="fb-274"></div>
+        </div>
+
+        <div class="question-item" id="q275">
+            <div class="q-text">275. _______ my experience speaking in front of my class definitely helped when I had to give a speech to the whole school.</div>
+            <div class="options-grid">
+                <button class="sketch-btn" onclick="check(275, 'A')">A. Drawing on</button>
+                <button class="sketch-btn" onclick="check(275, 'B')">B. To draw out</button>
+                <button class="sketch-btn" onclick="check(275, 'C')">C. Drawing up</button>
+                <button class="sketch-btn" onclick="check(275, 'D')">D. Drew off</button>
+            </div>
+            <div class="feedback" id="fb-275"></div>
+        </div>
+
+        <div class="question-item" id="q276">
+            <div class="q-text">276. The government worries about drawing _______ our oil reserves. (Using up)</div>
+            <div class="options-grid">
+                <button class="sketch-btn" onclick="check(276, 'A')">A. down</button>
+                <button class="sketch-btn" onclick="check(276, 'B')">B. up</button>
+                <button class="sketch-btn" onclick="check(276, 'C')">C. on</button>
+                <button class="sketch-btn" onclick="check(276, 'D')">D. in</button>
+            </div>
+            <div class="feedback" id="fb-276"></div>
+        </div>
+
+        <div class="question-item" id="q277">
+            <div class="q-text">277. The beginning of this book was so good that it just drew me _______ - I haven't been able to put it down since!</div>
+            <div class="options-grid">
+                <button class="sketch-btn" onclick="check(277, 'D')">A. down</button>
+                <button class="sketch-btn" onclick="check(277, 'B')">B. up</button>
+                <button class="sketch-btn" onclick="check(277, 'C')">C. on</button>
+                <button class="sketch-btn" onclick="check(277, 'D')">D. in</button>
+            </div>
+            <div class="feedback" id="fb-277"></div>
+        </div>
+
+        <div class="question-item" id="q278">
+            <div class="q-text">278. To _______ someone's horoscope, you need to know their date and exact time of birth.</div>
+            <div class="options-grid">
+                <button class="sketch-btn" onclick="check(278, 'A')">A. draw up</button>
+                <button class="sketch-btn" onclick="check(278, 'B')">B. draw aside</button>
+                <button class="sketch-btn" onclick="check(278, 'C')">C. draw out</button>
+                <button class="sketch-btn" onclick="check(278, 'D')">D. draw in</button>
+            </div>
+            <div class="feedback" id="fb-278"></div>
+        </div>
+
+        <div class="question-item" id="q279">
+            <div class="q-text">279. We do not want to get drawn _______ a long and expensive conflict.</div>
+            <div class="options-grid">
+                <button class="sketch-btn" onclick="check(279, 'D')">A. off</button>
+                <button class="sketch-btn" onclick="check(279, 'B')">B. up</button>
+                <button class="sketch-btn" onclick="check(279, 'C')">C. on</button>
+                <button class="sketch-btn" onclick="check(279, 'D')">D. into</button>
+            </div>
+            <div class="feedback" id="fb-279"></div>
+        </div>
+
+        <div class="question-item" id="q280">
+            <div class="q-text">280. The steward drew some wine _______ from the cask.</div>
+            <div class="options-grid">
+                <button class="sketch-btn" onclick="check(280, 'B')">A. on</button>
+                <button class="sketch-btn" onclick="check(280, 'B')">B. off</button>
+                <button class="sketch-btn" onclick="check(280, 'C')">C. down</button>
+                <button class="sketch-btn" onclick="check(280, 'D')">D. in</button>
+            </div>
+            <div class="feedback" id="fb-280"></div>
+        </div>
+
+        <div class="question-item" id="q281">
+            <div class="q-text">281. Fund managers drew _______ on cash reserves and bet that the bull market would continue.</div>
+            <div class="options-grid">
+                <button class="sketch-btn" onclick="check(281, 'A')">A. down</button>
+                <button class="sketch-btn" onclick="check(281, 'B')">B. up</button>
+                <button class="sketch-btn" onclick="check(281, 'C')">C. in</button>
+                <button class="sketch-btn" onclick="check(281, 'D')">D. out</button>
+            </div>
+            <div class="feedback" id="fb-281"></div>
+        </div>
+
+        <div class="question-item" id="q282">
+            <div class="q-text">282. I drew the nurse _______ so that I could ask a few more questions about my dad's surgery.</div>
+            <div class="options-grid">
+                <button class="sketch-btn" onclick="check(282, 'A')">A. aside</button>
+                <button class="sketch-btn" onclick="check(282, 'B')">B. down</button>
+                <button class="sketch-btn" onclick="check(282, 'C')">C. out</button>
+                <button class="sketch-btn" onclick="check(282, 'D')">D. off</button>
+            </div>
+            <div class="feedback" id="fb-282"></div>
+        </div>
+
+        <div class="question-item" id="q283">
+            <div class="q-text">283. Depositors drew so much money _______ of the bank that it was forced to close down.</div>
+            <div class="options-grid">
+                <button class="sketch-btn" onclick="check(283, 'D')">A. aside</button>
+                <button class="sketch-btn" onclick="check(283, 'B')">B. down</button>
+                <button class="sketch-btn" onclick="check(283, 'C')">C. in</button>
+                <button class="sketch-btn" onclick="check(283, 'D')">D. out</button>
+            </div>
+            <div class="feedback" id="fb-283"></div>
+        </div>
+
+        <div class="question-item" id="q284">
+            <div class="q-text">284. The days begin to _______ after the summer solstice. (Get shorter/darker earlier)</div>
+            <div class="options-grid">
+                <button class="sketch-btn" onclick="check(284, 'D')">A. draw up</button>
+                <button class="sketch-btn" onclick="check(284, 'B')">B. draw down</button>
+                <button class="sketch-btn" onclick="check(284, 'C')">C. draw out</button>
+                <button class="sketch-btn" onclick="check(284, 'D')">D. draw in</button>
+            </div>
+            <div class="feedback" id="fb-284"></div>
+        </div>
+
+        <div class="question-item" id="q285">
+            <div class="q-text">285. As the journey was drawn _______ he started to feel tired. (Drag on/Last long)</div>
+            <div class="options-grid">
+                <button class="sketch-btn" onclick="check(285, 'C')">A. on</button>
+                <button class="sketch-btn" onclick="check(285, 'B')">B. up</button>
+                <button class="sketch-btn" onclick="check(285, 'C')">C. out</button>
+                <button class="sketch-btn" onclick="check(285, 'D')">D. in</button>
+            </div>
+            <div class="feedback" id="fb-285"></div>
+        </div>
+
+        <div class="question-item" id="q286">
+            <div class="q-text">286. Just when I thought the professor couldn't _______ this lecture any more, he droned on about torts for another half hour.</div>
+            <div class="options-grid">
+                <button class="sketch-btn" onclick="check(286, 'C')">A. draw over</button>
+                <button class="sketch-btn" onclick="check(286, 'B')">B. draw on</button>
+                <button class="sketch-btn" onclick="check(286, 'C')">C. draw out</button>
+                <button class="sketch-btn" onclick="check(286, 'D')">D. draw in</button>
+            </div>
+            <div class="feedback" id="fb-286"></div>
+        </div>
+
+        <div class="question-item" id="q287">
+            <div class="q-text">287. Consumers continue to draw _______ inventories of aluminum, copper, and other metals.</div>
+            <div class="options-grid">
+                <button class="sketch-btn" onclick="check(287, 'A')">A. down</button>
+                <button class="sketch-btn" onclick="check(287, 'B')">B. out</button>
+                <button class="sketch-btn" onclick="check(287, 'C')">C. over</button>
+                <button class="sketch-btn" onclick="check(287, 'D')">D. aside</button>
+            </div>
+            <div class="feedback" id="fb-287"></div>
+        </div>
+
+        <div class="question-item" id="q288">
+            <div class="q-text">288. Well then, _______ a seat and tell us what you think.</div>
+            <div class="options-grid">
+                <button class="sketch-btn" onclick="check(288, 'B')">A. draw on</button>
+                <button class="sketch-btn" onclick="check(288, 'B')">B. draw up</button>
+                <button class="sketch-btn" onclick="check(288, 'C')">C. draw out</button>
+                <button class="sketch-btn" onclick="check(288, 'D')">D. draw off</button>
+            </div>
+            <div class="feedback" id="fb-288"></div>
+        </div>
+
+        <div class="question-item" id="q289">
+            <div class="q-text">289. She was good at drawing _______ young people and getting them to talk about their fears.</div>
+            <div class="options-grid">
+                <button class="sketch-btn" onclick="check(289, 'B')">A. in</button>
+                <button class="sketch-btn" onclick="check(289, 'B')">B. out</button>
+                <button class="sketch-btn" onclick="check(289, 'C')">C. off</button>
+                <button class="sketch-btn" onclick="check(289, 'D')">D. on</button>
+            </div>
+            <div class="feedback" id="fb-289"></div>
+        </div>
+
+        <div class="question-item" id="q290">
+            <div class="q-text">290. He drew _______ his experience as a yachtsman to make a documentary.</div>
+            <div class="options-grid">
+                <button class="sketch-btn" onclick="check(290, 'D')">A. up</button>
+                <button class="sketch-btn" onclick="check(290, 'B')">B. off</button>
+                <button class="sketch-btn" onclick="check(290, 'C')">C. down</button>
+                <button class="sketch-btn" onclick="check(290, 'D')">D. on</button>
+            </div>
+            <div class="feedback" id="fb-290"></div>
+        </div>
+
+    </div>
+
+    <div class="sticky-note">
+        <b>Tips:</b><br>
+        - <b>UP</b>: Lập kế hoạch (Plan) hoặc Xe dừng (Stop).<br>
+        - <b>ON</b>: Dựa vào (Rely/Use) hoặc Thời gian trôi qua.<br>
+        - <b>OUT</b>: Kéo dài (Longer) hoặc Rút tiền.<br>
+    </div>
+</div>
+
+<script>
+    const answerKey = {
+        274: {key: 'B', note: "<b>Draw up:</b> (Xe cộ) đỗ lại/dừng lại."},
+        275: {key: 'A', note: "<b>Draw on:</b> Sử dụng/tận dụng (kinh nghiệm/kiến thức) để làm gì."},
+        276: {key: 'A', note: "<b>Draw down:</b> Sử dụng hết, làm cạn kiệt (nguồn dự trữ)."},
+        277: {key: 'D', note: "<b>Draw sb in:</b> Thu hút, lôi cuốn ai đó."},
+        278: {key: 'A', note: "<b>Draw up:</b> Soạn thảo, chuẩn bị văn bản/kế hoạch (lá số tử vi)."},
+        279: {key: 'D', note: "<b>Draw sb into:</b> Lôi kéo, dính líu vào (cuộc xung đột)."},
+        280: {key: 'B', note: "<b>Draw off:</b> Hút ra, chiết ra (chất lỏng)."},
+        281: {key: 'A', note: "<b>Draw down:</b> Rút bớt (nguồn tiền/dự trữ)."},
+        282: {key: 'A', note: "<b>Draw aside:</b> Kéo ai sang một bên (để nói chuyện riêng)."},
+        283: {key: 'D', note: "<b>Draw out:</b> Rút tiền (từ ngân hàng)."},
+        284: {key: 'D', note: "<b>Draw in:</b> (Ngày) ngắn lại, trời tối sớm hơn (vào mùa đông)."},
+        285: {key: 'C', note: "<b>Draw out:</b> Kéo dài lê thê (hành trình). (Câu này trong sách có thể dùng 'draw out' với nghĩa kéo dài thời gian)."},
+        286: {key: 'C', note: "<b>Draw out:</b> Kéo dài (bài giảng) lâu hơn mức cần thiết."},
+        287: {key: 'A', note: "<b>Draw down:</b> Làm giảm, sử dụng hết (hàng tồn kho)."},
+        288: {key: 'B', note: "<b>Draw up (a chair):</b> Kéo ghế lại gần để ngồi."},
+        289: {key: 'B', note: "<b>Draw sb out:</b> Khơi gợi, động viên ai đó nói chuyện/bộc lộ bản thân (khi họ nhút nhát)."},
+        290: {key: 'D', note: "<b>Draw on:</b> Dựa vào, sử dụng (kinh nghiệm) làm nguồn tư liệu."}
+    };
+
+    function check(qId, choice) {
+        const correct = answerKey[qId].key;
+        const note = answerKey[qId].note;
+        const feedbackEl = document.getElementById(`fb-${qId}`);
+        const btns = document.querySelectorAll(`#q${qId} .sketch-btn`);
+
+        btns.forEach(btn => {
+            const txt = btn.innerText.split('.')[0].trim();
+            if (txt === correct) btn.classList.add('correct');
+            else if (txt === choice) btn.classList.add('incorrect');
+            btn.style.cursor = 'default';
+            btn.onclick = null;
+        });
+
+        feedbackEl.style.display = 'block';
+        if (choice === correct) {
+            feedbackEl.innerHTML = `🎨 <b>Chính xác!</b> ${note}`;
+            feedbackEl.style.borderLeftColor = "#2E7D32";
+            feedbackEl.style.background = "#E8F5E9";
+        } else {
+            feedbackEl.innerHTML = `✏️ <b>Chưa đúng.</b> Đáp án là <b>${correct}</b>.<br>${note}`;
+            feedbackEl.style.borderLeftColor = "#C62828";
+            feedbackEl.style.background = "#FFEBEE";
+        }
+    }
+</script>
+
+</body>
+</html>
