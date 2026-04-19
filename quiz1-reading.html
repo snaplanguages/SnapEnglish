@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz 1 | SnapEnglish</title>
+  <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #007bff;
+            --bg-body: #f4f6f8;
+            --border-color: #dfe3e8;
+            --text-color: #212b36;
+            --highlight-color: #ffff00; /* Vàng chuẩn */
+            --header-h: 60px;
+            --footer-h: 60px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* HEADER */
+        header {
+            height: var(--header-h); background: #fff;
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; z-index: 100;
+        }
+        h1 { font-size: 18px; margin: 0; font-weight: 700; color: #333; }
+        
+        .timer-box { font-family: monospace; font-size: 18px; font-weight: 700; color: #d32f2f; background: #ffebee; padding: 5px 12px; border-radius: 4px; }
+        .btn-submit { background: var(--primary); color: white; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .btn-submit:hover { background: #0056b3; }
+
+        /* LAYOUT */
+        .container { display: flex; height: calc(100vh - var(--header-h) - var(--footer-h)); width: 100%; }
+
+        /* PANES */
+        .pane {
+            flex: 1; padding: 30px; overflow-y: auto;
+            position: relative;
+        }
+        .pane-left { border-right: 4px solid #e0e0e0; background: #fff; font-size: 16px; line-height: 1.8; text-align: justify; }
+        .pane-right { background: #f9fafb; }
+        
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: #bdbdbd; border-radius: 4px; }
+
+        /* QUESTION STYLES */
+        .question-section { padding: 20px 30px; border-bottom: 1px solid var(--border-color); background: #fff; margin-bottom: 10px; }
+        .instruction { color: #007bff; font-weight: 700; margin-bottom: 15px; font-size: 15px; background: #e3f2fd; padding: 10px; border-radius: 5px; }
+
+        /* DRAG PALETTE */
+        .sticky-palette {
+            position: sticky; top: 0; background: #fff; padding: 10px 0;
+            border-bottom: 2px solid var(--primary); z-index: 50; margin-bottom: 20px;
+            display: flex; gap: 8px; flex-wrap: wrap;
+        }
+        
+        .drag-item {
+            background: #fff; border: 1px solid #90caf9; color: #1565c0;
+            padding: 6px 14px; border-radius: 4px; cursor: grab;
+            font-weight: 600; font-size: 14px; user-select: none;
+            transition: all 0.2s;
+        }
+        .drag-item:active { cursor: grabbing; }
+        
+        /* Class ẩn item khi đã dùng (cho dạng 1-1) */
+        .drag-item.used {
+            opacity: 0.2; pointer-events: none; background: #e0e0e0; border-color: #ccc;
+        }
+
+        .q-row { display: flex; margin-bottom: 20px; align-items: flex-start; }
+        .q-num {
+            min-width: 30px; height: 30px; background: #455a64; color: white;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: bold; margin-right: 12px; margin-top: 2px; flex-shrink: 0;
+        }
+        .q-text { flex: 1; font-size: 15px; }
+
+        /* INPUTS */
+        .input-gap {
+            display: inline-block; width: 100px; height: 36px;
+            border: 1px solid #cfd8dc; border-radius: 4px; margin-left: 10px;
+            vertical-align: middle; text-align: center; font-weight: 700;
+            color: #0277bd; background: #fff; font-size: 14px; text-transform: uppercase;
+        }
+        .input-gap:focus { border-color: var(--primary); outline: none; }
+        .input-gap.drag-over { background: #e1f5fe; border: 2px dashed var(--primary); }
+        .input-gap.filled { background: #e8f5e9; border-color: #4caf50; }
+
+        .select-answer {
+            display: inline-block; margin-top: 5px; padding: 6px 10px;
+            border: 1px solid #cfd8dc; border-radius: 4px; background-color: white;
+            font-size: 14px; cursor: pointer; width: 150px;
+        }
+
+        /* FOOTER */
+        footer {
+            height: var(--footer-h); background: #fff; border-top: 1px solid var(--border-color);
+            display: flex; align-items: center; padding: 0 20px; gap: 10px; z-index: 100;
+        }
+        .palette-scroller { flex: 1; display: flex; gap: 6px; overflow-x: auto; padding: 5px 0; }
+        .nav-dot {
+            min-width: 32px; height: 32px; border: 1px solid #cfd8dc; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center; font-size: 13px;
+            cursor: pointer; color: #78909c; background: white;
+        }
+        .nav-dot.done { background: #e3f2fd; color: #1565c0; border-color: #90caf9; font-weight: bold; }
+
+        /* HIGHLIGHT SYSTEM */
+        .highlight { background-color: var(--highlight-color); cursor: pointer; }
+        
+        #ctxMenu {
+            position: absolute; display: none; background: white; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 6px; 
+            font-size: 13px; z-index: 99999; border: 1px solid #eee; min-width: 120px;
+        }
+        #ctxMenu button {
+            background: none; border: none; padding: 10px 15px; 
+            width: 100%; text-align: left; cursor: pointer; display: block;
+            color: #333; font-family: inherit;
+        }
+        #ctxMenu button:hover { background: #f0f7ff; color: var(--primary); }
+        #ctxMenu button.delete:hover { background: #fff0f0; color: #d32f2f; }
+
+        .feedback { margin-left: 10px; font-weight: bold; font-size: 14px; }
+        .correct { color: #2e7d32; }
+        .wrong { color: #c62828; }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>READING PASSAGE 1 TEST 1</h1>
+    <div style="display:flex; align-items:center; gap:15px;">
+        <div class="timer-box">⏱ <span id="timer">60:00</span></div>
+        <button class="btn-submit" onclick="submitTest(true)">SUBMIT</button>
+    </div>
+</header>
+
+<div class="container" id="mainContainer">
+    
+    <div class="pane pane-left" id="passagePane">
+        <h2 style="text-align:center; color:#37474f;">Pollution in the Bay 🌊</h2>
+        <div id="passageText">
+            <p><strong>A.</strong> Pouring water into the sea sounds harmless enough. But in Florida Bay, a large and shallow section of the Gulf of Mexico that lies between the southern end of the Everglades and the Florida Keys, it is proving highly controversial. That is because researchers are divided over whether it will help or hinder the plants and animals that live in the bay.</p>
+            <p><strong>B.</strong> What is at risk is the future of the bay’s extensive beds of seagrasses. These grow on the bay’s muddy floor and act as nurseries for the larvae of shrimps, lobsters and fish – many of the important sport and commercial-fishing species. Also in danger is an impressive range of coral reefs that run the length of the Florida Keys and form the third-largest barrier reef in the world. Since the 1980s, coral cover has dropped by 40%, and a third of the coral species have gone. This has had a damaging effect on the animals that depend on the reef, such as crabs, turtles and nearly 600 species of fish.</p>
+            <p><strong>C.</strong> What is causing such ecological change is a matter of much debate. And the answer is of no small consequence. This is because the American government is planning to devote $8 billion over the next 30 years to revitalise the Everglades. Seasonal freshwater flows into the Everglades are to be restored in order to improve the region’s health. But they will then run off into the bay.</p>
+            <p><strong>D.</strong> Joseph Zieman, a marine ecologist at the University of Virginia, thinks this is a good idea. He believes that a lack of fresh water in the bay is its main problem. The blame, he says, lies with a century of drainage in the Everglades aimed at turning the marshes into farmland and areas for development. This has caused the flow of fresh water into Florida Bay to dwindle, making the water in the bay, overall, more saline. This, he argues, kills the seagrasses, and as these rots, nutrients are released that feed the microscopic plants and animals that live in the water. This, he says, is why the bay’s once crystal-clear waters often resemble pea soup. And in a vicious circle, these turbid blooms block out sunlight, causing more seagrasses to die and yet more turbidity.</p>
+            <p><strong>E.</strong> Brian Lapointe, a marine scientist at the Harbour Branch Oceanographic Institution at Fort Pierce in Florida, disagrees. He thinks seagrasses can tolerate much higher levels of salinity than the bay actually displays. Furthermore, he notes that when freshwater flows through the Everglades were increased experimentally in the 1990s, it led to massive plankton blooms. Freshwater running off from well-fertilised farmlands, he says, caused a fivefold rise in nitrogen levels in the bay. This was like pouring fuel on a fire. The result was mass mortality of seagrasses because of increased turbidity from the plankton. Dr Lapointe adds that, because corals thrive only in waters where nutrient levels are low, restoring freshwater rich in nitrogen will do more damage to the reef.</p>
+            <p><strong>F.</strong> It is a plausible theory. The water flowing off crops that are grown on the750,000 acres of heavily fertilised farmland on the northern edge of the Everglades is rich in nitrogen, half of which ends up in the bay. But Bill Kruczynski, of America’s Environmental Protection Agency, is convinced that nitrogen from farmlands is not the chief problem. Some coral reefs well away from any nitrogen pollution are dying and, curiously, a few are thriving. Dr Kruczynski thinks that increased nutrients arriving from local sewage discharges from the thousands of cesspits along the Florida Keys are part of the problem.</p>
+            <p><strong>G.</strong> Such claims and counterclaims make the impact of the restoration plan difficult to predict. If increased salinity is the main problem, the bay’s ecology will benefit from the Everglades restoration project. If, however, nitrogen is the problem, increasing the flow of freshwater could mate matters much worse.</p>
+            <p><strong>H.</strong> If this second hypothesis proves correct, the cure is to remove nitrogen from farmland or sewage discharges, or perhaps both. Neither will be easy. Man-made wetlands, at present, being built to reduce phosphate runoff into the bay—also from fertilisers—would need an algal culture (a sort of contained algal bloom) added to them to deal with discharges from farmlands. That would be costly. So too would be the replacement of cesspits with proper sewerage—one estimate puts the cost at $650m. Either way, it is clear that when, on December 1st, 3,000 square miles of sea around the reef are designated as a “protective zone” by the deputy secretary of commerce, Sam Bodman, this will do nothing to protect the reef from pollution.</p>
+            <p><strong>I.</strong> Some argue, though, that there is a more fundamental flaw in the plans for the bay: the very idea of returning it to a Utopian ideal before man wrought his damage. Nobody knows what Florida Bay was like before the 1950s when engineers cut the largest canals in the Everglades and took most of the water away. Dr Kruczynski suspects it was more like an estuary. The bay that many people wish to re-create could have been nothing more than a changing phase in the bay’s history.</p>
+            <p><strong>J.</strong> These arguments do not merely threaten to create ecological problems but economic ones as well. The economy of the Florida Keys depends on tourism—the local tourist industry has an annual turnover of $2.5 billion. People come for fishing-boat trips, for manatee watching, or for scuba diving and snorkeling to view the exotically coloured corals. If the plan to restore the Everglades makes problems in the bay and the reef worse, it could prove a very expensive mistake.</p>
+        </div>
+    </div>
+
+    <div class="pane pane-right" id="questionPane">
+        
+        <div class="question-section" id="group1">
+            <div class="instruction">Questions 1-4: The reading Passage has seven paragraphs A-J.
+<br>Which paragraph contains the following information?</div>
+            <div class="sticky-palette"></div>
+            <div id="group1-content"></div>
+        </div>
+
+        <div class="question-section" id="group2">
+            <div class="instruction">Questions 5-8: Use the information in the passage to match the people (listed A-C) with opinions or
+deeds below.<i><br>NB: You may use any letter more than once.</i></div>
+            <div class="sticky-palette">
+                <div class="drag-item" id="drag-G2-A" draggable="true" ondragstart="drag(event)" data-val="A" data-reusable="true">A. Bill Kruczynski</div>
+                <div class="drag-item" id="drag-G2-B" draggable="true" ondragstart="drag(event)" data-val="B" data-reusable="true">B. Brian Lapointe</div>
+                <div class="drag-item" id="drag-G2-C" draggable="true" ondragstart="drag(event)" data-val="C" data-reusable="true">C. Joseph Zieman</div>
+            </div>
+            <div id="group2-content"></div>
+        </div>
+
+        <div class="question-section">
+            <div class="instruction">Questions 9-13: Do the following statements agree with the information given in Reading Passage 2</div>
+            <div id="group3-content"></div>
+        </div>
+    </div>
+</div>
+
+<div id="ctxMenu">
+    <button onclick="doHighlight()">🖍 Highlight (Vàng)</button>
+    <button class="delete" onclick="removeHighlight()">🗑 Xóa Highlight</button>
+</div>
+
+<footer>
+    <div style="font-size:14px; font-weight:bold; color:#555;">Palette:</div>
+    <div class="palette-scroller" id="navPalette"></div>
+</footer>
+
+<script>
+    // --- DATA ---
+    const questions = [
+        { id: 1, type: "match", group: 1, text: "Seagrass turned to be more resistant to the saline water level in the Bay.", ans: "E" },
+        { id: 2, type: "match", group: 1, text: "Significance of finding a specific reason in controversy.", ans: "C" },
+        { id: 3, type: "match", group: 1, text: "Expensive proposals raised to solve the nitrogen dilemma.", ans: "H" },
+        { id: 4, type: "match", group: 1, text: "A statistic of ecological changes in both the coral area and species.", ans: "B" },
+        { id: 5, type: "match", group: 2, text: "Drainage system in Everglades actually results in high salty water in the bay.", ans: "C" },
+        { id: 6, type: "match", group: 2, text: "Restoring water high in nitrogen level will make more ecological side effect.", ans: "B" },
+        { id: 7, type: "match", group: 2, text: "High nitrogen levels may be caused by the nearby farmland.", ans: "B" },
+        { id: 8, type: "match", group: 2, text: "Released sewage rather than nutrients from agricultural area increase the level of Nitrogen.", ans: "A" },
+        { id: 9, type: "tf", text: "Everyone agrees with 'pouring water into the sea is harmless enough'.", ans: "FALSE" },
+        { id: 10, type: "tf", text: "Nitrogen was poured in from different types of crops as water flows through.", ans: "NOT GIVEN" },
+        { id: 11, type: "tf", text: "Everglades restoration project can be effective regardless of the cause of the pollution.", ans: "FALSE" },
+        { id: 12, type: "tf", text: "Human has changed Florida Bay where old image before 1950s is unrecalled.", ans: "TRUE" },
+        { id: 13, type: "tf", text: "Tourism contributes fundamentally to the Florida Bay area.", ans: "TRUE" }
+    ];
+
+    // --- INIT ---
+    window.onload = function() {
+        render();
+        startTimer();
+    }
+
+    // --- RENDER ---
+    function render() {
+        const g1 = document.getElementById("group1-content");
+        const g2 = document.getElementById("group2-content");
+        const g3 = document.getElementById("group3-content");
+        const nav = document.getElementById("navPalette");
+        const paletteG1 = document.querySelector("#group1 .sticky-palette");
+
+        ['A','B','C','D','E','F','G','H','I','J'].forEach(l => {
+            paletteG1.innerHTML += `<div class="drag-item" id="drag-G1-${l}" draggable="true" ondragstart="drag(event)" data-val="${l}" data-reusable="false">${l}</div>`;
+        });
+
+        questions.forEach(q => {
+            let dot = document.createElement("div");
+            dot.className = "nav-dot"; dot.id = `nav-${q.id}`; dot.innerText = q.id;
+            dot.onclick = () => document.getElementById(`q-row-${q.id}`).scrollIntoView({behavior:"smooth", block:"center"});
+            nav.appendChild(dot);
+
+            let inputHTML = '';
+            if (q.type === "match") {
+                let isConsumable = (q.group === 1); 
+                inputHTML = `<input type="text" class="input-gap" id="ans-${q.id}" 
+                                ondrop="drop(event, ${isConsumable})" ondragover="allowDrop(event)" 
+                                oninput="handleInput(this)" onclick="clearInput(this, ${isConsumable})"
+                                autocomplete="off" readonly placeholder="?">`;
+            } else {
+                inputHTML = `<select class="select-answer" id="ans-${q.id}" onchange="updateNav(${q.id})">
+                        <option value="">Select...</option>
+                        <option value="TRUE">TRUE</option>
+                        <option value="FALSE">FALSE</option>
+                        <option value="NOT GIVEN">NOT GIVEN</option>
+                    </select>`;
+            }
+
+            let html = `<div class="q-row" id="q-row-${q.id}">
+                    <div class="q-num">${q.id}</div>
+                    <div class="q-text">${q.text} <br> ${inputHTML} <span id="fb-${q.id}" class="feedback"></span></div>
+                </div>`;
+
+            if (q.id <= 4) g1.innerHTML += html;
+            else if (q.id <= 8) g2.innerHTML += html;
+            else g3.innerHTML += html;
+        });
+    }
+
+    // --- DRAG & DROP ---
+    let draggedSourceId = null;
+    function allowDrop(ev) { ev.preventDefault(); ev.target.classList.add("drag-over"); }
+    document.addEventListener("dragleave", (e) => { if (e.target.classList.contains("input-gap")) e.target.classList.remove("drag-over"); });
+    
+    function drag(ev) {
+        draggedSourceId = ev.target.id;
+        ev.dataTransfer.setData("text", ev.target.getAttribute("data-val"));
+        ev.dataTransfer.setData("reusable", ev.target.getAttribute("data-reusable"));
+    }
+
+    function drop(ev, isConsumable) {
+        ev.preventDefault(); ev.target.classList.remove("drag-over");
+        let val = ev.dataTransfer.getData("text").split('.')[0]; 
+        let isReusable = ev.dataTransfer.getData("reusable") === "true";
+        let target = ev.target;
+
+        if (target.value && isConsumable) restoreItem(target.value, 1);
+        target.value = val; target.classList.add("filled");
+        if (!isReusable && draggedSourceId) document.getElementById(draggedSourceId).classList.add("used");
+        updateNav(target.id.split('-')[1]); draggedSourceId = null; 
+    }
+
+    function restoreItem(val, group) {
+        let item = document.getElementById(`drag-G${group}-${val}`);
+        if (item) item.classList.remove("used");
+    }
+
+    function clearInput(el, isConsumable) {
+        if (el.value && confirm("Xóa đáp án này?")) {
+            if (isConsumable) restoreItem(el.value, 1);
+            el.value = ""; el.classList.remove("filled");
+            updateNav(el.id.split('-')[1]);
+        }
+    }
+
+    function updateNav(id) {
+        let el = document.getElementById(`ans-${id}`);
+        let nav = document.getElementById(`nav-${id}`);
+        if (el.value.trim() !== "") nav.classList.add("done");
+        else nav.classList.remove("done");
+    }
+
+    // --- TIMER ---
+    function startTimer() {
+        let duration = 60 * 60; // 60 phút
+        let display = document.getElementById("timer");
+        let timer = setInterval(function () {
+            let m = Math.floor(duration / 60);
+            let s = duration % 60;
+            display.textContent = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+            if (--duration < 0) { clearInterval(timer); submitTest(false); }
+        }, 1000);
+    }
+
+    // --- CHỨC NĂNG NỘP BÀI & LƯU KẾT QUẢ (Đã sửa lại) ---
+    function submitTest(manual) {
+        if (manual && !confirm("Bạn có chắc chắn muốn nộp bài?")) return;
+        
+        let score = 0;
+        let totalQuestions = questions.length;
+
+        // Chấm điểm
+        questions.forEach(q => {
+            let userAns = document.getElementById(`ans-${q.id}`).value.trim().toUpperCase();
+            let fb = document.getElementById(`fb-${q.id}`);
+            if (userAns === q.ans) { 
+                score++; 
+                fb.innerText = "✓"; 
+                fb.className = "feedback correct"; 
+            } else { 
+                fb.innerText = `✗ (${q.ans})`; 
+                fb.className = "feedback wrong"; 
+            }
+        });
+
+        // Tính toán thông số để lưu
+        let wrong = totalQuestions - score;
+        let timeRemaining = document.getElementById("timer").innerText;
+        // Giả sử làm trong 60 phút, bạn có thể tính thời gian đã làm bằng cách lấy 60 - timeRemaining nếu muốn chính xác hơn.
+        // Ở đây mình ghi tạm thời gian làm bài.
+
+        // --- GỌI HÀM LƯU VÀO DASHBOARD ---
+        saveResultToDashboard(
+            "Reading Passage 1 - Test 1",  // Tên bài thi
+            false,                         // false = Bài luyện tập nhỏ, true = Full Test
+            score,                         // Số câu đúng
+            wrong,                         // Số câu sai
+            "60:00",                       // Thời gian (bạn có thể sửa logic tính giờ thực tế sau)
+            `Bạn làm đúng ${score}/${totalQuestions} câu. Hãy xem lại các câu sai!`
+        );
+
+        // Thông báo và chuyển trang
+        alert(`Kết quả: ${score}/${totalQuestions}\nĐiểm số đã được lưu vào hệ thống!`);
+        window.location.href = "result.html"; 
+    }
+
+    // --- HÀM LƯU TRỮ (Core Function) ---
+    function saveResultToDashboard(testName, isFullTest, correctCount, wrongCount, timeString, suggestions) {
+        let history = JSON.parse(localStorage.getItem('ieltsResultHistory')) || [];
+        
+        let total = correctCount + wrongCount;
+        let percent = total === 0 ? 0 : ((correctCount / total) * 100).toFixed(1);
+        let today = new Date().toLocaleDateString("vi-VN");
+
+        let newResult = {
+            date: today,
+            testName: testName,
+            type: isFullTest ? "Full Test" : "Practice",
+            correct: correctCount,
+            wrong: wrongCount,
+            percentage: percent,
+            timeTaken: timeString,
+            suggestion: suggestions
+        };
+
+        history.push(newResult);
+        localStorage.setItem('ieltsResultHistory', JSON.stringify(history));
+    }
+
+    // --- HIGHLIGHT SYSTEM (GLOBAL) ---
+    const mainContainer = document.getElementById("mainContainer");
+    const menu = document.getElementById("ctxMenu");
+    let targetElement = null;
+    let selectedRange = null;
+
+    mainContainer.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        targetElement = null; selectedRange = null;
+
+        if (e.target.classList.contains("highlight")) {
+            targetElement = e.target;
+            showMenu(e.pageX, e.pageY, "remove");
+            return;
+        }
+
+        let sel = window.getSelection();
+        if (sel.toString().trim().length > 0) {
+            if (mainContainer.contains(sel.anchorNode)) {
+                selectedRange = sel.getRangeAt(0);
+                showMenu(e.pageX, e.pageY, "add");
+            }
+        } else {
+            menu.style.display = "none";
+        }
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!menu.contains(e.target)) menu.style.display = "none";
+    });
+
+    function showMenu(x, y, mode) {
+        menu.style.display = "block";
+        menu.style.left = x + "px";
+        menu.style.top = y + "px";
+        menu.children[0].style.display = (mode === "add") ? "block" : "none";
+        menu.children[1].style.display = (mode === "remove") ? "block" : "none";
+    }
+
+    function doHighlight() {
+        if (selectedRange) {
+            let span = document.createElement("span");
+            span.className = "highlight";
+            try { selectedRange.surroundContents(span); } 
+            catch(e) { console.log("Lỗi: Không tô màu qua nhiều đoạn văn được."); }
+            window.getSelection().removeAllRanges();
+        }
+        menu.style.display = "none";
+    }
+
+    function removeHighlight() {
+        if (targetElement) {
+            let text = document.createTextNode(targetElement.textContent);
+            targetElement.parentNode.replaceChild(text, targetElement);
+            mainContainer.normalize();
+        }
+        menu.style.display = "none";
+    }
+</script>
+</body>
+</html>
