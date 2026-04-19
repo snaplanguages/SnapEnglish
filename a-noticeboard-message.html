@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A noticeboard message | SnapEnglish</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #F2A2A2; 
+            --secondary: #9DB4C0; 
+            --accent: #E2D4E0; 
+            --background: #FDFBF7; 
+            --text-main: #4A4A4A;
+            --text-light: #7A7A7A;
+            --white: #FFFFFF;
+            --success: #A3C9A8; 
+            --danger: #E58C8A;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
+        body { background-color: var(--background); color: var(--text-main); display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
+        
+        .container { background: var(--white); width: 100%; max-width: 800px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; position: relative; margin-bottom: 30px; }
+        
+        .header { background: linear-gradient(135deg, var(--primary), var(--accent)); padding: 30px 20px; text-align: center; color: var(--white); }
+        .header h1 { font-size: 28px; font-weight: 800; margin-bottom: 5px; }
+        .header p { font-size: 16px; opacity: 0.9; }
+
+        .step-container { padding: 30px; display: none; animation: fadeIn 0.4s ease-in-out; }
+        .step-container.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2.section-title { color: var(--secondary); font-size: 22px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .btn-explain { background: var(--accent); color: var(--text-main); border: none; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.3s; }
+        .btn-explain:hover { background: var(--secondary); color: var(--white); }
+
+        /* MATCHING (DRAG & DROP) */
+        .matching-layout { display: flex; flex-direction: column; gap: 20px; }
+        .word-bank-match { display: flex; flex-wrap: wrap; gap: 10px; padding: 15px; background: #F8F8F8; border-radius: 12px; min-height: 60px; border: 2px dashed var(--secondary); }
+        .match-item { background: var(--white); border: 2px solid var(--primary); padding: 8px 15px; border-radius: 12px; cursor: grab; font-weight: 600; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .match-item:active { cursor: grabbing; transform: scale(0.95); }
+        
+        .def-list { display: flex; flex-direction: column; gap: 15px; }
+        .def-row { display: flex; align-items: center; gap: 15px; background: #FAFAFA; padding: 10px 15px; border-radius: 12px; border: 1px solid #EEEEEE; }
+        .drop-slot { min-width: 150px; height: 42px; border: 2px dashed var(--accent); border-radius: 10px; background: var(--white); display: flex; align-items: center; justify-content: center; }
+        .def-text { font-size: 15px; flex: 1; color: var(--text-main); }
+
+        /* READING */
+        .noticeboard-mockup { background: #FFFDE7; border: 2px solid #F2C94C; border-radius: 8px; padding: 25px; max-width: 500px; margin: 0 auto 30px; box-shadow: 3px 3px 15px rgba(0,0,0,0.05); position: relative; }
+        .pin { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 15px; height: 15px; background: #E53935; border-radius: 50%; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.3); }
+        .notice-title { font-size: 24px; font-weight: 800; text-align: center; margin-bottom: 15px; color: #333; text-transform: uppercase; }
+        .notice-content { font-size: 16px; line-height: 1.6; color: #444; }
+        
+        .tips-box { background: #E8F4F8; border-left: 4px solid var(--secondary); padding: 15px 20px; border-radius: 0 12px 12px 0; margin-top: 20px; }
+
+        /* QUIZ & TYPING */
+        .question-block { margin-bottom: 25px; background: var(--white); border: 1px solid #EEEEEE; padding: 20px; border-radius: 16px; }
+        .options-list { display: flex; gap: 20px; margin-top: 10px; }
+        .option-label { display: flex; align-items: center; padding: 10px 20px; background: #F9F9F9; border-radius: 10px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; flex: 1; justify-content: center; font-weight: 700; }
+        .option-label:hover { background: #F0F0F0; }
+        .option-label input[type="radio"] { margin-right: 10px; accent-color: var(--secondary); transform: scale(1.2); }
+
+        /* Fill in the blanks */
+        .fill-blank-text { line-height: 2.2; font-size: 16px; padding: 20px; background: #FAFAFA; border-radius: 12px; border: 1px solid #EEE; }
+        .inline-input { border: none; border-bottom: 2px solid var(--primary); background: transparent; width: 100px; text-align: center; font-size: 16px; font-weight: 700; color: var(--secondary); outline: none; padding: 2px 5px; margin: 0 5px; transition: 0.3s; }
+        .inline-input:focus { border-bottom-color: var(--secondary); width: 120px; }
+        
+        .scrambled-words { font-style: italic; color: var(--primary); margin-bottom: 8px; font-weight: 600; }
+        .type-input { width: 100%; padding: 12px 16px; border: 2px solid var(--accent); border-radius: 10px; font-size: 16px; outline: none; transition: 0.3s; color: var(--text-main); }
+        .type-input:focus { border-color: var(--secondary); }
+
+        /* Nav Buttons */
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 30px; padding-top: 20px; border-top: 1px solid #EEEEEE; }
+        .btn { padding: 12px 30px; border-radius: 25px; font-size: 16px; font-weight: 700; border: none; cursor: pointer; transition: 0.2s; }
+        .btn:active { transform: scale(0.95); }
+        .btn-prev { background: #EEEEEE; color: var(--text-main); }
+        .btn-next, .btn-submit { background: var(--secondary); color: var(--white); }
+
+        /* Modal & Review */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: var(--white); width: 90%; max-width: 500px; border-radius: 20px; padding: 30px; position: relative; max-height: 85vh; overflow-y: auto; }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: var(--text-light); background: none; border: none; }
+        .modal-title { color: var(--primary); margin-bottom: 15px; font-size: 22px; border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        .modal-body { line-height: 1.6; color: var(--text-main); }
+
+        .result-circle { width: 120px; height: 120px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; font-weight: 800; margin: 0 auto 20px; color: white; }
+        .pass-circle { background: var(--success); box-shadow: 0 0 20px rgba(163, 201, 168, 0.5); }
+        .fail-circle { background: var(--danger); box-shadow: 0 0 20px rgba(229, 140, 138, 0.5); }
+        
+        #review-section { width: 100%; max-width: 800px; display: none; margin-top: 20px; }
+        .review-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 6px solid #ccc; }
+        .review-card.correct { border-left-color: var(--success); }
+        .review-card.incorrect { border-left-color: var(--danger); }
+        .explanation-box { margin-top: 15px; padding: 15px; background: #FDFBF7; border: 1px solid var(--accent); border-radius: 10px; font-size: 14.5px; line-height: 1.6; }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; }
+        .status-correct { background: #e8f5e9; color: #2e7d32; }
+        .status-incorrect { background: #ffebee; color: #c62828; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>SnapEnglish</h1>
+        <p>A noticeboard message</p>
+    </div>
+
+    <div class="step-container active" id="step-1">
+        <h2 class="section-title">
+            Preparation Task
+            <button class="btn-explain" onclick="openModal('modal-explain-1')">💡 Xem dịch nghĩa</button>
+        </h2>
+        <p style="margin-bottom: 15px; color: var(--text-light);">Kéo các từ vựng màu hồng ở trên thả vào ô trống tương ứng với định nghĩa bên dưới.</p>
+        
+        <div class="matching-layout">
+            <div class="word-bank-match" id="word-bank" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <div class="match-item" draggable="true" ondragstart="drag(event)" id="w1" data-ans="d">an ensuite</div>
+                <div class="match-item" draggable="true" ondragstart="drag(event)" id="w2" data-ans="f">a bill</div>
+                <div class="match-item" draggable="true" ondragstart="drag(event)" id="w3" data-ans="c">a housemate</div>
+                <div class="match-item" draggable="true" ondragstart="drag(event)" id="w4" data-ans="g">a viewing</div>
+                <div class="match-item" draggable="true" ondragstart="drag(event)" id="w5" data-ans="a">a single room</div>
+                <div class="match-item" draggable="true" ondragstart="drag(event)" id="w6" data-ans="e">a pet</div>
+                <div class="match-item" draggable="true" ondragstart="drag(event)" id="w7" data-ans="b">to share</div>
+                <div class="match-item" draggable="true" ondragstart="drag(event)" id="w8" data-ans="h">to move in</div>
+            </div>
+
+            <div class="def-list" id="def-list-container">
+                </div>
+        </div>
+
+        <div class="nav-buttons"><div></div><button class="btn btn-next" onclick="nextStep(2)">Tiếp theo ➔</button></div>
+    </div>
+
+    <div class="step-container" id="step-2">
+        <h2 class="section-title">
+            Reading & Tips
+            <button class="btn-explain" onclick="openModal('modal-explain-2')">💡 Xem giải thích</button>
+        </h2>
+        
+        <div class="noticeboard-mockup">
+            <div class="pin"></div>
+            <div class="notice-title">Looking for a housemate</div>
+            <div class="notice-content">
+                Single ensuite room available in our lovely three-bedroom house in Didsbury. Five-minute walk from city centre.<br><br>
+                Move in from 1 June. Shared kitchen and living room with two female housemates, no parking, £600 a month excluding bills.<br><br>
+                No pets. Contact 07890 123456 for viewing.
+            </div>
+        </div>
+
+        <div class="tips-box">
+            <h3 style="color: var(--secondary); margin-bottom: 10px;">Tips (Mẹo viết thông báo)</h3>
+            <ul style="margin-left: 20px; font-size: 15px;">
+                <li>Viết tiêu đề hoặc ý chính to hơn để thu hút sự chú ý.</li>
+                <li>Giữ thông báo ngắn gọn, chỉ ghi những thông tin quan trọng nhất.</li>
+                <li><b>Đừng</b> ghi địa chỉ cụ thể nhà bạn lên bảng thông báo công cộng!</li>
+            </ul>
+        </div>
+        
+        <div class="nav-buttons">
+            <button class="btn btn-prev" onclick="prevStep(1)">⬅ Quay lại</button>
+            <button class="btn btn-next" onclick="nextStep(3)">Tiếp theo ➔</button>
+        </div>
+    </div>
+
+    <div class="step-container" id="step-3">
+        <h2 class="section-title">
+            Task 1 & 2
+            <button class="btn-explain" onclick="openModal('modal-explain-3')">💡 Hướng dẫn làm bài</button>
+        </h2>
+        
+        <h3 style="margin-bottom: 15px; color: var(--primary);">Task 1: Are the sentences True or False?</h3>
+        <div id="task1-container"></div>
+
+        <h3 style="margin-bottom: 15px; margin-top: 30px; color: var(--primary);">Task 2: Complete the notice</h3>
+        <p style="font-size: 14px; margin-bottom: 10px; color: var(--text-light);">Type the correct word from this list into the blanks:<br>
+        <b>Shared | parking | excluding | Available | minute | viewing | ensuite | pets</b></p>
+        
+        <div class="fill-blank-text">
+            Single <input type="text" class="inline-input" id="t2_0"> room in a two-bed house in Withington, a ten-<input type="text" class="inline-input" id="t2_1"> walk from city centre. 
+            <input type="text" class="inline-input" id="t2_2"> 1 September. 
+            <input type="text" class="inline-input" id="t2_3"> kitchen and living room with two guys, no <input type="text" class="inline-input" id="t2_4">. 
+            £700 a month <input type="text" class="inline-input" id="t2_5"> bills. 
+            No <input type="text" class="inline-input" id="t2_6">. 
+            Contact 07777 654321 for <input type="text" class="inline-input" id="t2_7">.
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn btn-prev" onclick="prevStep(2)">⬅ Quay lại</button>
+            <button class="btn btn-next" onclick="nextStep(4)">Tiếp theo ➔</button>
+        </div>
+    </div>
+
+    <div class="step-container" id="step-4">
+        <h2 class="section-title">
+            Task 3: Sentence Building
+            <button class="btn-explain" onclick="openModal('modal-explain-4')">💡 Hướng dẫn làm bài</button>
+        </h2>
+        <p style="margin-bottom: 20px; color: var(--text-light);">Sắp xếp lại các từ để tạo thành câu hoàn chỉnh bằng cách <b>gõ trực tiếp</b> vào ô trống.</p>
+        
+        <div id="task3-container"></div>
+        
+        <div class="nav-buttons">
+            <button class="btn btn-prev" onclick="prevStep(3)">⬅ Quay lại</button>
+            <button class="btn btn-submit" onclick="submitExam()">Nộp bài ✔</button>
+        </div>
+    </div>
+</div>
+
+<div id="review-section">
+    <h2 style="text-align: center; margin-bottom: 20px; color: var(--secondary);">GIẢI THÍCH CHI TIẾT (REVIEW)</h2>
+    <div id="review-content"></div>
+</div>
+
+<div class="modal-overlay" id="modal-explain-1">
+    <div class="modal-content">
+        <button class="close-modal" onclick="closeModal('modal-explain-1')">&times;</button>
+        <h3 class="modal-title">Từ vựng về nhà ở</h3>
+        <div class="modal-body">
+            <ul>
+                <li><b>an ensuite:</b> phòng ngủ có nhà vệ sinh/nhà tắm khép kín bên trong.</li>
+                <li><b>a bill:</b> hóa đơn (điện, nước, internet...).</li>
+                <li><b>a housemate:</b> bạn cùng nhà (người thuê chung).</li>
+                <li><b>a viewing:</b> buổi đến xem nhà/xem phòng.</li>
+                <li><b>a single room:</b> phòng đơn (dành cho 1 người).</li>
+                <li><b>to share:</b> chia sẻ, dùng chung (ví dụ: shared kitchen - bếp dùng chung).</li>
+                <li><b>to move in:</b> chuyển vào ở.</li>
+                <li><b>excluding:</b> không bao gồm (ngược với <i>including</i>).</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-explain-2">
+    <div class="modal-content">
+        <button class="close-modal" onclick="closeModal('modal-explain-2')">&times;</button>
+        <h3 class="modal-title">Dịch bản tin</h3>
+        <div class="modal-body">
+            <p><b>Tiêu đề: Tìm bạn cùng nhà</b></p>
+            <p>Hiện đang có phòng đơn khép kín (ensuite) trong căn nhà 3 phòng ngủ xinh xắn của chúng tôi ở Didsbury. Cách trung tâm thành phố 5 phút đi bộ.</p>
+            <p>Có thể dọn vào ở từ ngày 1 tháng 6. Dùng chung bếp và phòng khách với 2 bạn nữ cùng nhà, không có chỗ để xe, giá £600/tháng chưa tính tiền điện nước (excluding bills).</p>
+            <p>Không nhận nuôi thú cưng. Liên hệ số 07890 123456 để xem phòng.</p>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-explain-3">
+    <div class="modal-content">
+        <button class="close-modal" onclick="closeModal('modal-explain-3')">&times;</button>
+        <h3 class="modal-title">Hướng dẫn Task 1 & 2</h3>
+        <div class="modal-body">
+            <p><b>Task 1:</b> Đọc kỹ thông báo ở Bước 2. Hãy chú ý những chi tiết nhỏ như số người, tiện ích đi kèm (nhà tắm, chỗ đậu xe, phí internet...)</p>
+            <p><b>Task 2:</b> Bạn chỉ cần gõ đúng chính tả từ có trong danh sách in đậm. Nếu từ đó đứng đầu câu, hệ thống chấm điểm vẫn chấp nhận kể cả khi bạn không viết hoa (nhưng tốt nhất là nên viết hoa nhé).</p>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-explain-4">
+    <div class="modal-content">
+        <button class="close-modal" onclick="closeModal('modal-explain-4')">&times;</button>
+        <h3 class="modal-title">Lưu ý Task 3</h3>
+        <div class="modal-body">
+            <p>Trong các mẩu quảng cáo tìm người ở ghép, tiếng Anh thường được rút gọn chủ ngữ. <br>
+            Ví dụ: Thay vì nói <i>"It is ten minutes by bus"</i> người ta chỉ viết <i>"Ten minutes by bus..."</i>.</p>
+            <p>Hãy chú ý viết hoa đầu câu và gõ chính xác dấu câu nhé.</p>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-result">
+    <div class="modal-content" style="text-align: center;">
+        <button class="close-modal" onclick="closeModal('modal-result')">&times;</button>
+        <h3 class="modal-title" style="border:none; margin-bottom: 20px;">Kết quả bài làm</h3>
+        <div id="result-badge"></div>
+        <p class="result-text" id="result-message"></p>
+        <p style="margin-top: 15px; color: var(--text-light);" id="result-detail"></p>
+        <button class="btn btn-next" style="margin-top: 25px;" onclick="scrollToReview()">Xem chi tiết giải thích</button>
+    </div>
+</div>
+
+<script>
+    // --- ĐIỀU HƯỚNG ---
+    function nextStep(s) { document.querySelectorAll('.step-container').forEach(e => e.classList.remove('active')); document.getElementById(`step-${s}`).classList.add('active'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    function prevStep(s) { nextStep(s); }
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function scrollToReview() { closeModal('modal-result'); document.getElementById('review-section').style.display = 'block'; window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }
+    
+    window.onclick = function(e) { if(e.target.classList.contains('modal-overlay')) e.target.style.display = "none"; }
+
+    // --- DRAG & DROP LOGIC ---
+    function allowDrop(ev) { ev.preventDefault(); }
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+    function drop(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        var dropZone = ev.target.closest('.drop-slot, .word-bank-match');
+        if(dropZone && dropZone.children.length === 0 || dropZone.classList.contains('word-bank-match')) {
+            dropZone.appendChild(document.getElementById(data));
+        }
+    }
+
+    // --- DATA ---
+    const prepData = [
+        { id: 'a', def: 'a. a bedroom for one person' },
+        { id: 'b', def: 'b. to use something at the same time as another person' },
+        { id: 'c', def: 'c. someone to share a house with' },
+        { id: 'd', def: 'd. a bathroom that is directly connected to a bedroom' },
+        { id: 'e', def: 'e. an animal that lives with you' },
+        { id: 'f', def: 'f. a request for payment of money for water, gas, electricity, internet, etc.' },
+        { id: 'g', def: 'g. a visit to see a room, flat or house' },
+        { id: 'h', def: 'h. to start living in a house' }
+    ];
+
+    const task1Data = [
+        { q: "Two women live in this house at the moment.", ans: "True", explain: "<b>Đúng.</b> Trong bài viết có nhắc đến 'two female housemates' (hai bạn nữ cùng nhà)." },
+        { q: "You have to share a bathroom.", ans: "False", explain: "<b>Sai.</b> Bài ghi rõ là 'Single ensuite room' (phòng đơn có phòng tắm khép kín), nên bạn không phải dùng chung nhà tắm." },
+        { q: "It is near the city centre.", ans: "True", explain: "<b>Đúng.</b> Bài ghi 'Five-minute walk from city centre' (Cách trung tâm 5 phút đi bộ) -> Rất gần." },
+        { q: "You can keep your car here.", ans: "False", explain: "<b>Sai.</b> Bài ghi rõ 'no parking' (không có chỗ đậu xe)." },
+        { q: "You have to pay extra for Wi-Fi.", ans: "True", explain: "<b>Đúng.</b> Giá thuê 'excluding bills' (không bao gồm các hóa đơn tiện ích), nên internet/Wi-Fi bạn sẽ phải tự trả thêm." },
+        { q: "Pets can live in the house.", ans: "False", explain: "<b>Sai.</b> Có quy định 'No pets' (Không mang theo thú cưng)." }
+    ];
+
+    const task2Answers = ["ensuite", "minute", "Available", "Shared", "parking", "excluding", "pets", "viewing"];
+    
+    const task3Data = [
+        { words: "house. / three-bedroom / available in a / with ensuite bathroom / Double room", correct: "Double room with ensuite bathroom available in a three-bedroom house.", explain: "<b>Cấu trúc:</b> [Loại phòng] + with + [Tiện ích] + available in a + [Loại nhà]." },
+        { words: "from / Ten minutes by bus / the university.", correct: "Ten minutes by bus from the university.", explain: "<b>Cấu trúc chỉ khoảng cách:</b> [Thời gian] + by [phương tiện] + from [địa điểm]." },
+        { words: "living room / with two housemates. / Shared kitchen and", correct: "Shared kitchen and living room with two housemates.", explain: "<b>Cấu trúc liệt kê:</b> Shared [Tiện ích 1] and [Tiện ích 2] + with [Ai đó]." },
+        { words: "£800 / excluding bills. / a month / Rent", correct: "Rent £800 a month excluding bills.", explain: "<b>Cấu trúc báo giá:</b> Rent [Số tiền] a month + excluding/including bills." }
+    ];
+
+    // --- RENDER HTML ---
+    const defContainer = document.getElementById('def-list-container');
+    prepData.forEach(item => {
+        defContainer.innerHTML += `
+            <div class="def-row">
+                <div class="drop-slot" id="slot-${item.id}" data-ans="${item.id}" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                <div class="def-text">${item.def}</div>
+            </div>`;
+    });
+
+    const t1Container = document.getElementById('task1-container');
+    task1Data.forEach((item, index) => {
+        t1Container.innerHTML += `
+            <div class="question-block">
+                <div style="font-weight: 700; margin-bottom: 10px;">${index + 1}. ${item.q}</div>
+                <div class="options-list">
+                    <label class="option-label"><input type="radio" name="t1_q${index}" value="True"> True</label>
+                    <label class="option-label"><input type="radio" name="t1_q${index}" value="False"> False</label>
+                </div>
+            </div>`;
+    });
+
+    const t3Container = document.getElementById('task3-container');
+    task3Data.forEach((item, index) => {
+        t3Container.innerHTML += `
+            <div class="question-block">
+                <div class="scrambled-words">${index + 1}. ${item.words}</div>
+                <input type="text" class="type-input" id="t3_q${index}" placeholder="Nhập câu trả lời...">
+            </div>`;
+    });
+
+    // --- SCORING & REVIEW ---
+    function submitExam() {
+        let score = 0;
+        let total = 8 + 6 + 8 + 4; // 26 điểm tổng cộng
+        let reviewHtml = "";
+
+        // 1. Chấm Preparation (Matching)
+        let prepReview = `<h3 style="color:var(--primary); margin-top:20px;">1. Preparation Task</h3>`;
+        prepData.forEach(item => {
+            let slot = document.getElementById(`slot-${item.id}`);
+            let child = slot.firstElementChild;
+            let isCorrect = child && child.getAttribute('data-ans') === item.id;
+            if(isCorrect) score++;
+            
+            prepReview += `
+            <div class="review-card ${isCorrect ? 'correct' : 'incorrect'}">
+                <span class="status-badge ${isCorrect ? 'status-correct' : 'status-incorrect'}">${isCorrect ? '✔ Đúng' : '✘ Sai'}</span>
+                <p><b>Định nghĩa:</b> ${item.def}</p>
+                <p><b>Bạn ghép với:</b> <span style="color:var(--primary)">${child ? child.innerText : 'Bỏ trống'}</span></p>
+            </div>`;
+        });
+        reviewHtml += prepReview;
+
+        // 2. Chấm Task 1
+        let t1Review = `<h3 style="color:var(--primary); margin-top:30px;">2. Task 1: True / False</h3>`;
+        task1Data.forEach((item, i) => {
+            let selected = document.querySelector(`input[name="t1_q${i}"]:checked`);
+            let isCorrect = selected && selected.value === item.ans;
+            if(isCorrect) score++;
+
+            t1Review += `
+            <div class="review-card ${isCorrect ? 'correct' : 'incorrect'}">
+                <span class="status-badge ${isCorrect ? 'status-correct' : 'status-incorrect'}">${isCorrect ? '✔ Đúng' : '✘ Sai'}</span>
+                <p><b>Câu:</b> ${item.q}</p>
+                <p><b>Bạn chọn:</b> ${selected ? selected.value : 'Bỏ trống'} | <b>Đáp án đúng:</b> ${item.ans}</p>
+                <div class="explanation-box">${item.explain}</div>
+            </div>`;
+        });
+        reviewHtml += t1Review;
+
+        // 3. Chấm Task 2
+        let t2Review = `<h3 style="color:var(--primary); margin-top:30px;">3. Task 2: Fill in the blanks</h3>`;
+        task2Answers.forEach((ans, i) => {
+            let val = document.getElementById(`t2_${i}`).value.trim();
+            let isCorrect = val.toLowerCase() === ans.toLowerCase();
+            if(isCorrect) score++;
+
+            t2Review += `
+            <div class="review-card ${isCorrect ? 'correct' : 'incorrect'}" style="padding: 10px 20px;">
+                <span class="status-badge ${isCorrect ? 'status-correct' : 'status-incorrect'}">${isCorrect ? '✔' : '✘'}</span>
+                Blank (${i+1}): Bạn điền <b>"${val || 'trống'}"</b> -> Đáp án: <b>${ans}</b>
+            </div>`;
+        });
+        reviewHtml += t2Review;
+
+        // 4. Chấm Task 3
+        let t3Review = `<h3 style="color:var(--primary); margin-top:30px;">4. Task 3: Sentence Building</h3>`;
+        task3Data.forEach((item, i) => {
+            let val = document.getElementById(`t3_q${i}`).value.trim().replace(/\.$/, "");
+            let correctAns = item.correct.replace(/\.$/, "");
+            let isCorrect = val.toLowerCase() === correctAns.toLowerCase();
+            if(isCorrect) score++;
+
+            t3Review += `
+            <div class="review-card ${isCorrect ? 'correct' : 'incorrect'}">
+                <span class="status-badge ${isCorrect ? 'status-correct' : 'status-incorrect'}">${isCorrect ? '✔ Đúng' : '✘ Sai'}</span>
+                <p><b>Bạn gõ:</b> ${document.getElementById(`t3_q${i}`).value || 'Bỏ trống'}</p>
+                <p><b>Đáp án chuẩn:</b> ${item.correct}</p>
+                <div class="explanation-box">${item.explain}</div>
+            </div>`;
+        });
+        reviewHtml += t3Review;
+
+        // Xử lý Modal Kết quả
+        let percent = (score / total) * 100;
+        let isPassed = percent >= 80;
+
+        document.getElementById('result-badge').innerHTML = `<div class="result-circle ${isPassed ? 'pass-circle' : 'fail-circle'}">${Math.round(percent)}%</div>`;
+        document.getElementById('result-message').innerHTML = isPassed ? "🎉 Xuất sắc! Bạn đã <span style='color: var(--success);'>ĐẠT</span> bài này." : "💫 Cố gắng lên! Bạn <span style='color: var(--danger);'>CHƯA ĐẠT</span> (Cần 80%).";
+        document.getElementById('result-detail').innerText = `Đúng ${score}/${total} câu.`;
+        
+        document.getElementById('review-content').innerHTML = reviewHtml;
+        openModal('modal-result');
+    }
+</script>
+
+</body>
+</html>
