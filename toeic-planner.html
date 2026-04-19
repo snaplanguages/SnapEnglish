@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOEIC Journey Planner | SnapEnglish</title>
+  <link rel="icon" type="image/png" href="ảnh.png">
+    <style>
+        :root {
+            --bg-color: #FDF9F1;
+            --primary-color: #DDA7A5; /* Pastel Pink/Rose */
+            --secondary-color: #B2D8D8; /* Pastel Teal */
+            --text-main: #5C4B51;
+            --text-light: #8C7A80;
+            --white: #FFFFFF;
+            --shadow: 0 8px 16px rgba(92, 75, 81, 0.08);
+            --border-radius: 16px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: var(--white);
+            max-width: 700px;
+            width: 100%;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 30px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        h1, h2, h3 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.95em;
+            margin-bottom: 30px;
+        }
+
+        /* Form Styles */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #E8E2D9;
+            border-radius: 10px;
+            font-size: 1em;
+            color: var(--text-main);
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: var(--secondary-color);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #C89593;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button.outline-btn {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            margin-top: 20px;
+        }
+
+        button.outline-btn:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        /* Roadmap Styles */
+        .progress-container {
+            background-color: #E8E2D9;
+            border-radius: 20px;
+            height: 12px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background-color: var(--secondary-color);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 0.85em;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-top: -15px;
+            margin-bottom: 20px;
+        }
+
+        .month-block {
+            border: 1px solid #E8E2D9;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .month-header {
+            background-color: rgba(178, 216, 216, 0.2);
+            padding: 15px 20px;
+            font-weight: bold;
+            color: #4A8C8C;
+        }
+
+        .task-list {
+            padding: 15px 20px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed #E8E2D9;
+        }
+
+        .task-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .task-item input[type="checkbox"] {
+            margin-top: 4px;
+            margin-right: 15px;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--secondary-color);
+            cursor: pointer;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            transition: color 0.3s;
+        }
+
+        .task-desc {
+            font-size: 0.85em;
+            color: var(--text-light);
+            line-height: 1.4;
+        }
+
+        .task-item.completed .task-title {
+            text-decoration: line-through;
+            color: #A9A9A9;
+        }
+
+        .hidden { display: none !important; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="setup-screen">
+        <h1>Khởi Tạo Hành Trình</h1>
+        <p class="subtitle">Mỗi mục tiêu lớn đều bắt đầu từ những bước đi nhỏ và chi tiết.</p>
+        
+        <div class="input-group">
+            <label for="currentScore">Điểm TOEIC hiện tại của bạn:</label>
+            <input type="number" id="currentScore" placeholder="VD: 350" min="0" max="990">
+        </div>
+        <div class="input-group">
+            <label for="targetScore">Điểm TOEIC mục tiêu:</label>
+            <input type="number" id="targetScore" placeholder="VD: 750" min="0" max="990">
+        </div>
+        <div class="input-group">
+            <label for="months">Thời gian học mong muốn (Tháng):</label>
+            <input type="number" id="months" placeholder="VD: 3" min="1" max="24">
+        </div>
+
+        <button onclick="generateAndSaveRoadmap()">Tạo Lộ Trình Chi Tiết</button>
+    </div>
+
+    <div id="roadmap-screen" class="hidden">
+        <h1>Lộ Trình Của Bạn</h1>
+        <p class="subtitle" id="roadmap-summary"></p>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="progress-text" id="progress-text">Đã hoàn thành 0%</div>
+
+        <div id="schedule-container">
+            </div>
+
+        <button class="outline-btn" onclick="confirmReset()">Cài Đặt Lại Từ Đầu</button>
+    </div>
+</div>
+
+<script>
+    const STORAGE_KEY = 'snap_english_roadmap';
+
+    // Kiểm tra xem đã có dữ liệu chưa khi load trang
+    window.onload = function() {
+        const savedData = localStorage.getItem(STORAGE_KEY);
+        if (savedData) {
+            renderRoadmap(JSON.parse(savedData));
+        }
+    };
+
+    function generateAndSaveRoadmap() {
+        const current = parseInt(document.getElementById('currentScore').value);
+        const target = parseInt(document.getElementById('targetScore').value);
+        const months = parseInt(document.getElementById('months').value);
+
+        if (!current || !target || !months || current < 0 || target > 990 || months <= 0) {
+            alert('Vui lòng nhập đầy đủ và chính xác thông tin để hệ thống thiết kế lộ trình tốt nhất nhé!');
+            return;
+        }
+
+        if (current >= target) {
+            alert('Điểm mục tiêu phải cao hơn điểm hiện tại!');
+            return;
+        }
+
+        const roadmapData = createRoadmapLogic(current, target, months);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(roadmapData));
+        renderRoadmap(roadmapData);
+    }
+
+    function createRoadmapLogic(current, target, months) {
+        const data = {
+            current: current,
+            target: target,
+            months: months,
+            schedule: []
+        };
+
+        const gap = target - current;
+        let idCounter = 1;
+
+        for (let m = 1; m <= months; m++) {
+            let monthTitle = `Tháng ${m} - `;
+            let tasks = [];
+
+            // Phân bổ giai đoạn học logic dựa trên thời gian
+            if (m <= Math.ceil(months * 0.4)) {
+                monthTitle += "Xây Dựng Nền Tảng (Ngữ pháp & Từ vựng lõi)";
+                tasks.push(
+                    { id: idCounter++, title: "Học 30 từ vựng chủ đề Office & General Business", desc: "Sử dụng Flashcard. Đặt câu với mỗi từ để nhớ ngữ cảnh.", completed: false },
+                    { id: idCounter++, title: "Ôn tập 3 thì cơ bản (Hiện tại, Quá khứ, Tương lai)", desc: "Làm bài tập vận dụng. Ghi chú rõ lý do tại sao chọn đáp án đó.", completed: false },
+                    { id: idCounter++, title: "Luyện Nghe Part 1: Hình ảnh tranh tả người", desc: "Nghe chép chính tả (Dictation) 10 bức tranh. Phân tích bẫy phát âm (ví dụ: walking vs working).", completed: false },
+                    { id: idCounter++, title: "Luyện Đọc Part 5: Từ loại (Danh, Động, Tính, Trạng)", desc: "Giải 30 câu. Bắt buộc tra cứu và dịch toàn bộ câu sai, ghi chú giải thích chi tiết cho từng câu đúng và cả câu sai.", completed: false }
+                );
+            } else if (m <= Math.ceil(months * 0.75)) {
+                monthTitle += "Tăng Tốc Kỹ Năng (Chiến thuật & Tốc độ)";
+                tasks.push(
+                    { id: idCounter++, title: "Luyện Nghe Part 3 & 4: Đoạn hội thoại", desc: "Luyện kỹ năng đọc trước câu hỏi (Skimming). Nghe và shadowing lại các đoạn audio.", completed: false },
+                    { id: idCounter++, title: "Luyện Đọc Part 7: Single Passages", desc: "Luyện kỹ năng Scan tìm từ khóa. Dịch toàn bộ bài đọc sang tiếng Việt sau khi làm xong để nạp từ vựng.", completed: false },
+                    { id: idCounter++, title: "Review lại lỗi sai Part 5 & 6", desc: "Mở lại các câu đã làm sai ở tháng trước. Viết lại cấu trúc ngữ pháp ra sổ.", completed: false },
+                    { id: idCounter++, title: "Mini Test Cuối Tuần", desc: "Làm bài test 100 câu (50 nghe, 50 đọc) bấm giờ chuẩn. Đối chiếu đáp án và giải thích sâu.", completed: false }
+                );
+            } else {
+                monthTitle += "Thực Chiến Luyện Đề (Tối ưu điểm số)";
+                tasks.push(
+                    { id: idCounter++, title: "Full Test 1 (Bấm giờ nghiêm ngặt 120 phút)", desc: "Làm bài liên tục không gián đoạn để quen với áp lực phòng thi.", completed: false },
+                    { id: idCounter++, title: "Phân tích sâu Full Test 1", desc: "Dành thời gian gấp đôi thời gian làm test để xem lại. Phân tích tận gốc lý do sai: do từ vựng, ngữ pháp hay do bẫy?", completed: false },
+                    { id: idCounter++, title: "Củng cố điểm yếu", desc: "Tổng hợp các lỗi sai lặp lại nhiều nhất. Lên trang web luyện tập thêm 50 câu riêng cho phần đó.", completed: false },
+                    { id: idCounter++, title: "Full Test 2 & Rút kinh nghiệm", desc: "Làm bài thi thử tiếp theo. Áp dụng các chiến thuật loại trừ đã đúc kết được.", completed: false }
+                );
+            }
+
+            data.schedule.push({ month: m, title: monthTitle, tasks: tasks });
+        }
+        return data;
+    }
+
+    function renderRoadmap(data) {
+        document.getElementById('setup-screen').classList.add('hidden');
+        document.getElementById('roadmap-screen').classList.remove('hidden');
+
+        document.getElementById('roadmap-summary').innerText = `Mục tiêu: Từ ${data.current} lên ${data.target} TOEIC trong ${data.months} tháng.`;
+
+        const container = document.getElementById('schedule-container');
+        container.innerHTML = '';
+
+        data.schedule.forEach((monthData, monthIndex) => {
+            const monthDiv = document.createElement('div');
+            monthDiv.className = 'month-block';
+
+            const header = document.createElement('div');
+            header.className = 'month-header';
+            header.innerText = monthData.title;
+            monthDiv.appendChild(header);
+
+            const taskList = document.createElement('div');
+            taskList.className = 'task-list';
+
+            monthData.tasks.forEach((task, taskIndex) => {
+                const taskDiv = document.createElement('div');
+                taskDiv.className = `task-item ${task.completed ? 'completed' : ''}`;
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = task.completed;
+                checkbox.onchange = (e) => toggleTask(monthIndex, taskIndex, e.target.checked);
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'task-content';
+                
+                const title = document.createElement('div');
+                title.className = 'task-title';
+                title.innerText = task.title;
+
+                const desc = document.createElement('div');
+                desc.className = 'task-desc';
+                desc.innerText = task.desc;
+
+                contentDiv.appendChild(title);
+                contentDiv.appendChild(desc);
+
+                taskDiv.appendChild(checkbox);
+                taskDiv.appendChild(contentDiv);
+                taskList.appendChild(taskDiv);
+            });
+
+            monthDiv.appendChild(taskList);
+            container.appendChild(monthDiv);
+        });
+
+        updateProgress(data);
+    }
+
+    function toggleTask(monthIndex, taskIndex, isCompleted) {
+        let data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        data.schedule[monthIndex].tasks[taskIndex].completed = isCompleted;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        
+        // Re-render only progress and styles to avoid scroll jumping
+        renderRoadmap(data); 
+    }
+
+    function updateProgress(data) {
+        let total = 0;
+        let completed = 0;
+
+        data.schedule.forEach(month => {
+            month.tasks.forEach(task => {
+                total++;
+                if (task.completed) completed++;
+            });
+        });
+
+        const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+        document.getElementById('progress-bar').style.width = percent + '%';
+        document.getElementById('progress-text').innerText = `Đã hoàn thành ${percent}% (${completed}/${total} nhiệm vụ)`;
+    }
+
+    function confirmReset() {
+        if(confirm('Bạn có chắc chắn muốn xóa toàn bộ lộ trình hiện tại và cài đặt lại từ đầu không? Mọi lịch sử đánh dấu sẽ bị mất.')) {
+            localStorage.removeItem(STORAGE_KEY);
+            document.getElementById('roadmap-screen').classList.add('hidden');
+            document.getElementById('setup-screen').classList.remove('hidden');
+            
+            // Clear inputs
+            document.getElementById('currentScore').value = '';
+            document.getElementById('targetScore').value = '';
+            document.getElementById('months').value = '';
+        }
+    }
+</script>
+
+</body>
+</html>
