@@ -3,424 +3,616 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOEIC Journey Planner | SnapEnglish</title>
-  <link rel="icon" type="image/png" href="ảnh.png">
+    <title>AI TOEIC Journey | Snap English</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #FDF9F1;
-            --primary-color: #DDA7A5; /* Hồng đất */
-            --secondary-color: #B2D8D8; /* Xanh ngọc */
-            --accent-color: #8C7A80;
-            --text-main: #5C4B51;
-            --white: #FFFFFF;
-            --border-light: #E8E2D9;
-            --shadow: 0 8px 24px rgba(92, 75, 81, 0.08);
-            --radius: 14px;
-            --warning-bg: #FFF3E0;
-            --warning-text: #E65100;
+            /* Bảng màu Pastel Trưởng thành & Sâu sắc */
+            --bg-main: #F9F6F0; /* Trắng kem ấm */
+            --surface: #FFFFFF;
+            --primary: #D4A5A5; /* Hồng đất */
+            --primary-hover: #C39292;
+            --secondary: #9DB4AB; /* Xanh rêu nhạt / Sage Green */
+            --accent: #E2C2B3; /* Cam đào nhạt */
+            --text-dark: #4A4045; /* Nâu xám trầm */
+            --text-light: #8B8286;
+            --border: #EAE3D9;
+            --success: #82A896;
+            --warning: #DDA7A5;
+            
+            --shadow-soft: 0 12px 36px rgba(74, 64, 69, 0.06);
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            
+            --font-main: 'Nunito', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
+            font-family: var(--font-main);
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            min-height: 100vh;
+            align-items: center;
+            padding: 30px 15px;
+            line-height: 1.6;
         }
 
-        .container {
-            background-color: var(--white);
-            max-width: 850px;
+        .app-container {
+            background: var(--surface);
+            max-width: 900px;
             width: 100%;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 35px;
-            box-sizing: border-box;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+            position: relative;
         }
 
-        h1 {
+        /* --- Header & Typography --- */
+        .header {
             text-align: center;
-            color: var(--primary-color);
-            font-size: 1.9em;
-            margin-bottom: 5px;
+            padding: 40px 30px 20px;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            color: var(--text-dark);
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .header h1 span {
+            color: var(--primary);
         }
 
         .subtitle {
-            text-align: center;
-            color: var(--accent-color);
-            font-size: 0.95em;
-            margin-bottom: 30px;
+            color: var(--text-light);
+            font-size: 1.05rem;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        /* Form Inputs */
-        .input-row {
+        /* --- Form Thiết lập --- */
+        .setup-section {
+            padding: 20px 40px 50px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .input-group label {
-            display: block;
-            font-weight: 600;
-            font-size: 0.9em;
-            margin-bottom: 8px;
-            color: var(--text-main);
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .input-group input {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid var(--border-light);
-            border-radius: 10px;
-            font-size: 1em;
-            color: var(--text-main);
-            box-sizing: border-box;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        .input-group input:focus { border-color: var(--secondary-color); }
-        .input-group input::placeholder { color: #B0A5A8; font-size: 0.9em; }
-
-        button {
-            width: 100%;
             padding: 16px;
-            background-color: var(--primary-color);
-            color: var(--white);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            background-color: #FAFAFA;
+        }
+
+        .input-group input:focus {
+            border-color: var(--secondary);
+            background-color: var(--surface);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(157, 180, 171, 0.15);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 1.1em;
-            font-weight: bold;
+            padding: 18px 32px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: var(--radius-md);
             cursor: pointer;
-            transition: 0.2s;
+            width: 100%;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
         }
 
-        button:hover { background-color: #C89593; transform: translateY(-2px); }
-        
-        .btn-reset {
-            background-color: transparent;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
-            margin-top: 30px;
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(212, 165, 165, 0.3);
         }
-        .btn-reset:hover { background-color: var(--primary-color); color: var(--white); transform: none; }
 
-        /* Advice / Warning Box */
-        .advice-box {
-            background-color: var(--warning-bg);
-            color: var(--warning-text);
-            padding: 15px 20px;
-            border-radius: 10px;
-            border-left: 5px solid #FF9800;
-            margin-bottom: 25px;
-            font-size: 0.95em;
-            line-height: 1.5;
-            display: none; /* Ẩn mặc định */
+        /* --- AI Loading Screen --- */
+        .loading-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .ai-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 24px;
+        }
+
+        .ai-status-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            animation: pulse 1.5s infinite;
+        }
+
+        .ai-subtext {
+            color: var(--text-light);
+            margin-top: 8px;
+            font-size: 0.95rem;
+        }
+
+        /* --- Roadmap Dashboard --- */
+        .dashboard-section {
+            display: none;
+            padding: 0 40px 40px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .ai-insight-card {
+            background: linear-gradient(145deg, #FDFBF7, #F4F0E6);
+            border-left: 5px solid var(--secondary);
+            padding: 24px;
+            border-radius: var(--radius-md);
+            margin-bottom: 35px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            position: relative;
+        }
+
+        .ai-insight-card h3 {
+            color: var(--secondary);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-insight-card p {
+            color: var(--text-dark);
+            font-size: 0.95rem;
         }
 
         /* Progress Bar */
-        .progress-wrapper { margin: 20px 0 30px 0; }
-        .progress-bg {
-            background-color: var(--border-light);
-            height: 12px;
-            border-radius: 12px;
-            overflow: hidden;
+        .progress-container {
+            margin-bottom: 40px;
         }
-        .progress-fill {
-            background-color: var(--secondary-color);
-            height: 100%;
-            width: 0%;
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .progress-stats {
+        
+        .progress-header {
             display: flex;
             justify-content: space-between;
-            font-size: 0.85em;
-            font-weight: bold;
-            color: var(--accent-color);
-            margin-top: 10px;
+            margin-bottom: 12px;
+            font-weight: 700;
         }
 
-        /* Table/Grid Styles */
-        .week-block {
-            border: 2px solid var(--border-light);
-            border-radius: var(--radius);
-            margin-bottom: 30px;
+        .progress-track {
+            height: 14px;
+            background-color: var(--border);
+            border-radius: 20px;
             overflow: hidden;
-            background: var(--white);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), #B0C9C0);
+            border-radius: 20px;
+            width: 0%;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Roadmap Timeline */
+        .week-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            margin-bottom: 25px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
 
         .week-header {
-            background-color: rgba(178, 216, 216, 0.2);
-            padding: 18px 20px;
-            border-bottom: 2px solid var(--border-light);
+            background-color: #FAFAFA;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 800;
+            color: var(--text-dark);
             display: flex;
             justify-content: space-between;
-            align-items: center;
-        }
-
-        .week-title {
-            color: #4A8C8C;
-            font-size: 1.1em;
-            font-weight: bold;
-            margin: 0;
         }
 
         .day-row {
             display: flex;
-            border-bottom: 1px solid var(--border-light);
-            transition: background-color 0.2s;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
         }
-
         .day-row:last-child { border-bottom: none; }
-        .day-row:hover { background-color: rgba(253, 249, 241, 0.5); }
+        .day-row:hover { background-color: rgba(249, 246, 240, 0.4); }
 
-        .day-label {
-            width: 110px;
-            padding: 15px;
-            background-color: rgba(232, 226, 217, 0.2);
-            font-weight: 600;
-            color: var(--accent-color);
+        .day-badge {
+            width: 100px;
+            padding: 20px 15px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            border-right: 1px solid var(--border-light);
+            background-color: rgba(234, 227, 217, 0.15);
+            border-right: 1px solid var(--border);
             flex-shrink: 0;
-            text-align: center;
         }
 
-        .task-list {
-            padding: 12px 18px;
+        .day-badge span.day-num {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        .day-badge span.day-text {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tasks-container {
+            padding: 15px 24px;
             flex-grow: 1;
         }
 
         .task-item {
             display: flex;
             align-items: flex-start;
-            padding: 8px 0;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px dashed var(--border);
         }
+        .task-item:last-child { border-bottom: none; }
 
+        /* Custom Checkbox */
         .task-item input[type="checkbox"] {
-            margin-top: 4px;
-            margin-right: 14px;
-            width: 18px;
-            height: 18px;
-            accent-color: var(--secondary-color);
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--secondary);
+            border-radius: 6px;
+            margin-top: 3px;
             cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
             flex-shrink: 0;
         }
 
-        .task-text {
-            font-size: 0.95em;
-            line-height: 1.5;
-            color: var(--text-main);
+        .task-item input[type="checkbox"]:checked {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+        }
+
+        .task-item input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .task-content {
+            flex-grow: 1;
+            transition: all 0.3s;
+        }
+
+        .task-item.completed .task-content {
+            color: var(--text-light);
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        /* Tags AI phân loại */
+        .tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        .tag.grammar { background-color: #E2E8F0; color: #475569; }
+        .tag.listening { background-color: #E0E7FF; color: #4338CA; }
+        .tag.reading { background-color: #FEF3C7; color: #B45309; }
+        .tag.vocab { background-color: #FCE7F3; color: #BE185D; }
+        .tag.test { background-color: #FEE2E2; color: #B91C1C; }
+
+        .btn-reset {
+            background: transparent;
+            color: var(--text-light);
+            border: 1px solid var(--border);
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            display: block;
+            margin: 40px auto 0;
             transition: 0.3s;
         }
-
-        .task-item.completed .task-text {
-            text-decoration: line-through;
-            color: #B0A5A8;
+        .btn-reset:hover {
+            background: var(--bg-main);
+            color: var(--primary);
+            border-color: var(--primary);
         }
 
-        .hidden { display: none !important; }
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes pulse { 0% { opacity: 0.7; } 50% { opacity: 1; } 100% { opacity: 0.7; } }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             .day-row { flex-direction: column; }
-            .day-label { width: 100%; border-right: none; border-bottom: 1px solid var(--border-light); padding: 10px 15px; justify-content: flex-start; }
+            .day-badge { width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 12px; flex-direction: row; justify-content: flex-start; gap: 10px; background-color: transparent;}
+            .day-badge span.day-text { margin-top: 3px; }
+            .setup-section, .dashboard-section { padding: 20px; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div id="setup-screen">
-        <h1>Bản Đồ Chinh Phục TOEIC</h1>
-        <p class="subtitle">Lộ trình được thiết kế chi tiết, tối ưu hóa theo năng lực và thời gian của riêng bạn.</p>
-        
-        <div class="input-row">
-            <div class="input-group">
-                <label>Điểm TOEIC hiện tại:</label>
-                <input type="number" id="currentScore" placeholder="VD: 500" min="0" max="990">
-            </div>
-            <div class="input-group">
-                <label>Điểm mục tiêu:</label>
-                <input type="number" id="targetScore" placeholder="VD: 750" min="0" max="990">
-            </div>
-            <div class="input-group">
-                <label>Thời gian (Tháng):</label>
-                <input type="number" id="months" placeholder="Để trống hệ thống sẽ tự tính">
-            </div>
-        </div>
-        <button onclick="generateRoadmap()">Phân Tích & Tạo Lộ Trình</button>
+<div class="app-container">
+    <div class="header">
+        <h1><span>Snap</span> English</h1>
+        <p class="subtitle">AI TOEIC Journey Planner • Cá nhân hóa lộ trình học tập của riêng bạn</p>
     </div>
 
-    <div id="roadmap-screen" class="hidden">
-        <h1>Lộ Trình Học Tập</h1>
-        <p class="subtitle" id="roadmap-summary"></p>
-        
-        <div id="advice-box" class="advice-box"></div>
-
-        <div class="progress-wrapper">
-            <div class="progress-bg">
-                <div class="progress-fill" id="progress-bar"></div>
+    <div id="setup-screen" class="setup-section">
+        <div class="form-grid">
+            <div class="input-group">
+                <label>🎯 Điểm TOEIC hiện tại</label>
+                <input type="number" id="currentScore" placeholder="Ví dụ: 450" min="0" max="990">
             </div>
-            <div class="progress-stats">
-                <span id="progress-text">Đã hoàn thành: 0%</span>
-                <span id="task-count">0/0 Nhiệm vụ</span>
+            <div class="input-group">
+                <label>🏆 Điểm Mục tiêu</label>
+                <input type="number" id="targetScore" placeholder="Ví dụ: 800" min="0" max="990">
+            </div>
+            <div class="input-group">
+                <label>⏳ Thời gian (Tháng)</label>
+                <input type="number" id="months" placeholder="Khuyến nghị: Bỏ trống để AI tự tính">
+            </div>
+        </div>
+        <button class="btn-primary" onclick="startAIAnalysis()">
+            ✨ Khởi tạo Lộ trình bằng AI
+        </button>
+    </div>
+
+    <div id="loading-screen" class="loading-screen">
+        <div class="ai-spinner"></div>
+        <div class="ai-status-text" id="ai-status">Đang phân tích dữ liệu đầu vào...</div>
+        <div class="ai-subtext">Quá trình này giúp Snap English cấu trúc bài học hợp lý nhất.</div>
+    </div>
+
+    <div id="dashboard-screen" class="dashboard-section">
+        
+        <div class="ai-insight-card">
+            <h3>✨ Lời khuyên từ AI Trợ giảng</h3>
+            <p id="ai-advice-text"></p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-header">
+                <span id="progress-percent" style="color: var(--secondary);">0% Hoàn thành</span>
+                <span id="progress-count" style="color: var(--text-light);">0/0 Bài học</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-bar"></div>
             </div>
         </div>
 
-        <div id="planner-container"></div>
+        <div id="roadmap-content"></div>
 
-        <button class="btn-reset" onclick="resetRoadmap()">Xóa Toàn Bộ & Cài Đặt Lại</button>
+        <button class="btn-reset" onclick="resetApp()">Xóa dữ liệu & Tạo lộ trình mới</button>
     </div>
 </div>
 
 <script>
-    const STORAGE_KEY = 'snap_english_dynamic_planner';
+    const STORAGE_KEY = 'snap_english_ai_planner';
 
-    // Toàn bộ giáo trình được chia nhỏ thành 80 Tasks rải từ 0 đến 990 điểm
+    // Dữ liệu giáo trình nâng cấp với các tag phân loại ngầm định [Tag]
     const masterCurriculum = [
-        // GIAI ĐOẠN 1: Nền tảng (0 - 350)
-        "Nhận diện 4 loại từ chính (Danh, Động, Tính, Trạng) qua hậu tố (-tion, -ment, -ful, -ive, -ate, -ly).",
-        "Học kỹ năng phân biệt phát âm dễ nhầm lẫn (copy/coffee, late/rate) và nối âm, lược âm.",
-        "Ngữ pháp: Nắm vững Thì Hiện tại đơn & Hiện tại tiếp diễn (Dấu hiệu và cách dùng trong Part 1).",
-        "Luyện Part 1: Tranh tả một người (Tập trung vào động từ V-ing).",
-        "Luyện Part 1: Tranh tả nhiều người & Tranh phong cảnh/sự vật.",
-        "Ngữ pháp: Thì Quá khứ đơn & Tương lai đơn.",
-        "Part 2: Luyện nghe câu hỏi Wh- (Who, What, Which).",
-        "Ngữ pháp: Thể bị động (Passive Voice) - Ứng dụng cực nhiều trong Part 1 & 5.",
-        "Part 2: Luyện dạng câu hỏi Where, When. Áp dụng phương pháp Dictation (Chép chính tả).",
-        "Part 2: Luyện dạng câu hỏi How, Why. Kết hợp Shadowing (Nói nhại) để luyện phản xạ.",
-        "Ngữ pháp: Câu điều kiện loại 1, 2, 3.",
-        "Part 2: Luyện câu hỏi Yes/No và Câu hỏi lựa chọn (Or).",
-        "Part 2: Câu hỏi gián tiếp, câu hỏi đuôi và câu trần thuật.",
-        "Ngữ pháp: Mệnh đề quan hệ cơ bản (who, which, that).",
-        "Làm quen Part 3: Từ vựng & Hội thoại tình huống công sở, buổi họp.",
-        "Làm quen Part 3: Tình huống tư vấn khách hàng, mua sắm.",
-        "Làm quen Part 4: Bài nói ngắn về tin nhắn thoại (Voicemail).",
-        "Làm quen Part 4: Thông báo nội bộ & Bản tin thời tiết/giao thông.",
-        "Làm bài Mini Test Part 1, 2, 3, 4 để đánh giá tổng hợp.",
+        // Giai đoạn 1 (0 - 350)
+        "[Ngữ pháp] Nhận diện 4 loại từ chính (Danh, Động, Tính, Trạng) qua các hậu tố cốt lõi.",
+        "[Phát âm] Phân biệt âm dễ nhầm lẫn và quy tắc nối âm, lược âm nền tảng.",
+        "[Ngữ pháp] Làm chủ Thì Hiện tại đơn & Hiện tại tiếp diễn (Dấu hiệu trong Part 1).",
+        "[Nghe] Luyện Part 1: Chiến thuật phân tích Tranh tả một người (Focus V-ing).",
+        "[Nghe] Luyện Part 1: Tranh tả nhiều người & Phong cảnh (Focus Phân biệt vật/người).",
+        "[Ngữ pháp] Phân tích cấu trúc Thì Quá khứ đơn & Tương lai đơn.",
+        "[Nghe] Part 2: Bắt từ khóa câu hỏi Wh- (Who, What, Which) tránh bẫy đồng âm.",
+        "[Ngữ pháp] Thể bị động (Passive Voice) - Chìa khóa diệt gọn bẫy Part 1 & Part 5.",
+        "[Nghe] Part 2: Áp dụng phương pháp Dictation (Chép chính tả) cho dạng Where, When.",
+        "[Nghe] Part 2: Shadowing (Nói nhại) luyện phản xạ cho dạng How, Why.",
+        "[Ngữ pháp] Cấu trúc Câu điều kiện loại 1, 2, 3 và ứng dụng thực chiến.",
+        "[Nghe] Part 2: Xử lý mượt mà Câu hỏi Yes/No và Câu hỏi lựa chọn (Or).",
+        "[Nghe] Part 2: Phân tích bẫy Câu hỏi gián tiếp, câu hỏi đuôi.",
+        "[Ngữ pháp] Mệnh đề quan hệ cơ bản (who, which, that) và cách rút gọn.",
+        "[Từ vựng] Part 3: Khai phá chủ đề Hội thoại tình huống công sở, họp hành.",
+        "[Từ vựng] Part 3: Mở rộng cụm từ tình huống tư vấn khách hàng, mua sắm.",
+        "[Nghe] Part 4: Phân tích cấu trúc bài nói ngắn tin nhắn thoại (Voicemail).",
+        "[Nghe] Part 4: Bắt ý chính Thông báo nội bộ & Bản tin thời tiết/giao thông.",
+        "[Test] Hoàn thành Mini Test Part 1, 2, 3, 4 - Ghi chép lỗi sai vào sổ tay.",
         
-        // GIAI ĐOẠN 2: Tăng tốc (350 - 550)
-        "Ngữ pháp: Bổ sung 4 thì hoàn thành (Đặc biệt Quá khứ hoàn thành và Tương lai hoàn thành).",
-        "Học từ vựng theo cụm (Collocations) - Chủ đề Marketing & Office (vd: meet the requirements).",
-        "Ngữ pháp: Danh động từ (Gerund) & Động từ nguyên thể (To V).",
-        "Kỹ năng Nghe: Nắm chắc Part 1 & 2 để tránh bẫy. Làm quen kỹ năng Paraphrasing.",
-        "Ngữ pháp: Động từ khuyết thiếu (Modal verbs) và Sự hòa hợp chủ vị.",
-        "Part 3 & 4: Tập kỹ năng Scan (Quét) câu hỏi và đáp án trước khi audio phát.",
-        "Ngữ pháp: Câu trực tiếp - gián tiếp.",
-        "Kỹ năng Đọc Part 7: Luyện Skimming (Đọc lướt lấy ý chính) với bài Single Passage.",
-        "Ngữ pháp: Rút gọn mệnh đề quan hệ (Dùng V-ing cho chủ động, V-ed cho bị động).",
-        "Từ vựng: Chủ đề Shipping, HR & Finance.",
-        "Kỹ năng Đọc Part 7: Luyện Scanning (Đọc tìm chi tiết). Phân bổ 20-25p cho Part 5, 5-7p cho Part 6.",
-        "Ngữ pháp: Câu giả định (Subjunctive) - Thường gặp trong Part 5.",
-        "Giải Mini Test Reading: Bắt buộc tra cứu và dịch toàn bộ câu sai.",
-        "Luyện Part 3: Phân tích sâu các đoạn hội thoại có nhiều bẫy Paraphrase.",
-        "Luyện Part 4: Nghe chép chính tả 3 bài nói ngắn khó.",
-        "Tổng ôn 12 chủ điểm ngữ pháp trọng tâm TOEIC.",
+        // Giai đoạn 2 (350 - 550)
+        "[Ngữ pháp] Hoàn thiện 4 Thì hoàn thành (Nhấn mạnh Quá khứ/Tương lai hoàn thành).",
+        "[Từ vựng] Học từ vựng theo cụm (Collocations) - Chủ đề Marketing & Office.",
+        "[Ngữ pháp] Phân biệt rạch ròi Danh động từ (Gerund) & Động từ nguyên thể (To V).",
+        "[Nghe] Nắm chắc Paraphrasing (Từ đồng nghĩa) để tránh bẫy Part 3, 4.",
+        "[Ngữ pháp] Động từ khuyết thiếu (Modal verbs) và Sự hòa hợp chủ vị.",
+        "[Kỹ năng] Part 3 & 4: Thực hành kỹ năng Scan (Quét) câu hỏi trước khi audio phát.",
+        "[Ngữ pháp] Quy tắc lùi thì trong Câu trực tiếp - gián tiếp.",
+        "[Đọc] Part 7: Rèn kỹ năng Skimming (Đọc lướt lấy ý chính) - Single Passage.",
+        "[Ngữ pháp] Kỹ thuật Rút gọn mệnh đề quan hệ (V-ing chủ động, V-ed bị động).",
+        "[Từ vựng] Nạp bộ từ vựng chuyên ngành Shipping, HR & Finance.",
+        "[Đọc] Part 7: Rèn kỹ năng Scanning (Đọc tìm chi tiết). Ép thời gian giải Part 5 & 6.",
+        "[Ngữ pháp] Câu giả định (Subjunctive) - Dạng bài khó thường gặp Part 5.",
+        "[Test] Giải Mini Test Reading: Dịch xuôi toàn bộ các câu sai để thẩm thấu ngữ cảnh.",
+        "[Nghe] Luyện Part 3: Mổ xẻ các đoạn hội thoại có bẫy Paraphrase phức tạp.",
+        "[Nghe] Luyện Part 4: Nghe chép chính tả 3 bài nói ngắn mức độ khó.",
+        "[Ngữ pháp] Tổng ôn 12 chủ điểm ngữ pháp trọng tâm - Vẽ sơ đồ tư duy (Mindmap).",
         
-        // GIAI ĐOẠN 3: Luyện Đề (550 - 750)
-        "Ngữ pháp nâng cao: Câu so sánh kép (The more... the more...).",
-        "Từ vựng: Nâng cấp vốn từ lên mức B1, B2 (Mở rộng từ đồng nghĩa).",
-        "Ngữ pháp nâng cao: Câu điều kiện hỗn hợp.",
-        "Giải đề Nghe (Đề 1): Ghi lại số câu sai. Nghe đi nghe lại kết hợp đọc Transcript.",
-        "Ngữ pháp: Các cặp liên từ (Both...and, Not only...but also, Either...or).",
-        "Giải đề Đọc (Đề 1): Bấm giờ chuẩn 75 phút. Chữa bài, dịch lại toàn bộ để học từ mới.",
-        "Chữa lỗi đề 1: Dùng Oxford Practice Grammar hoặc Grammar in Use để lấp lỗ hổng ngữ pháp.",
-        "Giải đề Nghe (Đề 2): Tập trung sửa phát âm dựa vào Transcript các câu làm sai.",
-        "Giải đề Đọc (Đề 2): Phân tích nguyên nhân sai (Do từ vựng, ngữ pháp hay bẫy?).",
-        "Luyện Part 7 Double Passages: Tìm mối liên hệ giữa 2 đoạn văn.",
-        "Luyện Part 7 Triple Passages: Chiến thuật phân bổ thời gian không bị đuối.",
-        "Giải Full Test 1 (Bấm giờ 120 phút liên tục).",
-        "Phân tích Full Test 1: Mổ xẻ từng câu sai, lập bảng từ vựng mới.",
-        "Giải Full Test 2 (Bấm giờ 120 phút liên tục).",
-        "Phân tích Full Test 2: Rút ra quy luật bẫy của đề thi.",
+        // Giai đoạn 3 (550 - 750)
+        "[Ngữ pháp] Nâng cao: Câu so sánh kép (The more... the more...).",
+        "[Từ vựng] Nâng cấp hệ thống từ vựng lên mức B1, B2 (Mạng lưới từ đồng nghĩa).",
+        "[Ngữ pháp] Nâng cao: Phân tích Câu điều kiện hỗn hợp.",
+        "[Test] Giải Đề Nghe (Đề 1): Nghe lại kết hợp đọc Transcript để gỡ lỗi sai.",
+        "[Ngữ pháp] Các cặp liên từ tương quan (Both...and, Not only...but also).",
+        "[Test] Giải Đề Đọc (Đề 1): Bấm giờ chuẩn 75 phút. Ghi chú từ vựng mới.",
+        "[Đọc] Chữa bài Đề 1: Dùng ngữ cảnh để lấp lỗ hổng tư duy đọc hiểu.",
+        "[Test] Giải Đề Nghe (Đề 2): Tập trung nắn chỉnh phát âm dựa vào Transcript.",
+        "[Đọc] Phân tích Đề 2: Xác định nguyên nhân mất điểm (Từ vựng, Ngữ pháp hay Bẫy).",
+        "[Đọc] Part 7: Chiến thuật xử lý Double Passages - Tìm mối liên kết thông tin.",
+        "[Đọc] Part 7: Chiến thuật Triple Passages - Quản lý quỹ thời gian khắt khe.",
+        "[Test] Thực chiến Full Test 1 (Bấm giờ 120 phút liên tục - Rèn thể lực não).",
+        "[Kỹ năng] Phân tích Full Test 1: Lập bảng tra cứu bẫy từ vựng cá nhân.",
+        "[Test] Thực chiến Full Test 2 (Mô phỏng áp lực phòng thi).",
+        "[Kỹ năng] Phân tích Full Test 2: Rút ra quy luật tư duy của người ra đề ETS.",
         
-        // GIAI ĐOẠN 4: Bứt phá (750 - 980+)
-        "Chiến lược điểm tối đa: Thiết lập tư duy đạt 990 để duy trì tập trung cao độ 120 phút.",
-        "Rèn Tư duy phản biện (Critical Thinking): Phân tích câu hỏi Main Idea (thường ở đầu) vs Detail (thường ở thân).",
-        "Giải bộ đề ETS (2016/2024): Đề Nghe Test 1 (Giọng chuẩn 99% thi thật).",
-        "Chiến thuật Đọc ngược: Giải Part 7 ngay đầu tiên (30-40p) khi não bộ tỉnh táo nhất, sau đó lùi về Part 6, Part 5.",
-        "Giải ETS Đọc Test 1: Bấm giờ 70 phút (Ép thời gian).",
-        "Phân tích bẫy Part 5: Rà soát bẫy thể giả định, từ vựng đa nghĩa, đảo ngữ.",
-        "Giải ETS Nghe Test 2: Nghe tốc độ 1.2x để tăng phản xạ phòng thi.",
-        "Lập sổ tay bứt phá: Ghi lại toàn bộ ngữ pháp lạ, từ vựng dễ nhầm lẫn từ các đề đã giải.",
-        "Chuẩn bị tâm lý (Calm): Luyện thiền 10 phút. Tập thói quen chờ mọi người ổn định thao tác rồi mới làm bài.",
-        "Giải ETS Full Test Cuối (Mô phỏng thi thật 100% không gián đoạn).",
-        "Tổng rà soát sổ tay lỗi sai trước ngày thi. Nghỉ ngơi trọn vẹn."
+        // Giai đoạn 4 (750 - 980+)
+        "[Kỹ năng] Khởi động chiến lược 990: Thiết lập trạng thái Flow trong 120 phút.",
+        "[Đọc] Critical Thinking: Tách biệt tư duy câu hỏi Main Idea và Detail.",
+        "[Test] Giải bộ ETS Format mới: Đề Nghe Test 1.",
+        "[Kỹ năng] Chiến thuật Đọc Ngược: Xử lý Part 7 đầu tiên (35p), lùi về Part 6, Part 5.",
+        "[Test] Giải ETS Đọc Test 1: Bấm giờ ép xuống còn 70 phút.",
+        "[Đọc] Quét sạch bẫy Part 5: Từ vựng đa nghĩa, cụm động từ (Phrasal verbs), đảo ngữ.",
+        "[Nghe] Giải ETS Nghe Test 2: Bật tốc độ x1.2 để hack phản xạ thính giác.",
+        "[Kỹ năng] Tối ưu hóa Sổ tay bứt phá: Rà soát các cụm từ collocations siêu khó.",
+        "[Tâm lý] Luyện tập hít thở và quản trị cảm xúc khi gặp câu hỏi dị/từ vựng lạ.",
+        "[Test] Giải ETS Full Test Cuối (Chuẩn hóa 100% không gian thi thật).",
+        "[Kỹ năng] Rà soát lỗi sai lần cuối. Thả lỏng não bộ, sẵn sàng tỏa sáng."
     ];
 
     window.onload = function() {
-        const savedData = localStorage.getItem(STORAGE_KEY);
-        if (savedData) renderRoadmap(JSON.parse(savedData));
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            document.getElementById('setup-screen').style.display = 'none';
+            document.getElementById('dashboard-screen').style.display = 'block';
+            renderRoadmap(JSON.parse(saved));
+        }
     };
 
-    // Hàm chuyển đổi điểm số thành tỷ lệ % tiến trình trong giáo trình (0 -> 1)
-    function getCurriculumRatio(score) {
-        if (score <= 350) return (score / 350) * 0.35; // Giai đoạn 1 chiếm 35% list
-        if (score <= 550) return 0.35 + ((score - 350) / 200) * 0.25; // Giai đoạn 2 chiếm 25%
-        if (score <= 750) return 0.60 + ((score - 550) / 200) * 0.25; // Giai đoạn 3 chiếm 25%
-        return 0.85 + ((score - 750) / 240) * 0.15; // Giai đoạn 4 chiếm 15%
-    }
-
-    function generateRoadmap() {
+    function startAIAnalysis() {
         let current = parseInt(document.getElementById('currentScore').value);
         let target = parseInt(document.getElementById('targetScore').value);
         let userMonths = document.getElementById('months').value;
 
         if (isNaN(current) || isNaN(target) || current >= target || current < 0 || target > 990) {
-            alert('Vui lòng nhập điểm hiện tại và mục tiêu hợp lệ (Mục tiêu phải lớn hơn hiện tại).');
+            alert('Vui lòng nhập điểm hợp lệ (Mục tiêu phải lớn hơn hiện tại).');
             return;
         }
 
-        // Tính thời gian tối ưu (Quy tắc ngầm: ~100 điểm cần 1.5 - 2 tháng)
+        // Chuyển UI sang trạng thái Loading giả lập AI
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('loading-screen').style.display = 'flex';
+
+        const statuses = [
+            "Đang phân tích phổ điểm đầu vào...",
+            "Đang trích xuất thuật toán học tập...",
+            "Đang cấu trúc lộ trình cá nhân hóa...",
+            "Hoàn tất! Đang khởi tạo giao diện..."
+        ];
+        
+        let i = 0;
+        const statusEl = document.getElementById('ai-status');
+        const interval = setInterval(() => {
+            i++;
+            if (i < statuses.length) {
+                statusEl.innerText = statuses[i];
+            } else {
+                clearInterval(interval);
+                generateRoadmap(current, target, userMonths);
+            }
+        }, 800); // Mỗi bước 0.8 giây
+    }
+
+    function getRatio(score) {
+        if (score <= 350) return (score / 350) * 0.35;
+        if (score <= 550) return 0.35 + ((score - 350) / 200) * 0.25;
+        if (score <= 750) return 0.60 + ((score - 550) / 200) * 0.25;
+        return 0.85 + ((score - 750) / 240) * 0.15;
+    }
+
+    function generateRoadmap(current, target, userMonths) {
         let pointGap = target - current;
         let recommendedMonths = Math.max(1, Math.round(pointGap / 100 * 1.5));
         let months = userMonths ? parseFloat(userMonths) : recommendedMonths;
-        let isRushed = (months < recommendedMonths * 0.6); // Nếu thời gian học < 60% thời gian khuyến nghị
+        let isRushed = (months < recommendedMonths * 0.65);
 
-        // Xác định Start Index và End Index trong masterCurriculum
-        let startIndex = Math.floor(getCurriculumRatio(current) * masterCurriculum.length);
-        let endIndex = Math.ceil(getCurriculumRatio(target) * masterCurriculum.length);
+        let startIndex = Math.floor(getRatio(current) * masterCurriculum.length);
+        let endIndex = Math.ceil(getRatio(target) * masterCurriculum.length);
         
-        // Cắt mảng bài học (Tạo sự nối tiếp liền mạch, học sinh không nhận ra sự ngắt quãng giai đoạn)
-        if(startIndex >= endIndex) endIndex = startIndex + 3; // Fallback an toàn
+        if(startIndex >= endIndex) endIndex = startIndex + 3;
         if(endIndex > masterCurriculum.length) endIndex = masterCurriculum.length;
         
         let selectedTasks = masterCurriculum.slice(startIndex, endIndex);
         
-        // Thuật toán phân bổ bài tập vào các ngày
-        let totalDays = Math.ceil(months * 28); // 4 tuần/tháng * 7 ngày
-        let plan = { current, target, months, isRushed, recommendedMonths, weeks: [] };
-
+        let totalDays = Math.ceil(months * 28); // Giả định 1 tháng học 28 ngày
+        let plan = { current, target, months, isRushed, recommendedMonths, pointGap, weeks: [] };
         let taskDistribution = Array.from({length: totalDays}, () => []);
         
-        // Dàn đều bài chính
         selectedTasks.forEach((task, i) => {
             let dayIndex = Math.floor((i / selectedTasks.length) * totalDays);
             taskDistribution[dayIndex].push(task);
         });
 
-        // Điền bài phụ (Filler) cho những ngày trống hoặc thêm bài ôn tập
-        let fillerTasks = [
-            "Ôn tập từ vựng đã học trong sổ tay.",
-            "Luyện Nghe chép chính tả (Dictation) 1 bài tự chọn.",
-            "Đọc dịch 1 bài Part 7 và rút trích từ vựng.",
-            "Làm 20 câu Part 5 trên nền tảng online để giữ phong độ."
+        const fillers = [
+            "[Ôn tập] Lật lại sổ tay từ vựng, review các từ đã highlight.",
+            "[Kỹ năng] Làm 1 bài Mini Test Nghe ngắn trên Youtube.",
+            "[Đọc] Dịch chi tiết 1 bài báo tiếng Anh ngắn để tăng vốn từ thực tế.",
+            "[Kỹ năng] Ôn lại các cấu trúc bẫy đã ghi chú trong tuần."
         ];
 
         taskDistribution.forEach((dayTasks, i) => {
-            if (dayTasks.length === 0) {
-                dayTasks.push(fillerTasks[i % fillerTasks.length]);
-            }
+            if (dayTasks.length === 0) dayTasks.push(fillers[i % fillers.length]);
         });
 
-        // Nhóm vào các tuần
         let totalWeeks = Math.ceil(totalDays / 7);
         for (let w = 0; w < totalWeeks; w++) {
             let weekDays = [];
@@ -437,97 +629,126 @@
         }
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify(plan));
-        renderRoadmap(plan);
+        
+        setTimeout(() => {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('dashboard-screen').style.display = 'block';
+            renderRoadmap(plan);
+        }, 500);
+    }
+
+    function parseTaskText(rawText) {
+        // Trích xuất thẻ [Tag] để style HTML
+        const regex = /\[(.*?)\](.*)/;
+        const match = rawText.match(regex);
+        if (match) {
+            let tagType = match[1].trim();
+            let text = match[2].trim();
+            let tagClass = 'tag';
+            
+            if(tagType.includes('Ngữ pháp')) tagClass += ' grammar';
+            else if(tagType.includes('Nghe') || tagType.includes('Phát âm')) tagClass += ' listening';
+            else if(tagType.includes('Đọc')) tagClass += ' reading';
+            else if(tagType.includes('Từ vựng')) tagClass += ' vocab';
+            else if(tagType.includes('Test') || tagType.includes('Kỹ năng')) tagClass += ' test';
+            
+            return `<span class="${tagClass}">${tagType}</span> <span>${text}</span>`;
+        }
+        return `<span>${rawText}</span>`;
     }
 
     function renderRoadmap(plan) {
-        document.getElementById('setup-screen').classList.add('hidden');
-        document.getElementById('roadmap-screen').classList.remove('hidden');
-        document.getElementById('roadmap-summary').innerText = 
-            `Chặng đường: ${plan.current} ➔ ${plan.target} TOEIC trong ${plan.months} tháng (${plan.weeks.length} tuần)`;
-
-        // Xử lý Cảnh báo
-        const adviceBox = document.getElementById('advice-box');
+        // Sinh Insight thông minh
+        const insightEl = document.getElementById('ai-advice-text');
+        let insightHTML = `Mục tiêu của bạn là tăng <b>${plan.pointGap} điểm</b> trong <b>${plan.months} tháng</b>. `;
+        
         if (plan.isRushed) {
-            adviceBox.style.display = 'block';
-            adviceBox.innerHTML = `💡 <b>Lời khuyên chân thành:</b> Mục tiêu tăng ${plan.target - plan.current} điểm trong ${plan.months} tháng là khá thử thách (Lộ trình chuẩn thường cần khoảng ${plan.recommendedMonths} tháng). Nhưng đừng lo! Hệ thống đã tự động dồn nén kiến thức và tăng số bài học mỗi ngày. Hãy cố gắng kỷ luật 200% công lực, kết quả sẽ xứng đáng!`;
+            insightHTML += `AI nhận thấy quỹ thời gian của bạn khá hẹp (khuyến nghị chuẩn là ${plan.recommendedMonths} tháng). Lộ trình đã được tối ưu hóa theo dạng "nước rút". Hãy ưu tiên 70% thời gian cho việc giải đề và rà soát lỗi sai nhé!`;
+        } else if (plan.current < 400) {
+            insightHTML += `Do đang ở giai đoạn nền tảng, AI đã ưu tiên phân bổ sâu vào từ vựng và ngữ pháp cốt lõi. Hãy kiên nhẫn xây chắc móng trước khi bước vào giải đề tốc độ.`;
         } else {
-            adviceBox.style.display = 'none';
+            insightHTML += `Quỹ thời gian rất lý tưởng. AI đã phân bổ đều các kỹ năng. Hãy duy trì thói quen học mỗi ngày, sự kỷ luật là chìa khóa!`;
         }
+        insightEl.innerHTML = insightHTML;
 
-        const container = document.getElementById('planner-container');
+        const container = document.getElementById('roadmap-content');
         container.innerHTML = '';
         
         let totalTasks = 0;
         let completedTasks = 0;
 
         plan.weeks.forEach((week, wIndex) => {
-            const weekBlock = document.createElement('div');
-            weekBlock.className = 'week-block';
-
+            const weekDiv = document.createElement('div');
+            weekDiv.className = 'week-card';
+            
             const header = document.createElement('div');
             header.className = 'week-header';
-            header.innerHTML = `<h3 class="week-title">Tuần ${week.weekNum}</h3>`;
-            weekBlock.appendChild(header);
+            header.innerHTML = `<span>Chặng Tuần ${week.weekNum}</span>`;
+            weekDiv.appendChild(header);
 
             week.days.forEach((day, dIndex) => {
                 const dayRow = document.createElement('div');
                 dayRow.className = 'day-row';
 
-                const dayLabel = document.createElement('div');
-                dayLabel.className = 'day-label';
-                dayLabel.innerText = `Ngày ${day.dayNum}`;
-                
+                const dayBadge = document.createElement('div');
+                dayBadge.className = 'day-badge';
+                dayBadge.innerHTML = `<span class="day-num">${day.dayNum}</span><span class="day-text">Ngày</span>`;
+
                 const taskList = document.createElement('div');
-                taskList.className = 'task-list';
+                taskList.className = 'tasks-container';
 
                 day.tasks.forEach((task, tIndex) => {
                     totalTasks++;
                     if (task.completed) completedTasks++;
 
-                    const taskItem = document.createElement('div');
-                    taskItem.className = `task-item ${task.completed ? 'completed' : ''}`;
+                    const item = document.createElement('label');
+                    item.className = `task-item ${task.completed ? 'completed' : ''}`;
                     
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.checked = task.completed;
-                    checkbox.onchange = (e) => updateTaskStatus(wIndex, dIndex, tIndex, e.target.checked);
+                    const check = document.createElement('input');
+                    check.type = 'checkbox';
+                    check.checked = task.completed;
+                    check.onchange = (e) => updateTask(wIndex, dIndex, tIndex, e.target.checked);
 
-                    const text = document.createElement('div');
-                    text.className = 'task-text';
-                    text.innerText = task.text;
+                    const content = document.createElement('div');
+                    content.className = 'task-content';
+                    content.innerHTML = parseTaskText(task.text);
 
-                    taskItem.appendChild(checkbox);
-                    taskItem.appendChild(text);
-                    taskList.appendChild(taskItem);
+                    item.appendChild(check);
+                    item.appendChild(content);
+                    taskList.appendChild(item);
                 });
 
-                dayRow.appendChild(dayLabel);
+                dayRow.appendChild(dayBadge);
                 dayRow.appendChild(taskList);
-                weekBlock.appendChild(dayRow);
+                weekDiv.appendChild(dayRow);
             });
-
-            container.appendChild(weekBlock);
+            container.appendChild(weekDiv);
         });
 
-        const percent = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+        // Cập nhật Progress Bar
+        let percent = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
         document.getElementById('progress-bar').style.width = percent + '%';
-        document.getElementById('progress-text').innerText = `Đã hoàn thành: ${percent}%`;
-        document.getElementById('task-count').innerText = `${completedTasks}/${totalTasks} Nhiệm vụ`;
+        document.getElementById('progress-percent').innerText = `${percent}% Hoàn thành`;
+        document.getElementById('progress-count').innerText = `${completedTasks}/${totalTasks} Nhiệm vụ`;
     }
 
-    function updateTaskStatus(wIndex, dIndex, tIndex, isCompleted) {
+    function updateTask(w, d, t, isChecked) {
         let plan = JSON.parse(localStorage.getItem(STORAGE_KEY));
-        plan.weeks[wIndex].days[dIndex].tasks[tIndex].completed = isCompleted;
+        plan.weeks[w].days[d].tasks[t].completed = isChecked;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(plan));
-        renderRoadmap(plan);
+        renderRoadmap(plan); // Re-render để cập nhật % tiến độ
     }
 
-    function resetRoadmap() {
-        if(confirm('Bạn có chắc chắn muốn xóa toàn bộ lộ trình và bắt đầu lại từ đầu?')) {
+    function resetApp() {
+        if(confirm('Bạn có chắc chắn muốn xóa toàn bộ dữ liệu lộ trình hiện tại?')) {
             localStorage.removeItem(STORAGE_KEY);
-            document.getElementById('roadmap-screen').classList.add('hidden');
-            document.getElementById('setup-screen').classList.remove('hidden');
+            document.getElementById('dashboard-screen').style.display = 'none';
+            document.getElementById('setup-screen').style.display = 'block';
+            
+            // Clear inputs
+            document.getElementById('currentScore').value = '';
+            document.getElementById('targetScore').value = '';
+            document.getElementById('months').value = '';
         }
     }
 </script>
