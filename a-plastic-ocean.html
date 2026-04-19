@@ -17,61 +17,57 @@
             --text-main: #4a4a4a;
             --text-light: #7a7a7a;
             --highlight: #e9c46a; 
-            --border-radius: 16px;
         }
 
+        /* Reset và cho tràn 100% màn hình */
         body {
             font-family: 'Nunito', sans-serif;
             background-color: var(--primary-bg);
             color: var(--text-main);
             margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden; /* Chống cuộn toàn trang, chỉ cuộn ở 2 cột */
         }
 
         .container {
-            width: 95%;
-            max-width: 1400px; 
+            width: 100%;
+            height: 100%;
             background: var(--card-bg);
-            border-radius: var(--border-radius);
-            box-shadow: 0 10px 30px rgba(231, 111, 81, 0.08);
-            padding: 30px;
-            position: relative;
+            padding: 20px 30px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
         }
 
-        h2 { color: var(--theme-accent); text-align: center; margin-bottom: 20px; }
+        h2 { color: var(--theme-accent); text-align: center; margin-top: 0; margin-bottom: 15px; }
 
-        .step { display: none; animation: fadeIn 0.5s ease; }
-        .step.active { display: block; }
+        .step { display: none; height: 100%; animation: fadeIn 0.4s ease; flex-direction: column; }
+        .step.active { display: flex; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Buttons */
-        .btn-group {
-            display: flex; justify-content: space-between;
-            margin-top: 20px; padding-top: 20px; border-top: 2px dashed #fae1d4;
+        /* Bố cục 2 cột chiếm toàn bộ không gian còn lại */
+        .two-col {
+            flex: 1; 
+            min-height: 0; /* Quan trọng để flexbox scroll hoạt động */
+            display: flex; 
+            gap: 30px; 
         }
-        button {
-            padding: 10px 24px; border: none; border-radius: 20px;
-            font-family: 'Nunito', sans-serif; font-weight: 600;
-            cursor: pointer; transition: all 0.3s ease; font-size: 16px;
-        }
-        .btn-back { background-color: #f1e3dc; color: var(--text-main); }
-        .btn-next { background-color: var(--theme-main); color: #fff; }
-        .btn-check { background-color: var(--theme-accent); color: #fff; }
-        button:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-
-        /* Two Columns Layout */
-        .two-col { display: flex; gap: 30px; height: 65vh; }
+        
         .col {
-            flex: 1; padding: 25px; background: var(--primary-bg);
-            border-radius: var(--border-radius); overflow-y: auto;
-            position: relative; /* Hỗ trợ sticky con */
+            flex: 1; 
+            padding: 20px; 
+            background: var(--primary-bg);
+            border-radius: 12px; 
+            overflow-y: auto;
+            position: relative;
         }
+        
         .col::-webkit-scrollbar { width: 8px; }
         .col::-webkit-scrollbar-thumb { background-color: var(--theme-main); border-radius: 10px; }
 
@@ -83,49 +79,66 @@
         }
         span.highlight { background-color: var(--highlight); border-radius: 4px; padding: 0 2px; cursor: pointer; }
 
-        /* Drag & Drop chung + Sticky Word Bank */
+        /* Drag & Drop chung + Sticky Word Bank (Mỏng và gọn) */
         .word-bank {
             display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;
-            padding: 15px; background: rgba(255, 255, 255, 0.95); border-radius: 10px; min-height: 50px;
+            padding: 12px; background: rgba(255, 255, 255, 0.95); border-radius: 10px; 
             border: 2px dashed var(--theme-main);
-            position: sticky; top: -5px; z-index: 10; /* Bám sát viền trên khi cuộn */
+            position: sticky; top: -20px; z-index: 10; /* Bám sát viền trên khi cuộn */
             box-shadow: 0 8px 15px rgba(0,0,0,0.05);
             backdrop-filter: blur(5px);
         }
+        
         .draggable {
             background: #fff; border: 2px solid var(--theme-main);
-            padding: 8px 15px; border-radius: 20px; cursor: grab; font-weight: 600; font-size: 15px;
+            padding: 6px 16px; border-radius: 20px; cursor: grab; font-weight: bold; font-size: 14px;
             color: var(--theme-accent); display: inline-block;
         }
-        .draggable.long-drag {
-            display: block; width: 90%; text-align: left; margin: 5px 0; font-weight: normal; color: var(--text-main);
+
+        /* Danh sách câu hỏi tĩnh của Task 1 */
+        .reference-list {
+            background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 20px;
+            font-size: 14.5px; border: 1px solid #f1e3dc;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
+        .reference-list p { margin: 8px 0; line-height: 1.5; }
 
         /* Task 0: Prep (Category boxes) */
-        .category-container { display: flex; gap: 20px; }
+        .category-container { display: flex; gap: 20px; height: 100%; }
         .category-box {
             flex: 1; border: 2px dashed var(--theme-main); border-radius: 12px;
-            padding: 20px; min-height: 200px; background: #fff;
+            padding: 20px; background: #fff;
             display: flex; flex-wrap: wrap; align-content: flex-start; gap: 10px;
         }
         .category-title { width: 100%; text-align: center; color: var(--theme-accent); margin-top: 0; }
 
-        /* Task 1 & 2: Inline Dropzones */
+        /* Inline Dropzones */
         .dropzone {
             display: inline-flex; align-items: center; justify-content: center;
-            min-width: 100px; height: 32px; border-bottom: 2px dashed var(--theme-accent);
+            min-width: 60px; height: 32px; border-bottom: 2px dashed var(--theme-accent);
             margin: 0 5px; vertical-align: middle; background: rgba(255,255,255,0.5);
             color: var(--theme-accent); font-weight: bold; border-radius: 4px; padding: 0 5px;
         }
-        .dropzone.long-drop {
-            display: block; width: 95%; min-height: 45px; border: 2px dashed var(--theme-accent);
-            margin: 10px 0;
-        }
 
         .task-item {
-            background: #fff; padding: 15px; border-radius: 10px;
-            margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); font-size: 16px; line-height: 1.8;
+            background: #fff; padding: 12px 15px; border-radius: 10px;
+            margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); font-size: 15px;
         }
+
+        /* Nút bấm (Đã làm nhỏ lại) */
+        .btn-group {
+            display: flex; justify-content: space-between;
+            margin-top: 15px; padding-top: 15px; border-top: 2px dashed #fae1d4;
+        }
+        button {
+            padding: 8px 18px; border: none; border-radius: 20px;
+            font-family: 'Nunito', sans-serif; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease; font-size: 14px;
+        }
+        .btn-back { background-color: #f1e3dc; color: var(--text-main); }
+        .btn-next { background-color: var(--theme-main); color: #fff; }
+        .btn-check { background-color: var(--theme-accent); color: #fff; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
         /* Modal Popup */
         .modal-overlay {
@@ -135,12 +148,12 @@
         }
         .modal-content {
             background: #fff; width: 90%; max-width: 800px; max-height: 85vh;
-            overflow-y: auto; border-radius: var(--border-radius);
-            padding: 35px; box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            overflow-y: auto; border-radius: 12px;
+            padding: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.2);
         }
-        .modal-content h3 { margin-top: 0; color: var(--theme-accent); text-align: center; font-size: 24px;}
-        .close-modal { display: block; margin: 25px auto 0; background: var(--theme-main); }
-        .explanation-item { background: var(--primary-bg); padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .modal-content h3 { margin-top: 0; color: var(--theme-accent); text-align: center; font-size: 22px;}
+        .close-modal { display: block; margin: 20px auto 0; background: var(--theme-main); }
+        .explanation-item { background: var(--primary-bg); padding: 15px; border-radius: 10px; margin-bottom: 15px; }
         .correct-text { color: var(--theme-success); font-weight: bold; }
         .wrong-text { color: #d90429; font-weight: bold; }
         
@@ -154,9 +167,9 @@
 <div class="container">
     <div id="step1" class="step active">
         <h2>Preparation: Sort the words</h2>
-        <p style="text-align: center; color: var(--text-light);">Kéo thả các từ vựng vào đúng nhóm chủ đề: Film (Phim ảnh) hoặc Pollution (Ô nhiễm).</p>
+        <p style="text-align: center; color: var(--text-light); margin-top:0;">Kéo thả các từ vựng vào đúng nhóm chủ đề: Film (Phim ảnh) hoặc Pollution (Ô nhiễm).</p>
         
-        <div class="word-bank" id="prep-bank">
+        <div class="word-bank" id="prep-bank" style="position: relative; top: 0;">
             <div class="draggable" draggable="true" id="p1">dump</div>
             <div class="draggable" draggable="true" id="p2">filmmaker</div>
             <div class="draggable" draggable="true" id="p3">recycle</div>
@@ -189,9 +202,9 @@
 
     <div id="step2" class="step">
         <h2>Reading & Task 1</h2>
-        <p style="text-align: center; color: var(--text-light);">Bôi đen từ/câu và <b>nhấp chuột phải</b> để highlight. Kéo thả các câu a-e vào đúng vị trí 1-5.</p>
         <div class="two-col">
             <div class="col" id="reading-text-1">
+                <p style="text-align: center; color: var(--text-light); font-size:14px; margin-top:0;">Bôi đen từ/câu và <b>nhấp chuột phải</b> để highlight.</p>
                 <div class="reading-content message-box">
                     <h3 style="color: var(--theme-accent); text-align: center;">A Plastic Ocean: a film review</h3>
                     <p>A Plastic Ocean is a film to make you think. Think, and then act. We need to take action on our dependence on plastic. We've been producing plastic in huge quantities since the 1940s. Drink bottles, shopping bags, toiletries and even clothes are made with plastic. <b>[ 1 ]</b> What happens to all the rest?</p>
@@ -204,36 +217,32 @@
                     <p>Once you've seen A Plastic Ocean, you'll realise the time is now and we all have a role to play.</p>
                 </div>
             </div>
+            
             <div class="col scrollable-col">
                 <h3 style="color:var(--theme-accent); margin-top:0;">Task 1: Missing Sentences</h3>
+                
                 <div class="word-bank" id="task1-bank">
-                    <div class="draggable long-drag" draggable="true" id="s1" data-val="a">a. This prompts them to travel around the world to look at other areas that have been affected.</div>
-                    <div class="draggable long-drag" draggable="true" id="s2" data-val="b">b. These are contrasted with scenes of polluted cities and dumps full of plastic rubbish.</div>
-                    <div class="draggable long-drag" draggable="true" id="s3" data-val="c">c. We live in a world full of plastic, and only a small proportion is recycled.</div>
-                    <div class="draggable long-drag" draggable="true" id="s4" data-val="d">d. The results are disastrous, but it isn't too late to change.</div>
-                    <div class="draggable long-drag" draggable="true" id="s5" data-val="e">e. But the film doesn't only present the negative side.</div>
+                    <span style="font-size: 13px; color: #888; width: 100%;">Kéo chữ cái vào chỗ trống tương ứng:</span>
+                    <div class="draggable" draggable="true" id="s1" data-val="a">A</div>
+                    <div class="draggable" draggable="true" id="s2" data-val="b">B</div>
+                    <div class="draggable" draggable="true" id="s3" data-val="c">C</div>
+                    <div class="draggable" draggable="true" id="s4" data-val="d">D</div>
+                    <div class="draggable" draggable="true" id="s5" data-val="e">E</div>
+                </div>
+
+                <div class="reference-list">
+                    <p><b>A.</b> This prompts them to travel around the world to look at other areas that have been affected.</p>
+                    <p><b>B.</b> These are contrasted with scenes of polluted cities and dumps full of plastic rubbish.</p>
+                    <p><b>C.</b> We live in a world full of plastic, and only a small proportion is recycled.</p>
+                    <p><b>D.</b> The results are disastrous, but it isn't too late to change.</p>
+                    <p><b>E.</b> But the film doesn't only present the negative side.</p>
                 </div>
                 
-                <div class="task-item">
-                    <b>Gap 1:</b>
-                    <div class="dropzone dropzone-single long-drop" id="t1-1"></div>
-                </div>
-                <div class="task-item">
-                    <b>Gap 2:</b>
-                    <div class="dropzone dropzone-single long-drop" id="t1-2"></div>
-                </div>
-                <div class="task-item">
-                    <b>Gap 3:</b>
-                    <div class="dropzone dropzone-single long-drop" id="t1-3"></div>
-                </div>
-                <div class="task-item">
-                    <b>Gap 4:</b>
-                    <div class="dropzone dropzone-single long-drop" id="t1-4"></div>
-                </div>
-                <div class="task-item">
-                    <b>Gap 5:</b>
-                    <div class="dropzone dropzone-single long-drop" id="t1-5"></div>
-                </div>
+                <div class="task-item"><b>Gap 1:</b> <span class="dropzone dropzone-single" id="t1-1"></span></div>
+                <div class="task-item"><b>Gap 2:</b> <span class="dropzone dropzone-single" id="t1-2"></span></div>
+                <div class="task-item"><b>Gap 3:</b> <span class="dropzone dropzone-single" id="t1-3"></span></div>
+                <div class="task-item"><b>Gap 4:</b> <span class="dropzone dropzone-single" id="t1-4"></span></div>
+                <div class="task-item"><b>Gap 5:</b> <span class="dropzone dropzone-single" id="t1-5"></span></div>
             </div>
         </div>
         <div class="btn-group">
@@ -261,30 +270,14 @@
                     <div class="draggable" draggable="true" id="w8">make</div>
                 </div>
 
-                <div class="task-item">
-                    1. We urgently need to <span class="dropzone dropzone-single" id="t2-1"></span> action about the plastic waste problem.
-                </div>
-                <div class="task-item">
-                    2. The hurricane had a devastating <span class="dropzone dropzone-single" id="t2-2"></span> on the island.
-                </div>
-                <div class="task-item">
-                    3. The filmmakers <span class="dropzone dropzone-single" id="t2-3"></span> a shocking discovery in the Pacific.
-                </div>
-                <div class="task-item">
-                    4. The answer was painfully <span class="dropzone dropzone-single" id="t2-4"></span> to everyone in the room.
-                </div>
-                <div class="task-item">
-                    5. Everyone has a <span class="dropzone dropzone-single" id="t2-5"></span> to play in this situation.
-                </div>
-                <div class="task-item">
-                    6. It's not too late to <span class="dropzone dropzone-single" id="t2-6"></span> the tide and fix the problem.
-                </div>
-                <div class="task-item">
-                    7. This is a short- <span class="dropzone dropzone-single" id="t2-7"></span> solution. It won't work forever.
-                </div>
-                <div class="task-item">
-                    8. There is a staggering <span class="dropzone dropzone-single" id="t2-8"></span> of plastic in the world.
-                </div>
+                <div class="task-item">1. We urgently need to <span class="dropzone dropzone-single" id="t2-1"></span> action about the plastic waste problem.</div>
+                <div class="task-item">2. The hurricane had a devastating <span class="dropzone dropzone-single" id="t2-2"></span> on the island.</div>
+                <div class="task-item">3. The filmmakers <span class="dropzone dropzone-single" id="t2-3"></span> a shocking discovery in the Pacific.</div>
+                <div class="task-item">4. The answer was painfully <span class="dropzone dropzone-single" id="t2-4"></span> to everyone in the room.</div>
+                <div class="task-item">5. Everyone has a <span class="dropzone dropzone-single" id="t2-5"></span> to play in this situation.</div>
+                <div class="task-item">6. It's not too late to <span class="dropzone dropzone-single" id="t2-6"></span> the tide and fix the problem.</div>
+                <div class="task-item">7. This is a short- <span class="dropzone dropzone-single" id="t2-7"></span> solution. It won't work forever.</div>
+                <div class="task-item">8. There is a staggering <span class="dropzone dropzone-single" id="t2-8"></span> of plastic in the world.</div>
             </div>
         </div>
         <div class="btn-group">
@@ -315,7 +308,6 @@
 </div>
 
 <script>
-    // Điều hướng form
     function nextStep(step) {
         document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
         document.getElementById('step' + step).classList.add('active');
@@ -333,7 +325,6 @@
         enableHighlight(toId);
     }
 
-    // Highlight văn bản
     function enableHighlight(containerId) {
         let container = document.getElementById(containerId);
         container.oncontextmenu = function(e) {
@@ -355,9 +346,7 @@
     }
     enableHighlight('reading-text-1');
 
-    // Cấu hình Kéo Thả (Chung cho tất cả)
     let draggedItem = null;
-    let scrollInterval = null;
 
     document.querySelectorAll('.draggable').forEach(item => {
         item.addEventListener('dragstart', function(e) {
@@ -366,38 +355,9 @@
         });
         item.addEventListener('dragend', function() {
             setTimeout(() => { this.style.opacity = '1'; draggedItem = null; }, 0);
-            clearInterval(scrollInterval);
-            scrollInterval = null;
         });
     });
 
-    // Auto-scroll logic cho .scrollable-col
-    document.querySelectorAll('.scrollable-col').forEach(col => {
-        col.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            const rect = this.getBoundingClientRect();
-            const y = e.clientY - rect.top;
-            const scrollThreshold = 60; // 60px từ mép trên/dưới
-            
-            clearInterval(scrollInterval); // Dọn dẹp interval cũ
-            
-            if (y < scrollThreshold) {
-                // Cuộn lên
-                scrollInterval = setInterval(() => { this.scrollTop -= 15; }, 30);
-            } else if (y > rect.height - scrollThreshold) {
-                // Cuộn xuống
-                scrollInterval = setInterval(() => { this.scrollTop += 15; }, 30);
-            } else {
-                scrollInterval = null;
-            }
-        });
-        col.addEventListener('dragleave', function() {
-            clearInterval(scrollInterval);
-            scrollInterval = null;
-        });
-    });
-
-    // Dropzone cho nhiều item (Preparation)
     document.querySelectorAll('.dropzone-multi').forEach(zone => {
         zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.background = 'rgba(244, 162, 97, 0.1)'; });
         zone.addEventListener('dragleave', () => zone.style.background = '#fff');
@@ -407,14 +367,12 @@
         });
     });
 
-    // Dropzone cho 1 item (Task 1 & Task 2)
     document.querySelectorAll('.dropzone-single').forEach(zone => {
         zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.background = 'rgba(244, 162, 97, 0.3)'; });
         zone.addEventListener('dragleave', () => zone.style.background = 'rgba(255,255,255,0.5)');
         zone.addEventListener('drop', function() {
             this.style.background = 'rgba(255,255,255,0.5)';
             if (draggedItem) {
-                // Nếu ô đã có chữ, đẩy chữ cũ về bank tương ứng
                 if (this.hasChildNodes()) {
                     let bankId = draggedItem.id.includes('s') ? 'task1-bank' : 'task2-bank';
                     let currentChild = this.firstChild;
@@ -425,39 +383,36 @@
         });
     });
 
-    // Cho phép kéo về các Word Bank
     ['prep-bank', 'task1-bank', 'task2-bank'].forEach(id => {
         let bank = document.getElementById(id);
         bank.addEventListener('dragover', e => e.preventDefault());
         bank.addEventListener('drop', function() { if(draggedItem) this.appendChild(draggedItem); });
     });
 
-    // Dữ liệu đáp án
     const prepData = {
         film: ["filmmaker", "documentary", "shot", "spoiler", "premiere", "scene"],
         pollution: ["dump", "recycle", "rubbish", "waste", "reuse", "polluted"]
     };
 
     const task1Data = {
-        "t1-1": { ans: "c", why: "Đoạn trước liệt kê các sản phẩm làm từ nhựa. Câu (c) nối tiếp hợp lý: 'Chúng ta sống trong thế giới đầy nhựa, và chỉ một phần nhỏ được tái chế', dẫn tới câu hỏi tiếp theo 'What happens to all the rest?'." },
-        "t1-2": { ans: "a", why: "Đoạn trước kể về việc phát hiện lớp nhựa dày ở Ấn Độ Dương. Câu (a) 'Điều này thúc đẩy họ đi khắp thế giới để xem các khu vực khác bị ảnh hưởng' là kết quả trực tiếp của khám phá này." },
-        "t1-3": { ans: "b", why: "Đoạn trước nói về 'beautiful shots of the seas' (những cảnh đẹp của biển). Câu (b) tiếp nối bằng cách nói những cảnh đẹp này tương phản (contrasted) với cảnh thành phố ô nhiễm." },
-        "t1-4": { ans: "e", why: "Nửa đầu bài nói về tác hại (negative side). Nửa sau nói về giải pháp. Câu (e) 'Nhưng bộ phim không chỉ trình bày mặt tiêu cực' đóng vai trò chuyển ý hoàn hảo." },
-        "t1-5": { ans: "d", why: "Đoạn trước nhắc đến số lượng rác khổng lồ bị ném xuống biển. Câu (d) 'Kết quả thật thảm khốc, nhưng vẫn chưa quá muộn để thay đổi' chốt lại vấn đề trước khi tác giả kêu gọi hành động ở câu cuối." }
+        "t1-1": { ans: "c", why: "Đoạn trước liệt kê các sản phẩm làm từ nhựa. Câu (C) nối tiếp hợp lý: 'Chúng ta sống trong thế giới đầy nhựa, và chỉ một phần nhỏ được tái chế', dẫn tới câu hỏi tiếp theo 'What happens to all the rest?'." },
+        "t1-2": { ans: "a", why: "Đoạn trước kể về việc phát hiện lớp nhựa dày. Câu (A) 'Điều này thúc đẩy họ đi khắp thế giới để xem các khu vực khác bị ảnh hưởng' là kết quả trực tiếp của khám phá này." },
+        "t1-3": { ans: "b", why: "Đoạn trước nói về 'beautiful shots of the seas'. Câu (B) tiếp nối bằng cách nói những cảnh đẹp này tương phản (contrasted) với cảnh thành phố ô nhiễm." },
+        "t1-4": { ans: "e", why: "Nửa đầu bài nói về tác hại. Nửa sau nói về giải pháp. Câu (E) 'Nhưng bộ phim không chỉ trình bày mặt tiêu cực' đóng vai trò chuyển ý hoàn hảo." },
+        "t1-5": { ans: "d", why: "Đoạn trước nhắc đến số lượng rác khổng lồ. Câu (D) 'Kết quả thật thảm khốc, nhưng vẫn chưa quá muộn để thay đổi' chốt lại vấn đề trước khi tác giả kêu gọi hành động." }
     };
 
     const task2Data = {
         "t2-1": { ans: "take", why: "'Take action' là một collocation cố định, nghĩa là 'hành động'." },
-        "t2-2": { ans: "impact", why: "Cụm 'devastating impact on' có nghĩa là 'tác động tàn phá lên...'. Các từ khác không đi với giới từ 'on' trong ngữ cảnh này." },
+        "t2-2": { ans: "impact", why: "Cụm 'devastating impact on' có nghĩa là 'tác động tàn phá lên...'." },
         "t2-3": { ans: "make", why: "'Make a discovery' là một cụm từ cố định, nghĩa là 'khám phá ra điều gì'." },
         "t2-4": { ans: "obvious", why: "Cụm 'painfully obvious' nghĩa là 'hiển nhiên đến mức đau lòng'." },
         "t2-5": { ans: "role", why: "'Have a role to play' là một thành ngữ, nghĩa là 'có vai trò, trách nhiệm cần thực hiện'." },
-        "t2-6": { ans: "reverse", why: "'Reverse the tide' nghĩa đen là lật ngược thủy triều, nghĩa bóng là đảo ngược tình thế, khắc phục vấn đề." },
-        "t2-7": { ans: "term", why: "'Short-term solution' (giải pháp ngắn hạn) kết nối với việc nó sẽ không có tác dụng mãi mãi (won't work forever)." },
-        "t2-8": { ans: "amount", why: "'A staggering amount of' dùng cho danh từ không đếm được (plastic), nghĩa là một số lượng khổng lồ." }
+        "t2-6": { ans: "reverse", why: "'Reverse the tide' nghĩa đen là lật ngược thủy triều, nghĩa bóng là đảo ngược tình thế." },
+        "t2-7": { ans: "term", why: "'Short-term solution' (giải pháp ngắn hạn)." },
+        "t2-8": { ans: "amount", why: "'A staggering amount of' dùng cho danh từ không đếm được (plastic), nghĩa là số lượng khổng lồ." }
     };
 
-    // Modal
     function openModal(title, htmlContent) {
         document.getElementById('modal-title').innerText = title;
         document.getElementById('modal-body').innerHTML = htmlContent;
@@ -466,7 +421,6 @@
 
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
-    // Kiểm tra Prep
     function checkPrep() {
         let score = 0; let wrongCount = 0;
         let cats = ['film', 'pollution'];
@@ -490,7 +444,6 @@
         else openModal("Preparation Task", `<p style='text-align:center;'><span class='wrong-text'>Bạn đã phân loại đúng ${score}/12 từ. Các ô viền đỏ là bị sai nhóm, hãy kéo lại nhé!</span></p>`);
     }
 
-    // Kiểm tra Task 1
     function checkTask1() {
         let score = 0; let html = "";
         for (let i = 1; i <= 5; i++) {
@@ -501,15 +454,15 @@
             if (userVal === data.ans) {
                 score++;
                 html += `<div class="explanation-item">
-                    <p><b>Vị trí ${i}:</b></p>
-                    <p><span class="correct-text">✔ Đúng.</span> Bạn đã ghép câu (${userVal})</p>
+                    <p><b>Gap ${i}:</b></p>
+                    <p><span class="correct-text">✔ Đúng.</span> Câu (${userVal.toUpperCase()})</p>
                     <p><b>Giải thích:</b> ${data.why}</p>
                 </div>`;
             } else {
-                let displayAns = userVal === "" ? "(Chưa kéo thả)" : `Câu (${userVal})`;
+                let displayAns = userVal === "" ? "(Chưa kéo thả)" : `Câu (${userVal.toUpperCase()})`;
                 html += `<div class="explanation-item" style="border-left: 4px solid #d90429;">
-                    <p><b>Vị trí ${i}:</b></p>
-                    <p><span class="wrong-text">✘ Sai.</span> Bạn ghép: ${displayAns} | <span class="correct-text">Đúng phải là: Câu (${data.ans})</span></p>
+                    <p><b>Gap ${i}:</b></p>
+                    <p><span class="wrong-text">✘ Sai.</span> Bạn chọn: ${displayAns} | <span class="correct-text">Đúng là: Câu (${data.ans.toUpperCase()})</span></p>
                     <p><b>Lý do:</b> ${data.why}</p>
                 </div>`;
             }
@@ -517,7 +470,6 @@
         openModal(`Kết quả Task 1: ${score}/5`, html);
     }
 
-    // Kiểm tra Task 2
     function checkTask2() {
         let score = 0; let html = "";
         for (let i = 1; i <= 8; i++) {
@@ -529,14 +481,14 @@
                 score++;
                 html += `<div class="explanation-item">
                     <p><b>Câu ${i}:</b></p>
-                    <p><span class="correct-text">✔ Đúng.</span> Từ điền vào: ${userAnswer}</p>
+                    <p><span class="correct-text">✔ Đúng.</span> ${userAnswer}</p>
                     <p><b>Giải thích:</b> ${data.why}</p>
                 </div>`;
             } else {
                 let displayAns = userAnswer === "" ? "(Chưa kéo thả)" : userAnswer;
                 html += `<div class="explanation-item" style="border-left: 4px solid #d90429;">
                     <p><b>Câu ${i}:</b></p>
-                    <p><span class="wrong-text">✘ Sai.</span> Bạn chọn: ${displayAns} | <span class="correct-text">Đúng phải là: ${data.ans}</span></p>
+                    <p><span class="wrong-text">✘ Sai.</span> Bạn điền: ${displayAns} | <span class="correct-text">Đúng là: ${data.ans}</span></p>
                     <p><b>Lý do:</b> ${data.why}</p>
                 </div>`;
             }
@@ -544,7 +496,6 @@
         openModal(`Kết quả Task 2: ${score}/8`, html);
     }
 
-    // Final Review
     function showFinalReview() {
         syncReadingContent('reading-text-2', 'reading-text-final');
         let finalHtml = `<h3 style="color: var(--theme-accent);">Toàn bộ giải thích chi tiết</h3>`;
@@ -553,7 +504,7 @@
         for (let i = 1; i <= 5; i++) {
             let data = task1Data['t1-' + i];
             finalHtml += `<div class="explanation-item" style="padding:10px;">
-                <p><b>Vị trí ${i}</b> => <span class="correct-text">Câu (${data.ans})</span></p>
+                <p><b>Gap ${i}</b> => <span class="correct-text">Câu (${data.ans.toUpperCase()})</span></p>
                 <p style="font-size: 14px; margin: 5px 0;"><i>${data.why}</i></p>
             </div>`;
         }
