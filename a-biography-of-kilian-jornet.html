@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnapEnglish - A biography of Kilian Jornet</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+        :root {
+            --primary-bg: #fdf6f5;
+            --card-bg: #ffffff;
+            --pastel-blue: #a3c4f3;
+            --pastel-pink: #f1c0e8;
+            --pastel-green: #b9fbc0;
+            --text-main: #4a4a4a;
+            --text-light: #7a7a7a;
+            --highlight: #ffcfd2;
+            --border-radius: 16px;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1400px; 
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            padding: 30px;
+            position: relative;
+        }
+
+        img { max-width: 100%; height: auto; border-radius: 8px; object-fit: contain; }
+        h2 { color: #8e9aaf; text-align: center; margin-bottom: 20px; }
+
+        .step { display: none; animation: fadeIn 0.5s ease; }
+        .step.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex; justify-content: space-between;
+            margin-top: 20px; padding-top: 20px; border-top: 2px dashed #f0e6e6;
+        }
+        button {
+            padding: 10px 24px; border: none; border-radius: 20px;
+            font-family: 'Nunito', sans-serif; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease; font-size: 16px;
+        }
+        .btn-back { background-color: #e9ecef; color: var(--text-main); }
+        .btn-next { background-color: var(--pastel-blue); color: #fff; }
+        .btn-check { background-color: var(--pastel-pink); color: #fff; }
+
+        button:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+        /* Two Columns Layout */
+        .two-col { display: flex; gap: 30px; height: 65vh; }
+        .col {
+            flex: 1; padding: 25px; background: var(--primary-bg);
+            border-radius: var(--border-radius); overflow-y: auto;
+        }
+        .col::-webkit-scrollbar { width: 8px; }
+        .col::-webkit-scrollbar-thumb { background-color: var(--pastel-blue); border-radius: 10px; }
+
+        /* Reading Text Highlight */
+        .reading-content { line-height: 1.8; font-size: 16px; user-select: text; text-align: justify; }
+        .message-box {
+            background: #fff; padding: 20px; border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 4px solid var(--pastel-blue);
+        }
+        span.highlight {
+            background-color: var(--highlight); border-radius: 4px; padding: 0 2px; cursor: pointer;
+        }
+
+        /* Preparation Matching Task */
+        .match-container { display: flex; justify-content: space-between; gap: 30px;}
+        .match-col { display: flex; flex-direction: column; gap: 15px; width: 48%; }
+        .match-item {
+            background: var(--card-bg); border: 2px solid var(--pastel-blue);
+            padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; transition: 0.2s;
+            font-size: 15px; display: flex; align-items: center; justify-content: center;
+        }
+        .match-item.selected { background: var(--pastel-blue); color: #fff; transform: scale(1.02); }
+        .match-item.matched {
+            background: var(--pastel-green); border-color: var(--pastel-green);
+            color: #2b7a0b; cursor: default;
+        }
+
+        /* Task 1 Type-in */
+        .task-item {
+            background: #fff; padding: 20px; border-radius: 10px;
+            margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); font-size: 16px; line-height: 1.8;
+        }
+        .task-input {
+            border: 2px solid var(--pastel-blue); border-radius: 8px; padding: 5px 10px;
+            font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 600;
+            width: 120px; text-align: center; color: var(--pastel-blue); outline: none; transition: 0.3s;
+        }
+        .task-input:focus { background-color: var(--primary-bg); border-color: var(--pastel-pink); }
+
+        /* Task 2 True/False/Options */
+        .tf-options label { display: block; margin-bottom: 10px; cursor: pointer; font-weight: 600; padding: 8px 12px; border-radius: 8px; transition: 0.2s;}
+        .tf-options label:hover { background: var(--primary-bg); }
+        .tf-options input { margin-right: 10px; }
+
+        /* Modal Popup */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center;
+            z-index: 1000; backdrop-filter: blur(3px);
+        }
+        .modal-content {
+            background: #fff; width: 90%; max-width: 800px; max-height: 85vh;
+            overflow-y: auto; border-radius: var(--border-radius);
+            padding: 35px; box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+        .modal-content h3 { margin-top: 0; color: var(--pastel-blue); text-align: center; font-size: 24px;}
+        .close-modal { display: block; margin: 25px auto 0; background: var(--pastel-pink); }
+        .explanation-item { background: var(--primary-bg); padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .correct-text { color: #2b7a0b; font-weight: bold; }
+        .wrong-text { color: #d90429; font-weight: bold; }
+        
+        .hide-cite { display: none !important; }
+    </style>
+</head>
+<body>
+
+<span class="hide-cite"></span>
+
+<div class="container">
+    <div id="step1" class="step active">
+        <h2>Preparation: Match the vocabulary with definitions</h2>
+        <p style="text-align: center; color: var(--text-light); font-size: 16px;">Nhấp vào từ vựng ở cột trái, sau đó nhấp vào định nghĩa tương ứng ở cột phải.</p>
+        <div class="match-container">
+            <div class="match-col" id="col-start">
+                <div class="match-item" data-id="1">1. kidneys</div>
+                <div class="match-item" data-id="2">2. endurance</div>
+                <div class="match-item" data-id="3">3. to scale</div>
+                <div class="match-item" data-id="4">4. breathless</div>
+                <div class="match-item" data-id="5">5. a hike</div>
+                <div class="match-item" data-id="6">6. a Sherpa</div>
+                <div class="match-item" data-id="7">7. an ascent</div>
+                <div class="match-item" data-id="8">8. altitude</div>
+            </div>
+            <div class="match-col" id="col-end">
+                <div class="match-item" data-target="3">a. to climb to the top of something</div>
+                <div class="match-item" data-target="6">b. a mountain guide from the Himalaya mountains</div>
+                <div class="match-item" data-target="8">c. the height of a place above sea level</div>
+                <div class="match-item" data-target="5">d. a long, hard walk</div>
+                <div class="match-item" data-target="7">e. a climb up a mountain or other object</div>
+                <div class="match-item" data-target="2">f. the ability to do something difficult for a long time</div>
+                <div class="match-item" data-target="1">g. two organs in the body that process liquid waste</div>
+                <div class="match-item" data-target="4">h. not breathing easily</div>
+            </div>
+        </div>
+        <div class="btn-group">
+            <div></div> 
+            <button class="btn-next" onclick="nextStep(2)">Tiếp theo ➔</button>
+        </div>
+    </div>
+
+    <div id="step2" class="step">
+        <h2>Reading & Task 1 (Type the answer)</h2>
+        <p style="text-align: center; color: var(--text-light);">Bôi đen từ/câu và <b>nhấp chuột phải</b> để highlight. Làm lại để xóa.</p>
+        <div class="two-col">
+            <div class="col" id="reading-text-1">
+                <div class="reading-content message-box">
+                    <p>When you picture mountain climbers scaling Mount Everest, what probably comes to mind are teams of climbers with Sherpa guides leading them to the summit, equipped with oxygen masks, supplies and tents. And in most cases you'd be right, as 97 per cent of climbers use oxygen to ascend to Everest's summit at 8,850 metres above sea level. The thin air at high altitudes makes most people breathless at 3,500 metres, and the vast majority of climbers use oxygen past 7,000 metres. A typical climbing group will have 8-15 people in it, with an almost equal number of guides, and they'll spend weeks to get to the top after reaching Base Camp.</p>
+                    <p>But ultra-distance and mountain runner Kilian Jornet Burgada ascended the mountain in May 2017 alone, without an oxygen mask or fixed ropes for climbing. Oh, and he did it in 26 hours. With food poisoning. And then, five days later, he did it again, this time in only 17 hours.</p>
+                    <p>Born in 1987, Kilian has been training for Everest his whole life. And that really does mean his whole life, as he grew up 2,000 metres above sea level in the Pyrenees... While other children his age were learning to walk, Kilian was on skis. At one and a half years old he did a five-hour hike with his mother, entirely under his own steam. He left his peers even further behind when he climbed his first mountain and competed in his first cross-country ski race at age three.</p>
+                    <p>By age seven, he had scaled a 4,000er and, at ten, he did a 42-day crossing of the Pyrenees. He was 13 when he says he started to take it 'seriously' and trained with the Ski Mountaineering Technical Centre (CTEMC) in Catalonia, entering competitions and working with a coach. At 18, he took over his own ski-mountaineering and trail-running training, with a schedule that only allows a couple of weeks of rest a year. He does as many as 1,140 hours of endurance training a year...</p>
+                    <p>Sleeping only seven hours a night, Kilian Jornet seems almost superhuman. His resting heartbeat is extremely low at 33 beats per minute, compared with the average man's 60 per minute or an athlete's 40 per minute. He breathes more efficiently than average people too... All this is thanks to his childhood in the mountains and to genetics, but it is his mental strength that sets him apart.</p>
+                    <p>He often sets himself challenges to see how long he can endure difficult conditions... For example, he almost gave himself kidney failure after only drinking 3.5 litres of water on a 100km run in temperatures of around 40°C.</p>
+                    <p>It would take a book to list all the races and awards he's won... And even here, Kilian's achievements exceed the average person as, somehow, he finds time to record his career on his blog and has written three books, <i>Run or Die</i>, <i>The Invisible Border</i> and <i>Summits of My Life</i>.</p>
+                </div>
+            </div>
+            <div class="col">
+                <h3 style="color:var(--pastel-blue); margin-top:0;">Task 1: Write the correct numbers to complete the sentences</h3>
+                
+                <div class="task-item">
+                    <p>1. It's normal to find it hard to breathe at <input type="text" class="task-input" id="t1-1" placeholder="..."> metres above sea level.</p>
+                </div>
+                <div class="task-item">
+                    <p>2. Kilian reached the summit of Everest in <input type="text" class="task-input" id="t1-2" placeholder="..."> hours on his second attempt.</p>
+                </div>
+                <div class="task-item">
+                    <p>3. He was <input type="text" class="task-input" id="t1-3" placeholder="..."> years old when he walked a long way without being carried.</p>
+                </div>
+                <div class="task-item">
+                    <p>4. At the age of <input type="text" class="task-input" id="t1-4" placeholder="..."> he saw mountaineering as more than a hobby.</p>
+                </div>
+                <div class="task-item">
+                    <p>5. At age <input type="text" class="task-input" id="t1-5" placeholder="..."> he became his own trainer.</p>
+                </div>
+                <div class="task-item">
+                    <p>6. At <input type="text" class="task-input" id="t1-6" placeholder="..."> bpm, Kilian's pulse rate is much slower than even very fit people.</p>
+                </div>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn-back" onclick="prevStep(1)">⬅ Quay lại</button>
+            <button class="btn-check" onclick="checkTask1()">Kiểm tra đáp án ✔</button>
+            <button class="btn-next" onclick="nextStep(3)">Tiếp theo ➔</button>
+        </div>
+    </div>
+
+    <div id="step3" class="step">
+        <h2>Reading & Task 2</h2>
+        <div class="two-col">
+            <div class="col" id="reading-text-2"></div>
+            <div class="col">
+                <h3 style="color:var(--pastel-blue); margin-top:0;">Task 2: Circle the best answer</h3>
+                
+                <div class="task-item" data-q="1">
+                    <p><b>1. The majority of climbers on Everest ...</b></p>
+                    <div class="tf-options">
+                        <label><input type="radio" name="q1" value="a"> a. need oxygen to finish their ascent.</label>
+                        <label><input type="radio" name="q1" value="b"> b. are accompanied.</label>
+                        <label><input type="radio" name="q1" value="c"> c. make slow progress to the top.</label>
+                        <label><input type="radio" name="q1" value="d"> d. (all of the above)</label>
+                    </div>
+                </div>
+                <div class="task-item" data-q="2">
+                    <p><b>2. Kilian Jornet is unlike most Everest climbers because ...</b></p>
+                    <div class="tf-options">
+                        <label><input type="radio" name="q2" value="a"> a. he is a professional climber.</label>
+                        <label><input type="radio" name="q2" value="b"> b. he ascended faster.</label>
+                        <label><input type="radio" name="q2" value="c"> c. he found the climb difficult.</label>
+                        <label><input type="radio" name="q2" value="d"> d. (all of the above)</label>
+                    </div>
+                </div>
+                <div class="task-item" data-q="3">
+                    <p><b>3. In his training now, Kilian ...</b></p>
+                    <div class="tf-options">
+                        <label><input type="radio" name="q3" value="a"> a. demands a lot of himself.</label>
+                        <label><input type="radio" name="q3" value="b"> b. takes a lot of rest periods.</label>
+                        <label><input type="radio" name="q3" value="c"> c. uses a coach.</label>
+                        <label><input type="radio" name="q3" value="d"> d. (none of the above)</label>
+                    </div>
+                </div>
+                <div class="task-item" data-q="4">
+                    <p><b>4. Kilian partly owes his incredible fitness to ...</b></p>
+                    <div class="tf-options">
+                        <label><input type="radio" name="q4" value="a"> a. the way he makes extra time for sleep.</label>
+                        <label><input type="radio" name="q4" value="b"> b. his ability to recover from injury.</label>
+                        <label><input type="radio" name="q4" value="c"> c. where he grew up.</label>
+                        <label><input type="radio" name="q4" value="d"> d. (all of the above)</label>
+                    </div>
+                </div>
+                <div class="task-item" data-q="5">
+                    <p><b>5. His training includes ...</b></p>
+                    <div class="tf-options">
+                        <label><input type="radio" name="q5" value="a"> a. psychological preparation.</label>
+                        <label><input type="radio" name="q5" value="b"> b. making sure he drinks enough water.</label>
+                        <label><input type="radio" name="q5" value="c"> c. trying to reduce his recovery time.</label>
+                        <label><input type="radio" name="q5" value="d"> d. (none of the above)</label>
+                    </div>
+                </div>
+                <div class="task-item" data-q="6">
+                    <p><b>6. Kilian's books are ...</b></p>
+                    <div class="tf-options">
+                        <label><input type="radio" name="q6" value="a"> a. a long list of races and awards.</label>
+                        <label><input type="radio" name="q6" value="b"> b. discouraging to average people.</label>
+                        <label><input type="radio" name="q6" value="c"> c. best for an expert audience.</label>
+                        <label><input type="radio" name="q6" value="d"> d. another example of his impressive accomplishments.</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn-back" onclick="prevStep(2)">⬅ Quay lại</button>
+            <button class="btn-check" onclick="checkTask2()">Kiểm tra đáp án ✔</button>
+            <button class="btn-next" onclick="showFinalReview()">Hoàn thành & Xem trọn bộ ➔</button>
+        </div>
+    </div>
+
+    <div id="step4" class="step">
+        <h2>Tổng kết bài học</h2>
+        <div class="two-col">
+            <div class="col" id="reading-text-final"></div>
+            <div class="col" id="final-explanations"></div>
+        </div>
+        <div class="btn-group">
+            <button class="btn-back" onclick="prevStep(3)">⬅ Quay lại</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal">
+    <div class="modal-content">
+        <h3 id="modal-title">Kết quả</h3>
+        <div id="modal-body"></div>
+        <button class="btn-check close-modal" onclick="closeModal()">Đóng</button>
+    </div>
+</div>
+
+<script>
+    // Điều hướng form
+    function nextStep(step) {
+        document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+        document.getElementById('step' + step).classList.add('active');
+        if (step === 3) syncReadingContent('reading-text-1', 'reading-text-2');
+    }
+
+    function prevStep(step) {
+        document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+        document.getElementById('step' + step).classList.add('active');
+        if (step === 2) syncReadingContent('reading-text-2', 'reading-text-1');
+    }
+
+    function syncReadingContent(fromId, toId) {
+        document.getElementById(toId).innerHTML = document.getElementById(fromId).innerHTML;
+        enableHighlight(toId);
+    }
+
+    // Highlight văn bản
+    function enableHighlight(containerId) {
+        let container = document.getElementById(containerId);
+        container.oncontextmenu = function(e) {
+            e.preventDefault();
+            if (e.target.tagName === 'SPAN' && e.target.classList.contains('highlight')) {
+                let parent = e.target.parentNode;
+                parent.replaceChild(document.createTextNode(e.target.textContent), e.target);
+                container.normalize();
+            } else {
+                let selection = window.getSelection();
+                if (selection.rangeCount > 0 && !selection.isCollapsed) {
+                    let range = selection.getRangeAt(0);
+                    let span = document.createElement('span');
+                    span.className = 'highlight';
+                    try { range.surroundContents(span); selection.removeAllRanges(); } catch (err) { }
+                }
+            }
+        };
+    }
+    enableHighlight('reading-text-1');
+
+    // Nối Matching (Prep)
+    let selectedStart = null;
+    let selectedEnd = null;
+    
+    document.getElementById('col-start').addEventListener('click', (e) => {
+        if(e.target.classList.contains('match-item') && !e.target.classList.contains('matched')){
+            document.querySelectorAll('#col-start .match-item').forEach(el => el.classList.remove('selected'));
+            e.target.classList.add('selected');
+            selectedStart = e.target; checkMatch();
+        }
+    });
+
+    document.getElementById('col-end').addEventListener('click', (e) => {
+        if(e.target.classList.contains('match-item') && !e.target.classList.contains('matched')){
+            document.querySelectorAll('#col-end .match-item').forEach(el => el.classList.remove('selected'));
+            e.target.classList.add('selected');
+            selectedEnd = e.target; checkMatch();
+        }
+    });
+
+    function checkMatch() {
+        if (selectedStart && selectedEnd) {
+            if (selectedStart.getAttribute('data-id') === selectedEnd.getAttribute('data-target')) {
+                selectedStart.classList.remove('selected'); selectedEnd.classList.remove('selected');
+                selectedStart.classList.add('matched'); selectedEnd.classList.add('matched');
+                selectedStart = null; selectedEnd = null;
+            } else {
+                selectedStart.style.transform = 'translateX(5px)'; selectedEnd.style.transform = 'translateX(-5px)';
+                setTimeout(() => {
+                    selectedStart.style.transform = 'none'; selectedEnd.style.transform = 'none';
+                    selectedStart.classList.remove('selected'); selectedEnd.classList.remove('selected');
+                    selectedStart = null; selectedEnd = null;
+                }, 400);
+            }
+        }
+    }
+
+    // Dữ liệu Task 1 (Type-in, hỗ trợ nhiều đáp án số và chữ)
+    const task1Data = {
+        "t1-1": { q: "It's normal to find it hard to breathe at ___ metres", ans: ["3500", "3,500"], why: "Bài đọc ghi: 'The thin air at high altitudes makes most people breathless at 3,500 metres'. (Không khí loãng khiến hầu hết mọi người khó thở ở độ cao 3500m)." },
+        "t1-2": { q: "Kilian reached the summit of Everest in ___ hours", ans: ["17", "seventeen"], why: "Đoạn 2 ghi: 'And then, five days later, he did it again, this time in only 17 hours'. (Năm ngày sau anh ấy làm lại chỉ trong 17 giờ)." },
+        "t1-3": { q: "He was ___ years old when he walked a long way", ans: ["1.5", "1,5", "one and a half"], why: "Đoạn 3 ghi: 'At one and a half years old he did a five-hour hike... entirely under his own steam'. (Lúc 1.5 tuổi anh ấy tự mình đi bộ đường dài 5 tiếng)." },
+        "t1-4": { q: "At the age of ___ he saw mountaineering as more than a hobby.", ans: ["13", "thirteen"], why: "Đoạn 4 ghi: 'He was 13 when he says he started to take it seriously...'. (Năm 13 tuổi anh bắt đầu coi việc này một cách nghiêm túc)." },
+        "t1-5": { q: "At age ___ he became his own trainer.", ans: ["18", "eighteen"], why: "Đoạn 4 ghi: 'At 18, he took over his own ski-mountaineering and trail-running training...'. (Năm 18 tuổi anh tự tiếp quản việc huấn luyện của mình)." },
+        "t1-6": { q: "At ___ bpm, Kilian's pulse rate is much slower", ans: ["33", "thirty-three", "thirty three"], why: "Đoạn 5 ghi: 'His resting heartbeat is extremely low at 33 beats per minute...'. (Nhịp tim lúc nghỉ của anh cực thấp ở mức 33 nhịp/phút)." }
+    };
+
+    // Dữ liệu Task 2
+    const task2Data = {
+        q1: { q: "The majority of climbers on Everest ...", correct: "d", whyTrue: "Tất cả đều đúng. Đoạn 1 nhắc đến việc có hướng dẫn viên (b), dùng oxy để lên đỉnh (a) và mất nhiều tuần di chuyển chậm chạp (c).", whyFalse: "Chọn a, b, c riêng lẻ sẽ bị thiếu ý so với thực tế bài đọc đề cập." },
+        q2: { q: "Kilian Jornet is unlike most Everest climbers because ...", correct: "b", whyTrue: "Anh ấy leo cực kỳ nhanh (26 tiếng lần 1 và 17 tiếng lần 2) so với những người khác mất nhiều tuần.", whyFalse: "Bài đọc không nói anh thấy khó khăn (c), và việc anh là dân chuyên (a) không phải điểm so sánh chính mà là tốc độ phi thường của anh." },
+        q3: { q: "In his training now, Kilian ...", correct: "a", whyTrue: "Kilian đòi hỏi bản thân rất cao (demands a lot of himself): tự huấn luyện tới 1,140 tiếng/năm, ít nghỉ ngơi, thử nghiệm khắc nghiệt.", whyFalse: "Anh ấy rất ít khi nghỉ ngơi (b sai) và hiện tại anh tự huấn luyện chứ không dùng coach nữa (c sai - coach là hồi 13 tuổi)." },
+        q4: { q: "Kilian partly owes his incredible fitness to ...", correct: "c", whyTrue: "Đoạn 5 nói: 'All this is thanks to his childhood in the mountains and to genetics...'. Việc lớn lên ở vùng núi (where he grew up) giúp anh có thể lực tốt.", whyFalse: "Anh ấy ngủ ít chứ không ngủ nhiều (a sai). Recovery là kết quả của thể lực, không phải nguyên nhân (b sai)." },
+        q5: { q: "His training includes ...", correct: "a", whyTrue: "Đoạn 5 nhấn mạnh 'mental strength' (sức mạnh tâm lý / sự chuẩn bị tâm lý) giúp tạo nên sự khác biệt. Anh tự đặt ra thử thách để xem giới hạn chịu đựng.", whyFalse: "Anh từng cố tình uống RẤT ÍT nước (3.5 lít/100km) để thử thách chứ không phải đảm bảo uống đủ (b sai)." },
+        q6: { q: "Kilian's books are ...", correct: "d", whyTrue: "Cuối bài khen ngợi việc viết 3 cuốn sách là 'another example of his impressive accomplishments' (những thành tựu vượt xa người thường).", whyFalse: "Sách không phải là danh sách giải thưởng khô khan (a) và cũng không nhằm làm nản lòng người bình thường (b)." }
+    };
+
+    // Modal
+    function openModal(title, htmlContent) {
+        document.getElementById('modal-title').innerText = title;
+        document.getElementById('modal-body').innerHTML = htmlContent;
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+    // Check Task 1 (Type-in)
+    function checkTask1() {
+        let score = 0; let html = "";
+        for (let i = 1; i <= 6; i++) {
+            let inputField = document.getElementById('t1-' + i);
+            let userAnswer = inputField.value.trim().toLowerCase();
+            let data = task1Data['t1-' + i];
+            
+            if (data.ans.includes(userAnswer)) {
+                score++;
+                inputField.style.borderColor = "#2b7a0b";
+                inputField.style.backgroundColor = "#eafbea";
+                html += `<div class="explanation-item">
+                    <p><b>Câu ${i}:</b> ${data.q}</p>
+                    <p><span class="correct-text">✔ Đúng.</span> Đáp án: ${userAnswer}</p>
+                    <p><b>Giải thích:</b> ${data.why}</p>
+                </div>`;
+            } else {
+                inputField.style.borderColor = "#d90429";
+                inputField.style.backgroundColor = "#ffcfd2";
+                let displayAns = userAnswer === "" ? "(Để trống)" : userAnswer;
+                html += `<div class="explanation-item" style="border-left: 4px solid #d90429;">
+                    <p><b>Câu ${i}:</b> ${data.q}</p>
+                    <p><span class="wrong-text">✘ Sai.</span> Bạn điền: ${displayAns} | <span class="correct-text">Đúng: ${data.ans[0]}</span></p>
+                    <p><b>Giải thích:</b> ${data.why}</p>
+                </div>`;
+            }
+        }
+        openModal(`Kết quả Task 1: ${score}/6`, html);
+    }
+
+    // Check Task 2
+    function checkTask2() {
+        let score = 0; let html = "";
+        for (let i = 1; i <= 6; i++) {
+            let radios = document.getElementsByName('q' + i);
+            let userAnswer = "";
+            for (let r of radios) { if (r.checked) userAnswer = r.value; }
+            let data = task2Data['q' + i];
+
+            if (userAnswer === data.correct) {
+                score++;
+                html += `<div class="explanation-item">
+                    <p><b>Câu ${i}:</b> ${data.q}</p>
+                    <p><span class="correct-text">✔ Đúng.</span> Bạn chọn: ${userAnswer.toUpperCase()}</p>
+                    <p><b>Giải thích chi tiết:</b> ${data.whyTrue}</p>
+                </div>`;
+            } else {
+                let displayAns = userAnswer === "" ? "(Chưa chọn)" : userAnswer.toUpperCase();
+                html += `<div class="explanation-item" style="border-left: 4px solid #d90429;">
+                    <p><b>Câu ${i}:</b> ${data.q}</p>
+                    <p><span class="wrong-text">✘ Sai.</span> Bạn chọn: ${displayAns} | <span class="correct-text">Đúng: ${data.correct.toUpperCase()}</span></p>
+                    <p><b>Tại sao đúng:</b> ${data.whyTrue}</p>
+                    <p><b>Tại sao sai:</b> ${data.whyFalse}</p>
+                </div>`;
+            }
+        }
+        openModal(`Kết quả Task 2: ${score}/6`, html);
+    }
+
+    // Final Review
+    function showFinalReview() {
+        syncReadingContent('reading-text-2', 'reading-text-final');
+        let finalHtml = `<h3 style="color: var(--pastel-pink);">Toàn bộ giải thích chi tiết</h3>`;
+        
+        finalHtml += `<h4>Task 1 (Fill in the blanks)</h4>`;
+        for (let i = 1; i <= 6; i++) {
+            let data = task1Data['t1-' + i];
+            finalHtml += `<div class="explanation-item" style="padding:10px;">
+                <p><b>${i}. ${data.q}</b> <br>=> <span class="correct-text">${data.ans[0]}</span></p>
+                <p style="font-size: 14px; margin: 5px 0;"><i>${data.why}</i></p>
+            </div>`;
+        }
+        
+        finalHtml += `<h4>Task 2 (Multiple Choice)</h4>`;
+        for (let i = 1; i <= 6; i++) {
+            let data = task2Data['q' + i];
+            finalHtml += `<div class="explanation-item" style="padding:10px;">
+                <p><b>${i}. ${data.q}</b> <br>=> <span class="correct-text">Đáp án: ${data.correct.toUpperCase()}</span></p>
+                <p style="font-size: 14px; margin: 5px 0;"><i>${data.whyTrue}</i></p>
+            </div>`;
+        }
+        
+        document.getElementById('final-explanations').innerHTML = finalHtml;
+        nextStep(4);
+    }
+</script>
+
+</body>
+</html>
