@@ -318,7 +318,83 @@
             color: var(--pastel-blue);
             font-weight: bold;
         }
+/* --- ANIMATED STAGE STYLES --- */
+.animation-stage {
+    background: linear-gradient(to bottom, #e0f7fa, #b2ebf2);
+    border-radius: 16px;
+    padding: 30px 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
 
+.scene {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    height: 150px;
+    margin-top: 20px;
+}
+
+.character {
+    text-align: center;
+    transition: transform 0.3s;
+    opacity: 0.7;
+}
+
+.character.active {
+    transform: scale(1.2);
+    opacity: 1;
+}
+
+.character.active .avatar {
+    box-shadow: 0 0 15px var(--pastel-purple);
+    border-color: var(--pastel-purple);
+}
+
+.avatar {
+    font-size: 60px;
+    width: 100px;
+    height: 100px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 4px solid var(--pastel-blue);
+    margin-bottom: 10px;
+}
+
+.name {
+    font-weight: bold;
+    color: var(--text-main);
+    background: white;
+    padding: 2px 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.chat-bubble {
+    background: white;
+    border-radius: 15px;
+    padding: 15px 20px;
+    margin: 20px auto;
+    width: 80%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    font-size: 18px;
+    position: relative;
+    border-left: 5px solid var(--pastel-purple);
+    animation: fadeInBubble 0.3s ease-out;
+}
+
+@keyframes fadeInBubble {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
     </style>
 </head>
 <body>
@@ -331,17 +407,31 @@
 
         <div class="content">
             <div class="step active" id="step-1">
-                <h2 class="step-title"><i class="fa-solid fa-video"></i> Video Lesson</h2>
-                <div class="video-container">
-                    <video controls poster="https://via.placeholder.com/800x450/aec6cf/ffffff?text=Video:+Checking+Understanding">
-                        <source src="your_video_link.mp4" type="video/mp4">
-                        Trình duyệt của bạn không hỗ trợ thẻ video.
-                    </video>
-                </div>
-                <p style="text-align: center; color: var(--text-light); font-size: 15px;">
-                    Trong video này, Paul gặp vấn đề trong việc hiểu Bob. Hãy lắng nghe ngôn ngữ họ sử dụng để kiểm tra mức độ hiểu và thực hành nói các cụm từ hữu ích nhé.
-                </p>
+    <h2 class="step-title"><i class="fa-solid fa-clapperboard"></i> Animated Dialogue</h2>
+    
+    <div class="animation-stage" id="animationStage">
+        <div class="scene">
+            <div class="character paul" id="char-Paul">
+                <div class="avatar">👨‍🔧</div>
+                <div class="name">Paul</div>
             </div>
+            <div class="character bob" id="char-Bob">
+                <div class="avatar">👷‍♂️</div>
+                <div class="name">Bob</div>
+            </div>
+        </div>
+        <div class="chat-bubble" id="chatBubble" style="display: none;">
+            <strong id="speakerName"></strong>: <span id="speakerText"></span>
+        </div>
+        <div class="controls" style="text-align: center; margin-top: 20px;">
+            <button class="btn btn-next" id="playBtn" onclick="playAnimation()"><i class="fa-solid fa-play"></i> Bắt đầu xem hoạt cảnh</button>
+        </div>
+    </div>
+
+    <p style="text-align: center; color: var(--text-light); font-size: 15px; margin-top: 15px;">
+        Bấm "Bắt đầu" để xem Bob và Paul trò chuyện. Hãy lắng nghe cách họ kiểm tra lại thông tin nhé.
+    </p>
+</div>
 
             <div class="step" id="step-2">
                 <h2 class="step-title"><i class="fa-solid fa-puzzle-piece"></i> Preparation Task</h2>
@@ -414,7 +504,89 @@
               expRight: "Rất hay! 'repeat' (nhấn âm 2) và 'slowly' (nhấn âm 1).",
               expWrong: "Bạn chú ý đọc trôi chảy câu yêu cầu: <strong>\"Can you repeat that more slowly, please?\"</strong>" }
         ];
+// --- ANIMATION DIALOGUE DATA (Dựa trên Transcript của PDF) ---
+const dialogueData = [
+    { speaker: "Bob", text: "Excuse me, Paul, could you pass me the hammer?" },
+    { speaker: "Paul", text: "Sorry, Bob, my ears are blocked. I can't hear you very well. Could you say that again, please?" },
+    { speaker: "Bob", text: "The hammer. Please could you pass it to me?" },
+    { speaker: "Paul", text: "The spanner?" },
+    { speaker: "Bob", text: "No. The hammer!" },
+    { speaker: "Paul", text: "Sorry, Bob, I don't understand. This is the spanner!" },
+    { speaker: "Bob", text: "No, Paul, I need the hammer. It's in the toolbox, on the left, under the scissors." },
+    { speaker: "Paul", text: "Sorry, Bob. Could you repeat that more slowly, please?" },
+    { speaker: "Bob", text: "The hammer... in the toolbox... on the left... under the scissors." },
+    { speaker: "Paul", text: "On the left... under the scissors... Oh! Do you mean the hammer? Is this it?" },
+    { speaker: "Bob", text: "Yes, that's right!" }
+];
 
+let currentLine = 0;
+let isPlaying = false;
+
+function playAnimation() {
+    if (isPlaying) return;
+    
+    const playBtn = document.getElementById('playBtn');
+    playBtn.style.display = 'none';
+    isPlaying = true;
+    currentLine = 0;
+    
+    // Kiểm tra xem trình duyệt có hỗ trợ SpeechSynthesis không
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // Reset
+        playNextLine();
+    } else {
+        alert("Trình duyệt không hỗ trợ đọc giọng nói. Hãy dùng Chrome hoặc Edge nhé.");
+    }
+}
+
+function playNextLine() {
+    if (currentLine >= dialogueData.length) {
+        // Kết thúc hội thoại
+        document.getElementById('char-Paul').classList.remove('active');
+        document.getElementById('char-Bob').classList.remove('active');
+        document.getElementById('chatBubble').style.display = 'none';
+        
+        const playBtn = document.getElementById('playBtn');
+        playBtn.style.display = 'inline-block';
+        playBtn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Xem lại';
+        isPlaying = false;
+        return;
+    }
+
+    const line = dialogueData[currentLine];
+    const bubble = document.getElementById('chatBubble');
+    
+    // Cập nhật giao diện
+    document.getElementById('char-Paul').classList.remove('active');
+    document.getElementById('char-Bob').classList.remove('active');
+    document.getElementById(`char-${line.speaker}`).classList.add('active');
+    
+    bubble.style.display = 'block';
+    document.getElementById('speakerName').innerText = line.speaker;
+    document.getElementById('speakerName').style.color = line.speaker === 'Bob' ? '#ff9a9e' : '#a1c4fd';
+    document.getElementById('speakerText').innerText = line.text;
+
+    // Thiết lập giọng đọc
+    const utterance = new SpeechSynthesisUtterance(line.text);
+    utterance.lang = 'en-GB'; // Giọng Anh-Anh cho chuẩn bài học British Council
+    utterance.rate = 0.9; // Đọc chậm một chút để dễ nghe
+    
+    // Đổi pitch/giọng để phân biệt 2 nhân vật (nếu có thể)
+    if (line.speaker === 'Bob') {
+        utterance.pitch = 1.2;
+    } else {
+        utterance.pitch = 0.8;
+    }
+
+    // Khi đọc xong câu này, tự động chuyển sang câu tiếp theo
+    utterance.onend = function() {
+        currentLine++;
+        setTimeout(playNextLine, 500); // Nghỉ 0.5s giữa các câu
+    };
+
+    // Bắt đầu đọc
+    window.speechSynthesis.speak(utterance);
+}
         let currentStep = 1;
         const totalSteps = 4;
 
