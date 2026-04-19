@@ -9,15 +9,14 @@
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
 
         :root {
-            /* Tông màu mới: Sunset / Autumn Pastel */
             --primary-bg: #fdf8f5;
             --card-bg: #ffffff;
-            --theme-main: #f4a261; /* Cam đào nhạt */
-            --theme-accent: #e76f51; /* Cam đất / đỏ gạch */
-            --theme-success: #2a9d8f; /* Xanh ngọc */
+            --theme-main: #f4a261; 
+            --theme-accent: #e76f51; 
+            --theme-success: #2a9d8f; 
             --text-main: #4a4a4a;
             --text-light: #7a7a7a;
-            --highlight: #e9c46a; /* Vàng sáng */
+            --highlight: #e9c46a; 
             --border-radius: 16px;
         }
 
@@ -71,6 +70,7 @@
         .col {
             flex: 1; padding: 25px; background: var(--primary-bg);
             border-radius: var(--border-radius); overflow-y: auto;
+            position: relative; /* Hỗ trợ sticky con */
         }
         .col::-webkit-scrollbar { width: 8px; }
         .col::-webkit-scrollbar-thumb { background-color: var(--theme-main); border-radius: 10px; }
@@ -83,11 +83,14 @@
         }
         span.highlight { background-color: var(--highlight); border-radius: 4px; padding: 0 2px; cursor: pointer; }
 
-        /* Drag & Drop chung */
+        /* Drag & Drop chung + Sticky Word Bank */
         .word-bank {
             display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;
-            padding: 15px; background: #fff; border-radius: 10px; min-height: 50px;
-            border: 2px dashed #f1e3dc;
+            padding: 15px; background: rgba(255, 255, 255, 0.95); border-radius: 10px; min-height: 50px;
+            border: 2px dashed var(--theme-main);
+            position: sticky; top: -5px; z-index: 10; /* Bám sát viền trên khi cuộn */
+            box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+            backdrop-filter: blur(5px);
         }
         .draggable {
             background: #fff; border: 2px solid var(--theme-main);
@@ -201,7 +204,7 @@
                     <p>Once you've seen A Plastic Ocean, you'll realise the time is now and we all have a role to play.</p>
                 </div>
             </div>
-            <div class="col">
+            <div class="col scrollable-col">
                 <h3 style="color:var(--theme-accent); margin-top:0;">Task 1: Missing Sentences</h3>
                 <div class="word-bank" id="task1-bank">
                     <div class="draggable long-drag" draggable="true" id="s1" data-val="a">a. This prompts them to travel around the world to look at other areas that have been affected.</div>
@@ -244,7 +247,7 @@
         <h2>Reading & Task 2</h2>
         <div class="two-col">
             <div class="col" id="reading-text-2"></div>
-            <div class="col">
+            <div class="col scrollable-col">
                 <h3 style="color:var(--theme-accent); margin-top:0;">Task 2: Complete the sentences</h3>
                 
                 <div class="word-bank" id="task2-bank">
@@ -354,16 +357,43 @@
 
     // Cấu hình Kéo Thả (Chung cho tất cả)
     let draggedItem = null;
-    let sourceBank = null;
+    let scrollInterval = null;
 
     document.querySelectorAll('.draggable').forEach(item => {
         item.addEventListener('dragstart', function(e) {
             draggedItem = this;
-            sourceBank = this.parentElement.id.includes('bank') ? this.parentElement.id : null;
             setTimeout(() => this.style.opacity = '0.5', 0);
         });
         item.addEventListener('dragend', function() {
             setTimeout(() => { this.style.opacity = '1'; draggedItem = null; }, 0);
+            clearInterval(scrollInterval);
+            scrollInterval = null;
+        });
+    });
+
+    // Auto-scroll logic cho .scrollable-col
+    document.querySelectorAll('.scrollable-col').forEach(col => {
+        col.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            const rect = this.getBoundingClientRect();
+            const y = e.clientY - rect.top;
+            const scrollThreshold = 60; // 60px từ mép trên/dưới
+            
+            clearInterval(scrollInterval); // Dọn dẹp interval cũ
+            
+            if (y < scrollThreshold) {
+                // Cuộn lên
+                scrollInterval = setInterval(() => { this.scrollTop -= 15; }, 30);
+            } else if (y > rect.height - scrollThreshold) {
+                // Cuộn xuống
+                scrollInterval = setInterval(() => { this.scrollTop += 15; }, 30);
+            } else {
+                scrollInterval = null;
+            }
+        });
+        col.addEventListener('dragleave', function() {
+            clearInterval(scrollInterval);
+            scrollInterval = null;
         });
     });
 
@@ -388,7 +418,6 @@
                 if (this.hasChildNodes()) {
                     let bankId = draggedItem.id.includes('s') ? 'task1-bank' : 'task2-bank';
                     let currentChild = this.firstChild;
-                    // Tránh push tag title của category
                     if(currentChild.nodeType === 1) document.getElementById(bankId).appendChild(currentChild);
                 }
                 this.appendChild(draggedItem);
