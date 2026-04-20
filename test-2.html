@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Reading Test 2 | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette: Tím Pastel & Cam Đào (Cute, trưởng thành) */
+            --primary: #9b59b6;         /* Tím pastel */
+            --primary-dark: #8e44ad;    /* Tím đậm hơn chút */
+            --accent: #ffb7b2;          /* Cam đào ấm áp */
+            --bg-body: #fdfbfd;         /* Trắng pha chút tím nhạt */
+            --bg-pane: #ffffff;
+            --text-main: #4a4a4a;
+            --text-light: #888;
+            --border: #e8e0eb;
+            --highlight: #fff59d;       
+            --correct: #27ae60;
+            --wrong: #e74c3c;
+            --exp-bg: #f4effa;          /* Nền giải thích màu tím cực nhạt */
+            --header-h: 70px;
+            --footer-h: 80px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Quicksand', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- OVERLAY & MODAL (CÀI ĐẶT CHẾ ĐỘ) --- */
+        #setupOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        .setup-modal {
+            background: white; padding: 40px; border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(155, 89, 182, 0.15);
+            width: 90%; max-width: 500px; text-align: center;
+            border: 2px solid var(--border);
+        }
+        .setup-modal h2 { font-family: 'Lora', serif; color: var(--primary-dark); font-size: 28px; margin-top: 0; }
+        .mode-btn {
+            display: block; width: 100%; padding: 15px; margin: 15px 0;
+            border-radius: 15px; font-size: 18px; font-weight: 700; cursor: pointer;
+            transition: 0.3s; font-family: inherit;
+        }
+        .mode-practice { background: #fff0eb; color: #d87059; border: 2px solid #ffccbc; }
+        .mode-practice:hover, .mode-practice.selected { background: var(--accent); color: white; border-color: var(--accent); }
+        .mode-mock { background: var(--exp-bg); color: var(--primary-dark); border: 2px solid #d1c4e9; }
+        .mode-mock:hover, .mode-mock.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        
+        #timeInputBox { display: none; margin: 20px 0; }
+        #timeInput { 
+            width: 100px; padding: 10px; font-size: 18px; text-align: center; 
+            border: 2px solid var(--border); border-radius: 10px; font-family: inherit;
+            color: var(--primary-dark); font-weight: bold;
+        }
+        
+        .start-btn {
+            background: var(--primary); color: white; border: none; padding: 12px 35px;
+            border-radius: 50px; font-size: 18px; font-weight: 700; cursor: pointer;
+            margin-top: 20px; transition: 0.3s; display: none; box-shadow: 0 5px 15px rgba(155, 89, 182, 0.3);
+        }
+        .start-btn:hover { transform: translateY(-3px); }
+
+        /* --- HEADER --- */
+        header {
+            height: var(--header-h); background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 30px; z-index: 100;
+        }
+        
+        .brand { font-size: 24px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        .brand span { background: var(--primary); color: white; padding: 4px 10px; border-radius: 10px; font-size: 16px; }
+
+        .tab-container { display: flex; background: var(--exp-bg); padding: 5px; border-radius: 25px; gap: 5px; }
+        .tab-btn {
+            border: none; background: transparent; padding: 10px 25px; font-size: 16px;
+            font-family: inherit; font-weight: 600; color: #a094b8;
+            cursor: pointer; border-radius: 20px; transition: all 0.3s;
+        }
+        .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+
+        .controls { display: flex; gap: 20px; align-items: center; }
+        .timer-box { 
+            font-family: 'Quicksand', sans-serif; font-weight: 700; color: #d87059; 
+            background: #fff0eb; padding: 10px 20px; border-radius: 15px; font-size: 20px;
+        }
+        .btn-submit { 
+            background: var(--primary); color: white; border: none; padding: 10px 25px; 
+            border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s;
+            font-family: inherit; box-shadow: 0 4px 0 var(--primary-dark);
+        }
+        .btn-submit:active { transform: translateY(4px); box-shadow: none; }
+
+        /* --- LAYOUT --- */
+        .container { 
+            display: flex; 
+            height: calc(100vh - var(--header-h) - var(--footer-h)); 
+            width: 100%; max-width: 100%; 
+            margin: 0;
+        }
+
+        .pane {
+            flex: 1; padding: 40px 50px; overflow-y: auto;
+            position: relative; scroll-behavior: smooth;
+        }
+        .pane-left { 
+            background: #fff; border-right: 2px solid var(--border); 
+            font-size: 19px; line-height: 2; text-align: justify; color: #444;
+        }
+        .pane-right { background: #fafbfc; }
+
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-thumb { background: #d1c4e9; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* --- CONTENT STYLES --- */
+        h2 { color: var(--primary-dark); margin-top: 0; font-size: 28px; text-align: center; font-family: 'Lora', serif; border-bottom: 2px dashed var(--border); padding-bottom: 15px;}
+        .paragraph-label { color: var(--accent); font-weight: 800; font-size: 1.2em; margin-right: 5px; }
+        p { margin-bottom: 20px; }
+        
+        .passage-content, .q-group { display: none; animation: fadeIn 0.4s ease-out; }
+        .passage-content.active, .q-group.active { display: block; }
+        .q-group { padding-bottom: 60px; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .q-block { 
+            margin-bottom: 35px; background: white; 
+            padding: 30px; border-radius: 15px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03); 
+            border: 1px solid #f0f0f0;
+        }
+        .instruction {
+            background: var(--exp-bg); color: var(--primary-dark); 
+            padding: 15px; border-radius: 12px; 
+            font-weight: 600; font-size: 16px; margin-bottom: 25px; 
+            border-left: 4px solid var(--primary);
+        }
+
+        /* --- QUESTIONS UI --- */
+        .q-item { display: flex; margin-bottom: 25px; align-items: flex-start; flex-direction: column; }
+        .q-content-wrapper { display: flex; width: 100%; align-items: flex-start; }
+        .q-num {
+            min-width: 35px; height: 35px; background: var(--primary); color: white;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: bold; margin-right: 15px; margin-top: 2px; flex-shrink: 0;
+        }
+        .q-content { flex: 1; font-size: 18px; line-height: 1.8; font-weight: 500; }
+
+        input[type="text"], select {
+            border: 2px solid #dce0dd; border-radius: 8px; padding: 8px 15px;
+            font-family: inherit; font-size: 18px; color: var(--primary-dark);
+            outline: none; background: white; transition: 0.2s; font-weight: 600;
+        }
+        input[type="text"]:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.15); }
+        .input-gap { width: 160px; text-align: center; }
+        .input-gap.filled { background: var(--exp-bg); border-color: var(--primary); }
+
+        .drag-box {
+            display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 30px;
+            padding: 20px; background: var(--exp-bg); border-radius: 15px; border: 2px dashed #d1c4e9;
+        }
+        .drag-item {
+            background: white; padding: 10px 20px; border-radius: 20px;
+            border: 2px solid var(--primary); color: var(--primary);
+            font-weight: 700; font-size: 16px; cursor: grab; user-select: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: all 0.2s;
+        }
+        .drag-item:active { cursor: grabbing; transform: scale(0.95); }
+        .drag-item.used { opacity: 0.4; background: #e0e0e0; border-color: #bbb; color: #888; cursor: not-allowed; pointer-events: none; }
+
+        .mc-option { display: block; margin: 10px 0; cursor: pointer; padding: 12px; border-radius: 10px; transition: background 0.2s; font-size: 18px; border: 1px solid transparent; }
+        .mc-option:hover { background: var(--exp-bg); border-color: #d1c4e9; }
+        .mc-option input { margin-right: 12px; transform: scale(1.3); }
+
+        .feedback { font-weight: 700; margin-left: 15px; font-size: 18px; }
+        .correct { color: var(--correct); }
+        .wrong { color: var(--wrong); }
+
+        /* --- GIẢI THÍCH CHI TIẾT --- */
+        .exp-box {
+            display: none; background: var(--exp-bg); border-left: 5px solid var(--primary);
+            padding: 20px; margin-top: 15px; border-radius: 0 12px 12px 0; width: 100%;
+            font-size: 17px; line-height: 1.8; color: #333; animation: slideIn 0.4s;
+        }
+        .exp-box.show { display: block; }
+        .exp-title { font-weight: 700; color: var(--primary-dark); margin-bottom: 10px; font-size: 19px; display: flex; align-items: center; gap: 8px; }
+        .exp-quote { font-style: italic; background: white; padding: 10px 15px; border-radius: 8px; color: #555; margin-bottom: 12px; border: 1px dashed #d1c4e9; }
+        .exp-text { margin-bottom: 10px; }
+        .exp-vocab { font-size: 16px; color: var(--primary-dark); background: white; padding: 10px; border-radius: 8px; border: 1px solid #d1c4e9;}
+        .exp-vocab b { color: var(--primary); }
+
+        /* --- FOOTER --- */
+        footer {
+            height: var(--footer-h); background: #fff; border-top: 2px solid var(--border);
+            display: flex; flex-direction: column; justify-content: center; padding: 0 30px;
+            z-index: 100;
+        }
+        .nav-scroller { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; align-items: center; }
+        .nav-dot {
+            min-width: 40px; height: 40px; border: 2px solid #eee; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600;
+            cursor: pointer; color: #999; background: white; transition: 0.2s; flex-shrink: 0;
+        }
+        .nav-dot:hover { border-color: var(--primary); color: var(--primary); }
+        .nav-dot.done { background: var(--exp-bg); color: var(--primary-dark); border-color: #d1c4e9; }
+        .nav-dot.active-q { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* HIGHLIGHT MENU */
+        #ctxMenu {
+            position: absolute; display: none; background: white; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-radius: 12px; 
+            z-index: 99999; min-width: 160px; overflow: hidden;
+        }
+        #ctxMenu button {
+            background: none; border: none; padding: 12px 20px; 
+            width: 100%; text-align: left; cursor: pointer; 
+            font-family: inherit; font-size: 16px; color: #555; font-weight: 600;
+        }
+        #ctxMenu button:hover { background: #f0f7ff; color: var(--primary-dark); }
+        #ctxMenu button.delete:hover { background: #fff5f5; color: var(--wrong); }
+        .highlight { background-color: var(--highlight); cursor: pointer; border-radius: 4px; padding: 2px 0; }
+        .text-highlight-answer { background-color: #dce775; font-weight: bold; padding: 2px 4px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<div id="setupOverlay">
+    <div class="setup-modal">
+        <h2>Chào mừng học sinh đến với Reading Library ✨</h2>
+        <p style="font-size: 18px; color: #666; margin-bottom: 25px;">Hôm nay bạn muốn rèn luyện theo cách nào?</p>
+        
+        <button class="mode-btn mode-practice" onclick="selectMode('practice')">🎯 Chế độ Luyện Tập</button>
+        <button class="mode-btn mode-mock" onclick="selectMode('mock')">🏆 Chế độ Thi Thử</button>
+        
+        <div id="timeInputBox">
+            <label style="font-size: 18px; font-weight: bold; color: #555;">Cài đặt thời gian (phút): </label>
+            <input type="number" id="timeInput" value="60" min="10" max="180">
+        </div>
+        
+        <button class="start-btn" id="startBtn" onclick="askReady()">Sẵn sàng (OK)</button>
+    </div>
+</div>
+
+<header>
+    <div class="brand"><span>IELTS</span> READING TEST 2</div>
+    <div class="tab-container">
+        <button class="tab-btn active" onclick="setTab(1)">Passage 1</button>
+        <button class="tab-btn" onclick="setTab(2)">Passage 2</button>
+        <button class="tab-btn" onclick="setTab(3)">Passage 3</button>
+    </div>
+    <div class="controls">
+        <div class="timer-box">⏰ <span id="timer">00:00</span></div>
+        <button class="btn-submit" onclick="submitTest(true)">NỘP BÀI</button>
+    </div>
+</header>
+
+<div class="container" id="mainContainer">
+    
+    <div class="pane pane-left" id="passagePane">
+        
+        <div id="text-p1" class="passage-content active">
+            <h2>The Adolescents</h2>
+            <p><span class="paragraph-label">A</span> The American Academy of Pediatrics recognizes three stages of adolescence. These are early, middle and late adolescence, and each has its own developmental tasks. Teenagers move through these tasks at their own speed depending on their physical development and hormone levels. Although these stages are common to all teenagers, each child will go through them in his or her own highly individual ways.</p>
+            <p><span class="paragraph-label">B</span> During the early years young people make the first attempts to leave the dependent, secure role of a child and to establish themselves as unique individuals, independent of their parents. Early adolescence is marked by rapid physical growth and maturation. The focus of adolescents' self-concepts is thus often on their physical self and their evaluation of their physical acceptability. Early adolescence is also a period of intense conformity to peers. 'Getting along,' not being different, and being accepted seem somehow pressing to the early adolescent. The worst possibility, from the view of the early adolescent, is to be seen by peers as 'different'.</p>
+            <p><span class="paragraph-label">C</span> Middle adolescence is marked by the emergence of new thinking skills. The intellectual world of the young person is suddenly greatly expanded. Their concerns about peers are more directed toward their opposite sexed peers. It is also during this period that the move to establish psychological independence from one's parents accelerates. Delinquency behavior may emerge since parental views are no longer seen as absolutely correct by adolescents. Despite some delinquent behavior, middle adolescence is a period during which young people are oriented toward what is right and proper. They are developing a sense of behavioral maturity and learning to control their impulsiveness.</p>
+            <p><span class="paragraph-label">D</span> Late adolescence is marked by the final preparations for adult roles. The developmental demands of late adolescence often extend into the period that we think of as young adulthood. Late adolescents attempt to crystallize their vocational goals and to establish a sense of personal identity. Their needs for peer approval are diminished and they are largely psychologically independent from their parents. The shift to adulthood is nearly complete.</p>
+            <p><span class="paragraph-label">E</span> Some years ago, Professor Robert Havighurst of the University of Chicago proposed that stages in human development can best be thought of in terms of the developmental tasks that are part of the normal transition. He identified eleven developmental tasks associated with the adolescent transition. One developmental task an adolescent needs to achieve is to adjust to a new physical sense of self. At no other time since birth does an individual undergo such rapid and profound physical changes as during early adolescence. Puberty is marked by sudden rapid growth in height and weight. Also, the young person experiences the emergence and accentuation of those physical traits that make him or her a boy or girl. The effect of this rapid change is that young adolescent often becomes focused on his or her body.</p>
+            <p><span class="paragraph-label">F</span> Before adolescence, children's thinking is dominated by a need to have a concrete example for any problem that they solve. Their thinking is constrained to what is real and physical. During adolescence, young people begin to recognize and understand abstractions. The adolescent must adjust to increased cognitive demands at school. Adults see high school in part as a place where adolescents prepare for adult roles and responsibilities and in part as preparatory for further education. School curricula are frequently dominated by the inclusion of more abstract, demanding material, regardless of whether the adolescents have achieved formal thought. Since not all adolescents make the intellectual transition at the same rate, demands for abstract thinking prior to achievement of that ability may be frustrating.</p>
+            <p><span class="paragraph-label">G</span> During adolescence, as teens develop increasingly complex knowledge systems and a sense of self, they also adopt an integrated set of values and morals. During the early stages of moral development, parents provide their child with a structured set of rules of what is right and wrong, what is acceptable and unacceptable. Eventually, the adolescent must assess the parents' values as they come into conflict with values expressed by peers and other segments of society. To reconcile differences, the adolescent restructures those beliefs into a personal ideology.</p>
+            <p><span class="paragraph-label">H</span> The adolescent must develop expanded verbal skills. As adolescents mature intellectually, as they face increased school demands, and as they prepare for adult roles, they must develop new verbal skills to accommodate more complex concepts and tasks. Their limited language of childhood is no longer adequate. Adolescents may appear less competent because of their inability to express themselves meaningfully.</p>
+            <p><span class="paragraph-label">I</span> The adolescent must establish emotional and psychological independence from his or her parents. Childhood is marked by a strong dependence on one's parents. Adolescents may yearn to keep that safe, secure, supportive, dependent relationship. Yet, to be an adult implies a sense of independence, of autonomy, of being one's own person. Adolescents may vacillate between their desire for dependence and their need to be independent. In an attempt to assert their need for independence and individuality, adolescents may respond with what appears to be hostility and lack of cooperation.</p>
+            <p><span class="paragraph-label">J</span> Adolescents do not progress through these multiple developmental tasks separately. At any given time, adolescents may be dealing with several. Further, the centrality of specific developmental tasks varies with early, middle, and late periods of the transition.</p>
+        </div>
+
+        <div id="text-p2" class="passage-content">
+            <h2>Optimism and Health 2</h2>
+            <p>Mindset is all. How you start the year will set the template for 2009, and two scientifically-backed character traits hold the key: optimism and resilience (if the prospect leaves you feeling pessimistically spineless, the good news is that you can significantly boost both of these qualities).</p>
+            <p><span class="paragraph-label">A</span> Faced with 12 months of plummeting economics and rising human distress, staunchly maintaining a rosy view might seem deludedly Pollyannaish. But here we encounter the optimism paradox. As Brice Pitt, an emeritus professor of the psychiatry of old age at Imperial College, London, told me: optimists are unrealistic. Depressive people see things as they really are, but that is a disadvantage from an evolutionary point of view. Optimism is a piece of evolutionary equipment that carried us through millennia of setbacks.</p>
+            <p><span class="paragraph-label">B</span> It has been known that optimistic has something to do with the long life, and optimists have plenty to be happy about. In other words, if you can convince yourself that things will get better, the odds of it happening will improve - because you keep on playing the game. In this light, optimism "is a habitual way of explaining your setbacks to yourself", reports Martin Seligman, the psychology professor and author of Learned Optimism. The research shows that when times get tough, optimists do better than pessimists - they succeed better at work, respond better to stress, suffer fewer depressive episodes, and achieve more personal goals.</p>
+            <p><span class="paragraph-label">C</span> Studies also show that belief can help with the financial pinch. Chad Wallens, a social forecaster at the Henley Centre who surveyed middle-class Britons' beliefs about income, has found that "the people who feel wealthiest, and those who feel poorest, actually have almost the same amount of money at their disposal. Their attitudes and behaviour patterns, however, are different from one another."</p>
+            <p><span class="paragraph-label">D</span> Optimists have something else to be cheerful about - in general, they are more robust. For example, a study of 660 volunteers by the Yale University psychologist Dr Becca Levy, found that thinking positively adds an average of 7 years to your life. Other American research claims to have identified a physical mechanism behind this. A Harvard Medical School study of 670 men found that the optimists have significantly better lung function. The lead author, Dr Rosalind Wright, believes that attitude somehow strengthens the immune system. "Preliminary studies on heart patients suggest that, by changing a person's outlook, you can improve their mortality risk," she says.</p>
+            <p><span class="paragraph-label">E</span> Few studies have tried to ascertain the proportion of optimists in the world. But a 1995 nationwide survey conducted by the American magazine Adweek found that about half the population counted themselves as optimists, with women slightly more apt than men (53 per cent versus 48 per cent) to see the sunny side.</p>
+            <p><span class="paragraph-label">F</span> Although some optimists may be accurate in their positive beliefs about the future, others may be unrealistic-their optimism is misplaced, according to the American Psychological Association. Research shows that some smokers exhibit unrealistic optimism by underestimating their relative chances of experiencing disease. An important question is whether such unrealistic optimism is associated with risk-related attitudes and behavior. We addressed this question by investigating if one's perceived the risk of developing lung cancer, over and above one's objective risk, predicted acceptance of myths and other beliefs about smoking. Hierarchical regressions showed that those individuals who were unrealistically optimistic were more likely to endorse beliefs that there is no risk of lung cancer if one only smokes for a few years and that getting lung cancer depends on one's genes.</p>
+            <p><span class="paragraph-label">G</span> Of course, there is no guarantee that optimism will insulate you from the crunch's worst effects, but the best strategy is still to keep smiling and thank your lucky stars. Because (as every good sports coach knows) adversity is character-forming - so long as you practise the skills of resilience. Research among tycoons and business leaders shows that the path to success is often littered with failure: a record of sackings, bankruptcies and blistering castigation. But instead of curling into a foetal ball beneath the coffee table, they resiliently pick themselves up, learn from their pratfalls and march boldly towards the next opportunity.</p>
+            <p><span class="paragraph-label">H</span> The American Psychological Association defines resilience as the ability to adapt in the face of adversity, trauma or tragedy. A resilient person may go through difficulty and uncertainty, but he or she will doggedly bounce back.</p>
+            <p><span class="paragraph-label">I</span> Optimism is one of the central traits required in building resilience, say Yale University investigators in the Annual Review of Clinical Psychology. They add that resilient people learn to hold on to their sense of humour and this can help them to keep a flexible attitude when big changes of plan are warranted. The ability to accept your lot with equanimity also plays an important role, the study adds.</p>
+            <p><span class="paragraph-label">J</span> One of the best ways to acquire resilience is through experiencing a difficult childhood, the sociologist Steven Stack reports in the Journal of Social Psychology. For example, short men are less likely to commit suicide than tall guys, he says, because shorties develop psychological defence skills to handle the bullies and mickey-taking that their lack of stature attracts. By contrast, those who enjoyed adversity-free youths can get derailed by setbacks later on because they've never been inoculated against agro.</p>
+            <p><span class="paragraph-label">K</span> Learning to overcome your fears. If you are handicapped by having had a happy childhood, then practising proactive optimism can help you to become more resilient. Studies of resilient people show that they take more risks; they court failure and learn not to fear it. And despite being thick-skinned, resilient types are also more open than average to other people. Bouncing through knock-backs is all part of the process. It's about optimistic risk-taking - being confident that people will like you. Simply smiling and being warm to people can help. It's an altruistic path to self-interest - and if it achieves nothing else, it will reinforce an age-old adage: hard times can bring out the best in you.</p>
+        </div>
+
+        <div id="text-p3" class="passage-content">
+            <h2>Design the mat and Foot health</h2>
+            <p><span class="paragraph-label">A</span> Indoor types will appreciate the cobblestone walkway, a knobbly textured plastic mat that they can wobble along in the comfort of their own homes. And for the more adventurous, there are shoes designed to throw you off balance.</p>
+            <p><span class="paragraph-label">B</span> The technology may be cutting edge, but its origins are deep and exotic. Research into the idea that flat floors could be detrimental to our health was pioneered back in the late 1960s. While others in Long Beach, California, contemplated peace and love, podiatrist Charles Brantingham and physiologist Bruce Beekman were concerned with more pedestrian matters. They reckoned that the growing epidemic of high blood pressure, varicose veins and deep-vein thromboses might be linked to the uniformity of the surfaces that we tend to stand and walk on.</p>
+            <p><span class="paragraph-label">C</span> The trouble, as they saw it, was that walking continuously on flat floors, sidewalks and streets concentrate forces on just a few areas of the foot. As a result, these surfaces are likely to be far more conducive to chronic stress syndromes than natural ones, where the foot meets the ground in a wide variety of orientations. The anatomy of the foot parallels that of the human hand - each having 26 bones, 33 joints and more than 100 muscles, tendons and ligaments. Modem lifestyles waste all this flexibility in your socks. Brantingham and Beekman became convinced that damage was being done simply by people standing on even surfaces and that this could be rectified by introducing a wobble.</p>
+            <p><span class="paragraph-label">D</span> "In Beijing and Shanghai city dwellers take daily walks on cobbled paths to improve their health." To test their ideas, they got 65 clerks and factory workers to try standing on a variable terrain floor - spongy mats with amounts of giving across the surface. This modest irregularity allowed the soles of the volunteers' feet to deviate slightly from the horizontal each time they shifted position. As the researchers hoped, this simple intervention turned out to make a huge difference over just a few weeks. Just a slight wobble from the floor activated a host of muscles in people's legs, which in turn helped to pump blood back to their hearts. The muscle action prevented the pooling of blood in their feet and legs, reducing the stress on the entire cardiovascular system. And two-thirds of the volunteers reported feeling much less tired. Yet decades later, the flooring of the world's workplaces remains relentlessly smooth.</p>
+            <p><span class="paragraph-label">E</span> Earlier this year, however, the idea was given a new lease of life when researchers in Oregon announced findings from a similar experiment with people over 60. John Fisher and colleagues at the Oregon Research Institute in Eugene designed a mat intended to replicate the effect of walking on cobblestones. In tests funded by the National Institute of Aging, they got some 50 adults to walk on the mats in their stockinged feet for less than an hour three times a week. After 16 weeks, these people showed marked improvements in balance and mobility, and even a significant reduction in blood pressure. People in a control group who walked on ordinary floors also improved but not as dramatically.</p>
+            <p><span class="paragraph-label">F</span> The mats are now on sale at $35. "Our first 1000 cobblestone mats sold in three weeks," Fisher says. Production is now being scaled up. Even so, demand could exceed supply if this foot-stimulating activity really is a "useful non-pharmacological approach for preventing or controlling hypertension of older adults", as the researchers believe. They are not alone in extolling the revitalizing powers of cobblestones. Reflexologists have long advocated walking on textured surfaces to stimulate so-called "acupoints" on the soles of the feet. Practitioners of this unorthodox therapy believe that pressure applied to particular spots on the foot connects directly to corresponding organs and somehow enhances their function. In China, spas, hotels, apartment blocks and even factories promote their cobblestone paths as healthful amenities. Fisher admits he got the idea from regular visits to the country. In Beijing and Shanghai city dwellers take daily walks along cobbled paths to improve their health. "In the big cities, people take off their shoes and walk on these paths for 5 or 10 minutes, perhaps several times a day," Fisher says.</p>
+            <p><span class="paragraph-label">G</span> The idea is now taking off in Europe too. People in Germany, Austria and Switzerland can visit "barefoot parks" and walk along "paths of the senses" - with mud, logs, stone and moss underfoot - to receive what's known there as reflexzon-massage. And it is not difficult to construct your own "health pathway". American reflexologists Barbara and Kevin Kunz, based in Albuquerque, New Mexico, advise that you cobble together a walkway using broom handles, bamboo poles, hosepipes, gravel, pebbles, dried peas, driftwood, fallen logs, sand, door mats and strips of turf.</p>
+            <p><span class="paragraph-label">H</span> If your enthusiasm for DIY doesn't stretch to this, and Fisher's cobblestone mats are all sold out, there is another option. A new shoe on the market claims to transform flat, hard, artificial surfaces into something like natural uneven ground. "These shoes have an unbelievable effect," says Benno Nigg, an exercise scientist at the human performance laboratory of Calgary University in Canada, which has done contract research for the shoe's manufacturers. "They are one of the best things to have happened to humankind for years." Known as Masai Barefoot Technology, or MBTs, the shoes have rounded soles that cause you to rock slightly when you stand still, exercising the small muscles around the ankle that are responsible for fore-aft stability. Forces in the joint are reduced, putting less strain on the system, Nigg claims.</p>
+        </div>
+    </div>
+
+    <div class="pane pane-right">
+        
+        <div id="q-group-1" class="q-group active">
+            <div class="q-block">
+                <div class="instruction"><u>Questions 1-6:</u> Match the following characteristics with the correct stages of the adolescent.</div>
+                
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">1</div>
+                        <div class="q-content">Interested in the opposite sex <br><select id="ans-1" onchange="check(1)"><option value="">Select Stage...</option><option value="A">A - Early adolescence</option><option value="B">B - Middle adolescence</option><option value="C">C - Later adolescence</option></select><span class="feedback" id="fb-1"></span></div>
+                    </div>
+                    <div id="exp-1"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">2</div>
+                        <div class="q-content">Exposure to danger <br><select id="ans-2" onchange="check(2)"><option value="">Select Stage...</option><option value="A">A - Early adolescence</option><option value="B">B - Middle adolescence</option><option value="C">C - Later adolescence</option></select><span class="feedback" id="fb-2"></span></div>
+                    </div>
+                    <div id="exp-2"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">3</div>
+                        <div class="q-content">The same as others <br><select id="ans-3" onchange="check(3)"><option value="">Select Stage...</option><option value="A">A - Early adolescence</option><option value="B">B - Middle adolescence</option><option value="C">C - Later adolescence</option></select><span class="feedback" id="fb-3"></span></div>
+                    </div>
+                    <div id="exp-3"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">4</div>
+                        <div class="q-content">Beginning to form individual thinking without family context <br><select id="ans-4" onchange="check(4)"><option value="">Select Stage...</option><option value="A">A - Early adolescence</option><option value="B">B - Middle adolescence</option><option value="C">C - Later adolescence</option></select><span class="feedback" id="fb-4"></span></div>
+                    </div>
+                    <div id="exp-4"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">5</div>
+                        <div class="q-content">Less need the approval of friends <br><select id="ans-5" onchange="check(5)"><option value="">Select Stage...</option><option value="A">A - Early adolescence</option><option value="B">B - Middle adolescence</option><option value="C">C - Later adolescence</option></select><span class="feedback" id="fb-5"></span></div>
+                    </div>
+                    <div id="exp-5"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">6</div>
+                        <div class="q-content">Intellectual booming <br><select id="ans-6" onchange="check(6)"><option value="">Select Stage...</option><option value="A">A - Early adolescence</option><option value="B">B - Middle adolescence</option><option value="C">C - Later adolescence</option></select><span class="feedback" id="fb-6"></span></div>
+                    </div>
+                    <div id="exp-6"></div>
+                </div>
+            </div>
+
+            <div class="q-block">
+                <div class="instruction"> <u>Questions 7-10:</u> Complete each sentence with the correct ending (A-F).</div>
+                
+                <div class="drag-box" id="drag-box-1">
+                    <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="A" data-group="g1">A. form personal identity with a set of morals and values</div>
+                    <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="B" data-group="g1">B. develops a table and productive peer relationships</div>
+                    <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="C" data-group="g1">C. are designed to be more challenging than some can accept</div>
+                    <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="D" data-group="g1">D. varies from people to people</div>
+                    <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="E" data-group="g1">E. focuses on creating a self-image</div>
+                    <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="F" data-group="g1">F. become an extension of their parents</div>
+                </div>
+     
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">7</div>
+                        <div class="q-content">One of Havighurst's research <br>
+                            <input type="text" class="input-gap" id="ans-7" data-group="g1" ondrop="drop(event)" ondragover="allowDrop(event)" oninput="check(7); updateDragUI('g1')"> <span class="feedback" id="fb-7"></span>
+                        </div>
+                    </div>
+                    <div id="exp-7"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">8</div>
+                        <div class="q-content">High School Courses<br>
+                            <input type="text" class="input-gap" id="ans-8" data-group="g1" ondrop="drop(event)" ondragover="allowDrop(event)" oninput="check(8); updateDragUI('g1')"> <span class="feedback" id="fb-8"></span>
+                        </div>
+                    </div>
+                    <div id="exp-8"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">9</div>
+                        <div class="q-content">Adolescence is a time when young people<br>
+                            <input type="text" class="input-gap" id="ans-9" data-group="g1" ondrop="drop(event)" ondragover="allowDrop(event)" oninput="check(9); updateDragUI('g1')"> <span class="feedback" id="fb-9"></span>
+                        </div>
+                    </div>
+                    <div id="exp-9"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">10</div>
+                        <div class="q-content">The developmental speed of thinking patterns <br>
+                            <input type="text" class="input-gap" id="ans-10" data-group="g1" ondrop="drop(event)" ondragover="allowDrop(event)" oninput="check(10); updateDragUI('g1')"> <span class="feedback" id="fb-10"></span>
+                        </div>
+                    </div>
+                    <div id="exp-10"></div>
+                </div>
+            </div>
+
+            <div class="q-block">
+                <div class="instruction">Questions 11-13: Do the following statements agree with the information given in Reading Passage 1?<br><br><b><strong>TRUE</strong> if the statement is true <br><b><strong>FALSE</strong> if the statement is false<br><b><strong>NOT GIVEN</strong> if the information is not given in the passage </b> </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">11</div>
+                        <div class="q-content">The adolescent lacks the ability to think abstractly. <br><select id="ans-11" onchange="check(11)"><option value="">Select...</option><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option><option value="NOT GIVEN">NOT GIVEN</option></select> <span class="feedback" id="fb-11"></span></div>
+                    </div>
+                    <div id="exp-11"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">12</div>
+                        <div class="q-content">Adolescents may have a deficit in their language ability. <br><select id="ans-12" onchange="check(12)"><option value="">Select...</option><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option><option value="NOT GIVEN">NOT GIVEN</option></select> <span class="feedback" id="fb-12"></span></div>
+                    </div>
+                    <div id="exp-12"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">13</div>
+                        <div class="q-content">The adolescent experiences a transition from reliance on his parents to independence. <br><select id="ans-13" onchange="check(13)"><option value="">Select...</option><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option><option value="NOT GIVEN">NOT GIVEN</option></select> <span class="feedback" id="fb-13"></span></div>
+                    </div>
+                    <div id="exp-13"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="q-group-2" class="q-group">
+            <div class="q-block">
+                <div class="instruction"><u>Questions 14-18:</u> Complete the following summary of the paragraphs of Reading Passage. <br> Using <strong>NO MORE THAN TWO WORDS</strong> from the Reading Passage for each answer</div>
+                <div style="line-height: 2.2; font-size: 18px; border: 2px dashed var(--border); padding: 25px; border-radius: 12px;">
+                    Optimists generally are more robust. Yale University psychologist Dr Becca Levy found that an extension of around 
+                    <strong>14.</strong> <input type="text" class="input-gap" id="ans-14" oninput="check(14)"> <span class="feedback" id="fb-14"></span><div id="exp-14"></div> 
+                    to your life will be achieved by a positive attitude toward life. A Harvard Medical School conduct a research which study of 
+                    <strong>15.</strong> <input type="text" class="input-gap" id="ans-15" oninput="check(15)"> <span class="feedback" id="fb-15"></span><div id="exp-15"></div> 
+                    male volunteers found that the optimists have remarkably better 
+                    <strong>16.</strong> <input type="text" class="input-gap" id="ans-16" oninput="check(16)"> <span class="feedback" id="fb-16"></span><div id="exp-16"></div>.
+                    And Dr Rosalind Wright believes optimistic life may enhance the 
+                    <strong>17.</strong> <input type="text" class="input-gap" id="ans-17" oninput="check(17)"> <span class="feedback" id="fb-17"></span><div id="exp-17"></div>.
+                    Some initiative studies on 
+                    <strong>18.</strong> <input type="text" class="input-gap" id="ans-18" oninput="check(18)"> <span class="feedback" id="fb-18"></span><div id="exp-18"></div>
+                    indicate that people can improve their mortality risk by changing into a positive outlook.
+                </div>
+            </div>
+
+            <div class="q-block">
+                <div class="instruction"><u>Questions 19-23:</u> Use the information in the passage to match the people or organization (listed A-E) with opinions or deeds below </div>
+                <div class="drag-box" id="drag-box-2">
+                    <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="A" data-group="g2">A. Brice Pitt</div>
+                    <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="B" data-group="g2">B. American Psychological Association</div>
+                    <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="C" data-group="g2">C. Martin Seligman</div>
+                    <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="D" data-group="g2">D. Chad Wallens of Henley Centre</div>
+                    <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="E" data-group="g2">E. Annual Review of Clinical Psychology</div>
+                    <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="F" data-group="g2">F. Steven Stack</div>
+                    <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="G" data-group="g2">G. American magazine Adweek</div>
+                </div>
+              
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">19</div>
+                        <div class="q-content">Different optimism result found according to gender.<br><input type="text" class="input-gap" id="ans-19" data-group="g2" ondrop="drop(event)" ondragover="allowDrop(event)" oninput="check(19); updateDragUI('g2')"> <span class="feedback" id="fb-19"></span></div>
+                    </div>
+                    <div id="exp-19"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">20</div>
+                        <div class="q-content">There is no necessary relationship between happiness and money.<br><input type="text" class="input-gap" id="ans-20" data-group="g2" ondrop="drop(event)" ondragover="allowDrop(event)" oninput="check(20); updateDragUI('g2')"> <span class="feedback" id="fb-20"></span></div>
+                    </div>
+                    <div id="exp-20"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">21</div>
+                        <div class="q-content">Excessive optimism may be incorrect in everyday life.<br><input type="text" class="input-gap" id="ans-21" data-group="g2" ondrop="drop(event)" ondragover="allowDrop(event)" oninput="check(21); updateDragUI('g2')"> <span class="feedback" id="fb-21"></span></div>
+                    </div>
+                    <div id="exp-21"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">22</div>
+                        <div class="q-content">Optimists are advantageous for human evolution.<br><input type="text" class="input-gap" id="ans-22" data-group="g2" ondrop="drop(event)" ondragover="allowDrop(event)" oninput="check(22); updateDragUI('g2')"> <span class="feedback" id="fb-22"></span></div>
+                    </div>
+                    <div id="exp-22"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">23</div>
+                        <div class="q-content">Occurrence of emergency assists resilient people in a positive way.<br><input type="text" class="input-gap" id="ans-23" data-group="g2" ondrop="drop(event)" ondragover="allowDrop(event)" oninput="check(23); updateDragUI('g2')"> <span class="feedback" id="fb-23"></span></div>
+                    </div>
+                    <div id="exp-23"></div>
+                </div>
+            </div>
+
+            <div class="q-block">
+                <div class="instruction"><u>Questions 24-27:</u> Do the following statements agree with the information given in Reading Passage 2?<br><br><b><strong>YES</strong> if the statement is true <br><b><strong>NO</strong> if the statement is false<br><b><strong>NOT GIVEN</strong> if the information is not given in the passage </b> </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">24</div>
+                        <div class="q-content">The link between longevity and optimism has been known.<br><select id="ans-24" onchange="check(24)"><option value="">Select...</option><option value="YES">YES</option><option value="NO">NO</option><option value="NOT GIVEN">NOT GIVEN</option></select><span class="feedback" id="fb-24"></span></div>
+                    </div>
+                    <div id="exp-24"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">25</div>
+                        <div class="q-content">Optimists have a better personal relationship than those pessimists.<br><select id="ans-25" onchange="check(25)"><option value="">Select...</option><option value="YES">YES</option><option value="NO">NO</option><option value="NOT GIVEN">NOT GIVEN</option></select><span class="feedback" id="fb-25"></span></div>
+                    </div>
+                    <div id="exp-25"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">26</div>
+                        <div class="q-content">People who had a happy childhood do not need to practise optimism.<br><select id="ans-26" onchange="check(26)"><option value="">Select...</option><option value="YES">YES</option><option value="NO">NO</option><option value="NOT GIVEN">NOT GIVEN</option></select><span class="feedback" id="fb-26"></span></div>
+                    </div>
+                    <div id="exp-26"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">27</div>
+                        <div class="q-content">Experience of difficulties will eventually help people accumulate a fortune.<br><select id="ans-27" onchange="check(27)"><option value="">Select...</option><option value="YES">YES</option><option value="NO">NO</option><option value="NOT GIVEN">NOT GIVEN</option></select><span class="feedback" id="fb-27"></span></div>
+                    </div>
+                    <div id="exp-27"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="q-group-3" class="q-group">
+            <div class="q-block">
+                <div class="instruction"><u>Questions 28-32:</u> Do the following statements agree with the information given in Reading Passage 3? <br><br><b><strong>TRUE</strong> if the statement is true <br><b><strong>FALSE</strong> if the statement is false<br><b><strong>NOT GIVEN</strong> if the information is not given in the passage </b> </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">28</div>
+                        <div class="q-content">Charles Brantingham and Bruce Beekman are the pioneers to research the connection between hyper illness and conditions of road.<br><select id="ans-28" onchange="check(28)"><option value="">Select...</option><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option><option value="NOT GIVEN">NOT GIVEN</option></select><span class="feedback" id="fb-28"></span></div>
+                    </div>
+                    <div id="exp-28"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">29</div>
+                        <div class="q-content">John Fisher and his colleagues found that those who walked on cobble-stones suffered a worsening physical condition.<br><select id="ans-29" onchange="check(29)"><option value="">Select...</option><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option><option value="NOT GIVEN">NOT GIVEN</option></select><span class="feedback" id="fb-29"></span></div>
+                    </div>
+                    <div id="exp-29"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">30</div>
+                        <div class="q-content">Manufacture of Fisher's cobblestone mats booms due to high demand of this product.<br><select id="ans-30" onchange="check(30)"><option value="">Select...</option><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option><option value="NOT GIVEN">NOT GIVEN</option></select><span class="feedback" id="fb-30"></span></div>
+                    </div>
+                    <div id="exp-30"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">31</div>
+                        <div class="q-content">The research works such as customized pathway from Barbara and Kevin Kunz were inspired from an oversea trip.<br><select id="ans-31" onchange="check(31)"><option value="">Select...</option><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option><option value="NOT GIVEN">NOT GIVEN</option></select><span class="feedback" id="fb-31"></span></div>
+                    </div>
+                    <div id="exp-31"></div>
+                </div>
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">32</div>
+                        <div class="q-content">Benno Nigg suggests that shoes of Masai Barefoot Technology have a specific age limitation.<br><select id="ans-32" onchange="check(32)"><option value="">Select...</option><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option><option value="NOT GIVEN">NOT GIVEN</option></select><span class="feedback" id="fb-32"></span></div>
+                    </div>
+                    <div id="exp-32"></div>
+                </div>
+            </div>
+
+            <div class="q-block">
+                <div class="instruction"><u>Questions 33-35:</u> Choose the correct letter A, B, C or D.</div>
+                
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">33</div>
+                        <div class="q-content"><b>Which of the followings is true according to J Fisher's experiment cobbled paths in paragraph D?</b><br>
+                            <label class="mc-option"><input type="radio" name="q33" value="A" onclick="check(33)"> A. Spongy mats make the volunteer feel unbalance.</label>
+                            <label class="mc-option"><input type="radio" name="q33" value="B" onclick="check(33)"> B. Chinese special culture makes it only applicable in a certain area.</label>
+                            <label class="mc-option"><input type="radio" name="q33" value="C" onclick="check(33)"> C. More than half of participants reported a positive response.</label>
+                            <label class="mc-option"><input type="radio" name="q33" value="D" onclick="check(33)"> D. This method could cure cardiovascular disease unexpectedly.</label>
+                            <span class="feedback" id="fb-33"></span>
+                        </div>
+                    </div>
+                    <div id="exp-33"></div>
+                </div>
+
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">34</div>
+                        <div class="q-content"><b>John Fisher and colleagues from the Oregon Research Institute has found the followings:</b><br>
+                            <label class="mc-option"><input type="radio" name="q34" value="A" onclick="check(34)"> A. People walk on special designed mat only have improvements in blood pressure.</label>
+                            <label class="mc-option"><input type="radio" name="q34" value="B" onclick="check(34)"> B. Blood pressure of control group improves not as much as the other one.</label>
+                            <label class="mc-option"><input type="radio" name="q34" value="C" onclick="check(34)"> C. Elder people improve more dramatically than youngsters.</label>
+                            <label class="mc-option"><input type="radio" name="q34" value="D" onclick="check(34)"> D. Testing time of 16 weeks is a significant factor in this experiment.</label>
+                            <span class="feedback" id="fb-34"></span>
+                        </div>
+                    </div>
+                    <div id="exp-34"></div>
+                </div>
+
+                <div class="q-item">
+                    <div class="q-content-wrapper">
+                        <div class="q-num">35</div>
+                        <div class="q-content"><b>Shoes from MBT are also beneficial for your health as which of the following reasons:</b><br>
+                            <label class="mc-option"><input type="radio" name="q35" value="A" onclick="check(35)"> A. Special designed soles on the bottom make your feet stabled</label>
+                            <label class="mc-option"><input type="radio" name="q35" value="B" onclick="check(35)"> B. Researcher has previous experience in this field.</label>
+                            <label class="mc-option"><input type="radio" name="q35" value="C" onclick="check(35)"> C. African style shoes were very successful in store sales.</label>
+                            <label class="mc-option"><input type="radio" name="q35" value="D" onclick="check(35)"> D. They can protect the ankle and muscles around feet.</label>
+                            <span class="feedback" id="fb-35"></span>
+                        </div>
+                    </div>
+                    <div id="exp-35"></div>
+                </div>
+            </div>
+
+            <div class="q-block">
+                <div class="instruction"><u>Questions 36-40:</u> Complete the following summary of the paragraphs of Reading Passage. <br><b>Using <strong>NO MORE THAN TWO WORDS</strong> from the Reading Passage for each answer.</div>
+                <div style="line-height:2.2; font-size: 18px; border: 2px dashed var(--border); padding: 25px; border-radius: 12px; background: white;">
+                    The anatomy of human's foot is complex; which 
+                    <strong>36.</strong> <input type="text" class="input-gap" id="ans-36" oninput="check(36)"> <span class="feedback" id="fb-36"></span><div id="exp-36"></div> 
+                    human hand. The experiment, conducted on employees, showed that body movement on surface of different condition can lower the 
+                    <strong>37.</strong> <input type="text" class="input-gap" id="ans-37" oninput="check(37)"> <span class="feedback" id="fb-37"></span><div id="exp-37"></div> 
+                    on heart. Similarity was also found in another experiment conducted by a researcher from the Oregon Research Institute. The test also showed there was a substantial 
+                    <strong>38.</strong> <input type="text" class="input-gap" id="ans-38" oninput="check(38)"> <span class="feedback" id="fb-38"></span><div id="exp-38"></div> 
+                    in hypertension. Reflexologists advise people to work on a road with resistance to stimulate certain points of body via standing on the 
+                    <strong>39.</strong> <input type="text" class="input-gap" id="ans-39" oninput="check(39)"> <span class="feedback" id="fb-39"></span><div id="exp-39"></div>.
+                    In the end, the author of the passage also advocates that people can build their own health 
+                    <strong>40.</strong> <input type="text" class="input-gap" id="ans-40" oninput="check(40)"> <span class="feedback" id="fb-40"></span><div id="exp-40"></div> 
+                    except for buying the special mats and shoes.
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<footer id="navFooter">
+    <div style="font-size:14px; font-weight:bold; color:var(--text-light); text-transform:uppercase; margin-right:15px; flex-shrink: 0;">Bảng điều hướng:</div>
+</footer>
+
+<div id="ctxMenu">
+    <button onclick="applyHighlight()">🖍 Tô màu highlight (Vàng)</button>
+    <button onclick="deleteHighlight()" id="btnDelHL" style="display:none; color:var(--wrong);">❌ Xóa highlight</button>
+</div>
+
+<script>
+    // --- MODE & TIMER STATE ---
+    let currentMode = '';
+    let testDuration = 0; 
+    let timerInterval = null;
+    let isSubmitted = false;
+
+    // --- CÀI ĐẶT CHẾ ĐỘ ---
+    function selectMode(mode) {
+        currentMode = mode;
+        document.querySelector('.mode-practice').classList.toggle('selected', mode === 'practice');
+        document.querySelector('.mode-mock').classList.toggle('selected', mode === 'mock');
+        
+        document.getElementById('timeInputBox').style.display = (mode === 'practice') ? 'block' : 'none';
+        document.getElementById('startBtn').style.display = 'inline-block';
+    }
+
+    function askReady() {
+        let confirmMsg = currentMode === 'mock' 
+            ? "Bạn chọn Thi Thử (60 phút). Bạn đã sẵn sàng làm bài chưa?" 
+            : `Bạn chọn Luyện Tập (${document.getElementById('timeInput').value} phút). Bắt đầu tính giờ nhé?`;
+            
+        if(confirm(confirmMsg)) {
+            let minutes = (currentMode === 'mock') ? 60 : parseInt(document.getElementById('timeInput').value);
+            if(isNaN(minutes) || minutes < 1) minutes = 60;
+            testDuration = minutes * 60;
+            
+            document.getElementById('setupOverlay').style.display = 'none';
+            startTimer();
+        }
+    }
+
+    // --- ĐÁP ÁN CHUẨN ---
+    const answers = {
+        1:"B", 2:"A", 3:"A", 4:"A", 5:"C", 6:"B",
+        7:"E", 8:"C", 9:"A", 10:"D",
+        11:"FALSE", 12:"TRUE", 13:"TRUE",
+        14:"7 YEARS", 15:"670", 16:"LUNG FUNCTION", 17:"IMMUNE SYSTEM", 18:"HEART PATIENTS",
+        19:"G", 20:"D", 21:"B", 22:"A", 23:"E",
+        24:"YES", 25:"NOT GIVEN", 26:"NO", 27:"YES",
+        28:"TRUE", 29:"FALSE", 30:"TRUE", 31:"NOT GIVEN", 32:"NOT GIVEN",
+        33:"C", 34:"B", 35:"A",
+        36:"PARALLELS", 37:"STRESS", 38:"REDUCTION", 39:"SOLES", 40:"PATHWAY"
+    };
+
+    // --- GIẢI THÍCH CHI TIẾT ---
+    const explanations = {
+        1: { quote: "Their concerns about peers are more directed toward their opposite sexed peers.", exp: "Đoạn C (Middle adolescence) cho thấy sự quan tâm tới người khác giới bắt đầu phát triển mạnh.", vocab: "<b>Opposite sex (n)</b>: Khác giới" },
+        2: { quote: "Early adolescence is also a period of intense conformity to peers. 'Getting along,' not being different...", exp: "Câu hỏi nhắm vào 'the same as others' hoặc 'exposure to danger'. Thực ra key là A (Early adolescence) ở câu 3 vì 'conformity to peers' (giống người khác). Câu 2 (Exposure to danger) ở đoạn B cũng là A vì những cố gắng đầu tiên thoát khỏi vai trò an toàn của đứa trẻ.", vocab: "<b>Conformity (n)</b>: Sự tuân thủ, làm theo số đông" },
+        3: { quote: "'Getting along,' not being different... is to be seen by peers as 'different'.", exp: "Nhu cầu giống người khác ('not being different') là đặc điểm rõ rệt của giai đoạn đầu (Early - A)." },
+        4: { quote: "Early adolescence... make the first attempts to leave the dependent, secure role of a child and to establish themselves as unique individuals, independent of their parents.", exp: "Giai đoạn bắt đầu hình thành tư duy cá nhân, thoát khỏi bối cảnh gia đình (Early - A)." },
+        5: { quote: "Late adolescents... Their needs for peer approval are diminished...", exp: "Đoạn D (Late adolescence) cho thấy nhu cầu được bạn bè chấp thuận đã giảm đi (diminished). => C" },
+        6: { quote: "Middle adolescence is marked by the emergence of new thinking skills. The intellectual world... is suddenly greatly expanded.", exp: "Đoạn C đánh dấu sự bùng nổ về mặt trí tuệ (Intellectual booming). => B" },
+        7: { quote: "One developmental task an adolescent needs to achieve is to adjust to a new physical sense of self.", exp: "Nghiên cứu của Havighurst tập trung vào việc tạo ra hình ảnh tự nhận thức về thể chất (self-image). => E" },
+        8: { quote: "School curricula are frequently dominated by the inclusion of more abstract, demanding material... demands for abstract thinking prior to achievement of that ability may be frustrating.", exp: "Các khóa học ở trường cấp 3 thường đòi hỏi tư duy trừu tượng, đôi khi gây bực bội/thử thách cho học sinh chưa đủ khả năng. => C" },
+        9: { quote: "...they also adopt an integrated set of values and morals... the adolescent restructures those beliefs into a personal ideology.", exp: "Đoạn G: Thanh thiếu niên xây dựng hệ tư tưởng cá nhân với tập hợp các giá trị và đạo đức. => A" },
+        10: { quote: "Since not all adolescents make the intellectual transition at the same rate...", exp: "Đoạn F: Không phải tất cả đều phát triển nhận thức với cùng một tốc độ (varies from people to people). => D" },
+        11: { quote: "During adolescence, young people begin to recognize and understand abstractions.", exp: "Bài đọc khẳng định họ BẮT ĐẦU hiểu được sự trừu tượng, nên nói họ 'thiếu khả năng' (lacks the ability) là sai. => FALSE" },
+        12: { quote: "Adolescents may appear less competent because of their inability to express themselves meaningfully.", exp: "Đoạn H: Do ngôn ngữ thời thơ ấu không còn đủ dùng, họ có thể thiếu sót/yếu trong khả năng diễn đạt. => TRUE" },
+        13: { quote: "The adolescent must establish emotional and psychological independence from his or her parents... Childhood is marked by a strong dependence...", exp: "Đoạn I: Tuổi vị thành niên là quá trình chuyển tiếp từ phụ thuộc sang độc lập. => TRUE" },
+        14: { quote: "...found that thinking positively adds an average of 7 years to your life.", exp: "Sự suy nghĩ tích cực có thể kéo dài tuổi thọ thêm khoảng 7 năm (7 years). Chú ý giới hạn 2 từ.", vocab: "<b>Longevity (n)</b>: Tuổi thọ" },
+        15: { quote: "A Harvard Medical School study of 670 men...", exp: "Nghiên cứu của Harvard thực hiện trên 670 nam tình nguyện viên." },
+        16: { quote: "...found that the optimists have significantly better lung function.", exp: "Kết quả cho thấy những người lạc quan có chức năng phổi (lung function) tốt hơn đáng kể." },
+        17: { quote: "Dr Rosalind Wright, believes that attitude somehow strengthens the immune system.", exp: "Thái độ tích cực củng cố hệ thống miễn dịch (immune system)." },
+        18: { quote: "Preliminary studies on heart patients suggest that... you can improve their mortality risk...", exp: "Nghiên cứu sơ bộ trên các bệnh nhân tim (heart patients) cho thấy rủi ro tử vong có thể giảm đi.", vocab: "<b>Mortality risk (n)</b>: Rủi ro tử vong" },
+        19: { quote: "But a 1995 nationwide survey conducted by the American magazine Adweek found... with women slightly more apt than men...", exp: "Tạp chí Adweek (G) tìm ra sự khác biệt về sự lạc quan giữa nam và nữ." },
+        20: { quote: "Chad Wallens... found that 'the people who feel wealthiest, and those who feel poorest, actually have almost the same amount of money...'", exp: "Chad Wallens (D) chỉ ra những người cảm thấy giàu và nghèo thực chất có số tiền tương đương nhau, hạnh phúc/thái độ không nằm ở tiền." },
+        21: { quote: "...others may be unrealistic-their optimism is misplaced, according to the American Psychological Association.", exp: "Hiệp hội Tâm lý học Mỹ (B) chỉ ra rằng lạc quan thái quá có thể đặt sai chỗ/thiếu thực tế trong đời sống." },
+        22: { quote: "Optimism is a piece of evolutionary equipment that carried us through millennia of setbacks.", exp: "Brice Pitt (A) khẳng định sự lạc quan là một công cụ tiến hóa giúp con người vượt qua trở ngại." },
+        23: { quote: "They add that resilient people learn to hold on to their sense of humour and this can help them to keep a flexible attitude when big changes of plan are warranted.", exp: "Annual Review of Clinical Psychology (E) nêu bật việc giữ thái độ linh hoạt giúp xử lý các thay đổi/khẩn cấp một cách tích cực." },
+        24: { quote: "It has been known that optimistic has something to do with the long life...", exp: "Mối liên hệ giữa sự lạc quan và sống lâu (longevity) đã được biết đến. => YES" },
+        25: { quote: "", exp: "Bài đọc có nhắc người lạc quan thành công hơn, ít stress hơn, nhưng KHÔNG hề so sánh về mối quan hệ cá nhân (personal relationship). => NOT GIVEN" },
+        26: { quote: "If you are handicapped by having had a happy childhood, then practising proactive optimism can help you...", exp: "Câu hỏi: Có tuổi thơ hạnh phúc thì KHÔNG cần thực hành lạc quan. Bài đọc: Tuổi thơ hạnh phúc gây bất lợi, nên CẦN phải thực hành lạc quan chủ động. Tức là nói ngược lại. => NO" },
+        27: { quote: "Research among tycoons and business leaders shows that the path to success is often littered with failure...", exp: "Trải qua khó khăn giúp rèn luyện bản lĩnh dẫn tới thành công, đúng với những gì bài đọc nói về việc những nhà tài phiệt/nhà lãnh đạo kinh doanh vượt qua thất bại. => YES" },
+        28: { quote: "Research into the idea that flat floors could be detrimental to our health was pioneered back in the late 1960s... Brantingham and Beekman...", exp: "Câu hỏi tóm tắt đúng việc họ là những người tiên phong nghiên cứu sự liên hệ giữa bệnh lý và bề mặt đường đi (sàn nhà phẳng). => TRUE" },
+        29: { quote: "After 16 weeks, these people showed marked improvements in balance and mobility, and even a significant reduction in blood pressure.", exp: "Nghiên cứu của Fisher cho thấy những người đi trên thảm sỏi CẢI THIỆN sức khỏe (improvements), không phải tồi tệ đi (worsening). => FALSE" },
+        30: { quote: "Production is now being scaled up. Even so, demand could exceed supply...", exp: "Việc sản xuất thảm Fisher đang được mở rộng vì nhu cầu có thể vượt quá cung (boom do high demand). => TRUE" },
+        31: { quote: "", exp: "Có nhắc tới Barbara và Kevin Kunz tạo lối đi tự chế, nhưng KHÔNG HỀ nói họ lấy cảm hứng từ một chuyến đi nước ngoài (oversea trip). Chỉ có Fisher mới lấy ý tưởng từ Trung Quốc. => NOT GIVEN" },
+        32: { quote: "", exp: "Benno Nigg ca ngợi giày MBT, nhưng KHÔNG ĐỀ CẬP tới bất kỳ giới hạn độ tuổi (age limitation) nào cho người sử dụng. => NOT GIVEN" },
+        33: { quote: "And two-thirds of the volunteers reported feeling much less tired.", exp: "Trong thí nghiệm của Fisher ở Bắc Kinh/Thượng Hải (được thử nghiệm trên 65 công nhân), 2/3 số người (hơn một nửa) báo cáo cảm thấy đỡ mệt mỏi hơn. => C" },
+        34: { quote: "People in a control group who walked on ordinary floors also improved but not as dramatically.", exp: "Nhóm đối chứng (control group) đi trên sàn thường cũng cải thiện huyết áp, nhưng không mạnh mẽ bằng nhóm đi thảm sỏi. => B" },
+        35: { quote: "...exercising the small muscles around the ankle that are responsible for fore-aft stability.", exp: "Giày MBT giúp tập thể dục cho các cơ nhỏ quanh mắt cá chân, chịu trách nhiệm cho sự ổn định (stability) -> stabled feet. => A" },
+        36: { quote: "The anatomy of the foot parallels that of the human hand...", exp: "Cấu phẫu học của bàn chân tương đồng/song song (parallels) với bàn tay người." },
+        37: { quote: "...reducing the stress on the entire cardiovascular system.", exp: "Giảm áp lực (stress) lên hệ thống tim mạch/trái tim." },
+        38: { quote: "...and even a significant reduction in blood pressure.", exp: "Đồng nghĩa với một sự giảm đáng kể (substantial reduction) về tình trạng cao huyết áp (hypertension)." },
+        39: { quote: "...advocated walking on textured surfaces to stimulate so-called 'acupoints' on the soles of the feet.", exp: "Kích thích các điểm huyệt trên lòng bàn chân (soles)." },
+        40: { quote: "And it is not difficult to construct your own 'health pathway'.", exp: "Người đọc có thể tự xây dựng lối đi sức khỏe (health pathway) cho riêng mình." }
+    };
+
+    // --- SETUP NAV & EVENTS ---
+    window.onload = function() {
+        const footer = document.getElementById("navFooter");
+        for(let i=1; i<=40; i++) {
+            let dot = document.createElement("div");
+            dot.className = "nav-dot";
+            dot.id = "nav-"+i;
+            dot.innerText = i;
+            dot.onclick = () => scrollToQ(i);
+            footer.appendChild(dot);
+        }
+        document.getElementById('setupOverlay').style.display = 'flex'; 
+    };
+
+    function setTab(idx) {
+        document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i+1 === idx));
+        document.querySelectorAll('.passage-content').forEach((p, i) => p.classList.toggle('active', i+1 === idx));
+        document.querySelectorAll('.q-group').forEach((q, i) => q.classList.toggle('active', i+1 === idx));
+    }
+
+    function scrollToQ(id) {
+        let sec = 1;
+        if(id >= 14 && id <= 27) sec = 2;
+        if(id >= 28) sec = 3;
+        setTab(sec);
+        setTimeout(() => {
+            let el = document.getElementById("ans-" + id) || document.querySelector(`input[name="q${id}"]`);
+            if(el) {
+                let container = el.closest('.q-item') || el.closest('.q-block');
+                container.scrollIntoView({behavior: "smooth", block: "center"});
+                
+                // Highlight blink
+                let bg = container.style.backgroundColor;
+                container.style.transition = "background 0.5s";
+                container.style.backgroundColor = "var(--highlight)";
+                setTimeout(() => container.style.backgroundColor = bg, 1000);
+            }
+        }, 150);
+    }
+
+    // --- CHECK PROGRESS ---
+    function check(id) {
+        if(isSubmitted) return;
+        let val = "";
+        let el = document.getElementById("ans-" + id);
+        if(el) val = el.value;
+        else {
+            let radios = document.getElementsByName("q"+id);
+            for(let r of radios) if(r.checked) val = r.value;
+        }
+
+        let nav = document.getElementById("nav-"+id);
+        if(val && val.trim() !== "") nav.classList.add("done");
+        else nav.classList.remove("done");
+    }
+
+    // --- DRAG & DROP LOGIC ---
+    function allowDrop(ev) { if(!isSubmitted) ev.preventDefault(); }
+    function drag(ev) { 
+        if(!isSubmitted) {
+            ev.dataTransfer.setData("text", ev.target.getAttribute("data-val")); 
+            ev.dataTransfer.setData("group", ev.target.getAttribute("data-group")); 
+        }
+    }
+    
+    function drop(ev) {
+        if(isSubmitted) return;
+        ev.preventDefault();
+        let data = ev.dataTransfer.getData("text");
+        let group = ev.dataTransfer.getData("group");
+        let targetGroup = ev.target.getAttribute("data-group");
+
+        if(ev.target.tagName === "INPUT" && group === targetGroup) {
+            ev.target.value = data;
+            let id = ev.target.id.split("-")[1];
+            check(id);
+            updateDragUI(group);
+        }
+    }
+
+    function updateDragUI(groupId) {
+        const inputs = document.querySelectorAll(`input[data-group="${groupId}"]`);
+        const dragItems = document.querySelectorAll(`.drag-item[data-group="${groupId}"]`);
+        
+        let usedValues = [];
+        inputs.forEach(inp => {
+            if(inp.value.trim() !== "") usedValues.push(inp.value.trim().toUpperCase());
+        });
+
+        dragItems.forEach(item => {
+            let val = item.getAttribute("data-val").toUpperCase();
+            if(usedValues.includes(val)) {
+                item.classList.add("used");
+                item.setAttribute("draggable", "false");
+            } else {
+                item.classList.remove("used");
+                item.setAttribute("draggable", "true");
+            }
+        });
+    }
+
+    // --- HIGHLIGHT MENU LOGIC GLOBAL ---
+    const mainContainer = document.getElementById("mainContainer");
+    const menu = document.getElementById("ctxMenu");
+    const btnDel = document.getElementById("btnDelHL");
+    let savedRange = null;
+    let targetSpan = null; 
+
+    document.addEventListener("contextmenu", (e) => {
+        if (!e.target.closest('.pane')) return;
+        e.preventDefault();
+        
+        savedRange = null;
+        targetSpan = null;
+        btnDel.style.display = "none";
+        
+        const sel = window.getSelection();
+        
+        if (e.target.classList.contains('highlight')) {
+            targetSpan = e.target;
+            btnDel.style.display = "block";
+            showMenu(e.pageX, e.pageY);
+            return;
+        }
+
+        if(sel.rangeCount > 0 && sel.toString().length > 0) {
+            savedRange = sel.getRangeAt(0).cloneRange(); 
+            showMenu(e.pageX, e.pageY);
+        } else {
+            menu.style.display = "none";
+        }
+    });
+
+    function showMenu(x, y) {
+        menu.style.display = "block";
+        let mw = menu.offsetWidth;
+        let mh = menu.offsetHeight;
+        let left = x + mw > window.innerWidth ? window.innerWidth - mw - 10 : x;
+        let top = y + mh > window.innerHeight ? window.innerHeight - mh - 10 : y;
+        menu.style.left = left + "px";
+        menu.style.top = top + "px";
+    }
+
+    document.addEventListener("click", (e) => { 
+        if(!menu.contains(e.target)) menu.style.display="none"; 
+    });
+
+    function applyHighlight() {
+        if(savedRange) {
+            try {
+                let span = document.createElement("span");
+                span.className = "highlight";
+                savedRange.surroundContents(span);
+                window.getSelection().removeAllRanges(); 
+            } catch(e) {}
+        }
+        menu.style.display="none";
+    }
+
+    function deleteHighlight() {
+        if(targetSpan) {
+            let parent = targetSpan.parentNode;
+            while(targetSpan.firstChild) {
+                parent.insertBefore(targetSpan.firstChild, targetSpan);
+            }
+            parent.removeChild(targetSpan);
+            mainContainer.normalize();
+        }
+        menu.style.display="none";
+    }
+
+    // --- SUBMIT & TIMER & EXPLANATION ---
+    function submitTest(confirmSubmit) {
+        if (isSubmitted) return;
+        if (confirmSubmit && !confirm("Học sinh đã chắc chắn muốn nộp bài để xem đáp án chưa?")) return;
+        
+        isSubmitted = true;
+        clearInterval(timerInterval);
+        
+        document.querySelectorAll('input, select').forEach(el => el.disabled = true);
+        
+        let score = 0;
+        for(let i=1; i<=40; i++) {
+            let userAns = "";
+            let el = document.getElementById("ans-" + i);
+            if(el) userAns = el.value.trim().toUpperCase();
+            else {
+                let radios = document.getElementsByName("q"+i);
+                for(let r of radios) if(r.checked) userAns = r.value;
+            }
+            
+            let key = answers[i];
+            let cleanUser = userAns.replace(/[^A-Z0-9]/g, "");
+            let cleanKey = key.replace(/[^A-Z0-9]/g, "");
+            
+            let isCorrect = (cleanUser === cleanKey);
+            if(i === 36 && cleanUser === "PARALLEL") isCorrect = true; 
+            if(i === 40 && (cleanUser === "PATHWAY" || cleanUser === "WALKWAY")) isCorrect = true;
+
+            let fb = document.getElementById("fb-"+i);
+            let expContainer = document.getElementById("exp-"+i);
+
+            if(isCorrect && cleanUser !== "") {
+                score++;
+                if(fb) { fb.innerHTML = "✓ Đúng"; fb.className = "feedback correct"; }
+            } else {
+                if(fb) { fb.innerHTML = `✗ Sai (Đáp án: <span class="text-highlight-answer">${key}</span>)`; fb.className = "feedback wrong"; }
+            }
+
+            // Gắn giải thích chi tiết
+            if(expContainer && explanations[i]) {
+                let expData = explanations[i];
+                let quoteHtml = expData.quote ? `<div class="exp-quote">"${expData.quote}"</div>` : '';
+                let vocabHtml = expData.vocab ? `<div class="exp-vocab">${expData.vocab}</div>` : '';
+                
+                expContainer.innerHTML = `
+                    <div class="exp-box show">
+                        <div class="exp-title">💡 Giải thích chi tiết Câu ${i}</div>
+                        ${quoteHtml}
+                        <div class="exp-text">${expData.exp}</div>
+                        ${vocabHtml}
+                    </div>
+                `;
+            }
+
+            let nav = document.getElementById("nav-"+i);
+            nav.style.background = isCorrect ? "#c8e6c9" : "#ffcdd2";
+            nav.style.color = isCorrect ? "#2e7d32" : "#c62828";
+            nav.style.border = isCorrect ? "2px solid #81c784" : "2px solid #ef9a9a";
+        }
+        
+        setTimeout(() => {
+            alert(`🎉 CHÚC MỪNG HỌC SINH ĐÃ HOÀN THÀNH!\n\nSố câu đúng: ${score}/40\nBand Score ước tính: ${getBand(score)}\n\nHãy kéo xuống phần bài làm để xem giải thích chi tiết (từ vựng & dịch nghĩa) cho từng câu nhé!`);
+        }, 500);
+    }
+
+    function getBand(s) {
+        if(s>=39) return "9.0"; if(s>=37) return "8.5"; if(s>=35) return "8.0";
+        if(s>=33) return "7.5"; if(s>=30) return "7.0"; if(s>=27) return "6.5";
+        if(s>=23) return "6.0"; if(s>=19) return "5.5"; if(s>=15) return "5.0";
+        return "< 5.0";
+    }
+
+    function startTimer() {
+        let display = document.getElementById("timer");
+        timerInterval = setInterval(() => {
+            let m = Math.floor(testDuration / 60);
+            let s = testDuration % 60;
+            display.textContent = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+            if (--testDuration < 0) { 
+                clearInterval(timerInterval); 
+                submitTest(false); 
+            }
+        }, 1000);
+    }
+</script>
+
+</body>
+</html>
