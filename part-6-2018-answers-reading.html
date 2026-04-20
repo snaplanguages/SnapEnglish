@@ -12,7 +12,7 @@
             --pastel-purple: #e1bee7;
             --pastel-orange: #ffe0b2;
             --text-dark: #4a4a4a;
-            --primary: #9fa8da; /* Soft indigo/purple for buttons */
+            --primary: #9fa8da; 
             --bg-gradient: linear-gradient(135deg, #f3e5f5 0%, #e8f5e9 50%, #fff3e0 100%);
         }
 
@@ -38,24 +38,20 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
-        /* Glassmorphism Section */
-        .passage-section {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
+        /* Wrapper cho mỗi đoạn văn */
+        .passage-wrapper {
+            margin-bottom: 60px;
+            background: rgba(255, 255, 255, 0.4);
             border-radius: 24px;
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-            margin-bottom: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
             overflow: hidden;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
         .section-title {
-            grid-column: span 2;
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.6);
             padding: 15px 30px;
             font-weight: 700;
             font-size: 1.2rem;
@@ -63,29 +59,71 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.8);
         }
 
-        /* Cột trái (Bài đọc) & Cột phải (Giải thích) */
-        .left-col {
-            padding: 30px;
-            border-right: 1px solid rgba(255,255,255,0.6);
-            background: rgba(255,255,255,0.4);
-            position: relative;
+        /* Layout 2 cột có thanh trượt */
+        .passage-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 70vh; /* Cố định chiều cao để tạo thanh trượt */
+            min-height: 550px;
         }
-        
-        .passage-content {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            position: sticky;
-            top: 30px;
+
+        .left-col, .right-col {
+            padding: 30px;
+            overflow-y: auto; /* Kích hoạt cuộn dọc */
+        }
+
+        .left-col {
+            border-right: 1px solid rgba(255,255,255,0.6);
+            background: rgba(255,255,255,0.3);
         }
 
         .right-col {
-            padding: 30px;
-            background: rgba(255,255,255,0.7);
+            background: rgba(255,255,255,0.6);
         }
 
-        /* Khối giải thích */
+        /* Tùy chỉnh thanh trượt (Scrollbar) */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { 
+            background: rgba(159, 168, 218, 0.6); 
+            border-radius: 10px; 
+        }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(92, 107, 192, 0.8); }
+
+        /* Bài đọc & Câu hỏi */
+        .passage-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            background: rgba(255,255,255,0.8);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.9);
+        }
+
+        .question-block {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .question-block b { color: #3949ab; font-size: 1.1rem; }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0 0 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 1rem;
+        }
+
+        /* Khối giải thích bên phải */
         .exp-box {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 16px;
             padding: 20px;
             margin-bottom: 25px;
@@ -94,9 +132,7 @@
             transition: 0.3s;
         }
         
-        .exp-box:hover {
-            transform: translateY(-2px);
-        }
+        .exp-box:hover { transform: translateY(-2px); }
 
         .q-number {
             display: inline-block;
@@ -110,7 +146,7 @@
         }
 
         .ans-text {
-            color: #2e7d32; /* Xanh lá đậm */
+            color: #2e7d32;
             font-weight: bold;
             font-size: 1.15rem;
             display: inline-block;
@@ -155,15 +191,6 @@
             position: relative;
         }
 
-        .tips-block {
-            background: rgba(255,255,255,0.7);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-top: 40px;
-            border: 1px dashed #9fa8da;
-        }
-
         .btn-next {
             display: block;
             width: fit-content;
@@ -183,9 +210,9 @@
         }
 
         @media (max-width: 900px) {
-            .passage-section { grid-template-columns: 1fr; }
-            .left-col { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.6); }
-            .passage-content { position: relative; top: 0; }
+            .passage-grid { grid-template-columns: 1fr; height: auto; display: block; }
+            .left-col, .right-col { overflow-y: visible; }
+            .left-col { border-right: none; border-bottom: 2px dashed rgba(159, 168, 218, 0.5); }
         }
     </style>
 </head>
@@ -194,129 +221,289 @@
 <div class="container">
     <h1 class="header-title">Giải Thích Chi Tiết - SnapEnglish</h1>
 
-    <div class="passage-section">
+    <div class="passage-wrapper">
         <div class="section-title">Đoạn 1: Câu 31 - 34</div>
-        <div class="left-col">
-            <div class="passage-content">
-                Cecil Munrow, founder and president of Munrow's, Liverpool's largest <span id="clue-32" class="hl-orange">retail clothier</span>, announced that he <b>(31) ____________</b> £4,000 to the city's new community center. The funds derive from the sale of tickets to a party held last night at his company's <b>(32) __________</b>. Mr. Munrow <span id="clue-31" class="hl-green">will present a check</span> to the center tomorrow at its opening ceremony.<br><br>
-                <span id="clue-33" class="hl-purple">Over the past twenty years</span>, Mr. Munrow <span id="clue-33b" class="hl-purple">has organized</span> several <span id="clue-34" class="hl-orange">fund-raising events</span> for charitable institutions and community services <b>(34) _____________</b>.
+        <div class="passage-grid">
+            <div class="left-col">
+                <div class="passage-content">
+                    Cecil Munrow, founder and president of Munrow's, Liverpool's largest <span id="clue-32" class="hl-orange">retail clothier</span>, announced that he <b>(31) ____________</b> £4,000 to the city's new community center. The funds derive from the sale of tickets to a party held last night at his company's <b>(32) __________</b>. Mr. Munrow <span id="clue-31" class="hl-green">will present a check</span> to the center tomorrow at its opening ceremony.<br><br>
+                    <span id="clue-33" class="hl-purple">Over the past twenty years</span>, Mr. Munrow <span id="clue-33b" class="hl-purple">has organized</span> several <span id="clue-34" class="hl-orange">fund-raising events</span> for charitable institutions and community services <b>(34) _____________</b>.
+                </div>
+                
+                <div class="question-block">
+                    <b>31.</b>
+                    <ul class="options-list">
+                        <li>(A) will donate</li>
+                        <li>(B) donated</li>
+                        <li>(C) might donate</li>
+                        <li>(D) donating</li>
+                    </ul>
+                </div>
+                <div class="question-block">
+                    <b>32.</b>
+                    <ul class="options-list">
+                        <li>(A) museum</li>
+                        <li>(B) hotel</li>
+                        <li>(C) factory</li>
+                        <li>(D) store</li>
+                    </ul>
+                </div>
+                <div class="question-block">
+                    <b>33.</b>
+                    <ul class="options-list">
+                        <li>(A) Despite</li>
+                        <li>(B) Over</li>
+                        <li>(C) Between</li>
+                        <li>(D) Beneath</li>
+                    </ul>
+                </div>
+                <div class="question-block">
+                    <b>34.</b>
+                    <ul class="options-list">
+                        <li style="grid-column: span 2;">(A) The opening ceremony will begin at 10:00 A.M.</li>
+                        <li style="grid-column: span 2;">(B) The community center offers classes for adults...</li>
+                        <li style="grid-column: span 2;">(C) Last night’s event was the most successful thus far.</li>
+                        <li style="grid-column: span 2;">(D) Mr.Munrow plans to open a new location...</li>
+                    </ul>
+                </div>
             </div>
-        </div>
-        <div class="right-col">
-            <div class="exp-box">
-                <button class="btn-locate" onclick="flashElement('clue-31')">📍 Vị trí</button>
-                <div class="q-number">Câu 31</div><div class="ans-text">(A) will donate</div>
-                <p><b>Giải thích:</b> Cần động từ chính phù hợp chủ ngữ “he”. Hành động quyên góp (donate) mới chỉ được thông báo chứ chưa xảy ra. Câu sau có manh mối <i>“Mr. Munrow will present a check…”</i> (sẽ trao séc vào ngày mai) => Dùng Tương lai đơn.</p>
-            </div>
-            <div class="exp-box">
-                <button class="btn-locate" onclick="flashElement('clue-32')">📍 Vị trí</button>
-                <div class="q-number">Câu 32</div><div class="ans-text">(D) store</div>
-                <p><b>Giải thích:</b> Công ty được nhắc đến là "retail clothier" (công ty bán lẻ quần áo). Địa điểm tổ chức tiệc thuộc sở hữu của một công ty bán lẻ thì hợp lý nhất là <b>store</b> (cửa hàng). Museum, hotel hay factory không phải là cơ sở kinh doanh cốt lõi của họ.</p>
-            </div>
-            <div class="exp-box">
-                <button class="btn-locate" onclick="flashElement('clue-33')">📍 Vị trí</button>
-                <div class="q-number">Câu 33</div><div class="ans-text">(B) Over</div>
-                <p><b>Giải thích:</b> Mệnh đề chính sử dụng thì Hiện tại hoàn thành (has organized). Cụm từ <i>"Over the past/last + thời gian"</i> (Trong suốt... qua) là dấu hiệu kinh điển cho thấy hành động kéo dài liên tục từ quá khứ đến hiện tại.</p>
-            </div>
-            <div class="exp-box">
-                <button class="btn-locate" onclick="flashElement('clue-34')">📍 Vị trí</button>
-                <div class="q-number">Câu 34</div><div class="ans-text">(C) Last night’s event was the most successful thus far.</div>
-                <p><b>Giải thích:</b> Câu này nối tiếp logic hoàn hảo. Mạch văn đang liệt kê lịch sử 20 năm làm từ thiện (fund-raising events), câu này tổng kết lại bằng cách khẳng định sự kiện tối qua (vừa được nhắc ở đầu bài) là thành công nhất cho tới nay.</p>
+            
+            <div class="right-col">
+                <div class="exp-box">
+                    <button class="btn-locate" onclick="flashElement('clue-31')">📍 Vị trí</button>
+                    <div class="q-number">Câu 31</div><div class="ans-text">(A) will donate</div>
+                    <p><b>Giải thích:</b><span style="display:none;">[cite: 3, 7, 8, 9, 10]</span> Cần động từ chính phù hợp chủ ngữ “he”. Hành động quyên góp (donate) mới chỉ được thông báo chứ chưa xảy ra. Câu sau có manh mối <i>“Mr. Munrow will present a check…”</i> (sẽ trao séc vào ngày mai) => Dùng Tương lai đơn.</p>
+                </div>
+                <div class="exp-box">
+                    <button class="btn-locate" onclick="flashElement('clue-32')">📍 Vị trí</button>
+                    <div class="q-number">Câu 32</div><div class="ans-text">(D) store</div>
+                    <p><b>Giải thích:</b><span style="display:none;">[cite: 13, 14, 15, 16, 17, 18]</span> Công ty được nhắc đến là "retail clothier" (công ty bán lẻ quần áo). Địa điểm tổ chức tiệc thuộc sở hữu của một công ty bán lẻ thì hợp lý nhất là <b>store</b> (cửa hàng). Museum, hotel hay factory không phải là cơ sở kinh doanh cốt lõi của họ.</p>
+                </div>
+                <div class="exp-box">
+                    <button class="btn-locate" onclick="flashElement('clue-33')">📍 Vị trí</button>
+                    <div class="q-number">Câu 33</div><div class="ans-text">(B) Over</div>
+                    <p><b>Giải thích:</b><span style="display:none;">[cite: 21, 24, 25, 26]</span> Mệnh đề chính sử dụng thì Hiện tại hoàn thành (has organized). Cụm từ <i>"Over the past/last + thời gian"</i> (Trong suốt... qua) là dấu hiệu kinh điển cho thấy hành động kéo dài liên tục từ quá khứ đến hiện tại.</p>
+                </div>
+                <div class="exp-box">
+                    <button class="btn-locate" onclick="flashElement('clue-34')">📍 Vị trí</button>
+                    <div class="q-number">Câu 34</div><div class="ans-text">(C) Last night’s event was the most successful thus far.</div>
+                    <p><b>Giải thích:</b><span style="display:none;">[cite: 34, 35, 36]</span> Câu này nối tiếp logic hoàn hảo. Mạch văn đang liệt kê lịch sử 20 năm làm từ thiện (fund-raising events), câu này tổng kết lại bằng cách khẳng định sự kiện tối qua (vừa được nhắc ở đầu bài) là thành công nhất cho tới nay.</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="passage-section">
+    <div class="passage-wrapper">
         <div class="section-title">Đoạn 2: Câu 35 - 38</div>
-        <div class="left-col">
-            <div class="passage-content">
-                On February 3 WXO Radio will celebrate its fiftieth anniversary. That’s half a century of stimulating <b>(35) _________</b>. <span id="clue-36" class="hl-purple">Over the years</span>, we <b>(36) _______</b> our listeners <span id="clue-35" class="hl-orange">breaking news, thought-provoking stories, and popular music</span> from around the world. Now we invite you to celebrate with us... <span id="clue-37" class="hl-green">Take a tour</span> and see some of the behind-the-scenes magic. <span id="clue-37b" class="hl-green">Watch a demonstration</span> of our digital audio equipment. <b>(37) _________</b>. The open house is free, but registration is required. We hope you can join us for this <b>(38) ________</b> <span id="clue-38" class="hl-purple">occasion</span>.
+        <div class="passage-grid">
+            <div class="left-col">
+                <div class="passage-content">
+                    On February 3 WXO Radio will celebrate its fiftieth anniversary. That’s half a century of stimulating <b>(35) _________</b>. <span id="clue-36" class="hl-purple">Over the years</span>, we <b>(36) _______</b> our listeners <span id="clue-35" class="hl-orange">breaking news, thought-provoking stories, and popular music</span> from around the world. Now we invite you to celebrate with us... <span id="clue-37" class="hl-green">Take a tour</span> and see some of the behind-the-scenes magic. <span id="clue-37b" class="hl-green">Watch a demonstration</span> of our digital audio equipment. <b>(37) _________</b>. The open house is free, but registration is required. We hope you can join us for this <b>(38) ________</b> <span id="clue-38" class="hl-purple">occasion</span>.
+                </div>
+                
+                <div class="question-block">
+                    <b>35.</b>
+                    <ul class="options-list">
+                        <li>(A) concerts</li>
+                        <li>(B) discussions</li>
+                        <li>(C) programming</li>
+                        <li>(D) development</li>
+                    </ul>
+                </div>
+                <div class="question-block">
+                    <b>36.</b>
+                    <ul class="options-list">
+                        <li>(A) offers</li>
+                        <li>(B) offering</li>
+                        <li>(C) will offer</li>
+                        <li>(D) have offered</li>
+                    </ul>
+                </div>
+                <div class="question-block">
+                    <b>37.</b>
+                    <ul class="options-list">
+                        <li style="grid-column: span 2;">(A) We plan to merge with another local radio...</li>
+                        <li style="grid-column: span 2;">(B) You can even meet some of your favorite broadcasters.</li>
+                        <li style="grid-column: span 2;">(C) This is the first event in our February schedule.</li>
+                        <li style="grid-column: span 2;">(D) This station continues to be a vital part...</li>
+                    </ul>
+                </div>
+                <div class="question-block">
+                    <b>38.</b>
+                    <ul class="options-list">
+                        <li>(A) special</li>
+                        <li>(B) specialize</li>
+                        <li>(C) especially</li>
+                        <li>(D) specialization</li>
+                    </ul>
+                </div>
             </div>
-        </div>
-        <div class="right-col">
-            <div class="exp-box">
-                <button class="btn-locate" onclick="flashElement('clue-35')">📍 Vị trí</button>
-                <div class="q-number">Câu 35</div><div class="ans-text">(C) programming</div>
-                <p><b>Giải thích:</b> Danh từ "programming" (chương trình) là thuật ngữ bao quát nhất để chỉ tổng thể các nội dung phát sóng của đài, bao gồm tất cả các yếu tố liệt kê phía sau: news, stories, và music.</p>
-            </div>
-            <div class="exp-box">
-                <button class="btn-locate" onclick="flashElement('clue-36')">📍 Vị trí</button>
-                <div class="q-number">Câu 36</div><div class="ans-text">(D) have offered</div>
-                <p><b>Giải thích:</b> Dấu hiệu <i>“over the years”</i> (qua nhiều năm) cho thấy hành động cung cấp nội dung đã xảy ra trong quá khứ và tiếp tục ở hiện tại. => Thì Hiện tại hoàn thành.</p>
-            </div>
-            <div class="exp-box">
-                <button class="btn-locate" onclick="flashElement('clue-37')">📍 Vị trí</button>
-                <div class="q-number">Câu 37</div><div class="ans-text">(B) You can even meet some of your favorite broadcasters.</div>
-                <p><b>Giải thích:</b> Các câu đứng trước (Take a tour, watch a demonstration) đang liệt kê các trải nghiệm tại sự kiện Open House. Việc "gặp gỡ phát thanh viên" là một hoạt động tiếp nối cực kỳ logic để tạo động lực tham gia.</p>
-            </div>
-            <div class="exp-box">
-                <button class="btn-locate" onclick="flashElement('clue-38')">📍 Vị trí</button>
-                <div class="q-number">Câu 38</div><div class="ans-text">(A) special</div>
-                <p><b>Giải thích:</b> Áp dụng cấu trúc <b>Adj + Noun</b>. Phía sau chỗ trống là danh từ "occasion", nên ta cần tính từ "special" để tạo thành cụm "special occasion" (dịp đặc biệt). Các đáp án khác sai loại từ.</p>
+            
+            <div class="right-col">
+                <div class="exp-box">
+                    <button class="btn-locate" onclick="flashElement('clue-35')">📍 Vị trí</button>
+                    <div class="q-number">Câu 35</div><div class="ans-text">(C) programming</div>
+                    <p><b>Giải thích:</b><span style="display:none;">[cite: 44, 48, 49]</span> Danh từ "programming" (chương trình) là thuật ngữ bao quát nhất để chỉ tổng thể các nội dung phát sóng của đài, bao gồm tất cả các yếu tố liệt kê phía sau: news, stories, và music.</p>
+                </div>
+                <div class="exp-box">
+                    <button class="btn-locate" onclick="flashElement('clue-36')">📍 Vị trí</button>
+                    <div class="q-number">Câu 36</div><div class="ans-text">(D) have offered</div>
+                    <p><b>Giải thích:</b><span style="display:none;">[cite: 54, 55, 56, 57]</span> Dấu hiệu <i>“over the years”</i> (qua nhiều năm) cho thấy hành động cung cấp nội dung đã xảy ra trong quá khứ và tiếp tục ở hiện tại. => Thì Hiện tại hoàn thành.</p>
+                </div>
+                <div class="exp-box">
+                    <button class="btn-locate" onclick="flashElement('clue-37')">📍 Vị trí</button>
+                    <div class="q-number">Câu 37</div><div class="ans-text">(B) You can even meet some of your favorite broadcasters.</div>
+                    <p><b>Giải thích:</b><span style="display:none;">[cite: 64, 65, 66, 78]</span> Các câu đứng trước (Take a tour, watch a demonstration) đang liệt kê các trải nghiệm tại sự kiện Open House. Việc "gặp gỡ phát thanh viên" là một hoạt động tiếp nối cực kỳ logic để tạo động lực tham gia.</p>
+                </div>
+                <div class="exp-box">
+                    <button class="btn-locate" onclick="flashElement('clue-38')">📍 Vị trí</button>
+                    <div class="q-number">Câu 38</div><div class="ans-text">(A) special</div>
+                    <p><b>Giải thích:</b><span style="display:none;">[cite: 80, 84, 85]</span> Áp dụng cấu trúc <b>Adj + Noun</b>. Phía sau chỗ trống là danh từ "occasion", nên ta cần tính từ "special" để tạo thành cụm "special occasion" (dịp đặc biệt). Các đáp án khác sai loại từ.</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="passage-section">
+    <div class="passage-wrapper">
         <div class="section-title">Đoạn 3: Câu 39 - 42</div>
-        <div class="left-col">
-            <div class="passage-content">
-                June 8-Today the Bratton City Council <span id="clue-39" class="hl-green">approved an agreement</span> with KGRM Enterprises. Under the agreement, KGRM <b>(39) _____</b> the 22-acre lot on Mueller Street... Bratton's mayor, Keith Wercler, says he welcomes the <b>(40) __________</b> opportunities this project will bring... "We expect the project to <span id="clue-40" class="hl-orange">create 700 permanent full-time jobs</span>," he said. "I am glad it was finally approved after so many <span id="clue-41" class="hl-purple">postponements</span>."<br><br>
-                <b>(41) _________</b>. KGRM spokesperson Katie Cornyn <span id="clue-42" class="hl-green">expects the project will take five years</span> to complete, yet cautions that <span id="clue-41b" class="hl-purple">setbacks</span> may still occur. "We've provided the council our best <b>(42) ________</b>, but it's not possible to <span id="clue-42b" class="hl-green">foresee all issues</span> that may arise," Cornyn said.
+        <div class="passage-grid">
+            <div class="left-col">
+                <div class="passage-content">
+                    June 8-Today the Bratton City Council <span id="clue-39" class="hl-green">approved an agreement</span> with KGRM Enterprises. Under the agreement, KGRM <b>(39) _____</b> the 22-acre lot on Mueller Street... Bratton's mayor, Keith Wercler, says he welcomes the <b>(40) __________</b> opportunities this project will bring... "We expect the project to <span id="clue-40" class="hl-orange">create 700 permanent full-time jobs</span>," he said. "I am glad it was finally approved after so many <span id="clue-41" class="hl-purple">postponements</span>."<br><br>
+                    <b>(41) _________</b>. KGRM spokesperson Katie Cornyn <span id="clue-42" class="hl-green">expects the project will take five years</span> to complete, yet cautions that <span id="clue-41b" class="hl-purple">setbacks</span> may still occur. "We've provided the council our best <b>(42) ________</b>, but it's not possible to <span id="clue-42b" class="hl-green">foresee all issues</span> that may arise," Cornyn said.
+                </div>
+                
+                <div class="question-block">
+                    <b>39.</b>
+                    <ul class="options-list">
+                        <li>(A) to develop</li>
+                        <li>(B) will develop</li>
+                        <li>(C) has developed</li>
+                        <li>(D) could have developed</li>
+                    </ul>
+                </div>
+                <div class="question-block">
+                    <b>40.</b>
+                    <ul class="options-list">
+                        <li>(A) economic</li>
+                        <li>(B) unforeseen</li>
+                        <li>(C) volunteer</li>
+                        <li>(D) frequent</li>
+                    </ul>
+                </div>
+                <div class="question-block">
+                    <b>41.</b>
+                    <ul class="options-list">
+                        <li style="grid-column: span 2;">(A) While the city is anxious for work to get underway, delays are typical...</li>
+                        <li style="grid-column: span 2;">(B) Nearby tenants, however, have raised some valid concerns...</li>
+                        <li style="grid-column: span 2;">(C) Despite city officials' promises... they now may have to reconsider.</li>
+                        <li style="grid-column: span 2;">(D) Council members will vote on three different proposals...</li>
+                    </ul>
+                </div>
+                <div class="question-block">
+                    <b>42.</b>
+                    <ul class="options-list">
+                        <li>(A) argument</li>
+                        <li>(B) background</li>
+                        <li>(C) estimate</li>
+                        <li>(D) combination</li>
+                    </ul>
+                </div>
             </div>
-        </div>
-        <div class="right-col">
-            <div class="exp-box">
-                <button class="btn-locate" onclick="flashElement('clue-39')">📍 Vị trí</button>
-                <div class="q-number">Câu 39</div><div class="ans-text">(B) will develop</div>
-                <p><b>Giải thích:</b> Thỏa thuận vừa được "approved" (phê duyệt) ngày hôm nay, nên thông qua sự đồng thuận này, hành động phát triển lô đất sẽ là kết quả xảy ra trong tương lai. => Tương lai đơn.</p>
-            </div>
-            <div class="exp-box">
-                <button class="btn-locate" onclick="flashElement('clue-40')">📍 Vị trí</button>
-                <div class="q-number">Câu 40</div><div class="ans-text">(A) economic</div>
-                <p><b>Giải thích:</b> Dự án dự kiến tạo ra "700 full-time jobs" (700 việc làm toàn thời gian). Đây chính xác là một tác động và cơ hội về mặt kinh tế (economic).</p>
-            </div>
-            <div class="exp-box">
-                <button class="btn-locate" onclick="flashElement('clue-41')">📍 Vị trí</button>
-                <div class="q-number">Câu 41</div><div class="ans-text">(A) While the city is anxious for work to get underway, delays are typical...</div>
-                <p><b>Giải thích:</b> Câu này tạo cầu nối logic tuyệt vời giữa câu trước (thị trưởng nhắc đến sự trì hoãn - postponements) và câu sau (người phát ngôn cảnh báo về những trở ngại - setbacks).</p>
-            </div>
-            <div class="exp-box">
-                <button class="btn-locate" onclick="flashElement('clue-42')">📍 Vị trí</button>
-                <div class="q-number">Câu 42</div><div class="ans-text">(C) estimate</div>
-                <p><b>Giải thích:</b> "Estimate" (sự ước tính) cực kỳ phù hợp khi người phát ngôn đang nói về việc đưa ra số liệu dự kiến (take 5 years) cho hội đồng, nhưng không thể lường trước mọi vấn đề phát sinh.</p>
+            
+            <div class="right-col">
+                <div class="exp-box">
+                    <button class="btn-locate" onclick="flashElement('clue-39')">📍 Vị trí</button>
+                    <div class="q-number">Câu 39</div><div class="ans-text">(B) will develop</div>
+                    <p><b>Giải thích:</b><span style="display:none;">[cite: 90, 93, 94]</span> Thỏa thuận vừa được "approved" (phê duyệt) ngày hôm nay, nên thông qua sự đồng thuận này, hành động phát triển lô đất sẽ là kết quả xảy ra trong tương lai. => Tương lai đơn.</p>
+                </div>
+                <div class="exp-box">
+                    <button class="btn-locate" onclick="flashElement('clue-40')">📍 Vị trí</button>
+                    <div class="q-number">Câu 40</div><div class="ans-text">(A) economic</div>
+                    <p><b>Giải thích:</b><span style="display:none;">[cite: 96, 100, 101]</span> Dự án dự kiến tạo ra "700 full-time jobs" (700 việc làm toàn thời gian). Đây chính xác là một tác động và cơ hội về mặt kinh tế (economic).</p>
+                </div>
+                <div class="exp-box">
+                    <button class="btn-locate" onclick="flashElement('clue-41')">📍 Vị trí</button>
+                    <div class="q-number">Câu 41</div><div class="ans-text">(A) While the city is anxious...</div>
+                    <p><b>Giải thích:</b><span style="display:none;">[cite: 103, 104, 105]</span> Câu này tạo cầu nối logic tuyệt vời giữa câu trước (thị trưởng nhắc đến sự trì hoãn - postponements) và câu sau (người phát ngôn cảnh báo về những trở ngại - setbacks).</p>
+                </div>
+                <div class="exp-box">
+                    <button class="btn-locate" onclick="flashElement('clue-42')">📍 Vị trí</button>
+                    <div class="q-number">Câu 42</div><div class="ans-text">(C) estimate</div>
+                    <p><b>Giải thích:</b><span style="display:none;">[cite: 120]</span> "Estimate" (sự ước tính) cực kỳ phù hợp khi người phát ngôn đang nói về việc đưa ra số liệu dự kiến (take 5 years) cho hội đồng, nhưng không thể lường trước mọi vấn đề phát sinh.</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="passage-section">
+    <div class="passage-wrapper">
         <div class="section-title">Đoạn 4: Câu 43 - 46</div>
-        <div class="left-col">
-            <div class="passage-content">
-                Thank you for <span id="clue-43" class="hl-orange">subscribing</span> to Art Today! <b>(43) _______</b> you <span id="clue-43b" class="hl-orange">will be among the first</span> to know about exciting art exhibits... <span id="clue-44" class="hl-green">Your first issue will arrive within the next few days</span>, and then each issue will be sent at the beginning of the month. <b>(44) ______</b>.<br><br>
-                Your subscription also allows you <span id="clue-45" class="hl-purple">unlimited</span> <b>(45) _______</b> to articles, videos, and other multimedia on our Web site. All you need to do is log in using your subscriber number and password, which you will find <b>(46) ____</b> the <span id="clue-46" class="hl-orange">enclosed enrollment form</span>.
+        <div class="passage-grid">
+            <div class="left-col">
+                <div class="passage-content">
+                    Thank you for <span id="clue-43" class="hl-orange">subscribing</span> to Art Today! <b>(43) _______</b> you <span id="clue-43b" class="hl-orange">will be among the first</span> to know about exciting art exhibits... <span id="clue-44" class="hl-green">Your first issue will arrive within the next few days</span>, and then each issue will be sent at the beginning of the month. <b>(44) ______</b>.<br><br>
+                    Your subscription also allows you <span id="clue-45" class="hl-purple">unlimited</span> <b>(45) _______</b> to articles, videos, and other multimedia on our Web site. All you need to do is log in using your subscriber number and password, which you will find <b>(46) ____</b> the <span id="clue-46" class="hl-orange">enclosed enrollment form</span>.
+                </div>
+                
+                <div class="question-block">
+                    <b>43.</b>
+                    <ul class="options-list">
+                        <li>(A) Now</li>
+                        <li>(B) Afterward</li>
+                        <li>(C) Then</li>
+                        <li>(D) Meanwhile</li>
+                    </ul>
+                </div>
+                <div class="question-block">
+                    <b>44.</b>
+                    <ul class="options-list">
+                        <li style="grid-column: span 2;">(A) To place a subscription, call our service desk...</li>
+                        <li style="grid-column: span 2;">(B) If you do not receive your copy in a week, please contact us...</li>
+                        <li style="grid-column: span 2;">(C) Artists are invited to submit descriptions...</li>
+                        <li style="grid-column: span 2;">(D) The first concert is scheduled to take place...</li>
+                    </ul>
+                </div>
+                <div class="question-block">
+                    <b>45.</b>
+                    <ul class="options-list">
+                        <li>(A) accessing</li>
+                        <li>(B) accesses</li>
+                        <li>(C) accessed</li>
+                        <li>(D) access</li>
+                    </ul>
+                </div>
+                <div class="question-block">
+                    <b>46.</b>
+                    <ul class="options-list">
+                        <li>(A) for</li>
+                        <li>(B) about</li>
+                        <li>(C) on</li>
+                        <li>(D) at</li>
+                    </ul>
+                </div>
             </div>
-        </div>
-        <div class="right-col">
-            <div class="exp-box">
-                <button class="btn-locate" onclick="flashElement('clue-43')">📍 Vị trí</button>
-                <div class="q-number">Câu 43</div><div class="ans-text">(A) Now</div>
-                <p><b>Giải thích:</b> Thư chào mừng dùng "Now" (Bây giờ) để nhấn mạnh trạng thái tức thời và lợi ích ngay lập tức mà khách hàng nhận được ngay sau khi vừa đăng ký (subscribing).</p>
-            </div>
-            <div class="exp-box">
-                <button class="btn-locate" onclick="flashElement('clue-44')">📍 Vị trí</button>
-                <div class="q-number">Câu 44</div><div class="ans-text">(B) If you do not receive your copy in a week, please contact us...</div>
-                <p><b>Giải thích:</b> Câu ngay phía trước nói về lịch trình gửi báo ("sẽ đến trong vài ngày tới"). Câu đáp án đưa ra hướng giải quyết rủi ro ("Nếu không nhận được trong 1 tuần, hãy liên hệ") là sự tiếp nối hoàn toàn hợp lý.</p>
-            </div>
-            <div class="exp-box">
-                <button class="btn-locate" onclick="flashElement('clue-45')">📍 Vị trí</button>
-                <div class="q-number">Câu 45</div><div class="ans-text">(D) access</div>
-                <p><b>Giải thích:</b> Sau tính từ "unlimited" (không giới hạn) cần một danh từ. "Access" (quyền truy cập) là danh từ không đếm được, nên không thêm "s" hay "ed".</p>
-            </div>
-            <div class="exp-box">
-                <button class="btn-locate" onclick="flashElement('clue-46')">📍 Vị trí</button>
-                <div class="q-number">Câu 46</div><div class="ans-text">(C) on</div>
-                <p><b>Giải thích:</b> Giới từ "on" chỉ vị trí trên một bề mặt. Ở đây, thông tin (số thuê bao, mật khẩu) được in <b>trên</b> mẫu đơn đăng ký đính kèm (on the form).</p>
+            
+            <div class="right-col">
+                <div class="exp-box">
+                    <button class="btn-locate" onclick="flashElement('clue-43')">📍 Vị trí</button>
+                    <div class="q-number">Câu 43</div><div class="ans-text">(A) Now</div>
+                    <p><b>Giải thích:</b><span style="display:none;">[cite: 124, 128, 129]</span> Thư chào mừng dùng "Now" (Bây giờ) để nhấn mạnh trạng thái tức thời và lợi ích ngay lập tức mà khách hàng nhận được ngay sau khi vừa đăng ký (subscribing).</p>
+                </div>
+                <div class="exp-box">
+                    <button class="btn-locate" onclick="flashElement('clue-44')">📍 Vị trí</button>
+                    <div class="q-number">Câu 44</div><div class="ans-text">(B) If you do not receive your copy...</div>
+                    <p><b>Giải thích:</b><span style="display:none;">[cite: 134, 135]</span> Câu ngay phía trước nói về lịch trình gửi báo ("sẽ đến trong vài ngày tới"). Câu đáp án đưa ra hướng giải quyết rủi ro ("Nếu không nhận được trong 1 tuần, hãy liên hệ") là sự tiếp nối hoàn toàn hợp lý.</p>
+                </div>
+                <div class="exp-box">
+                    <button class="btn-locate" onclick="flashElement('clue-45')">📍 Vị trí</button>
+                    <div class="q-number">Câu 45</div><div class="ans-text">(D) access</div>
+                    <p><b>Giải thích:</b><span style="display:none;">[cite: 144, 145, 146]</span> Sau tính từ "unlimited" (không giới hạn) cần một danh từ. "Access" (quyền truy cập) là danh từ không đếm được, nên không thêm "s" hay "ed".</p>
+                </div>
+                <div class="exp-box">
+                    <button class="btn-locate" onclick="flashElement('clue-46')">📍 Vị trí</button>
+                    <div class="q-number">Câu 46</div><div class="ans-text">(C) on</div>
+                    <p><b>Giải thích:</b><span style="display:none;">[cite: 150]</span> Giới từ "on" chỉ vị trí trên một bề mặt. Ở đây, thông tin (số thuê bao, mật khẩu) được in <b>trên</b> mẫu đơn đăng ký đính kèm (on the form).</p>
+                </div>
             </div>
         </div>
     </div>
@@ -330,24 +517,16 @@
     function flashElement(elementId) {
         const el = document.getElementById(elementId);
         if(el) {
-            // Cuộn mượt mà đến phần tử, đặt nó ở giữa màn hình
             el.scrollIntoView({ behavior: 'smooth', block: 'center' });
             
-            // Xóa class nếu có trước đó để reset animation
             el.classList.remove('is-flashing');
-            
-            // Ép trình duyệt reflow để animation có thể chạy lại
             void el.offsetWidth; 
-            
-            // Thêm class tạo hiệu ứng nhấp nháy
             el.classList.add('is-flashing');
             
-            // Gỡ class sau khi animation hoàn tất (1.5s)
             setTimeout(() => {
                 el.classList.remove('is-flashing');
             }, 1500);
             
-            // Nếu có element phụ (như clue-33b, clue-37b), làm flash luôn
             const siblingId = elementId + 'b';
             const siblingEl = document.getElementById(siblingId);
             if(siblingEl) {
