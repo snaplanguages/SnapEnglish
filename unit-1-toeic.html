@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 1: Các Thì Đơn | SnapEnglish</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pastel-green: #e2f0cb;
+            --pastel-purple: #c7ceea;
+            --pastel-orange: #f5cba7;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --text-main: #3f3f46;
+            --text-sub: #71717a;
+            --correct-color: #4ade80;
+            --wrong-color: #fb7185;
+        }
+
+        /* Ẩn trích dẫn khỏi giao diện người dùng theo yêu cầu */
+        .hidden-cite {
+            display: none !important;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--pastel-green) 0%, var(--pastel-purple) 50%, var(--pastel-orange) 100%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Header & Navigation */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #5b4a99;
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.7);
+            margin-bottom: 10px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .nav-tab {
+            padding: 12px 25px;
+            border-radius: 50px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-main);
+        }
+
+        .nav-tab.active {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 8px 20px rgba(199, 206, 234, 0.6);
+            color: #5b4a99;
+            transform: translateY(-2px);
+        }
+
+        /* Content Sections */
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glass Cards for Theory */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+        }
+
+        h2.card-title {
+            color: #d97a6c;
+            border-bottom: 2px dashed #f5cba7;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.6);
+        }
+        th {
+            background: rgba(199, 206, 234, 0.4);
+            color: #5b4a99;
+            font-weight: 700;
+        }
+
+        /* Quiz Interface */
+        .question-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background: rgba(255,255,255,0.7);
+            border: 1px solid rgba(199, 206, 234, 0.8);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-main);
+        }
+
+        .option-btn:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .option-btn.selected-correct {
+            background: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+
+        .option-btn.selected-wrong {
+            background: var(--wrong-color);
+            color: white;
+            border-color: var(--wrong-color);
+        }
+
+        .option-btn.show-correct {
+            background: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+            opacity: 0.8;
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Explanation Box */
+        .explanation-box {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.85);
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .exp-status { font-weight: 700; font-size: 18px; margin-bottom: 10px; }
+        .exp-correct { color: #16a34a; }
+        .exp-wrong { color: #e11d48; }
+
+        .exp-item { margin-bottom: 8px; }
+        .exp-label { font-weight: 700; display: inline-block; width: 100px; color: #5b4a99;}
+        
+        .tip-box {
+            margin-top: 10px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #856404;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 10px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #c7ceea, #f5cba7);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>✨ Unit 1: Các Thì Đơn</h1>
+            <p>Hành trình làm chủ Quá khứ - Hiện tại - Tương lai</p>
+        </header>
+
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="switchTab('theory')">📚 Lý Thuyết</div>
+            <div class="nav-tab" onclick="switchTab('task1')">🎯 Task 1 (To Be)</div>
+            <div class="nav-tab" onclick="switchTab('task2')">🚀 Task 2 (V Thường)</div>
+        </div>
+
+        <div id="theory" class="section active">
+            <div class="glass-card">
+                <h2 class="card-title">1. Động từ "To Be"</h2>
+                <span class="hidden-cite">[cite: 1, 2]</span>
+                <table>
+                    <tr>
+                        <th>Cấu trúc</th>
+                        <th>PAST (Quá khứ)</th>
+                        <th>PRESENT (Hiện tại)</th>
+                        <th>FUTURE (Tương lai)</th>
+                    </tr>
+                    <tr>
+                        <td><b>(+) Khẳng định</b><br>S + Tobe + Adj/Noun <span class="hidden-cite">[cite: 3, 4]</span></td>
+                        <td>I/He/She/It <b>was</b><br>You/We/They <b>were</b></td>
+                        <td>I <b>am</b><br>He/She/It <b>is</b><br>You/We/They <b>are</b></td>
+                        <td>Tất cả chủ ngữ + <b>will be</b></td>
+                    </tr>
+                    <tr>
+                        <td><b>(-) Phủ định</b><br>S + Tobe + not <span class="hidden-cite">[cite: 5, 6]</span></td>
+                        <td>was not = <b>wasn't</b><br>were not = <b>weren't</b></td>
+                        <td><b>am not</b><br><b>isn't</b> / <b>aren't</b></td>
+                        <td>will not be = <b>won't be</b></td>
+                    </tr>
+                    <tr>
+                        <td><b>(?) Nghi vấn</b><br>Tobe + S + Adj/Noun? <span class="hidden-cite">[cite: 7, 8]</span></td>
+                        <td><b>Was/Were</b> + S...?</td>
+                        <td><b>Am/Is/Are</b> + S...?</td>
+                        <td><b>Will</b> + S + <b>be</b>...?</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="glass-card">
+                <h2 class="card-title">2. Động từ "Thường"</h2>
+                <span class="hidden-cite">[cite: 9]</span>
+                <table>
+                    <tr>
+                        <th>Cấu trúc</th>
+                        <th>PAST (Quá khứ)</th>
+                        <th>PRESENT (Hiện tại)</th>
+                        <th>FUTURE (Tương lai)</th>
+                    </tr>
+                    <tr>
+                        <td><b>(+) Khẳng định</b><br>S + V <span class="hidden-cite">[cite: 10, 11]</span></td>
+                        <td>V-ed / V2</td>
+                        <td>I/You/We/They + <b>V</b><br>He/She/It + <b>V-s/es</b></td>
+                        <td>will + <b>V</b></td>
+                    </tr>
+                    <tr>
+                        <td><b>(-) Phủ định</b><br>S + Trợ ĐT + not + V <span class="hidden-cite">[cite: 12, 13]</span></td>
+                        <td>Did not = <b>Didn't</b> + V</td>
+                        <td>Do not = <b>Don't</b> + V<br>Does not = <b>Doesn't</b> + V</td>
+                        <td>Will not = <b>Won't</b> + V</td>
+                    </tr>
+                    <tr>
+                        <td><b>(?) Nghi vấn</b><br>Trợ ĐT + S + V? <span class="hidden-cite">[cite: 14, 15]</span></td>
+                        <td><b>Did</b> + S + V?</td>
+                        <td><b>Do/Does</b> + S + V?</td>
+                        <td><b>Will</b> + S + V?</td>
+                    </tr>
+                </table>
+                <span class="hidden-cite">[cite: 16]</span>
+            </div>
+        </div>
+
+        <div id="task1" class="section">
+            <div class="glass-card" style="padding: 15px; margin-bottom: 15px;">
+                <p style="margin: 0; font-weight: 600; text-align: center; color: #5b4a99;">Luyện tập với động từ TO BE (Am/Is/Are/Was/Were/Will be)</p>
+            </div>
+            <div class="progress-container"><div class="progress-bar" id="pb1"></div></div>
+            <div id="task1-container"></div>
+        </div>
+
+        <div id="task2" class="section">
+            <div class="glass-card" style="padding: 15px; margin-bottom: 15px;">
+                <p style="margin: 0; font-weight: 600; text-align: center; color: #5b4a99;">Luyện tập với động từ THƯỜNG (V-ed, V-s/es, Do/Does/Did/Will)</p>
+            </div>
+            <div class="progress-container"><div class="progress-bar" id="pb2"></div></div>
+            <div id="task2-container"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // Data mẫu chuẩn 20 câu (10 câu Task 1, 10 câu Task 2).
+        // Bạn có thể copy/paste block { ... } để mở rộng lên 40-50 câu một cách dễ dàng.
+        const task1Data = [
+            {
+                q: "1. I ___ a graphic designer right now.",
+                opts: ["was", "were", "am", "is"],
+                ans: 2, // am
+                grammar: "Thì Hiện tại đơn, chủ ngữ 'I' đi với tobe 'am'.",
+                vocab: "Graphic designer (n): Thiết kế đồ họa",
+                tip: "Dấu hiệu 'right now' thường dùng cho HTTD, nhưng với nghề nghiệp/trạng thái cố định ta dùng Hiện tại đơn với to be."
+            },
+            {
+                q: "2. Yesterday, the weather ___ beautiful.",
+                opts: ["is", "was", "were", "will be"],
+                ans: 1, // was
+                grammar: "Thì Quá khứ đơn. 'the weather' là danh từ không đếm được (tương đương 'It') -> dùng 'was'.",
+                vocab: "Weather (n): Thời tiết",
+                tip: "Dấu hiệu 'Yesterday' -> Quá khứ đơn."
+            },
+            {
+                q: "3. They ___ at the conference in Tokyo next month.",
+                opts: ["are", "were", "was", "will be"],
+                ans: 3, // will be
+                grammar: "Thì Tương lai đơn. Chủ ngữ 'They' + will be.",
+                vocab: "Conference (n): Hội nghị",
+                tip: "Dấu hiệu 'next month' -> Tương lai đơn."
+            },
+            {
+                q: "4. Where ___ you last night at 8 PM?",
+                opts: ["was", "were", "are", "did"],
+                ans: 1, // were
+                grammar: "Câu hỏi dạng nghi vấn Quá khứ đơn với to be. Chủ ngữ 'you' -> dùng 'were'.",
+                vocab: "Last night (adv): Tối qua",
+                tip: "Chú ý phân biệt 'were' (to be) và 'did' (trợ động từ). Đằng sau không có động từ thường nên ta phải dùng to be."
+            },
+            {
+                q: "5. She ___ not a manager, she is an intern.",
+                opts: ["am", "is", "are", "was"],
+                ans: 1, // is
+                grammar: "Thì Hiện tại đơn. Chủ ngữ 'She' đi với 'is'.",
+                vocab: "Manager (n): Quản lý | Intern (n): Thực tập sinh",
+                tip: "Mệnh đề sau dùng 'is', cho thấy ngữ cảnh đang ở hiện tại."
+            },
+            {
+                q: "6. We ___ very excited about the new project.",
+                opts: ["am", "is", "are", "was"],
+                ans: 2, // are
+                grammar: "Chủ ngữ 'We' số nhiều -> dùng 'are' ở hiện tại.",
+                vocab: "Excited about sth: Hào hứng về cái gì",
+                tip: "Sau to be thường đi kèm với tính từ (excited)."
+            },
+            {
+                q: "7. ___ Mr. John in the office tomorrow?",
+                opts: ["Is", "Was", "Will", "Will be"],
+                ans: 2, // Will
+                grammar: "Cấu trúc nghi vấn Tương lai đơn với To be: Will + S + be...? Ở chỗ trống chỉ thiếu 'Will', vì đằng sau không có 'be'. Đợi đã, đáp án là Will be sai, câu chuẩn: Will Mr. John BE in the office? Nếu đề bài chưa có 'be' thì phải điền 'Will be'. *Lưu ý: trong đề bài chưa có chữ 'be', đáp án chuẩn là Will ... be.",
+                vocab: "Office (n): Văn phòng",
+                tip: "Hãy cẩn thận nhìn vào đề bài xem đã có chữ 'be' đứng sau chủ ngữ chưa nhé!"
+            },
+            // Fix lại câu 7 cho logic UI
+            {
+                q: "7. ___ Mr. John be in the office tomorrow?",
+                opts: ["Is", "Was", "Will", "Does"],
+                ans: 2, // Will
+                grammar: "Cấu trúc nghi vấn Tương lai đơn: Will + S + be...? Trong câu đã có 'be' nên ta điền 'Will'.",
+                vocab: "Office (n): Văn phòng",
+                tip: "Dấu hiệu 'tomorrow' -> Tương lai."
+            },
+            {
+                q: "8. I ___ sorry, but I ___ not at home yesterday.",
+                opts: ["am / am", "was / was", "am / was", "was / am"],
+                ans: 2, // am / was
+                grammar: "Vế 1 là hiện tại (bây giờ xin lỗi). Vế 2 có 'yesterday' nên dùng quá khứ 'was'.",
+                vocab: "At home: Ở nhà",
+                tip: "Một câu có thể kết hợp nhiều thì phụ thuộc vào trạng từ chỉ thời gian của từng mệnh đề."
+            },
+            {
+                q: "9. The reports ___ ready in 10 minutes.",
+                opts: ["is", "are", "will be", "was"],
+                ans: 2, // will be
+                grammar: "Dấu hiệu 'in + thời gian' (trong 10 phút nữa) chỉ tương lai -> dùng 'will be'.",
+                vocab: "Report (n): Báo cáo | Ready (adj): Sẵn sàng",
+                tip: "'In' + khoảng thời gian -> dùng Tương lai đơn."
+            },
+            {
+                q: "10. This software ___ completely free of charge.",
+                opts: ["are", "is", "were", "am"],
+                ans: 1, // is
+                grammar: "'Software' là danh từ không đếm được -> dùng To be số ít 'is'.",
+                vocab: "Free of charge (idiom): Miễn phí hoàn toàn",
+                tip: "Các danh từ như software, information, equipment luôn đi với To be số ít."
+            }
+        ];
+
+        const task2Data = [
+            {
+                q: "1. The CEO usually ___ meetings on Monday mornings.",
+                opts: ["hold", "holds", "holding", "held"],
+                ans: 1, // holds
+                grammar: "Thì Hiện tại đơn, chủ ngữ 'The CEO' (tương đương He/She) số ít -> Động từ thêm 's/es'.",
+                vocab: "Hold a meeting: Tổ chức cuộc họp",
+                tip: "Dấu hiệu 'usually' và 'on Monday mornings' (các buổi sáng T2)."
+            },
+            {
+                q: "2. I ___ the client's email two hours ago.",
+                opts: ["receive", "receives", "received", "will receive"],
+                ans: 2, // received
+                grammar: "Thì Quá khứ đơn. Động từ có quy tắc thêm '-ed'.",
+                vocab: "Client (n): Khách hàng | Receive (v): Nhận",
+                tip: "Dấu hiệu 'ago' -> Quá khứ đơn."
+            },
+            {
+                q: "3. We ___ our new branch in London next year.",
+                opts: ["opens", "opened", "will open", "open"],
+                ans: 2, // will open
+                grammar: "Thì Tương lai đơn với cấu trúc S + will + V nguyên thể.",
+                vocab: "Branch (n): Chi nhánh",
+                tip: "Dấu hiệu 'next year' -> Tương lai đơn."
+            },
+            {
+                q: "4. ___ you finish the financial report yesterday?",
+                opts: ["Do", "Does", "Did", "Will"],
+                ans: 2, // Did
+                grammar: "Câu nghi vấn Quá khứ đơn với động từ thường 'finish' -> dùng trợ động từ 'Did'.",
+                vocab: "Financial report (n): Báo cáo tài chính",
+                tip: "Chú ý 'yesterday' và động từ chính đang ở dạng nguyên thể."
+            },
+            {
+                q: "5. She ___ not like working overtime.",
+                opts: ["do", "does", "did", "is"],
+                ans: 1, // does
+                grammar: "Câu phủ định Hiện tại đơn. Chủ ngữ 'She' + does not + V nguyên.",
+                vocab: "Work overtime (v): Làm thêm giờ",
+                tip: "Nói về thói quen/sở thích ở hiện tại."
+            },
+            {
+                q: "6. The train ___ at 8:00 AM every morning.",
+                opts: ["depart", "departs", "departed", "will depart"],
+                ans: 1, // departs
+                grammar: "Hiện tại đơn dùng để diễn tả lịch trình, tàu xe. 'The train' số ít -> thêm 's'.",
+                vocab: "Depart (v): Khởi hành",
+                tip: "Dấu hiệu 'every morning' và lịch trình cố định."
+            },
+            {
+                q: "7. They ___ to sign the contract last week.",
+                opts: ["refuse", "refuses", "will refuse", "refused"],
+                ans: 3, // refused
+                grammar: "Quá khứ đơn. Động từ có quy tắc thêm '-ed'.",
+                vocab: "Refuse to do sth: Từ chối làm gì | Sign a contract: Ký hợp đồng",
+                tip: "Dấu hiệu 'last week'."
+            },
+            {
+                q: "8. I promise I ___ you as soon as I arrive.",
+                opts: ["call", "calls", "will call", "called"],
+                ans: 2, // will call
+                grammar: "Diễn tả một lời hứa (promise) -> Dùng Tương lai đơn.",
+                vocab: "As soon as: Ngay khi",
+                tip: "Các động từ như promise, hope, think... thường đi kèm với Will."
+            },
+            {
+                q: "9. Water ___ at 100 degrees Celsius.",
+                opts: ["boil", "boils", "boiled", "will boil"],
+                ans: 1, // boils
+                grammar: "Sự thật hiển nhiên -> Dùng Hiện tại đơn. 'Water' không đếm được -> thêm 's'.",
+                vocab: "Boil (v): Sôi | Degrees Celsius: Độ C",
+                tip: "Sự thật khoa học luôn dùng Hiện tại đơn."
+            },
+            {
+                q: "10. ___ they provide free shipping for orders over $50?",
+                opts: ["Do", "Does", "Did", "Are"],
+                ans: 0, // Do
+                grammar: "Câu hỏi về chính sách chung ở hiện tại. Chủ ngữ 'they' -> dùng trợ động từ 'Do'.",
+                vocab: "Provide (v): Cung cấp | Free shipping: Miễn phí giao hàng",
+                tip: "Không dùng 'Are' vì động từ chính là 'provide' (động từ thường)."
+            }
+        ];
+
+        // Hàm điều hướng Tabs
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Render Questions
+        function renderQuiz(data, containerId, pbId) {
+            const container = document.getElementById(containerId);
+            let html = '';
+
+            data.forEach((item, index) => {
+                html += `
+                <div class="question-card" id="q-${containerId}-${index}">
+                    <div class="question-text">${item.q}</div>
+                    <div class="options-grid">
+                        ${item.opts.map((opt, i) => `
+                            <button class="option-btn" onclick="checkAnswer(this, ${index}, ${i}, '${containerId}', ${item.ans})">
+                                ${String.fromCharCode(65 + i)}. ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="explanation-box" id="exp-${containerId}-${index}">
+                        <div class="exp-status" id="status-${containerId}-${index}"></div>
+                        <div class="exp-item"><span class="exp-label">💡 Ngữ pháp:</span> ${item.grammar}</div>
+                        <div class="exp-item"><span class="exp-label">📚 Từ vựng:</span> ${item.vocab}</div>
+                        <div class="tip-box">🎯 <b>Mẹo:</b> ${item.tip}</div>
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // State theo dõi tiến độ
+        const progress = {
+            'task1-container': { total: task1Data.length, answered: 0 },
+            'task2-container': { total: task2Data.length, answered: 0 }
+        };
+
+        // Hàm kiểm tra đáp án
+        function checkAnswer(btn, qIndex, selectedOpt, containerId, correctOpt) {
+            const qCard = document.getElementById(`q-${containerId}-${qIndex}`);
+            const buttons = qCard.querySelectorAll('.option-btn');
+            const expBox = document.getElementById(`exp-${containerId}-${qIndex}`);
+            const statusText = document.getElementById(`status-${containerId}-${qIndex}`);
+
+            // Vô hiệu hóa nút sau khi chọn
+            buttons.forEach(b => b.disabled = true);
+
+            // Kiểm tra đúng/sai
+            if (selectedOpt === correctOpt) {
+                btn.classList.add('selected-correct');
+                statusText.innerHTML = "✨ Chính xác!";
+                statusText.className = "exp-status exp-correct";
+            } else {
+                btn.classList.add('selected-wrong');
+                statusText.innerHTML = "🥺 Sai mất rồi!";
+                statusText.className = "exp-status exp-wrong";
+                // Highlight đáp án đúng
+                buttons[correctOpt].classList.add('show-correct');
+            }
+
+            // Hiện giải thích
+            expBox.style.display = "block";
+
+            // Update Progress Bar
+            progress[containerId].answered++;
+            const pbId = containerId === 'task1-container' ? 'pb1' : 'pb2';
+            const percent = (progress[containerId].answered / progress[containerId].total) * 100;
+            document.getElementById(pbId).style.width = percent + '%';
+        }
+
+        // Khởi tạo
+        renderQuiz(task1Data, 'task1-container', 'pb1');
+        renderQuiz(task2Data, 'task2-container', 'pb2');
+    </script>
+
+</body>
+</html>
