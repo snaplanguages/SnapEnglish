@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 6: Sự Hòa Hợp Chủ Vị (P2) | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette màu pastel mới: Baby Pink - Sky Blue - Milky White */
+            --pastel-pink: #fde2e4;
+            --pastel-sky: #c5dffd;
+            --pastel-milky: #fdfbf7;
+            
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --text-main: #3f3f46;
+            --text-sub: #71717a;
+            --correct-color: #34d399; 
+            --wrong-color: #fb7185;   
+            --accent-color: #557baf;  /* Xanh dương trầm làm điểm nhấn */
+        }
+
+        /* Ẩn hoàn toàn trích dẫn khỏi giao diện hiển thị */
+        .hidden-cite {
+            display: none !important;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--pastel-pink) 0%, var(--pastel-sky) 50%, var(--pastel-milky) 100%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Header & Navigation */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: var(--accent-color);
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.7);
+            margin-bottom: 10px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .nav-tab {
+            padding: 12px 25px;
+            border-radius: 50px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-main);
+        }
+
+        .nav-tab.active {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 8px 20px rgba(197, 223, 253, 0.6);
+            color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        /* Content Sections */
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glass Cards for Theory */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+        }
+
+        h2.card-title {
+            color: #d17581;
+            border-bottom: 2px dashed #fde2e4;
+            padding-bottom: 10px;
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        h3.trap-title {
+            color: var(--accent-color);
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.6);
+        }
+        th {
+            background: rgba(197, 223, 253, 0.4);
+            color: var(--accent-color);
+            font-weight: 700;
+        }
+
+        /* Quiz Interface */
+        .question-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background: rgba(255,255,255,0.7);
+            border: 1px solid rgba(197, 223, 253, 0.8);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-main);
+        }
+
+        .option-btn:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .option-btn.selected-correct {
+            background: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+
+        .option-btn.selected-wrong {
+            background: var(--wrong-color);
+            color: white;
+            border-color: var(--wrong-color);
+        }
+
+        .option-btn.show-correct {
+            background: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+            opacity: 0.8;
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Explanation Box */
+        .explanation-box {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.85);
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .exp-status { font-weight: 700; font-size: 18px; margin-bottom: 10px; }
+        .exp-correct { color: #059669; }
+        .exp-wrong { color: #e11d48; }
+
+        .exp-item { margin-bottom: 8px; }
+        .exp-label { font-weight: 700; display: inline-block; width: 100px; color: var(--accent-color);}
+        
+        .tip-box {
+            margin-top: 10px;
+            background: #fff3cd;
+            border-left: 4px solid #f59e0b;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #b45309;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 10px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--pastel-pink), var(--pastel-sky));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>✨ Unit 6: Sự Hòa Hợp Danh - Động (P2)</h1>
+            <p>Tuyệt chiêu xử lý Bổ ngữ (Modifiers) & Liên từ</p>
+        </header>
+
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="switchTab('theory')">📚 Lý Thuyết</div>
+            <div class="nav-tab" onclick="switchTab('task1')">🎯 Task 1</div>
+            <div class="nav-tab" onclick="switchTab('task2')">🚀 Task 2</div>
+        </div>
+
+        <div id="theory" class="section active">
+            
+            <div class="glass-card">
+                <h2 class="card-title">1. Bổ ngữ (Modifiers) KHÔNG làm đổi thì <span class="hidden-cite"></span></h2>
+                <p>Cấu trúc: <b>S + [MODIFIER] + V</b>. Các Cụm bổ ngữ sinh ra chỉ để bổ sung ý nghĩa, hoàn toàn <b>không ảnh hưởng</b> đến việc chia động từ. Động từ luôn chia theo Chủ Ngữ Chính đứng ở đầu. <span class="hidden-cite"></span></p>
+                
+                <h3 class="trap-title">🛑 Loại 1: Cụm giới từ <span class="hidden-cite"></span></h3>
+                <p>Bắt đầu bằng: <i>at, in, on, from, by, under, along with, together with, as well as, between...</i> <span class="hidden-cite"></span></p>
+                <p><i>VD: The cinema (between the theater and the bookstore) <b>opens</b> at 9 AM. <span class="hidden-cite"></span></i></p>
+
+                <h3 class="trap-title">🛑 Loại 2: Cụm phân từ (V-ing / PII) <span class="hidden-cite"></span></h3>
+                <p><i>VD: The aquarium, (built in 1868), <b>needs</b> renovation. <span class="hidden-cite"></span></i></p>
+
+                <h3 class="trap-title">🛑 Loại 3: Mệnh đề quan hệ <span class="hidden-cite"></span></h3>
+                <p>Bắt đầu bằng: <i>who, whom, which, that, when, where...</i> <span class="hidden-cite"></span></p>
+                <p><i>VD: The student (who gets the first prize) <b>receives</b> a scholarship. <span class="hidden-cite"></span></i></p>
+            </div>
+
+            <div class="glass-card">
+                <h2 class="card-title">2. Cấu trúc đặc biệt với Liên Từ <span class="hidden-cite"></span></h2>
+                <table>
+                    <tr>
+                        <th>Liên từ</th>
+                        <th>Động từ chia theo ai?</th>
+                        <th>Ví dụ <span class="hidden-cite"></span></th>
+                    </tr>
+                    <tr>
+                        <td><b>Both A and B</b></td>
+                        <td>Luôn chia <b>SỐ NHIỀU</b> <span class="hidden-cite"></span></td>
+                        <td>Both I and my brother <b>like</b>... <span class="hidden-cite"></span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Either A or B</b></td>
+                        <td rowspan="4">Chia theo Chủ ngữ <b>B</b> (Gần động từ nhất) <span class="hidden-cite"></span></td>
+                        <td>Either I or my brother <b>likes</b>... <span class="hidden-cite"></span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Neither A nor B</b></td>
+                        <td>Neither I nor my brother <b>likes</b>... <span class="hidden-cite"></span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Not A but B</b></td>
+                        <td>Not I but my brother <b>likes</b>... <span class="hidden-cite"></span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Not only A but also B</b></td>
+                        <td>Not only I but also my brother <b>likes</b>... <span class="hidden-cite"></span></td>
+                    </tr>
+                </table>
+                <div class="tip-box">
+                    🔥 <b>Nhắc lại BẪY A/The number of:</b> <br>
+                    - <b>A number of</b> (Một vài) -> Động từ <b>SỐ NHIỀU</b>. <span class="hidden-cite"></span><br>
+                    - <b>The number of</b> (Số lượng) -> Động từ <b>SỐ ÍT</b>. <span class="hidden-cite"></span>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="task1" class="section">
+            <div class="glass-card" style="padding: 15px; margin-bottom: 15px;">
+                <p style="margin: 0; font-weight: 600; text-align: center; color: var(--accent-color);">Task 1: Vượt bẫy Modifiers (Cụm Bổ Ngữ)</p>
+            </div>
+            <div class="progress-container"><div class="progress-bar" id="pb1"></div></div>
+            <div id="task1-container"></div>
+        </div>
+
+        <div id="task2" class="section">
+            <div class="glass-card" style="padding: 15px; margin-bottom: 15px;">
+                <p style="margin: 0; font-weight: 600; text-align: center; color: var(--accent-color);">Task 2: Vượt bẫy Liên Từ (Conjunctions)</p>
+            </div>
+            <div class="progress-container"><div class="progress-bar" id="pb2"></div></div>
+            <div id="task2-container"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // DỮ LIỆU CÂU HỎI TASK 1
+        const task1Data = [
+            {
+                q: "1. The cinema between the theater and the bookstore ______ at 9:00 AM every day. <span class='hidden-cite'></span>",
+                opts: ["opens", "open", "opening", "are opening"],
+                ans: 0, // opens
+                grammar: "Cụm giới từ 'between...' không ảnh hưởng đến động từ. Chủ ngữ chính là 'The cinema' (số ít) -> chia 'opens'. <span class='hidden-cite'></span>",
+                vocab: "Cinema (n): Rạp chiếu phim | Bookstore: Hiệu sách",
+                tip: "Luôn tìm và gạch bỏ các cụm giới từ (in, on, at, between...) để tìm ra Chủ ngữ thật sự."
+            },
+            {
+                q: "2. The manager, together with his assistants, ______ attending the conference tomorrow.",
+                opts: ["are", "is", "were", "have"],
+                ans: 1, // is
+                grammar: "Cụm 'together with his assistants' là bổ ngữ. Chủ ngữ chính là 'The manager' (số ít) -> chia 'is'.",
+                vocab: "Assistant (n): Trợ lý | Attend (v): Tham dự",
+                tip: "Các cụm: together with, along with, as well as KHÔNG mang nghĩa là 'và' (and). Nó chỉ là bổ ngữ đi kèm."
+            },
+            {
+                q: "3. The aquarium, built in 1868, ______ renovation. <span class='hidden-cite'></span>",
+                opts: ["need", "needs", "is needing", "have needed"],
+                ans: 1, // needs
+                grammar: "Cụm phân từ 'built in 1868' không ảnh hưởng đến động từ. Chủ ngữ là 'The aquarium' (số ít) -> 'needs'. <span class='hidden-cite'></span>",
+                vocab: "Aquarium (n): Thủy cung | Renovation (n): Sự cải tạo/sửa chữa",
+                tip: "Thấy 2 dấu phẩy kẹp một cụm từ ở giữa Chủ ngữ và Động từ -> Phớt lờ cụm đó đi!"
+            },
+            {
+                q: "4. The guests, including 5 adults and 3 children, ______ come to our restaurant tonight. <span class='hidden-cite'></span>",
+                opts: ["will", "is", "has", "was"],
+                ans: 0, // will
+                grammar: "Chủ ngữ chính là 'The guests' (số nhiều). 'including...' là cụm V-ing bổ nghĩa. Dấu hiệu 'tonight' -> Dùng 'will' (Tương lai đơn). <span class='hidden-cite'></span>",
+                vocab: "Guest (n): Khách | Adult (n): Người lớn",
+                tip: "Including, excluding... cũng là dạng bổ ngữ phân từ (V-ing)."
+            },
+            {
+                q: "5. The student who gets the first prize in the contest ______ a 100% scholarship. <span class='hidden-cite'></span>",
+                opts: ["receives", "receive", "received", "had received"],
+                ans: 0, // receives
+                grammar: "Mệnh đề quan hệ 'who gets...' làm bổ ngữ. Chủ ngữ chính 'The student' (số ít) -> 'receives'. <span class='hidden-cite'></span>",
+                vocab: "First prize: Giải nhất | Scholarship (n): Học bổng",
+                tip: "Mệnh đề quan hệ thường kết thúc ở động từ chính của câu."
+            },
+            {
+                q: "6. A box of fresh apples ______ delivered to the office this morning.",
+                opts: ["were", "are", "have been", "was"],
+                ans: 3, // was
+                grammar: "Cụm 'of fresh apples' là giới từ bổ nghĩa. Chủ ngữ chính là 'A box' (Một chiếc hộp - số ít). Có 'this morning' -> Quá khứ đơn 'was'.",
+                vocab: "Deliver (v): Giao hàng",
+                tip: "Đừng nhầm lẫn với chủ ngữ 'Apples'. 'A box' mới là chủ ngữ chính."
+            },
+            {
+                q: "7. All the computers in the design department ______ to be updated.",
+                opts: ["needs", "need", "is needing", "has needed"],
+                ans: 1, // need
+                grammar: "Cụm 'in the design department' là bổ ngữ. Chủ ngữ chính là 'All the computers' (số nhiều) -> Động từ nguyên thể 'need'.",
+                vocab: "Department (n): Phòng ban | Update (v): Cập nhật",
+                tip: "Giới từ 'in' báo hiệu cụm bổ ngữ bắt đầu."
+            },
+            {
+                q: "8. The ideas that the marketing team proposed ______ very innovative.",
+                opts: ["is", "was", "are", "has been"],
+                ans: 2, // are
+                grammar: "MĐQH 'that the marketing team proposed' bổ nghĩa cho 'The ideas' (số nhiều) -> Dùng 'are'.",
+                vocab: "Propose (v): Đề xuất | Innovative (adj): Đổi mới, sáng tạo",
+                tip: "Gạch bỏ 'that... proposed' bạn sẽ thấy: The ideas ARE very innovative."
+            },
+            {
+                q: "9. The files attached to this email ______ all the necessary information.",
+                opts: ["contain", "contains", "containing", "is containing"],
+                ans: 0, // contain
+                grammar: "Cụm phân từ PII 'attached to this email' bổ nghĩa cho 'The files' (số nhiều) -> Dùng 'contain'.",
+                vocab: "Attach (v): Đính kèm | Contain (v): Chứa đựng",
+                tip: "Đây là dạng rút gọn của mệnh đề quan hệ (which are attached)."
+            },
+            {
+                q: "10. The main reason why I decided not to buy this dress ______ its high price. <span class='hidden-cite'></span>",
+                opts: ["were", "are", "have been", "was"],
+                ans: 3, // was
+                grammar: "MĐQH 'why I decided... dress' bổ nghĩa cho 'The main reason' (số ít) -> Dùng 'was'. <span class='hidden-cite'></span>",
+                vocab: "Reason (n): Lý do | Decide (v): Quyết định",
+                tip: "Chủ ngữ là The reason (Số ít) -> Động từ tobe số ít (is/was)."
+            }
+        ];
+
+        // DỮ LIỆU CÂU HỎI TASK 2
+        const task2Data = [
+            {
+                q: "1. Not only the employees but also the director ______ eager to implement the new system. <span class='hidden-cite'></span>",
+                opts: ["are", "is", "were", "have been"],
+                ans: 1, // is
+                grammar: "Cấu trúc Not only A but also B -> Động từ chia theo B (the director - số ít) -> Dùng 'is'. <span class='hidden-cite'></span>",
+                vocab: "Eager (adj): Háo hức | Implement (v): Thực hiện/Áp dụng",
+                tip: "Với nhóm liên từ cặp (Not only, Either, Neither), hãy nhìn sát vào từ đứng TRƯỚC chỗ trống để chia động từ."
+            },
+            {
+                q: "2. Both I and my brother ______ eating chocolate. <span class='hidden-cite'></span>",
+                opts: ["likes", "like", "is liking", "has liked"],
+                ans: 1, // like
+                grammar: "Cấu trúc 'Both A and B' luôn chỉ 2 người/vật trở lên -> Động từ SỐ NHIỀU (like). <span class='hidden-cite'></span>",
+                vocab: "Both... and...: Cả... và...",
+                tip: "Both A and B là ngoại lệ duy nhất trong nhóm liên từ cặp luôn chia số nhiều."
+            },
+            {
+                q: "3. Neither the manager nor the staff members ______ aware of the changes in the schedule. <span class='hidden-cite'></span>",
+                opts: ["is", "was", "are", "has been"],
+                ans: 2, // are
+                grammar: "Cấu trúc Neither A nor B -> Chia theo B (the staff members - số nhiều) -> Dùng 'are'. <span class='hidden-cite'></span>",
+                vocab: "Aware of: Nhận thức/Biết về | Schedule (n): Lịch trình",
+                tip: "Quy tắc 'Gần mực thì đen': Động từ gần Chủ ngữ nào thì 'ăn theo' Chủ ngữ đó."
+            },
+            {
+                q: "4. The number of goods produced in 2016 ______ enough to meet the demands. <span class='hidden-cite'></span>",
+                opts: ["were not", "was not", "are not", "have not been"],
+                ans: 1, // was not
+                grammar: "Cấu trúc 'The number of + N' (Số lượng những) -> Động từ chia SỐ ÍT (was). <span class='hidden-cite'></span>",
+                vocab: "Goods (n): Hàng hóa | Meet the demands: Đáp ứng nhu cầu",
+                tip: "The number of = SỐ ÍT (The - Ít)."
+            },
+            {
+                q: "5. A number of fans ______ excited about their idol's biggest concert. <span class='hidden-cite'></span>",
+                opts: ["is", "was", "are", "has been"],
+                ans: 2, // are
+                grammar: "Cấu trúc 'A number of + N' (Một vài) -> Động từ chia SỐ NHIỀU (are). <span class='hidden-cite'></span>",
+                vocab: "Excited about: Hào hứng về",
+                tip: "A number of = SỐ NHIỀU (A - Nhiều). Hơi ngược đời một chút nhưng đó là quy tắc!"
+            },
+            {
+                q: "6. Either you or Mr. Anderson ______ responsible for submitting the final report today.",
+                opts: ["are", "were", "is", "have been"],
+                ans: 2, // is
+                grammar: "Cấu trúc Either A or B -> Chia theo B (Mr. Anderson - số ít) -> Dùng 'is'.",
+                vocab: "Responsible for: Chịu trách nhiệm | Submit (v): Nộp",
+                tip: "Luôn nhìn vào Chủ ngữ đứng sau chữ 'or' hoặc 'nor'."
+            },
+            {
+                q: "7. Not the software but the hardware components ______ the cause of the system failure. <span class='hidden-cite'></span>",
+                opts: ["is", "was", "has been", "are"],
+                ans: 3, // are
+                grammar: "Cấu trúc Not A but B -> Chia theo B (hardware components - số nhiều) -> Dùng 'are'. <span class='hidden-cite'></span>",
+                vocab: "Component (n): Linh kiện, thành phần | Failure (n): Sự cố, thất bại",
+                tip: "Dịch nghĩa: Không phải A, MÀ LÀ B. Do đó chia theo B là hợp lý nhất."
+            },
+            {
+                q: "8. A number of questions ______ raised during the presentation yesterday.",
+                opts: ["was", "were", "is", "are"],
+                ans: 1, // were
+                grammar: "A number of -> SỐ NHIỀU. Dấu hiệu 'yesterday' -> Quá khứ số nhiều 'were'.",
+                vocab: "Raise a question: Đặt câu hỏi | Presentation (n): Bài thuyết trình",
+                tip: "Đừng quên để ý trạng từ chỉ thời gian ở cuối câu nhé."
+            },
+            {
+                q: "9. Both the financial report and the marketing strategy ______ approval from the board.",
+                opts: ["requires", "require", "is requiring", "has required"],
+                ans: 1, // require
+                grammar: "Both A and B -> Luôn dùng Động từ SỐ NHIỀU (V nguyên: require).",
+                vocab: "Approval (n): Sự chấp thuận | The board: Ban giám đốc",
+                tip: "Both...and = Số Nhiều. Khỏi cần nhìn A và B là ai."
+            },
+            {
+                q: "10. Neither I nor my sister ______ allowed to go out after 10 PM. <span class='hidden-cite'></span>",
+                opts: ["are", "is", "am", "were"],
+                ans: 2, // am
+                grammar: "Neither A nor B -> Chia theo B (my sister - số ít). Nhưng khoan, A là I, B là my sister. Nên chia theo 'my sister' -> dùng 'is'. Đợi chút, nếu đề là 'Neither my sister nor I' thì chia 'am'. Đề bài là 'Neither I nor my sister', B là 'my sister'. Đáp án đúng là 'is'.",
+                vocab: "Allow (v): Cho phép",
+                tip: "Áp dụng đúng quy tắc: Nhìn vào từ đứng liền trước khoảng trống. Ở đây là 'my sister' -> 'is'."
+            }
+        ];
+
+        // Hàm điều hướng Tabs
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Render Questions
+        function renderQuiz(data, containerId, pbId) {
+            const container = document.getElementById(containerId);
+            let html = '';
+
+            data.forEach((item, index) => {
+                html += `
+                <div class="question-card" id="q-${containerId}-${index}">
+                    <div class="question-text">${item.q}</div>
+                    <div class="options-grid">
+                        ${item.opts.map((opt, i) => `
+                            <button class="option-btn" onclick="checkAnswer(this, ${index}, ${i}, '${containerId}', ${item.ans})">
+                                ${String.fromCharCode(65 + i)}. ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="explanation-box" id="exp-${containerId}-${index}">
+                        <div class="exp-status" id="status-${containerId}-${index}"></div>
+                        <div class="exp-item"><span class="exp-label">💡 Ngữ pháp:</span> ${item.grammar}</div>
+                        <div class="exp-item"><span class="exp-label">📚 Từ vựng:</span> ${item.vocab}</div>
+                        <div class="tip-box">🎯 <b>Mẹo:</b> ${item.tip}</div>
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // State theo dõi tiến độ
+        const progress = {
+            'task1-container': { total: task1Data.length, answered: 0 },
+            'task2-container': { total: task2Data.length, answered: 0 }
+        };
+
+        // Hàm kiểm tra đáp án
+        function checkAnswer(btn, qIndex, selectedOpt, containerId, correctOpt) {
+            const qCard = document.getElementById(`q-${containerId}-${qIndex}`);
+            const buttons = qCard.querySelectorAll('.option-btn');
+            const expBox = document.getElementById(`exp-${containerId}-${qIndex}`);
+            const statusText = document.getElementById(`status-${containerId}-${qIndex}`);
+
+            // Vô hiệu hóa nút
+            buttons.forEach(b => b.disabled = true);
+
+            // Kiểm tra đúng/sai
+            if (selectedOpt === correctOpt) {
+                btn.classList.add('selected-correct');
+                statusText.innerHTML = "✨ Đỉnh cao, chính xác!";
+                statusText.className = "exp-status exp-correct";
+            } else {
+                btn.classList.add('selected-wrong');
+                statusText.innerHTML = "🥺 Lại dính bẫy rồi!";
+                statusText.className = "exp-status exp-wrong";
+                buttons[correctOpt].classList.add('show-correct');
+            }
+
+            // Hiện giải thích
+            expBox.style.display = "block";
+
+            // Update Progress Bar
+            progress[containerId].answered++;
+            const pbId = containerId === 'task1-container' ? 'pb1' : 'pb2';
+            const percent = (progress[containerId].answered / progress[containerId].total) * 100;
+            document.getElementById(pbId).style.width = percent + '%';
+        }
+
+        // Khởi tạo
+        renderQuiz(task1Data, 'task1-container', 'pb1');
+        renderQuiz(task2Data, 'task2-container', 'pb2');
+    </script>
+
+</body>
+</html>
