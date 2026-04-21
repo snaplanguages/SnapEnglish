@@ -1,78 +1,289 @@
-<script>
-    const container = document.getElementById('unitContainer');
-    const noResultsMsg = document.getElementById('noResults');
-    const searchInput = document.getElementById('searchInput');
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOEIC Reading | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Bảng màu SnapEnglish Pastel --- */
+        :root {
+            --primary-eng: #a29bfe; /* Tím pastel */
+            --secondary-eng: #c8c2f2; /* Tím nhạt */
+            --accent-eng: #e7a87c; /* Cam đất Snap */
+            --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            --text-main: #4a4a4a;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.9);
+        }
 
-    // Cấu hình dữ liệu
-    const startYear = 2018;
-    const endYear = 2026;
-    const lessons = [];
+        body { 
+            font-family: 'Quicksand', sans-serif; 
+            margin: 0;
+            padding: 50px 20px;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: var(--text-main);
+            position: relative;
+            overflow-x: hidden;
+        }
 
-    // Tự động tạo danh sách bài học
-    for (let year = startYear; year <= endYear; year++) {
-        // Xác định số test: 2018 có 5 test, các năm khác có 10 test
-        const maxTest = (year === 2018) ? 5 : 10;
-        
-        for (let test = 1; test <= maxTest; test++) {
-            [5, 6, 7].forEach(part => {
-                lessons.push({
-                    year: year,
-                    part: part,
-                    test: test,
-                    title: `Reading Part ${part} - Test ${test} - ${year}`,
-                    // Link nội bộ .html và không target_blank
-                    url: `part-${part}-test-${test}-${year}.html`
+        /* --- Background trang trí đặc trưng Snap --- */
+        .shape {
+            position: fixed;
+            z-index: -1;
+            filter: blur(60px);
+            opacity: 0.3;
+        }
+        .shape-1 { width: 300px; height: 300px; background: var(--primary-eng); top: -50px; right: -50px; border-radius: 50%; }
+        .shape-2 { width: 400px; height: 400px; background: var(--accent-eng); bottom: -100px; left: -100px; border-radius: 30% 70% 70% 30%; }
+
+        /* --- Header --- */
+        .header-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 { 
+            font-size: 34px; 
+            margin-bottom: 8px;
+            color: #6c5ce7;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-accent { color: var(--accent-eng); }
+
+        p.subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        /* --- Tìm kiếm --- */
+        .search-wrapper {
+            max-width: 500px;
+            margin: 0 auto 50px auto;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 15px 25px;
+            border-radius: 15px;
+            border: 2px solid transparent;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            font-family: 'Quicksand', sans-serif;
+            font-size: 16px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            box-sizing: border-box; 
+            transition: all 0.3s ease;
+        }
+
+        #searchInput:focus {
+            border-color: var(--primary-eng);
+            outline: none;
+            background: #fff;
+            box-shadow: 0 10px 25px rgba(162, 155, 254, 0.2);
+        }
+
+        /* --- Grid Container --- */
+        .container { 
+            max-width: 1000px; 
+            margin: auto; 
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* --- Card Unit Style Snap --- */
+        .unit-card { 
+            background: var(--glass-bg);
+            padding: 22px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+            position: relative;
+            animation: fadeIn 0.5s ease backwards;
+        }
+
+        .unit-card:hover {
+            transform: translateY(-5px);
+            background: #fff;
+            box-shadow: 0 12px 25px rgba(162, 155, 254, 0.15);
+            border-color: var(--primary-eng);
+        }
+
+        .status-badge {
+            width: 6px;
+            height: 45px;
+            border-radius: 10px;
+            background: var(--primary-eng);
+            margin-right: 18px;
+            transition: 0.3s;
+        }
+
+        .unit-card:hover .status-badge {
+            background: var(--accent-eng);
+            transform: scaleY(1.1);
+        }
+
+        .unit-info { flex-grow: 1; }
+
+        .unit-tag {
+            font-size: 10px;
+            background: var(--secondary-eng);
+            color: #4b4b4b;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: inline-block;
+        }
+
+        .unit-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0;
+            color: #333;
+        }
+
+        .arrow-btn {
+            color: var(--primary-eng);
+            font-size: 18px;
+            font-weight: bold;
+            opacity: 0.5;
+            transition: 0.3s;
+        }
+
+        .unit-card:hover .arrow-btn {
+            opacity: 1;
+            transform: translateX(3px);
+            color: var(--accent-eng);
+        }
+
+        .hidden { display: none !important; }
+
+        #noResults {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 50px;
+            color: #95a5a6;
+            font-style: italic;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+
+    <div class="header-section">
+        <h1>📚 Snap<span class="brand-accent">Reading</span></h1>
+        <p class="subtitle">Thực chiến TOEIC Reading Part 5, 6, 7 (2018 - 2026)</p>
+    </div>
+    
+    <div class="search-wrapper">
+        <input type="text" id="searchInput" placeholder="Tìm năm, Part hoặc Test (VD: 2025, Part 5, Test 2)...">
+    </div>
+
+    <div class="container" id="unitContainer">
+        <div id="noResults" class="hidden">Không tìm thấy tài liệu bạn cần rồi... 🔍</div>
+    </div>
+
+   <script>
+    // Bọc code trong DOMContentLoaded để đảm bảo HTML load xong mới chạy JS
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('unitContainer');
+        const noResultsMsg = document.getElementById('noResults');
+        const searchInput = document.getElementById('searchInput');
+
+        // Cấu hình dữ liệu
+        const startYear = 2018;
+        const endYear = 2026;
+        const lessons = [];
+
+        // Tự động tạo danh sách bài học
+        for (let year = startYear; year <= endYear; year++) {
+            // Xác định số test: 2018 có 5 test, các năm khác có 10 test
+            const maxTest = (year === 2018) ? 5 : 10;
+            
+            for (let test = 1; test <= maxTest; test++) {
+                // Part 5, 6, 7 cho Reading
+                [5, 6, 7].forEach(part => {
+                    lessons.push({
+                        year: year,
+                        part: part,
+                        test: test,
+                        title: `Reading Part ${part} - Test ${test} - ${year}`,
+                        // Link nội bộ .html
+                        url: `part-${part}-test-${test}-${year}.html`
+                    });
                 });
+            }
+        }
+
+        function renderLessons() {
+            lessons.forEach((item, index) => {
+                const card = document.createElement('a');
+                card.className = 'unit-card';
+                card.href = item.url;
+                
+                // Cập nhật data-search để tìm được cả theo test
+                card.setAttribute('data-search', `${item.year} part ${item.part} test ${item.test}`);
+                
+                // Giảm độ trễ animation để không bị đợi lâu khi cuộn trang
+                card.style.animationDelay = `${(index % 20) * 0.02}s`;
+
+                card.innerHTML = `
+                    <div class="status-badge"></div>
+                    <div class="unit-info">
+                        <span class="unit-tag">TOEIC 800+</span>
+                        <h3 class="unit-title">${item.title}</h3>
+                    </div>
+                    <div class="arrow-btn">→</div>
+                `;
+                container.appendChild(card);
             });
         }
-    }
 
-    function renderLessons() {
-        lessons.forEach((item, index) => {
-            const card = document.createElement('a');
-            card.className = 'unit-card';
-            card.href = item.url;
-            // Cập nhật data-search để tìm được cả theo test
-            card.setAttribute('data-search', `${item.year} part ${item.part} test ${item.test}`);
-            // Giảm độ trễ animation một chút vì số lượng bài học giờ khá nhiều
-            card.style.animationDelay = `${(index % 20) * 0.02}s`;
+        // Xử lý tìm kiếm
+        searchInput.addEventListener('input', function() {
+            const filter = this.value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.unit-card');
+            let count = 0;
 
-            card.innerHTML = `
-                <div class="status-badge"></div>
-                <div class="unit-info">
-                    <span class="unit-tag">TOEIC 800+</span>
-                    <h3 class="unit-title">${item.title}</h3>
-                </div>
-                <div class="arrow-btn">→</div>
-            `;
-            container.appendChild(card);
-        });
-    }
+            cards.forEach(card => {
+                const searchText = card.getAttribute('data-search');
+                if (searchText.includes(filter)) {
+                    card.classList.remove('hidden');
+                    count++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
 
-    // Xử lý tìm kiếm
-    searchInput.addEventListener('input', function() {
-        const filter = this.value.toLowerCase().trim();
-        const cards = document.querySelectorAll('.unit-card');
-        let count = 0;
-
-        cards.forEach(card => {
-            const searchText = card.getAttribute('data-search');
-            if (searchText.includes(filter)) {
-                card.classList.remove('hidden');
-                count++;
+            // Hiển thị thông báo nếu không có kết quả
+            if (count === 0) {
+                noResultsMsg.classList.remove('hidden');
             } else {
-                card.classList.add('hidden');
+                noResultsMsg.classList.add('hidden');
             }
         });
 
-        // Hiển thị thông báo nếu không có kết quả
-        if (count === 0) {
-            noResultsMsg.classList.remove('hidden');
-        } else {
-            noResultsMsg.classList.add('hidden');
-        }
+        // Khởi tạo
+        renderLessons();
     });
-
-    // Khởi tạo
-    renderLessons();
    </script>
+</body>
+</html>
