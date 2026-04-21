@@ -263,3 +263,112 @@ const quizData = [
             <p><strong>[3]</strong>. Every Friday of the month, the previously closed third-floor galleries, which feature sculptures and paintings by contemporary Bermudian artists, will be open to all visitors until 9:00 P.M. Photographs of select artwork from these galleries can be viewed on our Web site.</p><strong>[4]</strong><p>We hope to see you in the coming month.<br>Sincerely,<br>Ilyana Cooper<br>Director of Member Services</p>`,
         questions: [
                 
+
+
+
+
+
+
+        ]
+        }
+    ];
+
+    let currentIndex = 0;
+    const userAnswers = {};
+    const totalQuestions = quizData.reduce((acc, curr) => acc + curr.questions.length, 0);
+
+    const passageContainer = document.getElementById('passage-container');
+    const questionsContainer = document.getElementById('questions-container');
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const btnSubmit = document.getElementById('btn-submit');
+    const btnExplain = document.getElementById('btn-explain');
+    const progressText = document.getElementById('progress-text');
+
+    function renderView() {
+        const currentData = quizData[currentIndex];
+        
+        passageContainer.innerHTML = currentData.passage;
+
+        let html = '';
+        currentData.questions.forEach(q => {
+            html += `<div class="question-block" id="qb-${q.id}">
+                        <div class="question-title">Câu ${q.id}: ${q.text}</div>
+                        <div class="options">`;
+            
+            for (const [key, value] of Object.entries(q.options)) {
+                const isSelected = userAnswers[q.id] === key;
+                html += `
+                    <label class="option-label ${isSelected ? 'selected' : ''}">
+                        <input type="radio" name="q${q.id}" value="${key}" 
+                               ${isSelected ? 'checked' : ''} 
+                               onchange="selectAnswer(${q.id}, '${key}')">
+                        <b>${key}.</b> &nbsp; ${value}
+                    </label>
+                `;
+            }
+            html += `</div></div>`;
+        });
+        questionsContainer.innerHTML = html;
+
+        progressText.innerText = `Cụm bài đọc ${currentIndex + 1} / ${quizData.length}`;
+        
+        btnPrev.style.display = currentIndex === 0 ? 'none' : 'inline-block';
+        
+        if (currentIndex === quizData.length - 1) {
+            btnNext.style.display = 'none';
+            btnSubmit.style.display = 'inline-block';
+        } else {
+            btnNext.style.display = 'inline-block';
+            btnSubmit.style.display = 'none';
+        }
+        
+        passageContainer.scrollTop = 0;
+        questionsContainer.scrollTop = 0;
+    }
+
+    function selectAnswer(questionId, answer) {
+        userAnswers[questionId] = answer;
+        
+        const block = document.getElementById(`qb-${questionId}`);
+        const labels = block.querySelectorAll('.option-label');
+        labels.forEach(label => label.classList.remove('selected'));
+        
+        const selectedInput = block.querySelector(`input[value="${answer}"]`);
+        if(selectedInput) {
+            selectedInput.closest('.option-label').classList.add('selected');
+        }
+    }
+
+    function changePassage(direction) {
+        currentIndex += direction;
+        renderView();
+    }
+
+    function submitQuiz() {
+        let correctCount = 0;
+        
+        quizData.forEach(passage => {
+            passage.questions.forEach(q => {
+                if(userAnswers[q.id] === q.correct) {
+                    correctCount++;
+                }
+            });
+        });
+
+        document.getElementById('score-correct').innerText = correctCount;
+        document.getElementById('score-total').innerText = totalQuestions;
+        document.getElementById('result-overlay').classList.add('active');
+        
+        btnExplain.style.display = 'inline-block';
+    }
+
+    function closeResult() {
+        document.getElementById('result-overlay').classList.remove('active');
+    }
+
+    renderView();
+</script>
+
+</body>
+</html>
