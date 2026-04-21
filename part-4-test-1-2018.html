@@ -767,73 +767,47 @@
     }
 
     function renderPassage() {
-    const pData = passagesData[passageIndex];
-    document.getElementById('passage-title').innerText = `Questions ${pData.id}`;
-    audio.src = pData.audio;
+        const pData = passagesData[passageIndex];
+        document.getElementById('passage-title').innerText = `Questions ${pData.id}`;
+        audio.src = pData.audio;
 
-    const qContainer = document.getElementById('questions-container');
-    qContainer.innerHTML = '';
+        const qContainer = document.getElementById('questions-container');
+        qContainer.innerHTML = '';
 
-    // Nếu CÓ hình ảnh (Graphic), sử dụng bố cục 2 cột
-    if (pData.graphic) {
-        const layoutWrap = document.createElement('div');
-        layoutWrap.className = 'two-col-layout';
+        // Nếu CÓ hình ảnh (Graphic), sử dụng bố cục 2 cột
+        if (pData.graphic) {
+            const layoutWrap = document.createElement('div');
+            layoutWrap.className = 'two-col-layout';
 
-        // Tạo cột TRÁI (Graphic)
-        const leftCol = document.createElement('div');
-        leftCol.className = 'left-col';
-        const gBox = document.createElement('div');
-        gBox.className = 'graphic-box';
-        gBox.innerHTML = pData.graphic;
-        leftCol.appendChild(gBox);
-        layoutWrap.appendChild(leftCol);
+            // Tạo cột TRÁI (Graphic)
+            const leftCol = document.createElement('div');
+            leftCol.className = 'left-col';
+            const gBox = document.createElement('div');
+            gBox.className = 'graphic-box';
+            gBox.innerHTML = pData.graphic;
+            leftCol.appendChild(gBox);
+            layoutWrap.appendChild(leftCol);
 
-        // Tạo cột PHẢI (Câu hỏi)
-        const rightCol = document.createElement('div');
-        rightCol.className = 'right-col';
-        
-        pData.questions.forEach((q, index) => {
-            const qBlock = createQuestionBlock(q, index); // Gọi hàm phụ tạo block câu hỏi
-            rightCol.appendChild(qBlock);
-        });
-        
-        layoutWrap.appendChild(rightCol);
-        qContainer.appendChild(layoutWrap);
-    } else {
-        // Nếu KHÔNG có hình ảnh, hiển thị 1 cột bình thường
-        pData.questions.forEach((q, index) => {
-            const qBlock = createQuestionBlock(q, index);
-            qContainer.appendChild(qBlock);
-        });
-    }
+            // Tạo cột PHẢI (Câu hỏi)
+            const rightCol = document.createElement('div');
+            rightCol.className = 'right-col';
+            
+            pData.questions.forEach((q, index) => {
+                const qBlock = createQuestionBlock(q, index); 
+                rightCol.appendChild(qBlock);
+            });
+            
+            layoutWrap.appendChild(rightCol);
+            qContainer.appendChild(layoutWrap);
+        } else {
+            // Nếu KHÔNG có hình ảnh, hiển thị 1 cột bình thường
+            pData.questions.forEach((q, index) => {
+                const qBlock = createQuestionBlock(q, index);
+                qContainer.appendChild(qBlock);
+            });
+        }
 
-    // Logic ẩn/hiện nút điều hướng
-    updateNavigationButtons();
-}
-
-// Hàm phụ để tạo HTML cho từng câu hỏi (để tái sử dụng)
-function createQuestionBlock(q, index) {
-    let optsHTML = '';
-    q.opts.forEach(o => {
-        const isChecked = userAnswers[q.id] === o.l ? 'checked' : '';
-        const selectedClass = isChecked ? 'selected-ui' : '';
-        optsHTML += `
-            <label class="option-label ${selectedClass}" onclick="handleOptClick(this, ${q.id}, '${o.l}')">
-                <input type="radio" name="q_${q.id}" value="${o.l}" ${isChecked}>
-                <div class="custom-radio"></div>
-                <span>(${o.l}) ${o.text}</span>
-            </label>
-        `;
-    });
-
-    const highlightBorderClass = index === 0 ? "border-color: var(--hl-q1);" : (index === 1 ? "border-color: var(--hl-q2);" : "border-color: var(--hl-q3);");
-    const qBlock = document.createElement('div');
-    qBlock.className = 'question-block';
-    qBlock.style = highlightBorderClass;
-    qBlock.innerHTML = `<div class="q-title">Question ${q.id}: ${q.q_en}</div><div class="options-grid">${optsHTML}</div>`;
-    return qBlock;
-}
-
+        // Logic ẩn/hiện nút và Audio
         const isLast = passageIndex === passagesData.length - 1;
 
         if (currentMode === 'mock') {
@@ -862,6 +836,29 @@ function createQuestionBlock(q, index) {
             document.getElementById('mock-msg').style.display = 'none';
             audio.onended = null;
         }
+    } // <-- ĐÂY MỚI LÀ NƠI KẾT THÚC HÀM renderPassage
+
+    // Hàm phụ để tạo HTML cho từng câu hỏi (được tách ra ngoài đàng hoàng)
+    function createQuestionBlock(q, index) {
+        let optsHTML = '';
+        q.opts.forEach(o => {
+            const isChecked = userAnswers[q.id] === o.l ? 'checked' : '';
+            const selectedClass = isChecked ? 'selected-ui' : '';
+            optsHTML += `
+                <label class="option-label ${selectedClass}" onclick="handleOptClick(this, ${q.id}, '${o.l}')">
+                    <input type="radio" name="q_${q.id}" value="${o.l}" ${isChecked}>
+                    <div class="custom-radio"></div>
+                    <span>(${o.l}) ${o.text}</span>
+                </label>
+            `;
+        });
+
+        const highlightBorderClass = index === 0 ? "border-color: var(--hl-q1);" : (index === 1 ? "border-color: var(--hl-q2);" : "border-color: var(--hl-q3);");
+        const qBlock = document.createElement('div');
+        qBlock.className = 'question-block';
+        qBlock.style = highlightBorderClass;
+        qBlock.innerHTML = `<div class="q-title">Question ${q.id}: ${q.q_en}</div><div class="options-grid">${optsHTML}</div>`;
+        return qBlock;
     }
 
     function handleOptClick(labelEl, qId, val) {
