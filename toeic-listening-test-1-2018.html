@@ -1121,40 +1121,11 @@
         
         let missingDivs = '<div style="display:none;">';
         for(let i=1; i<=100; i++) {
-            if(keys[i]) {
-                totalRendered++;
-                let isCorr = (userAnswers[i] === keys[i]);
-                if(isCorr) correctCount++;
-
-                // Đổi màu Label - Đã Fix lỗi xanh lè nhiều câu
-                document.querySelectorAll(`input[name="q${i}"]`).forEach(inp => {
-                    let lbl = inp.closest('.opt-label');
-                    if(inp.value === keys[i]) {
-                        lbl.classList.add('is-correct');
-                    } else if (inp.value === userAnswers[i] && !isCorr) {
-                        lbl.classList.add('is-wrong');
-                    }
-                });
-
-                // Hiển thị Explanation
-                let exp = document.getElementById(`exp-${i}`);
-                if(exp) exp.classList.add('show');
-
-                // Cập nhật Nav
-                let nav = document.getElementById(`nav-${i}`);
-                if(nav) {
-                    nav.classList.remove('answered');
-                    nav.classList.add(isCorr ? 'correct' : 'wrong');
-                }
-
-                // Bỏ Blur Part 2
-                let qText = document.getElementById(`text-q${i}`);
-                if(qText) qText.classList.add('revealed');
-            }
+            if(!allIDs.includes(i)) missingDivs += `<div id="card-${i}">Fake Q${i}</div><div id="exp-${i}"></div>`;
         }
-
-        // Hiện dịch tiếng Việt của các Option A, B, C, D (nếu Data có cấu trúc chi tiết)
-        document.querySelectorAll('.opt-vi-hint').forEach(el => el.style.display = 'block');
+        missingDivs += '</div>';
+        main.innerHTML += missingDivs;
+    } // ĐÓNG HÀM renderTest()
 
     function buildNavGrid() {
         const grid = document.getElementById('navGrid');
@@ -1222,7 +1193,7 @@
         closeModal('confirmModal');
         
         let correctCount = 0;
-        let totalRendered = 0; // Để tính điểm dựa trên data thực tế có trong JSON mẫu
+        let totalRendered = 0;
 
         // Tạo mảng Answer Key phẳng từ Data
         const keys = {};
@@ -1237,16 +1208,15 @@
                 let isCorr = (userAnswers[i] === keys[i]);
                 if(isCorr) correctCount++;
 
-                // Đổi màu Label
-                let card = document.getElementById(`card-${i}`);
-                if(card) {
-                    let parent = card.tagName === 'DIV' && card.classList.contains('q-header') ? card.parentElement : card;
-                    parent.querySelectorAll('.opt-label').forEach(lbl => {
-                        let inp = lbl.querySelector('input');
-                        if(inp.value === keys[i]) lbl.classList.add('is-correct');
-                        else if (inp.value === userAnswers[i] && !isCorr) lbl.classList.add('is-wrong');
-                    });
-                }
+                // Đổi màu Label - Đã Fix lỗi xanh lè lan sang nhiều câu
+                document.querySelectorAll(`input[name="q${i}"]`).forEach(inp => {
+                    let lbl = inp.closest('.opt-label');
+                    if(inp.value === keys[i]) {
+                        lbl.classList.add('is-correct');
+                    } else if (inp.value === userAnswers[i] && !isCorr) {
+                        lbl.classList.add('is-wrong');
+                    }
+                });
 
                 // Hiển thị Explanation
                 let exp = document.getElementById(`exp-${i}`);
@@ -1254,8 +1224,10 @@
 
                 // Cập nhật Nav
                 let nav = document.getElementById(`nav-${i}`);
-                nav.classList.remove('answered');
-                nav.classList.add(isCorr ? 'correct' : 'wrong');
+                if(nav) {
+                    nav.classList.remove('answered');
+                    nav.classList.add(isCorr ? 'correct' : 'wrong');
+                }
 
                 // Bỏ Blur Part 2
                 let qText = document.getElementById(`text-q${i}`);
@@ -1265,13 +1237,16 @@
 
         // Hiện Explanation chung của Passage P3, P4
         document.querySelectorAll('[id^="exp-passage-"]').forEach(el => el.classList.add('show'));
+        
+        // Hiện dịch tiếng Việt của các Option A, B, C, D (nếu Data có cấu trúc chi tiết)
+        document.querySelectorAll('.opt-vi-hint').forEach(el => el.style.display = 'block');
 
         // Vô hiệu hóa chọn đáp án
         document.querySelectorAll('input[type="radio"]').forEach(el => el.disabled = true);
         document.getElementById('headerSubmitBtn').style.display = 'none';
 
         // Show Kết Quả
-        document.getElementById('scoreDisplay').innerText = `${correctCount}/${totalRendered}`; // Thực tế là 100 nếu full data
+        document.getElementById('scoreDisplay').innerText = `${correctCount}/${totalRendered}`; 
         document.getElementById('resultModal').classList.add('show');
     }
 </script>
