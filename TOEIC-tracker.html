@@ -3,24 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SnapEnglish TOEIC Tracker - Chinh Phục Đỉnh Cao</title>
+    <title>TOEIC Tracker | SnapEnglish</title>
     <link rel="icon" type="image/png" href="ảnh.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary: #FF6B6B; /* Đỏ cam năng động */
-            --secondary: #4ECDC4; /* Xanh ngọc dịu nhẹ */
-            --listening: #45B7D1; /* Xanh dương */
-            --reading: #96CEB4; /* Xanh lá */
-            --writing: #FFBE0B; /* Vàng */
-            --speaking: #9D4EDD; /* Tím */
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --listening: #45B7D1;
+            --reading: #96CEB4;
+            --speaking: #9D4EDD;
+            --writing: #FFBE0B;
             --bg-color: #f7f9fc;
             --text-main: #2d3436;
             --correct: #4caf50;
             --incorrect: #f44336;
-            --total: #9c27b0;
         }
 
         body {
@@ -33,15 +32,16 @@
             justify-content: center;
         }
 
+        /* Phóng to hết ra màn hình, không giới hạn width nhỏ nữa */
         .container {
-            max-width: 1000px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.9);
+            width: 98%;
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 24px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.05);
             padding: 30px;
             border: 2px solid rgba(255, 255, 255, 0.5);
+            box-sizing: border-box;
         }
 
         .header {
@@ -57,18 +57,15 @@
             margin: 0;
         }
         
-        .header p {
-            color: #636e72;
-            font-weight: 600;
-        }
+        .header p { color: #636e72; font-weight: 600; }
 
         .grid-layout {
             display: grid;
-            grid-template-columns: 1fr 1.5fr;
+            grid-template-columns: 320px 1fr;
             gap: 30px;
         }
 
-        @media(max-width: 768px) {
+        @media(max-width: 1024px) {
             .grid-layout { grid-template-columns: 1fr; }
         }
 
@@ -79,180 +76,110 @@
             border-radius: 16px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.03);
             border: 1px solid #eee;
+            margin-bottom: 20px;
         }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #555;
-        }
-
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; }
         input, select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-family: 'Quicksand', sans-serif;
-            font-size: 14px;
-            box-sizing: border-box;
-            transition: all 0.3s;
+            width: 100%; padding: 12px; border: 2px solid #e0e0e0;
+            border-radius: 12px; font-family: 'Quicksand', sans-serif;
+            font-size: 14px; box-sizing: border-box; transition: all 0.3s;
         }
-
-        input:focus, select:focus {
-            border-color: var(--secondary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2);
-        }
+        input:focus, select:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2); }
 
         .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            font-family: 'Quicksand', sans-serif;
+            padding: 12px 20px; border: none; border-radius: 12px;
+            font-weight: bold; font-size: 16px; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s; font-family: 'Quicksand', sans-serif;
         }
+        .btn-submit { background: linear-gradient(45deg, var(--primary), var(--secondary)); color: white; width: 100%; margin-top: 10px; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .btn-reset { background: #ff7675; color: white; padding: 8px 15px; font-size: 14px; }
 
-        .btn-submit {
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            color: white;
-            width: 100%;
-            margin-top: 10px;
+        /* Dashboard & Totals */
+        .dashboard-header {
+            display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap;
         }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        
+        .total-box {
+            flex: 1; min-width: 200px;
+            background: linear-gradient(135deg, #f6f8fd 0%, #f1f5f9 100%);
+            padding: 20px; border-radius: 16px; text-align: center;
+            border: 1px solid #e2e8f0;
         }
+        .total-box h3 { margin: 0 0 10px 0; color: #475569; font-size: 1.1em; }
+        .total-box .score { font-size: 2.2em; font-weight: bold; color: var(--primary); }
+        .total-box .max-score { font-size: 1.2em; color: #94a3b8; }
 
-        .btn-reset {
-            background: #ff7675;
-            color: white;
-            width: 100%;
-            margin-top: 15px;
+        /* Multi-Circles */
+        .circles-container {
+            display: flex; justify-content: space-between; gap: 15px;
+            flex-wrap: wrap; margin-top: 10px;
         }
-
-        /* Circular Progress & Estimated Score */
-        .score-display {
-            text-align: center;
-            margin-top: 20px;
-            display: none;
+        .skill-circle-box {
+            display: flex; flex-direction: column; align-items: center; flex: 1;
         }
-
+        .skill-name { margin-top: 10px; font-weight: 600; color: #555; }
+        
         .circle-wrap {
-            width: 120px;
-            height: 120px;
-            background: #e6e9f0;
-            border-radius: 50%;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
+            width: 80px; height: 80px; background: #e6e9f0; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; position: relative;
         }
-
         .circle-inner {
-            width: 100px;
-            height: 100px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--primary);
-            z-index: 10;
+            width: 65px; height: 65px; background: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: bold; z-index: 10;
         }
 
         /* History Table */
-        .history-list {
-            margin-top: 20px;
-            max-height: 400px;
-            overflow-y: auto;
+        .table-container {
+            width: 100%; overflow-x: auto; max-height: 500px; overflow-y: auto;
+            border-radius: 12px; border: 1px solid #eee;
         }
-
-        .history-item {
-            background: #fafafa;
-            border-left: 5px solid var(--primary);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            animation: fadeIn 0.5s ease;
+        table {
+            width: 100%; border-collapse: collapse; text-align: left;
+            white-space: nowrap;
         }
-
-        .history-info strong { display: block; font-size: 16px; }
-        .history-info span { font-size: 13px; color: #777; }
+        thead { position: sticky; top: 0; background: #f8f9fa; z-index: 20; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        th, td { padding: 12px 15px; border-bottom: 1px solid #eee; }
+        th { font-weight: 600; color: #444; }
+        tbody tr:hover { background: #fdfdfd; }
         
-        .score-stats {
-            margin-top: 5px;
-            font-size: 14px;
-            font-weight: bold;
+        .badge {
+            padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white;
         }
+        .badge-listening { background: var(--listening); }
+        .badge-reading { background: var(--reading); }
+        .badge-speaking { background: var(--speaking); }
+        .badge-writing { background: var(--writing); }
 
-        .c-green { color: var(--correct); }
-        .c-red { color: var(--incorrect); }
-        .c-purple { color: var(--total); }
-
-        .btn-delete {
-            background: #ffeaa7;
-            color: #d63031;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-        }
+        .btn-delete { background: #ffeaa7; color: #d63031; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; }
 
         /* Toast Notification */
         #toast {
-            position: fixed;
-            bottom: -100px;
-            right: 20px;
-            background: white;
-            border-left: 5px solid var(--secondary);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: bottom 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            z-index: 1000;
-            max-width: 300px;
+            position: fixed; bottom: -100px; right: 20px; background: white;
+            border-left: 5px solid var(--secondary); padding: 20px; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: bottom 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000; max-width: 300px;
         }
-
-        #toast.show {
-            bottom: 20px;
-        }
-
+        #toast.show { bottom: 20px; }
         #toast .title { font-weight: bold; margin-bottom: 5px; color: var(--primary); }
         #toast .message { font-size: 14px; color: #555; line-height: 1.4; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div class="header">
-            <h1>SnapEnglish TOEIC 🚀</h1>
+            <h1>SnapEnglish TOEIC Tracker 🚀</h1>
             <p>Hành trình chinh phục 990 bắt đầu từ hôm nay</p>
         </div>
 
         <div class="grid-layout">
             <div>
                 <div class="card">
+                    <h3 style="margin-top: 0;">Nhập Điểm Thi</h3>
                     <form id="scoreForm">
                         <div class="form-group">
                             <label>Kỹ năng (Part)</label>
@@ -279,32 +206,80 @@
                             <label>Số câu ĐÚNG</label>
                             <input type="number" id="correctQ" placeholder="Ví dụ: 85" required>
                         </div>
-                        
                         <button type="submit" class="btn btn-submit">Ghi Nhận Điểm 🌟</button>
                     </form>
-
-                    <div class="score-display" id="scoreDisplay">
-                        <p style="font-weight: bold; margin-bottom: 10px;">Điểm TOEIC Ước Tính</p>
-                        <div class="circle-wrap" id="circleWrap">
-                            <div class="circle-inner" id="estimatedScore">0</div>
-                        </div>
-                        <p style="margin-top: 10px; font-size: 14px; color: #777;" id="scoreQuote"></p>
-                    </div>
                 </div>
             </div>
 
             <div>
-                <div class="card" style="margin-bottom: 20px;">
-                    <canvas id="progressChart" height="150"></canvas>
+                <div class="dashboard-header">
+                    <div class="total-box">
+                        <h3>Tổng điểm ước tính (L&R)</h3>
+                        <span class="score" id="totalLR">0</span> <span class="max-score">/ 990</span>
+                    </div>
+                    <div class="total-box">
+                        <h3>Tổng điểm ước tính (S&W)</h3>
+                        <span class="score" id="totalSW">0</span> <span class="max-score">/ 400</span>
+                    </div>
                 </div>
 
                 <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3 style="margin: 0;">Lịch sử luyện tập</h3>
-                        <button class="btn btn-reset" style="width: auto; margin: 0; padding: 8px 15px; font-size: 14px;" onclick="resetAll()">Xóa tất cả</button>
-                    </div>
-                    <div class="history-list" id="historyList">
+                    <h3 style="margin-top: 0; text-align: center;">Điểm Trung Bình Từng Kỹ Năng</h3>
+                    <div class="circles-container">
+                        <div class="skill-circle-box">
+                            <div class="circle-wrap" id="circle-Listening">
+                                <div class="circle-inner" style="color: var(--listening);" id="avg-Listening">0</div>
+                            </div>
+                            <div class="skill-name">Listening</div>
                         </div>
+                        <div class="skill-circle-box">
+                            <div class="circle-wrap" id="circle-Reading">
+                                <div class="circle-inner" style="color: var(--reading);" id="avg-Reading">0</div>
+                            </div>
+                            <div class="skill-name">Reading</div>
+                        </div>
+                        <div class="skill-circle-box">
+                            <div class="circle-wrap" id="circle-Speaking">
+                                <div class="circle-inner" style="color: var(--speaking);" id="avg-Speaking">0</div>
+                            </div>
+                            <div class="skill-name">Speaking</div>
+                        </div>
+                        <div class="skill-circle-box">
+                            <div class="circle-wrap" id="circle-Writing">
+                                <div class="circle-inner" style="color: var(--writing);" id="avg-Writing">0</div>
+                            </div>
+                            <div class="skill-name">Writing</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="margin: 0;">Lịch Sử Luyện Tập</h3>
+                        <button class="btn btn-reset" onclick="resetAll()">Xóa toàn bộ</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="historyTable">
+                            <thead>
+                                <tr>
+                                    <th>Ngày</th>
+                                    <th>Kỹ năng</th>
+                                    <th>Tên bài thi</th>
+                                    <th>Thời gian</th>
+                                    <th>Đúng / Tổng</th>
+                                    <th>Sai</th>
+                                    <th>Điểm ước tính</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <canvas id="progressChart" height="100"></canvas>
                 </div>
             </div>
         </div>
@@ -319,7 +294,20 @@
         let records = JSON.parse(localStorage.getItem('snapToeicData')) || [];
         let chartInstance = null;
 
-        // Tự động cập nhật số câu hỏi mặc định khi chọn kỹ năng
+        const maxScores = {
+            'Listening': 495,
+            'Reading': 495,
+            'Speaking': 200,
+            'Writing': 200
+        };
+
+        const colors = {
+            'Listening': 'var(--listening)',
+            'Reading': 'var(--reading)',
+            'Speaking': 'var(--speaking)',
+            'Writing': 'var(--writing)'
+        };
+
         function updateDefaultQuestions() {
             const skill = document.getElementById('skill').value;
             const totalQInput = document.getElementById('totalQ');
@@ -332,16 +320,11 @@
             }
         }
 
-        // Bảng quy đổi điểm TOEIC ước tính (Tương đối theo tỷ lệ chuẩn ETS)
         function calculateToeicScore(skill, correct, total) {
             let percentage = correct / total;
-            let maxScore = (skill === 'Listening' || skill === 'Reading') ? 495 : 200;
+            let maxScore = maxScores[skill];
             let step = (skill === 'Listening' || skill === 'Reading') ? 5 : 10;
-            
-            // Tính điểm theo tỷ lệ và làm tròn theo step (bước nhảy 5đ cho L/R, 10đ cho S/W)
             let estimated = Math.round((percentage * maxScore) / step) * step;
-            
-            // Đảm bảo không vượt quá max hoặc dưới 5
             if (estimated > maxScore) return maxScore;
             if (estimated < 5 && (skill === 'Listening' || skill === 'Reading')) return 5;
             if (estimated < 0) return 0;
@@ -350,7 +333,8 @@
 
         function init() {
             updateDefaultQuestions();
-            renderHistory();
+            updateDashboard();
+            renderTable();
             renderChart();
         }
 
@@ -370,60 +354,73 @@
 
             const incorrectQ = totalQ - correctQ;
             const calculatedScore = calculateToeicScore(skill, correctQ, totalQ);
-            const dateStr = new Date().toLocaleDateString('vi-VN');
-            const timestamp = Date.now();
+            
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('vi-VN');
+            const timestamp = now.getTime();
 
             const newRecord = {
                 id: timestamp, date: dateStr, skill, testName, timeTaken, totalQ, correctQ, incorrectQ, score: calculatedScore
             };
 
-            // So sánh và hiển thị popup (Toast)
             compareAndShowToast(newRecord);
 
-            // Lưu dữ liệu
             records.push(newRecord);
             localStorage.setItem('snapToeicData', JSON.stringify(records));
 
-            // Hiển thị vòng tròn điểm
-            showCircleScore(calculatedScore, correctQ, totalQ, skill);
-
-            // Cập nhật UI
-            renderHistory();
+            updateDashboard();
+            renderTable();
             renderChart();
             
-            // Reset form nhưng giữ nguyên kỹ năng
             const currentSkill = document.getElementById('skill').value;
             this.reset();
             document.getElementById('skill').value = currentSkill;
             updateDefaultQuestions();
         });
 
-        function showCircleScore(score, correct, total, skill) {
-            const display = document.getElementById('scoreDisplay');
-            const wrap = document.getElementById('circleWrap');
-            const scoreEl = document.getElementById('estimatedScore');
-            const quoteEl = document.getElementById('scoreQuote');
-            
-            display.style.display = 'block';
-            scoreEl.innerText = score;
-            
-            const percentage = (correct / total) * 100;
-            wrap.style.background = `conic-gradient(var(--secondary) ${percentage}%, #e6e9f0 0)`;
+        function updateDashboard() {
+            const getAverage = (skill) => {
+                const skillRecords = records.filter(r => r.skill === skill);
+                if (skillRecords.length === 0) return 0;
+                const sum = skillRecords.reduce((acc, r) => acc + r.score, 0);
+                // Làm tròn về hệ số chia hết cho 5 (hoặc 10) gần nhất cho chuẩn điểm TOEIC
+                const avg = sum / skillRecords.length;
+                let step = (skill === 'Listening' || skill === 'Reading') ? 5 : 10;
+                return Math.round(avg / step) * step;
+            };
 
-            // Lời khuyên tuỳ chỉnh theo TOEIC
-            if (percentage >= 85) {
-                quoteEl.innerText = "Wow! Phong độ huỷ diệt quá Snap-er ơi! Giữ vững nhé! ✨";
-            } else if (percentage >= 60) {
-                quoteEl.innerText = "Khá lắm! Cố gắng nghe kỹ Part 3,4 hoặc cày thêm từ vựng Part 7 nha! 💪";
-            } else {
-                quoteEl.innerText = "Sai ở đâu ghim lại ở đó. Ôn kỹ transcript và bẫy đề là lên trình ngay! 💖";
-            }
+            const avgL = getAverage('Listening');
+            const avgR = getAverage('Reading');
+            const avgS = getAverage('Speaking');
+            const avgW = getAverage('Writing');
+
+            // Cập nhật text vòng tròn
+            document.getElementById('avg-Listening').innerText = avgL;
+            document.getElementById('avg-Reading').innerText = avgR;
+            document.getElementById('avg-Speaking').innerText = avgS;
+            document.getElementById('avg-Writing').innerText = avgW;
+
+            // Cập nhật gradient vòng tròn
+            const updateCircleUI = (skill, avgScore) => {
+                const percentage = (avgScore / maxScores[skill]) * 100;
+                const wrap = document.getElementById(`circle-${skill}`);
+                wrap.style.background = `conic-gradient(${colors[skill]} ${percentage}%, #e6e9f0 0)`;
+            };
+
+            updateCircleUI('Listening', avgL);
+            updateCircleUI('Reading', avgR);
+            updateCircleUI('Speaking', avgS);
+            updateCircleUI('Writing', avgW);
+
+            // Cập nhật Tổng
+            document.getElementById('totalLR').innerText = avgL + avgR;
+            document.getElementById('totalSW').innerText = avgS + avgW;
         }
 
         function compareAndShowToast(newRecord) {
             const previousRecords = records.filter(r => r.skill === newRecord.skill);
             if (previousRecords.length === 0) {
-                showToast("Chào mừng Snap-er!", `Lần đầu nhập điểm ${newRecord.skill}. Hãy giữ thói quen luyện đề TOEIC mỗi ngày nhé!`);
+                showToast("Chào mừng Snap-er!", `Lần đầu nhập điểm ${newRecord.skill}. Hãy giữ thói quen luyện đề mỗi ngày nhé!`);
                 return;
             }
 
@@ -431,20 +428,17 @@
             const diff = newRecord.correctQ - lastRecord.correctQ;
             const scoreDiff = newRecord.score - lastRecord.score;
 
-            let title = "";
-            let msg = "";
-
+            let title = "", msg = "";
             if (diff > 0) {
                 title = "Đỉnh quá Snap-er ơi! 🎉";
-                msg = `Điểm ${newRecord.skill} hôm nay TĂNG ${scoreDiff}đ! Bạn đúng thêm được ${diff} câu so với lần trước. Xứng đáng một ly trà sữa!`;
+                msg = `Điểm ${newRecord.skill} tăng ${scoreDiff}đ! Cố gắng giữ phong độ nhé!`;
             } else if (diff < 0) {
-                title = "Đừng nản chí nha! 🥺";
-                msg = `Điểm ${newRecord.skill} hơi rớt nhẹ xíu. Đừng buồn, check lại phần mình hay sai nhất, ngày mai làm lại phục thù!`;
+                title = "Cố lên nhé! 🥺";
+                msg = `Điểm ${newRecord.skill} hơi rớt nhẹ xíu. Ôn lại lỗi sai rồi làm lại phục thù!`;
             } else {
                 title = "Phong độ ổn định! ⚖️";
-                msg = `Số câu đúng bằng y xì lần trước! Tối nay xem thêm một chút mẹo làm bài của SnapEnglish để bứt phá nha!`;
+                msg = `Tỉ lệ đúng bằng lần trước! Tối nay xem thêm mẹo SnapEnglish để bứt phá!`;
             }
-
             showToast(title, msg);
         }
 
@@ -452,52 +446,43 @@
             const toast = document.getElementById('toast');
             document.getElementById('toastTitle').innerText = title;
             document.getElementById('toastMessage').innerText = message;
-            
             toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 6000);
+            setTimeout(() => { toast.classList.remove('show'); }, 6000);
         }
 
-        function renderHistory() {
-            const list = document.getElementById('historyList');
-            list.innerHTML = '';
+        function renderTable() {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
             
             const reversed = [...records].reverse();
 
-            reversed.forEach(record => {
-                const colors = {
-                    'Listening': 'var(--listening)',
-                    'Reading': 'var(--reading)',
-                    'Writing': 'var(--writing)',
-                    'Speaking': 'var(--speaking)'
-                };
+            if (reversed.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: #999;">Chưa có dữ liệu luyện tập</td></tr>`;
+                return;
+            }
 
-                const div = document.createElement('div');
-                div.className = 'history-item';
-                div.style.borderLeftColor = colors[record.skill];
-                
-                div.innerHTML = `
-                    <div class="history-info">
-                        <strong>[${record.skill}] ${record.testName}</strong>
-                        <span>🗓️ ${record.date} | ⏱️ ${record.timeTaken} phút | Điểm ước tính: ${record.score}</span>
-                        <div class="score-stats">
-                            Đúng: <span class="c-green">${record.correctQ}</span> | 
-                            Sai: <span class="c-red">${record.incorrectQ}</span> | 
-                            Tổng: <span class="c-purple">${record.totalQ}</span>
-                        </div>
-                    </div>
-                    <button class="btn-delete" onclick="deleteRecord(${record.id})">Xóa</button>
+            reversed.forEach(record => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${record.date}</td>
+                    <td><span class="badge badge-${record.skill.toLowerCase()}">${record.skill}</span></td>
+                    <td><strong>${record.testName}</strong></td>
+                    <td>${record.timeTaken} phút</td>
+                    <td><span style="color: var(--correct); font-weight: bold;">${record.correctQ}</span> / ${record.totalQ}</td>
+                    <td style="color: var(--incorrect);">${record.incorrectQ}</td>
+                    <td style="font-weight: bold;">${record.score}</td>
+                    <td><button class="btn-delete" onclick="deleteRecord(${record.id})">Xóa</button></td>
                 `;
-                list.appendChild(div);
+                tbody.appendChild(tr);
             });
         }
 
         function deleteRecord(id) {
-            if(confirm("Bạn có chắc muốn xóa kết quả này không?")) {
+            if(confirm("Bạn có chắc muốn xóa kết quả này không? Thống kê sẽ được tính lại!")) {
                 records = records.filter(r => r.id !== id);
                 localStorage.setItem('snapToeicData', JSON.stringify(records));
-                renderHistory();
+                updateDashboard();
+                renderTable();
                 renderChart();
             }
         }
@@ -506,8 +491,8 @@
             if(confirm("Xóa toàn bộ lịch sử luyện TOEIC? Mọi dữ liệu sẽ biến mất đó nha!")) {
                 records = [];
                 localStorage.removeItem('snapToeicData');
-                document.getElementById('scoreDisplay').style.display = 'none';
-                renderHistory();
+                updateDashboard();
+                renderTable();
                 renderChart();
             }
         }
@@ -516,7 +501,6 @@
             const ctx = document.getElementById('progressChart').getContext('2d');
             const labels = [...new Set(records.map(r => r.date))];
             
-            // Hàm lấy % đúng thay vì điểm tuyệt đối để chung 1 biểu đồ (Vì LR max 495, SW max 200)
             const getPercentageBySkill = (skill) => {
                 return labels.map(date => {
                     const dayRecords = records.filter(r => r.date === date && r.skill === skill);
@@ -526,9 +510,7 @@
                 });
             };
 
-            if (chartInstance) {
-                chartInstance.destroy();
-            }
+            if (chartInstance) { chartInstance.destroy(); }
 
             chartInstance = new Chart(ctx, {
                 type: 'line',
@@ -543,24 +525,12 @@
                 },
                 options: {
                     responsive: true,
-                    plugins: {
-                        legend: { position: 'top', labels: { font: { family: 'Quicksand' } } },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': ' + context.parsed.y + '% Tỷ lệ đúng';
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: { min: 0, max: 100, title: { display: true, text: 'Tỷ lệ đúng (%)' } }
-                    }
+                    plugins: { legend: { position: 'top', labels: { font: { family: 'Quicksand' } } } },
+                    scales: { y: { min: 0, max: 100, title: { display: true, text: 'Tỷ lệ đúng (%)' } } }
                 }
             });
         }
 
-        // Khởi tạo app
         init();
     </script>
 </body>
