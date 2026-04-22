@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOEIC Part 1 - Cute & Professional</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Cute Pastel Palette */
+            --primary: #A084E8;        /* Soft Violet */
+            --primary-hover: #8F71D8;
+            --primary-light: #F3EFFF;
+            
+            --secondary: #6BE8D5;      /* Mint Green */
+            --success: #2ED573;        /* Bright Green */
+            --success-light: #E0F9EA;
+            --danger: #FF6B81;         /* Watermelon Red */
+            --danger-light: #FFE0E5;
+            
+            --text-main: #2F3542;
+            --text-muted: #747D8C;
+            --bg-body: #FDFBFF;
+            --bg-card: #FFFFFF;
+            
+            --shadow-soft: 0 15px 35px rgba(160, 132, 232, 0.1);
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Quicksand', sans-serif; 
+        }
+        
+        body { 
+            background-color: var(--bg-body); 
+            color: var(--text-main); 
+            padding: 20px; 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+        }
+
+        .container { 
+            background: var(--bg-card); 
+            max-width: 950px; 
+            width: 100%; 
+            border-radius: 30px; 
+            box-shadow: var(--shadow-soft); 
+            overflow: hidden; 
+            position: relative; 
+            border: 3px solid #F5F1FF;
+        }
+
+        /* Screens */
+        .screen { display: none; padding: 40px; animation: bounceIn 0.5s ease-out; }
+        .screen.active { display: block; }
+        
+        @keyframes bounceIn { 
+            0% { opacity: 0; transform: scale(0.95) translateY(20px); } 
+            100% { opacity: 1; transform: scale(1) translateY(0); } 
+        }
+
+        h1, h2, h3 { text-align: center; color: var(--primary); margin-bottom: 20px; font-weight: 700; }
+        .desc { text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 1.15rem; }
+
+        /* Buttons */
+        .btn { 
+            background: var(--primary); color: white; border: none; padding: 14px 30px; 
+            font-size: 1.05rem; font-weight: 700; border-radius: 20px; cursor: pointer; 
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px; 
+            box-shadow: 0 5px 15px rgba(160, 132, 232, 0.3);
+        }
+        .btn:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 8px 20px rgba(160, 132, 232, 0.4); }
+        .btn-outline { background: transparent; color: var(--primary); border: 2.5px solid var(--primary); box-shadow: none; }
+        .btn-outline:hover { background: var(--primary-light); transform: translateY(-2px); }
+        .btn-success { background: var(--success); box-shadow: 0 5px 15px rgba(46, 213, 115, 0.3); }
+
+        /* Test Layout */
+        .test-layout { display: flex; gap: 30px; margin-bottom: 30px; }
+        .image-col { flex: 1; background: #FAFAFA; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; align-items: center; border: 2px dashed #EAEAEA; }
+        .image-col img { max-width: 100%; border-radius: 16px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        
+        .question-col { flex: 0.8; display: flex; flex-direction: column; justify-content: center; }
+        .options { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; }
+        
+        .option-label { 
+            display: flex; align-items: center; cursor: pointer; padding: 16px 20px; 
+            border-radius: 18px; border: 2.5px solid #F1F2F6; transition: 0.3s; 
+            font-weight: 600; font-size: 1.1rem; background: white;
+        }
+        .option-label:hover { background: var(--primary-light); border-color: var(--primary); transform: translateX(5px); }
+        .option-label input { display: none; }
+        
+        .custom-radio { 
+            width: 24px; height: 24px; border: 2.5px solid #CED6E0; border-radius: 50%; 
+            margin-right: 18px; position: relative; transition: 0.2s; 
+        }
+        .option-label input:checked + .custom-radio { border-color: var(--primary); }
+        .option-label input:checked + .custom-radio::after { 
+            content: ""; width: 12px; height: 12px; background: var(--primary); 
+            border-radius: 50%; position: absolute; top: 3.5px; left: 3.5px; 
+        }
+        .option-label.selected { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+
+        /* Audio & Navigation */
+        audio { width: 100%; border-radius: 50px; outline: none; margin-top: 15px; }
+        .nav-footer { display: flex; justify-content: space-between; border-top: 2px dashed #F1F2F6; padding-top: 25px; margin-top: 20px; }
+
+        /* Results & Modal */
+        .score-box { text-align: center; padding: 40px; background: var(--primary-light); border-radius: 25px; margin-bottom: 30px; border: 2px solid #E2D9FF; }
+        .score-number { font-size: 4rem; font-weight: 800; color: var(--primary); text-shadow: 2px 2px 0px white; }
+        
+        .result-item { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid #F1F2F6; background: white; border-radius: 15px; margin-bottom: 10px; }
+        .status-tag { padding: 6px 15px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; }
+        .tag-correct { background: var(--success-light); color: #219A52; border: 1px solid #B7EFCF; }
+        .tag-wrong { background: var(--danger-light); color: #D63031; border: 1px solid #FFC9D1; }
+
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(47, 53, 66, 0.6); backdrop-filter: blur(6px); justify-content: center; align-items: center; }
+        .modal-content { background: white; width: 95%; max-width: 850px; max-height: 90vh; border-radius: 30px; padding: 35px; overflow-y: auto; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .close-modal { position: absolute; right: 25px; top: 20px; font-size: 35px; cursor: pointer; color: #A4B0BE; transition: 0.2s; }
+        .close-modal:hover { color: var(--danger); transform: rotate(90deg); }
+
+        /* Highlight Styles (The Magic!) */
+        .script-box { background: #FAFAFA; padding: 20px; border-radius: 18px; margin: 20px 0; border: 2px solid #EAEAEA; }
+        
+        .explain-item { margin-bottom: 12px; padding: 15px; border-radius: 15px; font-size: 1.05rem; line-height: 1.6;}
+        .explain-correct { background: var(--success-light); border-left: 5px solid var(--success); }
+        .explain-wrong { background: var(--danger-light); border-left: 5px solid var(--danger); }
+        
+        /* Highlight Classes */
+        .hl-right { background-color: #D5F5E3; color: #1E8449; font-weight: 700; padding: 2px 6px; border-radius: 6px; }
+        .hl-wrong { background-color: #FFEAA7; color: #D63031; font-weight: 700; padding: 2px 6px; border-radius: 6px; text-decoration: line-through decoration-red; }
+        .hl-vocab { color: #0984E3; font-weight: 700; background: #E8F4FD; padding: 2px 6px; border-radius: 6px; }
+        
+        .info-card { background: #FFF9F0; padding: 20px; border-radius: 18px; border: 2px dashed #FFEAA7; line-height: 1.7; font-size: 1.05rem; }
+        .info-card h4 { color: #E15F41; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+
+        @media (max-width: 768px) { .test-layout { flex-direction: column; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="screen-welcome" class="screen active">
+        <div style="font-size: 5rem; text-align: center; margin-bottom: 10px;">🎧✨</div>
+        <h1>Luyện Thi TOEIC Part 1</h1>
+        <p class="desc">Giao diện học tập siêu đáng yêu. Highlight đáp án rõ ràng giúp bạn dễ dàng chinh phục Part 1!</p>
+        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+            <button class="btn btn-outline" onclick="startApp('practice')">🌸 Luyện Tập Thư Giãn</button>
+            <button class="btn" onclick="startApp('mock')">🔥 Thi Thử Căng Thẳng</button>
+        </div>
+    </div>
+
+    <div id="screen-test" class="screen">
+        <div class="test-layout">
+            <div class="image-col">
+                <img id="q-image" src="" alt="TOEIC Image">
+                <audio id="q-audio" controls></audio>
+                <div id="mock-msg" style="display:none; color: var(--primary); font-weight:700; margin-top:15px; background: var(--primary-light); padding: 12px 25px; border-radius: 20px; text-align: center; width: 100%;">
+                    Audio đang phát... Cố lên nha! 🍀
+                </div>
+            </div>
+            <div class="question-col">
+                <h3 id="q-number" style="border-bottom: 2px dashed var(--primary-light); padding-bottom: 15px;">Câu Hỏi 1</h3>
+                <div class="options" id="options-container">
+                    <label class="option-label"><input type="radio" name="ans" value="A"><div class="custom-radio"></div><span>A</span></label>
+                    <label class="option-label"><input type="radio" name="ans" value="B"><div class="custom-radio"></div><span>B</span></label>
+                    <label class="option-label"><input type="radio" name="ans" value="C"><div class="custom-radio"></div><span>C</span></label>
+                    <label class="option-label"><input type="radio" name="ans" value="D"><div class="custom-radio"></div><span>D</span></label>
+                </div>
+            </div>
+        </div>
+        <div class="nav-footer">
+            <button id="btn-prev" class="btn btn-outline" style="display:none;" onclick="changeQuestion(-1)">⬅ Câu trước</button>
+            <div style="flex-grow: 1;"></div> 
+            <button id="btn-next" class="btn" style="display:none;" onclick="changeQuestion(1)">Câu tiếp theo ➡</button>
+            <button id="btn-submit" class="btn btn-success" style="display:none;" onclick="finishTest()">Nộp Bài Ngay ✨</button>
+        </div>
+    </div>
+
+    <div id="screen-result" class="screen">
+        <div class="score-box">
+            <h2>Kết Quả Của Bạn 🏆</h2>
+            <div class="score-number" id="final-score">0/6</div>
+            <p id="score-comment" style="font-size: 1.2rem; margin-top: 10px; font-weight: 600;">Xem lại giải thích siêu chi tiết bên dưới nhé!</p>
+        </div>
+        <div id="result-list"></div>
+        <div style="text-align: center; margin-top: 40px;">
+            <button class="btn" onclick="location.reload()">🔄 Bắt Đầu Lại</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-detail" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h2 id="modal-title" style="text-align:left; color: var(--primary);">Giải thích Câu 1 🌟</h2>
+        <audio id="modal-audio" controls style="margin-bottom: 20px;"></audio>
+        
+        <div class="script-box">
+            <h4 style="color: #2F3542; margin-bottom: 10px;">🇬🇧 Script tiếng Anh</h4>
+            <div id="modal-script-en" style="line-height: 1.6; margin-bottom: 15px;"></div>
+            <h4 style="color: #2F3542; margin-bottom: 10px;">🇻🇳 Dịch tiếng Việt</h4>
+            <div id="modal-script-vi" style="line-height: 1.6; color: var(--text-muted);"></div>
+        </div>
+
+        <h3 style="margin-top: 25px; text-align: left;">🕵️ Phân tích đáp án</h3>
+        <div id="modal-explains" style="margin-bottom: 25px;"></div>
+
+        <div class="info-card">
+            <h4>📚 Từ vựng quan trọng cần nhớ</h4>
+            <div id="modal-vocab"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            id: 1, 
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-1-17.png", 
+            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-01.mp3",
+            correct: "D",
+            script_en: "(A) He's picking up a bag.<br>(B) He's cycling on a road.<br>(C) He's climbing some rocks.<br>(D) He's wearing a jacket.",
+            script_vi: "(A) Người đàn ông đang nhấc một chiếc túi lên.<br>(B) Người đàn ông đang đạp xe trên đường.<br>(C) Người đàn ông đang leo lên một số tảng đá.<br>(D) Người đàn ông đang mặc áo khoác.",
+            explains: [
+                { opt: "A", text: "Sai động từ. Người đàn ông đang mang theo túi đi chứ không phải là hình ảnh đang <span class='hl-wrong'>nhấc lên (picking up a bag)</span>.", type: "wrong" },
+                { opt: "B", text: "Sai động từ, không phải là hình ảnh người đàn ông đang <span class='hl-wrong'>đạp xe (cycling)</span> trên đường.", type: "wrong" },
+                { opt: "C", text: "Sai động từ. Không phải là hình ảnh người đàn ông đang <span class='hl-wrong'>leo lên đá (climbing some rocks)</span>.", type: "wrong" },
+                { opt: "D", text: "Đáp án đúng. Vì người đàn ông đang <span class='hl-right'>mặc áo khoác (wearing a jacket)</span>.", type: "correct" }
+            ],
+            vocab: "• <span class='hl-vocab'>pick up</span>: nhấc lên, cầm lên<br>• <span class='hl-vocab'>cycle</span>: đạp xe<br>• <span class='hl-vocab'>wear</span>: mặc (chỉ trạng thái đã mặc trên người)"
+        },
+        {
+            id: 2, 
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-15.png", 
+            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-02.mp3",
+            correct: "A",
+            script_en: "(A) They're seated in a waiting area.<br>(B) They're placing books on a table.<br>(C) One of the women is moving a chair.<br>(D) One of the women is watering a plant.",
+            script_vi: "(A) Mọi người đang ngồi trong phòng chờ.<br>(B) Mọi người đang đặt sách lên bàn.<br>(C) Một trong những người phụ nữ đang di chuyển một chiếc ghế.<br>(D) Một trong những người phụ nữ đang tưới cây.",
+            explains: [
+                { opt: "A", text: "Đáp án đúng, vì hình ảnh hai người đang <span class='hl-right'>ngồi trong phòng chờ (seated in a waiting area)</span>.", type: "correct" },
+                { opt: "B", text: "Sai động từ, vì không phải là hình ảnh hai người đang <span class='hl-wrong'>đặt sách lên bàn (placing books on a table)</span>.", type: "wrong" },
+                { opt: "C", text: "Sai động từ, vì không phải là hình ảnh phụ nữ đang <span class='hl-wrong'>di chuyển ghế (moving a chair)</span>.", type: "wrong" },
+                { opt: "D", text: "Sai động từ. Có thấy cây nhưng không phải là hình ảnh đang <span class='hl-wrong'>tưới cây (watering a plant)</span>.", type: "wrong" }
+            ],
+            vocab: "• <span class='hl-vocab'>waiting area</span>: phòng chờ<br>• <span class='hl-vocab'>place</span>: đặt, để<br>• <span class='hl-vocab'>water a plant</span>: tưới cây"
+        },
+        {
+            id: 3, 
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-3-16.png", 
+            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-03.mp3",
+            correct: "C",
+            script_en: "(A) A man is pushing a shopping cart.<br>(B) A man is paying for some groceries.<br>(C) Some merchandise is arranged on shelves.<br>(D) Some baskets are lined up on the floor.",
+            script_vi: "(A) Một người đàn ông đang đẩy xe đẩy mua sắm.<br>(B) Một người đàn ông đang thanh toán tiền tạp hóa.<br>(C) Hàng hóa được sắp xếp trên kệ.<br>(D) Một vài chiếc rổ được xếp thành hàng trên sàn.",
+            explains: [
+                { opt: "A", text: "Sai động từ. Không phải là hình ảnh người đàn ông đang <span class='hl-wrong'>đẩy xe đẩy mua sắm (pushing a shopping cart)</span>.", type: "wrong" },
+                { opt: "B", text: "Sai động từ, không phải là hình ảnh người đàn ông đang <span class='hl-wrong'>thanh toán tiền tạp hóa (paying for some groceries)</span>.", type: "wrong" },
+                { opt: "C", text: "Đáp án đúng. Vì hình ảnh <span class='hl-right'>hàng hóa được sắp xếp trên kệ (arranged on shelves)</span>.", type: "correct" },
+                { opt: "D", text: "Sai động từ. Có thấy rổ mua sắm nhưng không phải hình ảnh được <span class='hl-wrong'>xếp thành hàng trên sàn (lined up on the floor)</span>.", type: "wrong" }
+            ],
+            vocab: "• <span class='hl-vocab'>grocery</span>: tạp hóa<br>• <span class='hl-vocab'>merchandise</span>: hàng hóa<br>• <span class='hl-vocab'>arrange</span>: sắp xếp, bày trí<br>• <span class='hl-vocab'>shelf</span>: kệ<br>• <span class='hl-vocab'>line up</span>: xếp thành hàng<br>• <span class='hl-vocab'>floor</span>: sàn nhà"
+        },
+        {
+            id: 4, 
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-4-14.png", 
+            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-04.mp3",
+            correct: "A",
+            script_en: "(A) A woman's working at a laptop computer.<br>(B) A woman's drinking from a bottle.<br>(C) A woman's stacking some furniture.<br>(D) A woman's putting items in a backpack.",
+            script_vi: "(A) Một người phụ nữ đang làm việc trên máy tính xách tay.<br>(B) Một người phụ nữ đang uống nước từ chai.<br>(C) Một người phụ nữ đang xếp chồng đồ nội thất lên nhau.<br>(D) Một người phụ nữ đang cho các món đồ vào ba lô.",
+            explains: [
+                { opt: "A", text: "Đáp án đúng, vì người phụ nữ đang <span class='hl-right'>làm việc trên máy tính xách tay (working at a laptop computer)</span>.", type: "correct" },
+                { opt: "B", text: "Sai động từ, có thấy chai nước nhưng không phải là hình ảnh đang <span class='hl-wrong'>uống nước từ chai (drinking from a bottle)</span>.", type: "wrong" },
+                { opt: "C", text: "Sai động từ, không phải là hình ảnh người phụ nữ đang <span class='hl-wrong'>xếp chồng đồ nội thất (stacking some furniture)</span>.", type: "wrong" },
+                { opt: "D", text: "Sai động từ, có thấy ba lô nhưng không phải là hình ảnh đang <span class='hl-wrong'>cho đồ vào ba lô (putting items in a backpack)</span>.", type: "wrong" }
+            ],
+            vocab: "• <span class='hl-vocab'>drink from a bottle</span>: uống nước từ chai<br>• <span class='hl-vocab'>stack</span>: xếp, xếp chồng<br>• <span class='hl-vocab'>backpack</span>: ba lô"
+        },
+        {
+            id: 5, 
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-5-14.png", 
+            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-05.mp3",
+            correct: "B",
+            script_en: "(A) A stage has been set up indoors.<br>(B) Some people are watching a performance.<br>(C) People are waiting in line for tickets.<br>(D) A concert hall is unoccupied.",
+            script_vi: "(A) Sân khấu đã được thiết lập trong nhà.<br>(B) Vài người đang xem biểu diễn.<br>(C) Mọi người đang xếp hàng chờ mua vé.<br>(D) Phòng hòa nhạc đang trống.",
+            explains: [
+                { opt: "A", text: "Sai danh từ, sân khấu được thiết lập ngoài trời (outdoors) chứ không phải được <span class='hl-wrong'>thiết lập trong nhà (indoors)</span>.", type: "wrong" },
+                { opt: "B", text: "Đáp án đúng. Vì hình ảnh vài người đang <span class='hl-right'>xem biểu diễn (watching a performance)</span>.", type: "correct" },
+                { opt: "C", text: "Sai động từ. Có thấy mọi người nhưng không phải hình ảnh mọi người đang <span class='hl-wrong'>xếp hàng chờ (waiting in line)</span> để mua vé.", type: "wrong" },
+                { opt: "D", text: "Đáp án sai do sử dụng danh từ không có trong ảnh. Trong ảnh không thấy <span class='hl-wrong'>tòa nhà biểu diễn (concert hall)</span>.", type: "wrong" }
+            ],
+            vocab: "• <span class='hl-vocab'>stage</span>: sân khấu<br>• <span class='hl-vocab'>set up</span>: thiết lập<br>• <span class='hl-vocab'>indoors</span>: trong nhà<br>• <span class='hl-vocab'>performance</span>: buổi biểu diễn<br>• <span class='hl-vocab'>unoccupied</span>: trống, không có người"
+        },
+        {
+            id: 6, 
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-6-12.png", 
+            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-06.mp3",
+            correct: "C",
+            script_en: "(A) Some pedestrians are crossing at an intersection.<br>(B) Tree branches are being cleared off a walkway.<br>(C) Some vehicles are facing a low wall.<br>(D) A car is exiting a parking garage.",
+            script_vi: "(A) Một vài người đi bộ đang băng qua ngã tư.<br>(B) Các cành cây đang được dọn sạch khỏi lối đi bộ.<br>(C) Vài chiếc xe đang hướng về một bức tường thấp.<br>(D) Một chiếc xe hơi đang đi ra khỏi nhà để xe.",
+            explains: [
+                { opt: "A", text: "Đáp án sai do sử dụng danh từ không có trong ảnh, không thấy <span class='hl-wrong'>những người đi bộ (pedestrians)</span>.", type: "wrong" },
+                { opt: "B", text: "Sai động từ. Trong ảnh có thấy cành cây nhưng không phải hình ảnh đang được <span class='hl-wrong'>dọn sạch (being cleared off)</span>.", type: "wrong" },
+                { opt: "C", text: "Đáp án đúng, vì hình ảnh vài chiếc xe đang <span class='hl-right'>hướng về một bức tường thấp (facing a low wall)</span>.", type: "correct" },
+                { opt: "D", text: "Sai động từ, trong ảnh có xe nhưng không phải hình ảnh xe đang <span class='hl-wrong'>đi ra khỏi nhà để xe (exiting a parking garage)</span>.", type: "wrong" }
+            ],
+            vocab: "• <span class='hl-vocab'>pedestrian</span>: người đi bộ<br>• <span class='hl-vocab'>intersection</span>: ngã tư<br>• <span class='hl-vocab'>tree branch</span>: cành cây<br>• <span class='hl-vocab'>clear off</span>: dọn sạch<br>• <span class='hl-vocab'>walkway</span>: lối đi bộ"
+        }
+    ];
+
+    let currentMode = '';
+    let currentIndex = 0;
+    let userAnswers = new Array(questions.length).fill(null);
+    const audio = document.getElementById('q-audio');
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if (!audio.paused) audio.pause();
+    }
+
+    function startApp(mode) {
+        currentMode = mode;
+        currentIndex = 0;
+        userAnswers.fill(null);
+        showScreen('screen-test');
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const q = questions[currentIndex];
+        document.getElementById('q-number').innerText = `Câu Hỏi ${q.id}`;
+        document.getElementById('q-image').src = q.image;
+        audio.src = q.audio;
+        
+        // Cập nhật trạng thái radio buttons
+        const labels = document.querySelectorAll('.option-label');
+        labels.forEach(lbl => lbl.classList.remove('selected'));
+        
+        const radios = document.getElementsByName('ans');
+        radios.forEach(r => {
+            r.checked = (r.value === userAnswers[currentIndex]);
+            if(r.checked) r.parentElement.classList.add('selected');
+            
+            r.onchange = () => { 
+                userAnswers[currentIndex] = r.value; 
+                labels.forEach(lbl => lbl.classList.remove('selected'));
+                r.parentElement.classList.add('selected');
+            };
+        });
+
+        const isLast = currentIndex === questions.length - 1;
+
+        if (currentMode === 'mock') {
+            document.getElementById('btn-prev').style.display = 'none';
+            document.getElementById('btn-next').style.display = 'none';
+            document.getElementById('btn-submit').style.display = isLast ? 'inline-flex' : 'none';
+            
+            audio.style.display = 'none';
+            document.getElementById('mock-msg').style.display = 'inline-block';
+            
+            audio.play().catch(e => console.log("Trình duyệt chặn Autoplay."));
+            
+            audio.onended = () => {
+                if (!isLast) setTimeout(() => changeQuestion(1), 1000);
+            };
+        } else {
+            document.getElementById('btn-prev').style.display = (currentIndex === 0) ? 'none' : 'inline-flex';
+            document.getElementById('btn-next').style.display = isLast ? 'none' : 'inline-flex';
+            document.getElementById('btn-submit').style.display = isLast ? 'inline-flex' : 'none';
+
+            audio.style.display = 'block';
+            document.getElementById('mock-msg').style.display = 'none';
+            audio.onended = null;
+        }
+    }
+
+    function changeQuestion(step) {
+        currentIndex += step;
+        renderQuestion();
+    }
+
+    function finishTest() {
+        showScreen('screen-result');
+        let correctCount = 0;
+        const listDiv = document.getElementById('result-list');
+        listDiv.innerHTML = '';
+
+        questions.forEach((q, idx) => {
+            const isCorrect = userAnswers[idx] === q.correct;
+            if(isCorrect) correctCount++;
+
+            const item = document.createElement('div');
+            item.className = 'result-item';
+            item.innerHTML = `
+                <div>
+                    <strong style="color: var(--primary); font-size:1.1rem;">Câu ${q.id}:</strong> Bạn chọn <b>${userAnswers[idx] || "Trống"}</b> 
+                    <span class="status-tag ${isCorrect ? 'tag-correct' : 'tag-wrong'}" style="margin-left:10px;">${isCorrect ? '✔ Đúng' : '✖ Sai'}</span>
+                </div>
+                <button class="btn btn-outline" style="padding: 8px 20px; font-size:0.9rem;" onclick="openDetail(${idx})">Xem giải thích ✨</button>
+            `;
+            listDiv.appendChild(item);
+        });
+
+        document.getElementById('final-score').innerText = `${correctCount}/${questions.length}`;
+        if(correctCount === questions.length) {
+            document.getElementById('score-comment').innerText = "Wow! Bạn đạt điểm tuyệt đối rồi! Quá đỉnh! 🎉";
+        } else if(correctCount >= 4) {
+            document.getElementById('score-comment').innerText = "Khá lắm! Cố gắng luyện thêm xíu nữa là hoàn hảo! 🌟";
+        }
+    }
+
+    function openDetail(idx) {
+        const q = questions[idx];
+        document.getElementById('modal-title').innerText = `Phân tích chi tiết Câu ${q.id} 🌟`;
+        document.getElementById('modal-audio').src = q.audio;
+        document.getElementById('modal-script-en').innerHTML = q.script_en;
+        document.getElementById('modal-script-vi').innerHTML = q.script_vi;
+        document.getElementById('modal-vocab').innerHTML = q.vocab;
+
+        const explainDiv = document.getElementById('modal-explains');
+        explainDiv.innerHTML = '';
+        q.explains.forEach(ex => {
+            const div = document.createElement('div');
+            div.className = `explain-item ${ex.type === 'correct' ? 'explain-correct' : 'explain-wrong'}`;
+            div.innerHTML = `<strong>(${ex.opt})</strong> ${ex.text}`;
+            explainDiv.appendChild(div);
+        });
+
+        document.getElementById('modal-detail').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('modal-detail').style.display = 'none';
+        document.getElementById('modal-audio').pause();
+    }
+</script>
+
+</body>
+</html>
