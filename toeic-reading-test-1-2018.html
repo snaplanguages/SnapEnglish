@@ -105,7 +105,31 @@ footer {
 .nav-dot:hover { border-color: var(--primary); color: var(--primary); }
 .nav-dot.done { background: #edf2ea; color: var(--primary-dark); border-color: #c1d5a4; }
 .nav-dot.active-q { background: var(--primary); color: white; border-color: var(--primary); }
+/* --- OVERLAY & MODALS (Cài đặt, Nộp bài) --- */
+.custom-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255,255,255,0.85); backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center; z-index: 99999;
+}
+.custom-modal {
+    background: white; padding: 40px; border-radius: 25px;
+    box-shadow: 0 15px 40px rgba(136, 176, 75, 0.15);
+    width: 90%; max-width: 450px; text-align: center; border: 2px solid var(--border);
+}
+.mode-btn {
+    display: block; width: 100%; padding: 15px; margin: 15px 0;
+    border-radius: 15px; font-size: 18px; font-weight: 700; cursor: pointer; transition: 0.3s;
+    font-family: inherit;
+}
+.mode-practice { background: #fff0eb; color: #d87059; border: 2px solid #ffccbc; }
+.mode-practice:hover, .mode-practice.selected { background: var(--accent); color: white; border-color: var(--accent); }
+.mode-mock { background: #e8f5e9; color: var(--primary-dark); border: 2px solid #c8e6c9; }
+.mode-mock:hover, .mode-mock.selected { background: var(--primary); color: white; border-color: var(--primary); }
 
+#timeInputBox input { width: 100px; padding: 10px; font-size: 18px; text-align: center; border-radius: 8px; border: 2px solid var(--border); outline: none; font-family: inherit;}
+.start-btn, .btn-confirm { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 15px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s;}
+.btn-cancel { background: #f5f5f5; color: #666; border: 2px solid #ddd; padding: 12px 25px; border-radius: 15px; font-size: 16px; font-weight: 700; cursor: pointer;}
+.modal-actions { display: flex; gap: 15px; margin-top: 25px; justify-content: center; }
     </style>
 </head>
 <body>
@@ -155,7 +179,53 @@ footer {
         <div class="nav-scroller" id="navPalette">
             </div>
     </footer>
+<div id="setupOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2 style="color: var(--primary-dark); font-family: 'Lora', serif; font-size:28px;">Cài đặt bài làm ✨</h2>
+        <button class="mode-btn mode-practice" onclick="selectMode('practice')">🎯 Luyện Tập</button>
+        <button class="mode-btn mode-mock" onclick="selectMode('mock')">🏆 Thi Thử (75 phút)</button>
+        <div id="timeInputBox" style="display: none; margin: 20px 0;">
+            <label style="font-weight: bold; color: #555; font-size:18px;">Thời gian (phút): </label>
+            <input type="number" id="timeInput" value="75" min="5" max="180">
+        </div>
+        <button class="start-btn" id="startBtn" style="display: none; width: 100%; margin-top:10px;" onclick="askReady()">Bắt đầu</button>
+    </div>
+</div>
 
+<div id="startConfirmOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2 style="color: var(--primary-dark); font-family: 'Lora', serif;">Xác nhận</h2>
+        <p id="startConfirmMsg" style="font-size: 18px; line-height: 1.6; color:#555;"></p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeStartConfirmModal()">Huỷ</button>
+            <button class="btn-confirm" onclick="startTestActual()">OK</button>
+        </div>
+    </div>
+</div>
+
+<div id="confirmOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2 style="color: var(--primary-dark); font-family: 'Lora', serif;">Nộp bài</h2>
+        <p style="font-size: 18px; color:#555;">Bạn có chắc chắn muốn nộp bài?</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeConfirmModal()">Quay lại</button>
+            <button class="btn-confirm" onclick="executeSubmit()">Nộp bài</button>
+        </div>
+    </div>
+</div>
+
+<div id="resultOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2 style="color: var(--primary-dark); font-family: 'Lora', serif;">🎉 Hoàn thành!</h2>
+        <div id="resultMessage" style="margin: 20px 0; line-height:1.6;"></div>
+        <button class="btn-confirm" style="width: 100%;" onclick="closeResultModal()">Xem đáp án & Giải thích</button>
+    </div>
+</div>
+
+<div id="ctxMenu" style="position: absolute; display: none; background: white; box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-radius: 12px; z-index: 99999; overflow:hidden;">
+    <button onclick="doHighlight()" style="display:block; width:100%; padding:12px 20px; border:none; background:none; cursor:pointer; text-align:left; font-weight:600; color:#555; font-family:inherit;">🖍 Highlight (Vàng)</button>
+    <button onclick="removeHighlight()" style="display:block; width:100%; padding:12px 20px; border:none; background:none; cursor:pointer; text-align:left; font-weight:600; color:#e06666; font-family:inherit;">🗑 Xóa Highlight</button>
+</div>
     <script>
   const toeicData = {
     part5: [
@@ -677,7 +747,7 @@ footer {
                 <p style="text-align: right; margin-bottom: 0;"><strong>— Evan Bryant</strong></p>
             </div>
         </div>`,
-        questions: [passageId: "p7-14",
+        questions: [
             { id: 86, text: "What is suggested about Janney's Star Tours?", options: { A: "Opened new offices", B: "Celebrating expansion", C: "New tours created", D: "Tours scheduled weekly" }, correct: "D" },
             { id: 87, text: "What can they offer clients?", options: { A: "Artist discussions", B: "Repeat discounts", C: "Max group size", D: "Group preferences customization" }, correct: "D" },
             { id: 88, text: "What is suggested about Mr. Bryant's tour?", options: { A: "Five days long", B: "Purchased at reduced price", C: "No gallery fees", D: "Designed for historians" }, correct: "B" },
@@ -859,14 +929,14 @@ function renderDynamicContent() {
     let part5Html = '';
     let part6Html = '';
     let part7Html = '';
+    let leftPaneHtml = ''; // Biến lưu toàn bộ bài đọc để nhét sang cột trái
 
     // 1. Render Part 5
     if(toeicData.part5) {
-        part5Html += `<div class="instruction"> <u>Part 5: Incomplete Sentences</u><br>Choose the word or phrase that best completes the sentence.</div>`;
+        part5Html += `<div class="instruction" style="background:#e8f5e9; color:#2e7d32; padding:15px; border-radius:12px; margin-bottom:25px; font-weight:bold;"> <u>Part 5: Incomplete Sentences</u><br>Choose the word or phrase that best completes the sentence.</div>`;
         toeicData.part5.forEach(q => {
             part5Html += createTOEICQuestion(q);
             allQuestionIds.push(q.id);
-            // Lưu đáp án. Nếu đáp án là text (vd: "recommendation"), ta cần chuyển sang A, B, C, D
             answerKey[q.id] = formatAnswer(q.options, q.a || q.correct);
         });
         document.getElementById('render-part5').innerHTML = part5Html;
@@ -874,25 +944,32 @@ function renderDynamicContent() {
 
     // 2. Render Part 6
     if(toeicData.part6) {
-        part6Html += `<div class="instruction"> <u>Part 6: Text Completion</u><br>Choose the best word or phrase for each blank.</div>`;
+        part6Html += `<div class="instruction" style="background:#e8f5e9; color:#2e7d32; padding:15px; border-radius:12px; margin-bottom:25px; font-weight:bold;"> <u>Part 6: Text Completion</u><br>Choose the best word or phrase for each blank.</div>`;
         toeicData.part6.forEach(passageObj => {
-            part6Html += createPassageBlock(passageObj);
+            leftPaneHtml += `<div id="passage-${passageObj.passageId}" class="passage-text-content" style="display:none; margin-bottom: 30px;">${passageObj.passage}</div>`;
+            part6Html += createQuestionsBlock(passageObj);
         });
         document.getElementById('render-part6').innerHTML = part6Html;
     }
 
     // 3. Render Part 7
     if(toeicData.part7) {
-        part7Html += `<div class="instruction"> <u>Part 7: Reading Comprehension</u><br>Read the passages and answer the questions.</div>`;
+        part7Html += `<div class="instruction" style="background:#e8f5e9; color:#2e7d32; padding:15px; border-radius:12px; margin-bottom:25px; font-weight:bold;"> <u>Part 7: Reading Comprehension</u><br>Read the passages and answer the questions.</div>`;
         toeicData.part7.forEach(passageObj => {
-            part7Html += createPassageBlock(passageObj);
+            leftPaneHtml += `<div id="passage-${passageObj.passageId}" class="passage-text-content" style="display:none; margin-bottom: 30px;">${passageObj.passage}</div>`;
+            part7Html += createQuestionsBlock(passageObj);
         });
         document.getElementById('render-part7').innerHTML = part7Html;
     }
 
+    // Đổ nội dung bài đọc vào cột trái
+    document.getElementById('passage-content-container').innerHTML += leftPaneHtml;
+
     // 4. Khởi tạo Footer Navigation Dots
     const nav = document.getElementById("navPalette");
-    allQuestionIds.sort((a, b) => a - b); // Sắp xếp ID từ bé đến lớn
+    // Lọc bỏ undefined nếu mảng bị lỗi
+    allQuestionIds = allQuestionIds.filter(id => id); 
+    allQuestionIds.sort((a, b) => a - b);
     allQuestionIds.forEach(id => {
         let dot = document.createElement("div");
         dot.className = "nav-dot"; 
@@ -903,7 +980,7 @@ function renderDynamicContent() {
     });
 }
 
-// Helper: Chuyển đáp án Text thành A, B, C, D nếu cần
+// Helper: Chuyển đáp án Text thành A, B, C, D
 function formatAnswer(options, answer) {
     if(!options) return answer;
     if(Array.isArray(options)) {
@@ -911,48 +988,55 @@ function formatAnswer(options, answer) {
         let idx = options.indexOf(answer);
         return idx !== -1 ? labels[idx] : answer;
     }
-    return answer; // Nếu options đã là Object {A: "...", B: "..."} thì answer đã là A,B,C,D
+    return answer; 
 }
 
 // Helper: Tạo HTML cho 1 câu hỏi trắc nghiệm
 function createTOEICQuestion(qObj) {
-    let text = qObj.q || qObj.text;
+    if(!qObj || !qObj.id) return ""; // Bypass lỗi nếu cấu trúc data sai
+    let text = qObj.q || qObj.text || "";
     let opts = qObj.options;
     let optsHTML = "";
+
+    let inputStyle = `margin-right:12px; transform:scale(1.3); cursor:pointer;`;
+    let labelStyle = `display:block; margin:10px 0; padding:12px; border-radius:10px; cursor:pointer; border:1px solid transparent; transition:0.2s; font-size:18px;`;
 
     if (Array.isArray(opts)) {
         let labels = ["A", "B", "C", "D"];
         opts.forEach((opt, i) => {
-            optsHTML += `<label class="mc-option"><input type="radio" name="q${qObj.id}" value="${labels[i]}" onclick="checkNav(${qObj.id})"> <b>${labels[i]}.</b> ${opt}</label>`;
+            optsHTML += `<label class="mc-option" style="${labelStyle}" onmouseover="this.style.background='#edf2ea'" onmouseout="this.style.background='transparent'"><input type="radio" name="q${qObj.id}" value="${labels[i]}" style="${inputStyle}" onclick="checkNav(${qObj.id})"> <b>${labels[i]}.</b> ${opt}</label>`;
         });
     } else {
         for (let key in opts) {
-            optsHTML += `<label class="mc-option"><input type="radio" name="q${qObj.id}" value="${key}" onclick="checkNav(${qObj.id})"> <b>${key}.</b> ${opts[key]}</label>`;
+            optsHTML += `<label class="mc-option" style="${labelStyle}" onmouseover="this.style.background='#edf2ea'" onmouseout="this.style.background='transparent'"><input type="radio" name="q${qObj.id}" value="${key}" style="${inputStyle}" onclick="checkNav(${qObj.id})"> <b>${key}.</b> ${opts[key]}</label>`;
         }
     }
 
-    return `<div class="q-row" id="q-row-${qObj.id}">
-                <div class="q-content-wrapper">
-                    <div class="q-num">${qObj.id}</div>
-                    <div class="q-text"><b>${text}</b><br>${optsHTML}<span id="fb-${qObj.id}" class="feedback"></span></div>
+    return `<div class="q-row" id="q-row-${qObj.id}" style="margin-bottom:25px; display:flex;">
+                <div class="q-num" style="min-width:35px; height:35px; background:#7FA99B; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; margin-right:15px; flex-shrink:0;">${qObj.id}</div>
+                <div class="q-text" style="flex:1; font-size:18px; line-height:1.8;">
+                    <b>${text}</b><br>${optsHTML}
+                    <span id="fb-${qObj.id}" class="feedback" style="font-weight:bold; margin-left:10px;"></span>
+                    <div id="exp-${qObj.id}"></div>
                 </div>
-                <div id="exp-${qObj.id}"></div>
             </div>`;
 }
 
-// Helper: Tạo khối Đoạn văn + Câu hỏi cho Part 6 & 7
-function createPassageBlock(passageObj) {
-    let html = `<div class="passage-block" style="margin-bottom: 40px; background: white; padding: 25px; border-radius: 12px; border: 2px solid var(--border);">`;
-    html += `<div class="passage-text" style="margin-bottom: 25px; font-size: 18px; line-height: 1.8;">${passageObj.passage}</div>`;
-    html += `<div class="passage-questions" style="border-top: 2px dashed #eee; padding-top: 20px;">`;
+// Helper: Gom nhóm câu hỏi cho Part 6 & 7 (Cột phải)
+function createQuestionsBlock(passageObj) {
+    // Thêm onmouseenter để tự động hiện đoạn văn tương ứng bên cột trái khi cuộn chuột vào câu hỏi
+    let html = `<div class="questions-block" style="margin-bottom: 40px; background: white; padding: 25px; border-radius: 12px; border: 2px solid var(--border); box-shadow:0 4px 10px rgba(0,0,0,0.02);" onmouseenter="showPassage('${passageObj.passageId}')">`;
+    html += `<div style="color:var(--primary); font-weight:bold; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">📝 Questions for Passage: ${passageObj.passageId}</div>`;
     
-    passageObj.questions.forEach(q => {
+    // Fix lỗi cú pháp cho passage p7-13 & p7-14 của bạn
+    let validQuestions = passageObj.questions.filter(q => q && q.id); 
+
+    validQuestions.forEach(q => {
         html += createTOEICQuestion(q);
         allQuestionIds.push(q.id);
         answerKey[q.id] = formatAnswer(q.options, q.a || q.correct);
     });
-    
-    html += `</div></div>`;
+    html += `</div>`;
     return html;
 }
 
@@ -961,15 +1045,27 @@ function switchTab(n) {
     document.querySelectorAll('.tab-btn').forEach((b, i) => { b.classList.toggle('active', i + 1 === n); });
     document.querySelectorAll('.question-group').forEach((q, i) => { q.style.display = (i + 1 === n) ? 'block' : 'none'; });
     
-    // Copy nội dung đoạn văn sang cột trái nếu đang ở Part 6 hoặc 7
+    // Ẩn tất cả đoạn văn
+    document.querySelectorAll('.passage-text-content').forEach(p => p.style.display = 'none');
+
     let passagePane = document.getElementById('passagePane');
+    let introText = document.getElementById('passage-content-container').querySelector('h2');
+    
     if(n === 1) {
-        passagePane.innerHTML = `<h2 style="color: var(--primary-dark); text-align: center; margin-top: 50px;">Part 5: Incomplete Sentences<br><br>👉 Hãy đọc kỹ và chọn đáp án đúng bên cột phải nhé!</h2>`;
+        if(introText) introText.innerHTML = `Part 5: Incomplete Sentences<br><br><span style="font-size:18px; color:#555; font-weight:normal;">👉 Hãy đọc kỹ và chọn đáp án đúng bên cột phải nhé!</span>`;
     } else {
-        passagePane.innerHTML = `<h2 style="color: var(--primary-dark); text-align: center;">Đoạn văn tham khảo</h2><p style="text-align:center; color:#888;">(Cuộn cột bên phải để xem các đoạn văn tương ứng)</p>`;
+        if(introText) introText.innerHTML = `Đoạn văn tham khảo<br><span style="font-size:18px; color:#888; font-weight:normal;">(Cuộn chuột vào nhóm câu hỏi bên phải để xem đoạn văn tương ứng)</span>`;
     }
+    
     document.querySelector('.pane-left').scrollTop = 0;
     document.querySelector('.pane-right').scrollTop = 0;
+}
+
+// Hiển thị đoạn văn tương ứng bên cột trái
+function showPassage(passageId) {
+    document.querySelectorAll('.passage-text-content').forEach(p => p.style.display = 'none');
+    let p = document.getElementById(`passage-${passageId}`);
+    if (p) p.style.display = 'block';
 }
 
 function checkNav(id) {
@@ -986,7 +1082,6 @@ function checkNav(id) {
 }
 
 function scrollToQuestion(id) {
-    // Xác định câu hỏi thuộc Part nào để switch tab
     let group = 1;
     if (toeicData.part6.some(p => p.questions.some(q => q.id == id))) group = 2;
     if (toeicData.part7.some(p => p.questions.some(q => q.id == id))) group = 3;
@@ -999,7 +1094,15 @@ function scrollToQuestion(id) {
             el.scrollIntoView({behavior: "smooth", block: "center"});
             el.style.transition = "background 0.5s";
             el.style.background = "#fff9c4";
-            setTimeout(() => el.style.background = "", 1000);
+            setTimeout(() => el.style.background = "transparent", 1000);
+            
+            // Kích hoạt hiển thị đoạn văn luôn
+            let parentBlock = el.closest('.questions-block');
+            if(parentBlock) {
+                // Kích hoạt event onmouseenter bằng code
+                let mouseEvent = new MouseEvent('mouseenter');
+                parentBlock.dispatchEvent(mouseEvent);
+            }
         }
     }, 100);
 }
@@ -1021,11 +1124,8 @@ function startTimer() {
 // --- GRADING ---
 function submitTest(manual) {
     if (isSubmitted) return;
-    if (manual) {
-        document.getElementById('confirmOverlay').style.display = 'flex';
-    } else {
-        executeSubmit();
-    }
+    if (manual) document.getElementById('confirmOverlay').style.display = 'flex';
+    else executeSubmit();
 }
 
 function closeConfirmModal() { document.getElementById('confirmOverlay').style.display = 'none'; }
@@ -1049,19 +1149,15 @@ function executeSubmit() {
         let isCorrect = (userAns === correctAns);
         if (isCorrect) score++;
 
-        // Render Feedback mark
         let feedbackEl = document.getElementById(`fb-${id}`);
         if(feedbackEl) {
             if(isCorrect) {
-                feedbackEl.innerHTML = `✓ Đúng`;
-                feedbackEl.className = "feedback correct";
+                feedbackEl.innerHTML = `<span style="color:var(--correct);">✓ Đúng</span>`;
             } else {
-                feedbackEl.innerHTML = `✗ Sai (Đáp án: <span class="text-highlight-answer">${correctAns}</span>)`;
-                feedbackEl.className = "feedback wrong";
+                feedbackEl.innerHTML = `<span style="color:var(--wrong);">✗ Sai (Đáp án: <span style="background:#dce775; color:#333; padding:2px 5px; border-radius:4px;">${correctAns}</span>)</span>`;
             }
         }
         
-        // Cập nhật Navigator dots
         let nav = document.getElementById(`nav-${id}`);
         if(nav) {
             nav.style.background = isCorrect ? "#c8e6c9" : "#ffcdd2";
@@ -1070,25 +1166,22 @@ function executeSubmit() {
         }
     });
 
-    // Final UI Alert (Tính điểm chuẩn TOEIC Reading Ước lượng)
     let toeicScore = calculateToeicReading(score, totalQuestions);
     document.getElementById('resultMessage').innerHTML = `
         <strong style="font-size: 20px; color: #555; display: block; margin-bottom: 10px;">Số câu đúng: ${score}/${totalQuestions}</strong>
-        <strong style="font-size: 32px; color: var(--primary);">Điểm Reading: ${toeicScore}/495</strong>
+        <strong style="font-size: 32px; color: var(--primary);">Điểm Reading ước lượng: ${toeicScore}/495</strong>
     `;
     setTimeout(() => { document.getElementById('resultOverlay').style.display = 'flex'; }, 500);
 }
 
-// Bảng quy đổi điểm TOEIC Reading (Ước lượng)
 function calculateToeicReading(raw, total) {
     if (raw === 0) return 5;
-    // Vì data của bạn có thể không đủ 100 câu, ta dùng công thức tỷ lệ
     let percent = raw / total;
     let score = Math.round((percent * 495) / 5) * 5; 
     return score > 495 ? 495 : (score < 5 ? 5 : score);
 }
 
-// --- HIGHLIGHT SYSTEM (Dành cho Part 6 & 7) ---
+// --- HIGHLIGHT SYSTEM ---
 const mainContainer = document.getElementById("mainContainer");
 const menu = document.getElementById("ctxMenu");
 let targetElement = null;
@@ -1144,7 +1237,6 @@ function removeHighlight() {
     }
     menu.style.display = "none";
 }
-    loadQuestion();
 </script>
 
 </body>
