@@ -694,7 +694,7 @@
         document.getElementById('resultOverlay').style.display = 'none';
     }
 
-    function executeSubmit() {
+   function executeSubmit() {
         // Đóng popup xác nhận nếu nó đang mở
         document.getElementById('confirmOverlay').style.display = 'none';
         
@@ -706,31 +706,12 @@
         
         let score = 0;
 
-        for (let i = 1; i <= 40; i++) {
+        // VÒNG LẶP CHỈ CHẠY TỪ CÂU 1 ĐẾN 13 (Dành riêng cho Quiz 1)
+        for (let i = 1; i <= 13; i++) {
             let userAns = "";
             let el = document.getElementById(`ans-${i}`);
             let feedbackEl = document.getElementById(`fb-${i}`);
             let expContainer = document.getElementById(`exp-${i}`);
-            
-            // Fix for table items
-            if (!feedbackEl && i >= 14 && i <= 18) {
-                let container = document.getElementById('fb-container-14-18');
-                let rowInfo = document.createElement('div');
-                rowInfo.style.display = "flex"; rowInfo.style.alignItems = "center"; rowInfo.style.flexWrap = "wrap";
-                
-                let span = document.createElement('span'); span.id = `fb-${i}`;
-                let expBox = document.createElement('div'); expBox.id = `exp-${i}`; expBox.style.width = "100%";
-                
-                let label = document.createElement('b'); label.innerText = `Câu ${i}: `; label.style.marginRight = "10px";
-                
-                rowInfo.appendChild(label);
-                rowInfo.appendChild(span);
-                rowInfo.appendChild(expBox);
-                container.appendChild(rowInfo);
-                
-                feedbackEl = span;
-                expContainer = expBox;
-            }
 
             if (el) {
                 userAns = el.value.trim().toUpperCase();
@@ -739,14 +720,17 @@
                 for (let r of radios) if (r.checked) userAns = r.value;
             }
 
-            let correctAns = answerKey[i];
+            // Fix lỗi lấy đáp án: Trong file Quiz 1, đáp án được lưu trong mảng 'questions'
+            let qData = questions.find(q => q.id === i);
+            let correctAns = qData ? qData.ans : "";
+            
             let cleanUser = userAns.replace(/[^A-Z0-9%]/g, "");
             let cleanKey = correctAns.replace(/[^A-Z0-9%]/g, "");
             
             let isCorrect = (cleanUser === cleanKey);
             if (isCorrect) score++;
 
-            // Render Feedback mark
+            // Render biểu tượng Đúng / Sai
             if(feedbackEl) {
                 if(isCorrect) {
                     feedbackEl.innerHTML = `✓ Đúng`;
@@ -757,17 +741,19 @@
                 }
             }
             
-            // Render Detailed Explanation
+            // Render khung Giải thích chi tiết (Cập nhật giao diện có nút Xem dẫn chứng)
             if(expContainer && explanations[i]) {
                 let expData = explanations[i];
-                let quoteHtml = expData.quote ? `<div class="exp-quote">"${expData.quote}"</div>` : '';
                 let vocabHtml = expData.vocab ? `<div class="exp-vocab">${expData.vocab}</div>` : '';
                 let tipHtml = expData.tip ? `<div style="margin-top:8px; color:#d87059; font-weight:600;">📌 Mẹo: ${expData.tip}</div>` : '';
                 
                 expContainer.innerHTML = `
                     <div class="exp-box show">
-                        <div class="exp-title">💡 Giải thích chi tiết Câu ${i}</div>
-                        ${quoteHtml}
+                        <div class="exp-title">
+                            <div class="exp-title-left">💡 Giải thích Câu ${i}</div>
+                            <button class="locate-btn" onclick="scrollToEvidence(${i})">📍 Xem dẫn chứng</button>
+                        </div>
+                        <div class="exp-translation">"${expData.translation}"</div>
                         <div class="exp-text">${expData.exp}</div>
                         ${vocabHtml}
                         ${tipHtml}
@@ -775,21 +761,24 @@
                 `;
             }
             
-            // Update Navigator dots
+            // Cập nhật màu sắc Navigator dots dưới footer
             let nav = document.getElementById(`nav-${i}`);
-            nav.style.background = isCorrect ? "#c8e6c9" : "#ffcdd2";
-            nav.style.color = isCorrect ? "#2e7d32" : "#c62828";
-            nav.style.borderColor = isCorrect ? "#81c784" : "#ef9a9a";
+            if(nav) {
+                nav.style.background = isCorrect ? "#c8e6c9" : "#ffcdd2";
+                nav.style.color = isCorrect ? "#2e7d32" : "#c62828";
+                nav.style.borderColor = isCorrect ? "#81c784" : "#ef9a9a";
+            }
         }
 
-        // Show highlight feature for reading text
+        // Bỏ màu xám nền của bài đọc
         document.getElementById('passagePane').style.backgroundColor = "#fff";
         
-        // Final UI Alert (thay vì dùng alert mặc định)
+        // Hiển thị điểm số (Điểm /13, loại bỏ Band Score vì Quiz không đủ 40 câu)
         document.getElementById('resultMessage').innerHTML = `
-            <strong style="font-size: 26px; color: var(--accent); display: block; margin-bottom: 10px;">Số câu đúng: ${score}/40</strong>
-            <strong style="font-size: 26px; color: var(--primary);">Band Score: ${calculateBand(score)}</strong>
+            <strong style="font-size: 26px; color: var(--accent); display: block; margin-bottom: 10px;">Số câu đúng: ${score}/13</strong>
+            <p style="font-size: 16px; color: #666;">Tuyệt vời! Bạn đã hoàn thành bài luyện tập.</p>
         `;
+        
         setTimeout(() => {
             document.getElementById('resultOverlay').style.display = 'flex';
         }, 500);
