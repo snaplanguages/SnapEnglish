@@ -309,17 +309,14 @@
 <div id="setupOverlay">
     <div class="setup-modal">
         <h2>Chào mừng bạn đến với Reading Library ✨</h2>
-        <p style="font-size: 19px; color: #666; margin-bottom: 30px;">Hôm nay bạn muốn rèn luyện theo cách nào?</p>
+        <p style="font-size: 19px; color: #666; margin-bottom: 20px;">Hãy cài đặt thời gian để bắt đầu luyện tập nhé!</p>
         
-        <button class="mode-btn mode-practice" onclick="selectMode('practice')">🎯 Chế độ Luyện Tập</button>
-        <button class="mode-btn mode-mock" onclick="selectMode('mock')">🏆 Chế độ Thi Thử</button>
-        
-        <div id="timeInputBox">
-            <label style="font-size: 19px; font-weight: bold; color: #555;">Cài đặt thời gian (phút): </label>
+        <div id="timeInputBox" style="display: block; margin: 30px 0;">
+            <label style="font-size: 19px; font-weight: bold; color: #555;">Thời gian (phút): </label>
             <input type="number" id="timeInput" value="60" min="10" max="180">
         </div>
         
-        <button class="start-btn" id="startBtn" onclick="askReady()">Sẵn sàng (OK)</button>
+        <button class="start-btn" id="startBtn" style="display: inline-block;" onclick="askReady()">Sẵn sàng (OK)</button>
     </div>
 </div>
 
@@ -400,6 +397,16 @@
         <button class="btn-confirm" style="width: 100%; margin-top: 10px;" onclick="closeResultModal()">Xem giải thích chi tiết</button>
     </div>
 </div>
+                    <div id="startConfirmOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2>Xác nhận bắt đầu</h2>
+        <p id="startConfirmMsg" style="font-size: 18px; color: #555; margin-bottom: 20px; white-space: pre-line;"></p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeStartConfirmModal()">Huỷ</button>
+            <button class="btn-confirm" onclick="startTestActual()">OK</button>
+        </div>
+    </div>
+</div>
 <footer>
     <div style="font-size:15px; font-weight:bold; color:var(--text-light); text-transform:uppercase; margin-right:20px; flex-shrink: 0;">Bảng điều hướng nhanh:</div>
     <div class="nav-scroller" id="navPalette"></div>
@@ -412,34 +419,36 @@
 
 <script>
     // --- STATE ---
-    let currentMode = '';
     let testDuration = 0; 
     let timerInterval = null;
     let isSubmitted = false;
 
-    // --- SETUP CHẾ ĐỘ ---
-    function selectMode(mode) {
-        currentMode = mode;
-        document.querySelector('.mode-practice').classList.toggle('selected', mode === 'practice');
-        document.querySelector('.mode-mock').classList.toggle('selected', mode === 'mock');
-        
-        document.getElementById('timeInputBox').style.display = (mode === 'practice') ? 'block' : 'none';
-        document.getElementById('startBtn').style.display = 'inline-block';
+   function askReady() {
+        let minutes = parseInt(document.getElementById('timeInput').value);
+        if(isNaN(minutes) || minutes < 1) minutes = 60; // Mặc định 60p nếu nhập sai
+
+        let confirmMsg = `Bạn đã cài đặt thời gian làm bài là ${minutes} phút.\nBạn đã chuẩn bị tinh thần chưa?`;
+            
+        // Gắn nội dung câu hỏi vào popup và hiển thị
+        document.getElementById('startConfirmMsg').innerText = confirmMsg;
+        document.getElementById('startConfirmOverlay').style.display = 'flex';
     }
 
-    function askReady() {
-        let confirmMsg = currentMode === 'mock' 
-            ? "Chế độ THI THỬ (60 phút).\nBạn đã sẵn sàng làm bài chưa?" 
-            : `Chế độ LUYỆN TẬP (${document.getElementById('timeInput').value} phút).\nBạn đã chuẩn bị tinh thần chưa?`;
-            
-        if(confirm(confirmMsg)) {
-            let minutes = (currentMode === 'mock') ? 60 : parseInt(document.getElementById('timeInput').value);
-            if(isNaN(minutes) || minutes < 1) minutes = 60;
-            testDuration = minutes * 60;
-            
-            document.getElementById('setupOverlay').style.display = 'none';
-            startTimer();
-        }
+    function closeStartConfirmModal() {
+        // Tắt popup nếu bấm nút Huỷ
+        document.getElementById('startConfirmOverlay').style.display = 'none';
+    }
+
+    function startTestActual() {
+        // Tắt popup và bắt đầu tính giờ nếu bấm OK
+        document.getElementById('startConfirmOverlay').style.display = 'none';
+        
+        let minutes = parseInt(document.getElementById('timeInput').value);
+        if(isNaN(minutes) || minutes < 1) minutes = 60;
+        testDuration = minutes * 60;
+        
+        document.getElementById('setupOverlay').style.display = 'none';
+        startTimer();
     }
 
     // --- DATA ---
