@@ -1046,7 +1046,7 @@
         p2HTML += `</div>`;
         main.innerHTML += p2HTML;
 
-        // Render Part 3 & 4 (Đã fix: Graphic Ảnh/Bảng biểu & Cắt tiếng Việt lúc thi)
+        // Render Part 3 & 4 (Đã dời Transcript sang trái & Hỗ trợ dịch A,B,C,D)
         const renderPassage = (data, title) => {
             let html = `<div id="part${title.includes('3') ? 3 : 4}" class="part-container">
                 <div class="part-title">${title}</div>
@@ -1058,11 +1058,17 @@
                         <div class="split-media">
                             <div style="font-weight:800; color:var(--primary-dark); margin-bottom:15px;">Questions ${p.id}</div>
                             ${p.graphic ? (p.graphic.includes('<') ? `<div style="overflow-x:auto; margin-bottom:15px;">${p.graphic}</div>` : `<img src="${p.graphic}" alt="Graphic">`) : ''}
-                            <audio controls src="${p.audio}"></audio>
+                            <audio controls src="${p.audio}" style="width: 100%;"></audio>
+                            
+                            <div class="explanation-box" id="exp-passage-${p.id}" style="margin-top:20px; border-top:2px dashed var(--border); border-left:none; padding:20px 0 0 0; background:transparent; text-align:left;">
+                                <div class="exp-title">Transcript Song Ngữ</div>
+                                <div class="script-en">${p.script_en.replace(/\n/g, '<br>')}</div>
+                                <div class="script-vi">${p.script_vi.replace(/\n/g, '<br>')}</div>
+                                ${p.vocab ? `<div class="vocab-box" style="margin-top:15px; background:#F8FAFC;"><b>📚 Từ vựng quan trọng:</b><br>${p.vocab.replace(/\n/g, '<br>')}</div>` : ''}
+                            </div>
                         </div>
                         <div class="split-questions">`;
                 p.questions.forEach(q => {
-                    // Logic cắt dịch tiếng Việt ra khỏi câu hỏi lúc thi
                     let qTextEn = q.q.includes('<br>') ? q.q.split('<br>')[0] : q.q;
                     let qTextVi = q.q.includes('<br>') ? q.q.split('<br>')[1] : '';
                     
@@ -1072,11 +1078,21 @@
                                 <div class="q-text">${qTextEn}</div>
                             </div>
                             <div class="options-grid">
-                                ${['A','B','C','D'].map((opt, i) => `
-                                <label class="opt-label" onclick="selectAnswer(${q.id}, '${opt}')">
-                                    <input type="radio" name="q${q.id}" value="${opt}">
-                                    <div class="custom-radio"></div><span><b>${opt}.</b> ${q.opts[i]}</span>
-                                </label>`).join('')}
+                                ${['A','B','C','D'].map((opt, i) => {
+                                    // Hỗ trợ hiển thị dịch tiếng Việt nếu Data có chứa text_vi
+                                    let optText = typeof q.opts[i] === 'object' ? q.opts[i].text : q.opts[i];
+                                    let optVi = typeof q.opts[i] === 'object' && q.opts[i].text_vi ? `<div class="opt-vi-hint" style="display:none; font-size:14px; color:var(--text-muted); font-weight:normal; margin-top:4px;"><i>${q.opts[i].text_vi}</i></div>` : '';
+                                    
+                                    return `
+                                    <label class="opt-label" onclick="selectAnswer(${q.id}, '${opt}')">
+                                        <input type="radio" name="q${q.id}" value="${opt}">
+                                        <div class="custom-radio"></div>
+                                        <div style="display:flex; flex-direction:column;">
+                                            <span><b>${opt}.</b> ${optText}</span>
+                                            ${optVi}
+                                        </div>
+                                    </label>`;
+                                }).join('')}
                             </div>
                             <div class="explanation-box" id="exp-${q.id}">
                                 <div style="margin-bottom:10px; font-size:15px; color:var(--text-muted);">${qTextVi}</div>
@@ -1084,12 +1100,6 @@
                             </div>`;
                 });
                 html += `
-                            <div class="explanation-box" id="exp-passage-${p.id}" style="margin-top:30px; border-left:5px solid var(--secondary);">
-                                <div class="exp-title">Transcript Song Ngữ</div>
-                                <div class="script-en">${p.script_en.replace(/\n/g, '<br>')}</div>
-                                <div class="script-vi">${p.script_vi.replace(/\n/g, '<br>')}</div>
-                                ${p.vocab ? `<div class="vocab-box" style="margin-top:15px;"><b>📚 Từ vựng quan trọng:</b><br>${p.vocab.replace(/\n/g, '<br>')}</div>` : ''}
-                            </div>
                         </div>
                     </div>
                 </div>`;
@@ -1111,11 +1121,40 @@
         
         let missingDivs = '<div style="display:none;">';
         for(let i=1; i<=100; i++) {
-            if(!allIDs.includes(i)) missingDivs += `<div id="card-${i}">Fake Q${i}</div><div id="exp-${i}"></div>`;
+            if(keys[i]) {
+                totalRendered++;
+                let isCorr = (userAnswers[i] === keys[i]);
+                if(isCorr) correctCount++;
+
+                // Đổi màu Label - Đã Fix lỗi xanh lè nhiều câu
+                document.querySelectorAll(`input[name="q${i}"]`).forEach(inp => {
+                    let lbl = inp.closest('.opt-label');
+                    if(inp.value === keys[i]) {
+                        lbl.classList.add('is-correct');
+                    } else if (inp.value === userAnswers[i] && !isCorr) {
+                        lbl.classList.add('is-wrong');
+                    }
+                });
+
+                // Hiển thị Explanation
+                let exp = document.getElementById(`exp-${i}`);
+                if(exp) exp.classList.add('show');
+
+                // Cập nhật Nav
+                let nav = document.getElementById(`nav-${i}`);
+                if(nav) {
+                    nav.classList.remove('answered');
+                    nav.classList.add(isCorr ? 'correct' : 'wrong');
+                }
+
+                // Bỏ Blur Part 2
+                let qText = document.getElementById(`text-q${i}`);
+                if(qText) qText.classList.add('revealed');
+            }
         }
-        missingDivs += '</div>';
-        main.innerHTML += missingDivs;
-    }
+
+        // Hiện dịch tiếng Việt của các Option A, B, C, D (nếu Data có cấu trúc chi tiết)
+        document.querySelectorAll('.opt-vi-hint').forEach(el => el.style.display = 'block');
 
     function buildNavGrid() {
         const grid = document.getElementById('navGrid');
