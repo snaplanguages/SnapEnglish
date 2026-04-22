@@ -167,7 +167,7 @@
         /* Modal Giải thích */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(47, 53, 66, 0.7); backdrop-filter: blur(8px); justify-content: center; align-items: center; }
         .modal-content { 
-            background: var(--bg-color); width: 95%; max-width: 1100px; height: 95vh; 
+            background: var(--bg-color); width: 95%; max-width: 1150px; height: 95vh; 
             border-radius: 28px; padding: 40px; overflow-y: auto; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.2);
             scroll-behavior: smooth;
         }
@@ -182,21 +182,21 @@
         
         .legend-box { background: white; padding: 15px 25px; border-radius: 12px; margin-bottom: 20px; display: inline-flex; gap: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-weight: 700;}
 
-        /* Đan xen Script Layout */
+        /* --- SCRIPT SONG SONG LAYOUT --- */
         .script-box { background: #FFFFFF; padding: 25px; border-radius: 20px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border-top: 5px solid var(--primary); }
-        .script-box h3 { color: var(--primary-dark); margin-bottom: 20px; text-align: left;}
-        .script-row {
-            margin-bottom: 15px;
-            padding: 15px;
-            background: #FAFAFA;
-            border-radius: 12px;
-            border-left: 4px solid var(--secondary);
-            transition: 0.2s;
-        }
-        .script-row:hover { transform: translateX(3px); border-left-color: var(--primary); background: #F8F7FF;}
-        .script-en { font-weight: 600; color: #5F27CD; margin-bottom: 6px; font-size: 1.05rem; }
-        .script-vi { color: var(--text-gray); font-size: 0.95rem; font-style: italic; }
+        .script-split-container { display: flex; gap: 25px; align-items: stretch; }
+        .script-col { flex: 1; padding: 20px; border-radius: 16px; background: #FAFAFA; box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);}
+        .script-col.en-col { border-left: 4px solid var(--primary); }
+        .script-col.vi-col { border-left: 4px solid var(--secondary); }
         
+        .script-line { margin-bottom: 12px; line-height: 1.7; font-size: 1.05rem; }
+        .script-line.en { font-weight: 600; color: #5F27CD; }
+        .script-line.vi { color: var(--text-dark); }
+        
+        @media (max-width: 850px) {
+            .script-split-container { flex-direction: column; }
+        }
+
         .vocab-box { background: #FFF9F0; padding: 25px; border-radius: 20px; margin-bottom: 30px; border: 2px dashed #FFEAA7; }
         .vocab-box h4 { color: #E15F41; font-size: 1.2rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;}
         .vocab-text { font-size: 1.05rem; line-height: 1.7; color: #784212; white-space: pre-wrap;}
@@ -233,7 +233,7 @@
         <div style="max-width: 700px; margin: auto; text-align: center;">
             <div style="font-size: 5rem; margin-bottom: 20px;">🗣️✨</div>
             <h1>TOEIC Part 3: Short Conversations</h1>
-            <p class="desc">Luyện kỹ năng nghe hội thoại dài từ Câu 32 đến Câu 70.<br>Giao diện siêu dễ thương, Highlight đáp án và đan xen Script Anh-Việt!</p>
+            <p class="desc">Luyện kỹ năng nghe hội thoại dài từ Câu 32 đến Câu 70.<br>Giao diện siêu dễ thương, Highlight đáp án và Script song song siêu mượt!</p>
             <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
                 <button class="btn btn-outline" style="width: 250px;" onclick="startApp('practice')">🌸 Luyện Tập Thư Giãn</button>
                 <button class="btn" style="width: 250px;" onclick="startApp('mock')">🔥 Thi Thử Căng Thẳng</button>
@@ -266,7 +266,7 @@
         <div class="score-box">
             <h2>Kết Quả Của Bạn 🏆</h2>
             <div class="score-number" id="final-score">0/39</div>
-            <p style="color: var(--text-gray); font-size: 1.1rem;">Nhấn vào từng đoạn để xem kịch bản đan xen song ngữ và giải thích cực kỳ chi tiết!</p>
+            <p style="color: var(--text-gray); font-size: 1.1rem;">Nhấn vào từng đoạn để xem kịch bản song ngữ và giải thích cực kỳ chi tiết!</p>
         </div>
         
         <div class="result-list" id="result-list"></div>
@@ -295,7 +295,7 @@
         </div>
         
         <div class="script-box">
-            <h3>📜 Kịch bản đan xen Anh - Việt</h3>
+            <h3 style="color: var(--primary-dark); margin-bottom: 20px;">📜 Kịch bản Song song (Anh - Việt)</h3>
             <div id="modal-script-combined">
                 </div>
         </div>
@@ -311,7 +311,6 @@
 </div>
 
 <script>
-    // DỮ LIỆU ĐÃ ĐƯỢC CHÈN HIGHLIGHT (hl-q1, hl-q2, hl-q3) VÀ HL-RIGHT VÀO PHẦN GIẢI THÍCH
     const passagesData = [
         {
             id: "32-34",
@@ -843,7 +842,7 @@
                     opts: [
                         { l: "A", text: "His password has expired.", text_vi: "Mật khẩu của anh ấy đã hết hạn.", isCorrect: false },
                         { l: "B", text: "His Internet connection is not working.", text_vi: "Kết nối mạng của anh ấy không hoạt động.", isCorrect: true },
-                        { l: "C", text: "He forgot to update some software.", text_vi: "Anh ấy quên chưa cập nhật phần mềm.", isCorrect: false },
+                        { l: "C", text: "He forgot to update some software.", text_vi: "Anh ấy quên chưa cập nhật phần mềm.", is: false },
                         { l: "D", text: "He left a power cord at home.", text_vi: "Anh ấy đã để quên dây cắm nguồn ở nhà.", isCorrect: false }
                     ],
                     explanation: "<strong>Giải thích:</strong> Chi tiết lý do việc người nam không kiểm tra được email.<br>Người nam nói trong lời thoại thứ hai rằng do mình không có kết nối internet nên không đọc được e-mail (<span class='hl-right'>Well, I can't connect to it, so I can't see my e-mail</span>). Vậy đáp án đúng là (B)."
@@ -1052,18 +1051,30 @@
         document.getElementById('modal-title').innerText = `Phân tích Hội thoại ${p.id} 🌟`;
         document.getElementById('modal-audio').src = p.audio;
         
-        // --- XỬ LÝ LỒNG ĐAN XEN SCRIPT ANH - VIỆT ---
+        // --- XỬ LÝ LỒNG SCRIPT SONG SONG (2 CỘT TÁCH BIỆT) ---
         const enLines = p.script_en.split('\n');
         const viLines = p.script_vi.split('\n');
-        let combinedHTML = '';
+        
+        let enHTML = '';
+        let viHTML = '';
+
         for(let i = 0; i < enLines.length; i++) {
-            combinedHTML += `
-                <div class="script-row">
-                    <div class="script-en">${enLines[i]}</div>
-                    <div class="script-vi">${viLines[i]}</div>
-                </div>
-            `;
+            enHTML += `<div class="script-line en">${enLines[i]}</div>`;
+            viHTML += `<div class="script-line vi">${viLines[i]}</div>`;
         }
+
+        const combinedHTML = `
+            <div class="script-split-container">
+                <div class="script-col en-col">
+                    <h4 style="margin-bottom:15px; color:var(--primary-dark); font-size:1.15rem; display:flex; align-items:center; gap:8px;">🇬🇧 English Script</h4>
+                    ${enHTML}
+                </div>
+                <div class="script-col vi-col">
+                    <h4 style="margin-bottom:15px; color:var(--text-dark); font-size:1.15rem; display:flex; align-items:center; gap:8px;">🇻🇳 Bản dịch Tiếng Việt</h4>
+                    ${viHTML}
+                </div>
+            </div>
+        `;
         document.getElementById('modal-script-combined').innerHTML = combinedHTML;
         
         // Từ vựng
