@@ -2038,11 +2038,51 @@
         });
         document.getElementById('questions-container').innerHTML = qHtml;
 
+
+        // =========================================================
+        // CODE THÊM MỚI: TỰ ĐỘNG TÔ MÀU PASTEL CHO CÁC DẪN CHỨNG
+        // =========================================================
+        const pastelColors = [
+            { bg: '#ffadad', text: '#5a1c1c' }, // Đỏ pastel
+            { bg: '#ffd6a5', text: '#663d14' }, // Cam pastel
+            { bg: '#caffbf', text: '#1f4d1f' }, // Xanh lá pastel
+            { bg: '#9bf6ff', text: '#16565c' }, // Xanh dương pastel
+            { bg: '#a0c4ff', text: '#1c3666' }, // Xanh biển pastel
+            { bg: '#bdb2ff', text: '#352666' }, // Tím pastel
+            { bg: '#ffc6ff', text: '#661a66' }, // Hồng pastel
+            { bg: '#e2f0cb', text: '#3e5222' }  // Xanh rêu pastel
+        ];
+
+        const colorMap = {};
+        let colorIndex = 0;
+        
+        // Quét tất cả thẻ ev-box trong cả 2 cột bài đọc
+        document.querySelectorAll('.passage-grid .ev-box').forEach((el) => {
+            const evId = el.getAttribute('id');
+            
+            // Nếu ID này chưa được cấp màu, thì cấp cho nó 1 màu mới trong mảng
+            if (evId && !colorMap[evId]) {
+                colorMap[evId] = pastelColors[colorIndex % pastelColors.length];
+                colorIndex++;
+            }
+            
+            // Áp dụng màu (nếu thẻ không có ID thì lấy màu ngẫu nhiên tiếp theo)
+            const color = evId ? colorMap[evId] : pastelColors[colorIndex % pastelColors.length];
+            
+            el.style.backgroundColor = color.bg;
+            el.style.color = color.text;
+            el.style.padding = '2px 6px';
+            el.style.borderRadius = '6px';
+            el.style.fontWeight = '600';
+            el.style.border = 'none'; // Xóa viền mặc định
+        });
+        // =========================================================
+
+
         // Cập nhật trạng thái nút Bấm Tiếp theo / Quay lại
         document.getElementById('btn-prev').disabled = idx === 0;
         document.getElementById('btn-next').disabled = idx === reviewData.length - 1;
     }
-
     // HÀM ĐIỀU HƯỚNG CÁC ĐOẠN VĂN
     function navigate(dir) {
         let newIdx = currentPassageIdx + dir;
