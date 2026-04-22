@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Cute Pastel Palette */
             --primary: #A084E8;        
             --primary-dark: #8F71D8; 
             --primary-light: #F3EFFF;
@@ -143,6 +142,7 @@
         .score-box { text-align: center; padding: 40px; background: var(--primary-light); border-radius: 25px; margin-bottom: 30px; border: 2px solid #E2D9FF; }
         .score-number { font-size: 4.5rem; font-weight: 800; color: var(--primary); text-shadow: 2px 2px 0px white; }
         
+        .result-list { max-height: 500px; overflow-y: auto; padding-right: 10px; }
         .result-item { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid #F1F2F6; background: white; border-radius: 15px; margin-bottom: 10px; }
         .status-tag { padding: 6px 15px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; }
         .tag-correct { background: var(--success-light); color: #219A52; border: 1px solid #B7EFCF; }
@@ -178,6 +178,12 @@
         .info-card { background: #FFF9F0; padding: 20px; border-radius: 18px; border: 2px dashed #FFEAA7; line-height: 1.7; font-size: 1.05rem; }
         .info-card h4 { color: #E15F41; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 
+        /* Custom scrollbar for result list */
+        .result-list::-webkit-scrollbar { width: 8px; }
+        .result-list::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .result-list::-webkit-scrollbar-thumb { background: #D1C4E9; border-radius: 10px; }
+        .result-list::-webkit-scrollbar-thumb:hover { background: #A084E8; }
+
         @media (max-width: 768px) { .script-split-container { flex-direction: column; } }
     </style>
 </head>
@@ -187,7 +193,7 @@
     <div id="screen-welcome" class="screen active">
         <div style="font-size: 5rem; text-align: center; margin-bottom: 10px;">🎧✨</div>
         <h1>Luyện Thi TOEIC Part 2</h1>
-        <p class="desc">Chế độ thi thực tế: <strong>Không hiển thị Script</strong>. Chỉ nghe và chọn đáp án A, B, C.<br>Sau khi nộp bài sẽ có giải thích bẫy siêu chi tiết!</p>
+        <p class="desc"><strong>Đầy đủ từ Câu 7 đến Câu 31!</strong><br>Chế độ thi thực tế: <strong>Không hiển thị Script</strong>. Chỉ nghe và chọn đáp án A, B, C.<br>Sau khi nộp bài sẽ có giải thích bẫy siêu chi tiết!</p>
         <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
             <button class="btn btn-outline" onclick="startApp('practice')">🌸 Luyện Tập </button>
             <button class="btn" onclick="startApp('mock')">🔥 Thi Thử </button>
@@ -232,10 +238,10 @@
     <div id="screen-result" class="screen">
         <div class="score-box">
             <h2>Kết Quả Của Bạn 🏆</h2>
-            <div class="score-number" id="final-score">0/5</div>
+            <div class="score-number" id="final-score">0/25</div>
             <p id="score-comment" style="font-size: 1.2rem; margin-top: 10px; font-weight: 600;">Xem lại giải thích bẫy siêu chi tiết bên dưới nhé!</p>
         </div>
-        <div id="result-list"></div>
+        <div class="result-list" id="result-list"></div>
         <div style="text-align: center; margin-top: 40px;">
             <button class="btn" onclick="location.reload()">🔄 Bắt Đầu Lại</button>
         </div>
@@ -268,72 +274,257 @@
 </div>
 
 <script>
-    // Dữ liệu mẫu (Lấy 5 câu đầu tiên của Part 2 để minh họa)
+    // Dữ liệu 100% Full Q7-Q31
     const questions = [
         {
-            id: 7, 
-            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-07.mp3",
-            correct: "B",
+            id: 7, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-07.mp3", correct: "B",
             script_en: "Q: Why did the flight from Hong Kong arrive so late?<br>(A) No, it's a direct flight.<br>(B) Probably because of the weather.<br>(C) I've been there recently.",
             script_vi: "Hỏi: Tại sao chuyến bay từ Hồng Kông đến trễ vậy?<br>(A) Không, đó là một chuyến bay thẳng.<br>(B) Có lẽ là do thời tiết.<br>(C) Tôi đã đến đó gần đây.",
             explains: [
                 { opt: "A", text: "<strong>Sai.</strong> Không thể dùng Yes/No cho câu hỏi Wh- (Why).", type: "wrong" },
-                { opt: "B", text: "<strong>Đúng.</strong> Đưa ra lý do cụ thể <span class='hl-right'>vì thời tiết (because of the weather)</span> cho việc máy bay đến trễ.", type: "correct" },
-                { opt: "C", text: "<strong>Sai (Bẫy liên tưởng).</strong> Đáp án dùng 'I've been there' cố tình gây liên tưởng đến địa danh 'Hong Kong' trong câu hỏi.", type: "wrong" }
-            ],
-            vocab: ""
+                { opt: "B", text: "<strong>Đúng.</strong> Đưa ra lý do cụ thể <span class='hl-right'>vì thời tiết (because of the weather)</span>.", type: "correct" },
+                { opt: "C", text: "<strong>Sai (Bẫy liên tưởng).</strong> Đáp án dùng 'I've been there' cố tình gây liên tưởng đến địa danh 'Hong Kong'.", type: "wrong" }
+            ], vocab: ""
         },
         {
-            id: 8, 
-            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-08.mp3",
-            correct: "B",
+            id: 8, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-08.mp3", correct: "B",
             script_en: "Q: Where did you leave the blue folder?<br>(A) She leaves at noon.<br>(B) On your desk.<br>(C) I folded the brochures.",
             script_vi: "Hỏi: Bạn đã để tập tài liệu màu xanh ở đâu?<br>(A) Cô ấy rời đi vào buổi trưa.<br>(B) Tôi để trên bàn của bạn.<br>(C) Tôi đã gấp các cuốn sách nhỏ.",
             explains: [
-                { opt: "A", text: "<strong>Sai (Bẫy lặp từ).</strong> Từ <span class='hl-wrong'>'leave'</span> trong câu trả lời mang nghĩa 'rời đi', lặp lại từ 'leave' (đặt/để) trong câu hỏi.", type: "wrong" },
-                { opt: "B", text: "<strong>Đúng.</strong> Trả lời bằng một địa điểm cụ thể <span class='hl-right'>(On your desk)</span> cho câu hỏi vị trí Where.", type: "correct" },
-                { opt: "C", text: "<strong>Sai (Bẫy phái sinh).</strong> Sử dụng từ <span class='hl-wrong'>'folded'</span> có phát âm và từ gốc phái sinh từ 'folder' trong câu hỏi.", type: "wrong" }
-            ],
-            vocab: "• <span class='hl-vocab'>folder</span>: tập tài liệu<br>• <span class='hl-vocab'>fold</span>: gấp<br>• <span class='hl-vocab'>brochure</span>: cuốn sách nhỏ/tờ rơi"
+                { opt: "A", text: "<strong>Sai (Bẫy lặp từ).</strong> Từ <span class='hl-wrong'>'leave'</span> trong câu trả lời lặp lại từ 'leave' (đặt/để) trong câu hỏi.", type: "wrong" },
+                { opt: "B", text: "<strong>Đúng.</strong> Trả lời bằng một địa điểm cụ thể <span class='hl-right'>(On your desk)</span> cho câu hỏi Where.", type: "correct" },
+                { opt: "C", text: "<strong>Sai (Bẫy phái sinh).</strong> Sử dụng từ <span class='hl-wrong'>'folded'</span> phái sinh từ 'folder'.", type: "wrong" }
+            ], vocab: "• <span class='hl-vocab'>folder</span>: tập tài liệu<br>• <span class='hl-vocab'>fold</span>: gấp<br>• <span class='hl-vocab'>brochure</span>: tờ rơi"
         },
         {
-            id: 9, 
-            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-09.mp3",
-            correct: "C",
+            id: 9, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-09.mp3", correct: "C",
             script_en: "Q: Who's in charge of scheduling employees' work shifts?<br>(A) From nine to five.<br>(B) Several vacation days.<br>(C) The factory supervisor.",
             script_vi: "Hỏi: Ai là người phụ trách lên lịch ca làm việc của nhân viên?<br>(A) Từ 9 giờ đến 5 giờ.<br>(B) Vài ngày nghỉ phép.<br>(C) Quản đốc nhà máy.",
             explains: [
-                { opt: "A", text: "<strong>Sai.</strong> Đây là câu trả lời chỉ thời gian, dùng cho câu hỏi How long / What time.", type: "wrong" },
-                { opt: "B", text: "<strong>Sai (Bẫy liên tưởng).</strong> Từ 'vacation' (kỳ nghỉ) gây liên tưởng đến 'scheduling' (lên lịch).", type: "wrong" },
-                { opt: "C", text: "<strong>Đúng.</strong> Trả lời bằng chức danh cụ thể là <span class='hl-right'>quản đốc nhà máy (supervisor)</span> cho câu hỏi Who (Ai).", type: "correct" }
-            ],
-            vocab: "• <span class='hl-vocab'>in charge of</span>: phụ trách<br>• <span class='hl-vocab'>work shift</span>: ca làm việc<br>• <span class='hl-vocab'>supervisor</span>: quản đốc, người giám sát"
+                { opt: "A", text: "<strong>Sai.</strong> Câu trả lời chỉ thời gian, dùng cho câu hỏi How long / What time.", type: "wrong" },
+                { opt: "B", text: "<strong>Sai (Bẫy liên tưởng).</strong> Từ 'vacation' gây liên tưởng đến 'scheduling'.", type: "wrong" },
+                { opt: "C", text: "<strong>Đúng.</strong> Trả lời bằng chức danh cụ thể là <span class='hl-right'>quản đốc nhà máy (supervisor)</span> cho câu hỏi Who.", type: "correct" }
+            ], vocab: "• <span class='hl-vocab'>in charge of</span>: phụ trách<br>• <span class='hl-vocab'>supervisor</span>: quản đốc"
         },
         {
-            id: 10, 
-            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-10.mp3",
-            correct: "B",
+            id: 10, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-10.mp3", correct: "B",
             script_en: "Q: Would you like juice or water?<br>(A) Water the plants every day.<br>(B) I'm not very thirsty right now.<br>(C) Twenty-four bottles in a case.",
             script_vi: "Hỏi: Bạn muốn dùng nước ép hay nước lọc?<br>(A) Tưới cây mỗi ngày.<br>(B) Bây giờ tôi không khát lắm.<br>(C) 24 chai một thùng.",
             explains: [
-                { opt: "A", text: "<strong>Sai (Bẫy lặp từ/Đồng âm).</strong> Từ <span class='hl-wrong'>'water'</span> trong đáp án mang nghĩa 'tưới nước', lặp lại từ 'water' (nước lọc) trong câu hỏi.", type: "wrong" },
+                { opt: "A", text: "<strong>Sai (Bẫy lặp từ/Đồng âm).</strong> Từ <span class='hl-wrong'>'water'</span> (tưới nước) lặp lại 'water' (nước lọc).", type: "wrong" },
                 { opt: "B", text: "<strong>Đúng.</strong> Từ chối khéo léo việc uống đồ uống bằng cách nói hiện tại <span class='hl-right'>không khát lắm (not thirsty)</span>.", type: "correct" },
                 { opt: "C", text: "<strong>Sai.</strong> Câu trả lời về số lượng (24 bottles), phù hợp cho câu hỏi How many.", type: "wrong" }
-            ],
-            vocab: "• <span class='hl-vocab'>water a plant</span>: tưới cây<br>• <span class='hl-vocab'>thirsty</span>: khát nước"
+            ], vocab: "• <span class='hl-vocab'>thirsty</span>: khát nước"
         },
         {
-            id: 11, 
-            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-11.mp3",
-            correct: "B",
+            id: 11, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-11.mp3", correct: "B",
             script_en: "Q: Don't we need a password to log onto the computer?<br>(A) We don't have a logo.<br>(B) Yes, but I can't remember it.<br>(C) He's in the computer lab.",
             script_vi: "Hỏi: Chúng ta không cần mật khẩu để đăng nhập vào máy tính sao?<br>(A) Không có logo.<br>(B) Có, nhưng tôi không nhớ.<br>(C) Anh ấy đang ở phòng máy tính.",
             explains: [
-                { opt: "A", text: "<strong>Sai (Bẫy phát âm).</strong> Từ <span class='hl-wrong'>'logo'</span> có phát âm na ná với từ 'log (onto)' trong câu hỏi.", type: "wrong" },
+                { opt: "A", text: "<strong>Sai (Bẫy phát âm).</strong> Từ <span class='hl-wrong'>'logo'</span> có phát âm na ná với từ 'log (onto)'.", type: "wrong" },
                 { opt: "B", text: "<strong>Đúng.</strong> Trả lời Yes xác nhận việc cần mật khẩu, sau đó giải thích thêm là <span class='hl-right'>không nhớ (can't remember)</span>.", type: "correct" },
-                { opt: "C", text: "<strong>Sai (Bẫy lặp từ).</strong> Lặp lại từ <span class='hl-wrong'>'computer'</span> có trong câu hỏi.", type: "wrong" }
-            ],
-            vocab: "• <span class='hl-vocab'>log onto</span>: đăng nhập vào"
+                { opt: "C", text: "<strong>Sai (Bẫy lặp từ).</strong> Lặp lại từ <span class='hl-wrong'>'computer'</span>.", type: "wrong" }
+            ], vocab: "• <span class='hl-vocab'>log onto</span>: đăng nhập vào"
+        },
+        {
+            id: 12, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-12.mp3", correct: "A",
+            script_en: "Q: Which of these paint colors would look best in the hallway?<br>(A) My preference is the yellow.<br>(B) No, it's just down the hall.<br>(C) I didn't see what she looked like.",
+            script_vi: "Hỏi: Trong số những màu sơn này, màu nào sẽ trông đẹp nhất ở hành lang?<br>(A) Tôi thích màu vàng hơn.<br>(B) Không, chỉ cần đi dọc theo hành lang.<br>(C) Tôi đã không nhìn thấy cô ấy trông như thế nào.",
+            explains: [
+                { opt: "A", text: "<strong>Đúng.</strong> Đưa ra màu sắc cụ thể <span class='hl-right'>(màu vàng - yellow)</span> cho câu hỏi Which.", type: "correct" },
+                { opt: "B", text: "<strong>Sai.</strong> Không thể trả lời Yes/No cho câu hỏi Which.", type: "wrong" },
+                { opt: "C", text: "<strong>Sai.</strong> Đối tượng 'she' không có mặt trong câu hỏi.", type: "wrong" }
+            ], vocab: "• <span class='hl-vocab'>hallway</span>: hành lang<br>• <span class='hl-vocab'>preference</span>: sự ưa thích"
+        },
+        {
+            id: 13, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-13.mp3", correct: "C",
+            script_en: "Q: Why did we order the cleaning supplies from a different company?<br>(A) Until Tuesday.<br>(B) Through the catalog.<br>(C) The prices were much cheaper.",
+            script_vi: "Hỏi: Tại sao chúng ta lại đặt hàng đồ dùng dọn dẹp từ một công ty khác?<br>(A) Cho đến thứ Ba.<br>(B) Thông qua danh mục sản phẩm.<br>(C) Giá rẻ hơn nhiều.",
+            explains: [
+                { opt: "A", text: "<strong>Sai.</strong> Trả lời cho câu hỏi When.", type: "wrong" },
+                { opt: "B", text: "<strong>Sai.</strong> Trả lời cho câu hỏi How.", type: "wrong" },
+                { opt: "C", text: "<strong>Đúng.</strong> Đưa ra lý do cụ thể <span class='hl-right'>(The prices were much cheaper)</span> cho câu hỏi Why.", type: "correct" }
+            ], vocab: "• <span class='hl-vocab'>cleaning supplies</span>: đồ dùng dọn dẹp"
+        },
+        {
+            id: 14, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-14.mp3", correct: "A",
+            script_en: "Q: How can we meet the project deadline?<br>(A) We'll have to work extra hours.<br>(B) Can you turn on the projector?<br>(C) The meeting went too long.",
+            script_vi: "Hỏi: Làm thế nào chúng ta có thể kịp thời hạn của dự án?<br>(A) Chúng ta sẽ phải làm thêm giờ.<br>(B) Bạn có thể bật máy chiếu lên được không?<br>(C) Cuộc họp kéo dài quá lâu.",
+            explains: [
+                { opt: "A", text: "<strong>Đúng.</strong> Đưa ra phương pháp cụ thể <span class='hl-right'>(work extra hours)</span> cho câu hỏi How.", type: "correct" },
+                { opt: "B", text: "<strong>Sai (Bẫy phái sinh).</strong> Từ <span class='hl-wrong'>'projector'</span> phái sinh từ 'project'.", type: "wrong" },
+                { opt: "C", text: "<strong>Sai (Bẫy phái sinh).</strong> Từ <span class='hl-wrong'>'meeting'</span> phái sinh từ 'meet'.", type: "wrong" }
+            ], vocab: "• <span class='hl-vocab'>meet the deadline</span>: kịp thời hạn"
+        },
+        {
+            id: 15, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-15.mp3", correct: "A",
+            script_en: "Q: Could you help me find my sunglasses?<br>(A) Where did you have them last?<br>(B) A few more drinking glasses.<br>(C) The rainy season begins next month.",
+            script_vi: "Hỏi: Bạn có thể giúp tôi tìm kính râm được không?<br>(A) Lần cuối cùng bạn để chúng ở đâu?<br>(B) Thêm vài chiếc ly uống nước nữa.<br>(C) Mùa mưa bắt đầu vào tháng tới.",
+            explains: [
+                { opt: "A", text: "<strong>Đúng.</strong> Phản hồi bằng cách hỏi ngược lại thông tin <span class='hl-right'>(Where did you have them last?)</span> để giúp tìm kiếm.", type: "correct" },
+                { opt: "B", text: "<strong>Sai (Bẫy từ đồng âm/phái sinh).</strong> Từ <span class='hl-wrong'>'glasses'</span> (ly) nhầm với 'sunglasses' (kính).", type: "wrong" },
+                { opt: "C", text: "<strong>Sai.</strong> Câu trả lời cho When.", type: "wrong" }
+            ], vocab: ""
+        },
+        {
+            id: 16, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-16.mp3", correct: "B",
+            script_en: "Q: I think I have this meeting room reserved.<br>(A) When did they take place?<br>(B) I'm so sorry I'll be out in a minute.<br>(C) A hotel in the city center.",
+            script_vi: "Hỏi: Tôi nghĩ tôi đã đặt trước phòng họp này rồi.<br>(A) Chúng đã diễn ra khi nào?<br>(B) Thực sự xin lỗi. Tôi sẽ ra ngoài ngay.<br>(C) Một khách sạn ở trung tâm thành phố.",
+            explains: [
+                { opt: "A", text: "<strong>Sai (Bẫy liên tưởng).</strong> Cụm 'take place' gây liên tưởng đến việc tổ chức 'meeting'.", type: "wrong" },
+                { opt: "B", text: "<strong>Đúng.</strong> Phản hồi lại câu trần thuật bằng lời xin lỗi và rời đi <span class='hl-right'>(I'll be out in a minute)</span>.", type: "correct" },
+                { opt: "C", text: "<strong>Sai.</strong> Trả lời cho câu hỏi Where.", type: "wrong" }
+            ], vocab: "• <span class='hl-vocab'>reserve</span>: đặt trước<br>• <span class='hl-vocab'>in a minute</span>: ngay lập tức"
+        },
+        {
+            id: 17, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-17.mp3", correct: "B",
+            script_en: "Q: When was the sculpture gallery added to the Iversen Museum?<br>(A) A substantial amount of money.<br>(B) Four or five years ago.<br>(C) A local artist.",
+            script_vi: "Hỏi: Khu trưng bày tác phẩm điêu khắc được thêm vào Bảo tàng Iversen khi nào?<br>(A) Một số tiền đáng kể.<br>(B) 4 đến 5 năm trước.<br>(C) Một nghệ sĩ địa phương.",
+            explains: [
+                { opt: "A", text: "<strong>Sai.</strong> Trả lời cho câu hỏi How much.", type: "wrong" },
+                { opt: "B", text: "<strong>Đúng.</strong> Đưa ra mốc thời gian cụ thể <span class='hl-right'>(Four or five years ago)</span> cho câu hỏi When.", type: "correct" },
+                { opt: "C", text: "<strong>Sai (Bẫy liên tưởng).</strong> 'artist' liên tưởng đến 'gallery'.", type: "wrong" }
+            ], vocab: "• <span class='hl-vocab'>sculpture</span>: điêu khắc"
+        },
+        {
+            id: 18, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-18.mp3", correct: "C",
+            script_en: "Q: Aren't you traveling to China at the end of this month?<br>(A) Two window seats.<br>(B) The travel agency.<br>(C) No, not until next November.",
+            script_vi: "Hỏi: Chẳng phải bạn sẽ đi du lịch đến Trung Quốc vào cuối tháng này sao?<br>(A) Hai ghế cạnh cửa sổ.<br>(B) Đại lý du lịch.<br>(C) Không, phải đến tháng 11 năm sau.",
+            explains: [
+                { opt: "A", text: "<strong>Sai.</strong> Trả lời cho How many.", type: "wrong" },
+                { opt: "B", text: "<strong>Sai (Bẫy lặp từ).</strong> Lặp lại từ <span class='hl-wrong'>'travel'</span>.", type: "wrong" },
+                { opt: "C", text: "<strong>Đúng.</strong> Phủ nhận (No) và đưa ra thời gian đúng <span class='hl-right'>(not until next November)</span>.", type: "correct" }
+            ], vocab: "• <span class='hl-vocab'>not until</span>: mãi cho đến khi"
+        },
+        {
+            id: 19, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-19.mp3", correct: "A",
+            script_en: "Q: Will Mr. Lu pick up his order, or should we deliver it?<br>(A) He picked it up this morning.<br>(B) That's all right; I don't want any.<br>(C) A floral arrangement.",
+            script_vi: "Hỏi: Ông Lu sẽ đến lấy đơn hàng của mình, hay chúng ta nên giao nó?<br>(A) Ông ấy đã đến lấy vào sáng nay.<br>(B) Không sao đâu; tôi không cần.<br>(C) Sự cắm hoa.",
+            explains: [
+                { opt: "A", text: "<strong>Đúng.</strong> Trả lời cho câu hỏi lựa chọn bằng một thực tế đã xảy ra <span class='hl-right'>(He picked it up this morning)</span>.", type: "correct" },
+                { opt: "B", text: "<strong>Sai.</strong> Dùng để từ chối một lời mời.", type: "wrong" },
+                { opt: "C", text: "<strong>Sai.</strong> Trả lời cho What.", type: "wrong" }
+            ], vocab: "• <span class='hl-vocab'>pick up</span>: đến lấy<br>• <span class='hl-vocab'>deliver</span>: giao hàng"
+        },
+        {
+            id: 20, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-20.mp3", correct: "B",
+            script_en: "Q: You can reschedule the event, can't you?<br>(A) Don't forget to sign up.<br>(B) The invitations have already been sent out.<br>(C) I attended that meeting.",
+            script_vi: "Hỏi: Bạn có thể dời lịch sự kiện, đúng không?<br>(A) Đừng quên đăng ký.<br>(B) Thiệp mời đã được gửi đi rồi.<br>(C) Tôi đã tham dự cuộc họp đó.",
+            explains: [
+                { opt: "A", text: "<strong>Sai (Bẫy liên tưởng).</strong> 'sign up' liên tưởng đến 'event'.", type: "wrong" },
+                { opt: "B", text: "<strong>Đúng.</strong> Từ chối việc dời lịch khéo léo bằng cách nêu lý do <span class='hl-right'>(The invitations have already been sent out)</span>.", type: "correct" },
+                { opt: "C", text: "<strong>Sai (Bẫy liên tưởng).</strong> 'meeting' liên tưởng đến 'event'.", type: "wrong" }
+            ], vocab: "• <span class='hl-vocab'>reschedule</span>: dời lịch"
+        },
+        {
+            id: 21, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-21.mp3", correct: "A",
+            script_en: "Q: Do you need help getting that box down from the top shelf?<br>(A) I'll just use a ladder.<br>(B) The shipping was free.<br>(C) His office is upstairs.",
+            script_vi: "Hỏi: Bạn có cần giúp lấy chiếc hộp đó từ trên kệ cao xuống không?<br>(A) Tôi sẽ chỉ dùng thang thôi.<br>(B) Việc vận chuyển là miễn phí.<br>(C) Văn phòng của anh ấy ở tầng trên.",
+            explains: [
+                { opt: "A", text: "<strong>Đúng.</strong> Từ chối khéo léo lời đề nghị giúp đỡ bằng cách nói <span class='hl-right'>sẽ dùng thang (use a ladder)</span>.", type: "correct" },
+                { opt: "B", text: "<strong>Sai (Bẫy liên tưởng).</strong> 'shipping' liên quan đến 'box'.", type: "wrong" },
+                { opt: "C", text: "<strong>Sai.</strong> Chủ ngữ 'His' không liên quan.", type: "wrong" }
+            ], vocab: "• <span class='hl-vocab'>ladder</span>: cái thang"
+        },
+        {
+            id: 22, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-22.mp3", correct: "C",
+            script_en: "Q: Who's the new public relations manager?<br>(A) On the third floor.<br>(B) A pool of five applicants.<br>(C) Someone from the London branch.",
+            script_vi: "Hỏi: Giám đốc quan hệ công chúng mới là ai?<br>(A) Ở tầng 3.<br>(B) Một nhóm năm ứng viên.<br>(C) Một người nào đó từ chi nhánh London.",
+            explains: [
+                { opt: "A", text: "<strong>Sai.</strong> Trả lời cho Where.", type: "wrong" },
+                { opt: "B", text: "<strong>Sai (Bẫy liên tưởng).</strong> 'applicants' (ứng viên) liên tưởng đến 'manager'.", type: "wrong" },
+                { opt: "C", text: "<strong>Đúng.</strong> Trả lời cho Who bằng đại từ bất định <span class='hl-right'>(Someone from the London branch)</span>.", type: "correct" }
+            ], vocab: "• <span class='hl-vocab'>public relations</span>: quan hệ công chúng"
+        },
+        {
+            id: 23, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-23.mp3", correct: "C",
+            script_en: "Q: You said the financial report would be done this week, didn't you?<br>(A) No, he didn't pay for it.<br>(B) The keys are in the supply drawer.<br>(C) I did, but there's been a delay.",
+            script_vi: "Hỏi: Bạn đã nói rằng báo cáo tài chính sẽ hoàn thành trong tuần này, đúng không?<br>(A) Không, anh ấy chưa thanh toán cho việc đó.<br>(B) Chìa khóa ở trong ngăn kéo đựng đồ.<br>(C) Tôi đã nói thế, nhưng có sự chậm trễ.",
+            explains: [
+                { opt: "A", text: "<strong>Sai.</strong> Đối tượng 'he' không có mặt trong câu hỏi.", type: "wrong" },
+                { opt: "B", text: "<strong>Sai.</strong> Trả lời cho Where.", type: "wrong" },
+                { opt: "C", text: "<strong>Đúng.</strong> Xác nhận có nói (I did) và giải thích lý do chưa xong <span class='hl-right'>(there's been a delay)</span>.", type: "correct" }
+            ], vocab: "• <span class='hl-vocab'>delay</span>: sự chậm trễ"
+        },
+        {
+            id: 24, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-24.mp3", correct: "A",
+            script_en: "Q: What floor is Taffer Technologies on?<br>(A) There's a building directory behind you.<br>(B) It's mostly industrial machine parts.<br>(C) Yes, that's where we're located.",
+            script_vi: "Hỏi: Taffer Technologies ở tầng mấy?<br>(A) Có một sơ đồ hướng dẫn tòa nhà ở ngay sau bạn.<br>(B) Chủ yếu là các bộ phận máy móc công nghiệp.<br>(C) Vâng, đó là nơi chúng tôi tọa lạc.",
+            explains: [
+                { opt: "A", text: "<strong>Đúng.</strong> Trả lời khéo léo bằng cách chỉ người hỏi xem <span class='hl-right'>sơ đồ tòa nhà (building directory)</span>.", type: "correct" },
+                { opt: "B", text: "<strong>Sai (Bẫy liên tưởng).</strong> 'industrial machine' liên tưởng đến 'Technologies'.", type: "wrong" },
+                { opt: "C", text: "<strong>Sai.</strong> Không thể trả lời Yes/No cho câu hỏi What.", type: "wrong" }
+            ], vocab: "• <span class='hl-vocab'>building directory</span>: bảng chỉ dẫn tòa nhà"
+        },
+        {
+            id: 25, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-25.mp3", correct: "C",
+            script_en: "Q: Why don't you ask some of the interns to help you with the project?<br>(A) A graph showing sales projections.<br>(B) I did enjoy the internship.<br>(C) I hadn't thought of that!",
+            script_vi: "Hỏi: Tại sao bạn không nhờ một vài thực tập sinh giúp thực hiện dự án?<br>(A) Một biểu đồ hiển thị dự báo doanh số bán hàng.<br>(B) Tôi thực sự rất thích kỳ thực tập.<br>(C) Tôi chưa nghĩ đến điều đó!",
+            explains: [
+                { opt: "A", text: "<strong>Sai (Bẫy phái sinh).</strong> Từ <span class='hl-wrong'>'projections'</span> phái sinh từ 'project'.", type: "wrong" },
+                { opt: "B", text: "<strong>Sai (Bẫy phái sinh).</strong> Từ <span class='hl-wrong'>'internship'</span> phái sinh từ 'interns'.", type: "wrong" },
+                { opt: "C", text: "<strong>Đúng.</strong> Thể hiện sự đồng tình với một lời khuyên <span class='hl-right'>(I hadn't thought of that!)</span>.", type: "correct" }
+            ], vocab: "• <span class='hl-vocab'>intern</span>: thực tập sinh"
+        },
+        {
+            id: 26, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-26.mp3", correct: "A",
+            script_en: "Q: What time does your bus come?<br>(A) I'm walking today.<br>(B) A one-way ticket.<br>(C) It's on Thirty-Fourth Street.",
+            script_vi: "Hỏi: Chuyến xe buýt của bạn đến lúc mấy giờ?<br>(A) Hôm nay tôi đi bộ.<br>(B) Một chiếc vé một chiều.<br>(C) Nó nằm trên Đường 34.",
+            explains: [
+                { opt: "A", text: "<strong>Đúng.</strong> Trả lời gián tiếp rằng hôm nay không đi xe buýt <span class='hl-right'>(I'm walking today)</span>.", type: "correct" },
+                { opt: "B", text: "<strong>Sai (Bẫy liên tưởng).</strong> 'ticket' liên tưởng đến 'bus'.", type: "wrong" },
+                { opt: "C", text: "<strong>Sai.</strong> Trả lời cho Where.", type: "wrong" }
+            ], vocab: ""
+        },
+        {
+            id: 27, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-27.mp3", correct: "C",
+            script_en: "Q: Are there any openings on your company's design team?<br>(A) The new design is very popular.<br>(B) We're open until seven o'clock.<br>(C) You're welcome to fill out an application.",
+            script_vi: "Hỏi: Có vị trí trống nào trong đội ngũ thiết kế của công ty bạn không?<br>(A) Thiết kế mới rất phổ biến.<br>(B) Chúng tôi mở cửa đến 7 giờ.<br>(C) Bạn được hoan nghênh điền vào đơn xin việc.",
+            explains: [
+                { opt: "A", text: "<strong>Sai (Bẫy lặp từ).</strong> Lặp lại từ <span class='hl-wrong'>'design'</span>.", type: "wrong" },
+                { opt: "B", text: "<strong>Sai (Bẫy phái sinh).</strong> Từ <span class='hl-wrong'>'open'</span> phái sinh từ 'openings'.", type: "wrong" },
+                { opt: "C", text: "<strong>Đúng.</strong> Khẳng định gián tiếp việc có chỗ trống bằng cách <span class='hl-right'>mời điền đơn xin việc</span>.", type: "correct" }
+            ], vocab: "• <span class='hl-vocab'>opening</span>: vị trí trống<br>• <span class='hl-vocab'>fill out</span>: điền vào"
+        },
+        {
+            id: 28, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-28.mp3", correct: "A",
+            script_en: "Q: How did you get the extra discount coupons?<br>(A) I signed up for them online.<br>(B) Usually fifteen percent off.<br>(C) No, the mail hasn't arrived.",
+            script_vi: "Hỏi: Bạn làm cách nào để nhận được thêm phiếu giảm giá?<br>(A) Tôi đã đăng ký nhận chúng trực tuyến.<br>(B) Thường thì giảm giá 15 phần trăm.<br>(C) Không, bưu kiện vẫn chưa tới.",
+            explains: [
+                { opt: "A", text: "<strong>Đúng.</strong> Đưa ra phương pháp cụ thể <span class='hl-right'>(signed up online)</span> cho câu hỏi How.", type: "correct" },
+                { opt: "B", text: "<strong>Sai (Bẫy liên tưởng).</strong> 'percent off' liên tưởng đến 'discount'.", type: "wrong" },
+                { opt: "C", text: "<strong>Sai.</strong> Không thể trả lời Yes/No cho câu hỏi How.", type: "wrong" }
+            ], vocab: "• <span class='hl-vocab'>sign up</span>: đăng ký"
+        },
+        {
+            id: 29, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-29.mp3", correct: "B",
+            script_en: "Q: There has to be a faster way to drive to the warehouse.<br>(A) A driver's license.<br>(B) Sorry, I don't know any other routes.<br>(C) They'll be away for a few days.",
+            script_vi: "Hỏi: Chắc chắn phải có một con đường nhanh hơn để lái xe đến nhà kho.<br>(A) Bằng lái xe.<br>(B) Xin lỗi, tôi không biết con đường nào khác.<br>(C) Họ sẽ đi vắng trong vài ngày.",
+            explains: [
+                { opt: "A", text: "<strong>Sai (Bẫy phái sinh).</strong> Từ <span class='hl-wrong'>'driver'</span> phái sinh từ 'drive'.", type: "wrong" },
+                { opt: "B", text: "<strong>Đúng.</strong> Đáp lại câu trần thuật bằng cách <span class='hl-right'>nói mình không biết đường khác</span>.", type: "correct" },
+                { opt: "C", text: "<strong>Sai (Bẫy phát âm).</strong> Từ <span class='hl-wrong'>'away'</span> có phát âm giống với 'way'.", type: "wrong" }
+            ], vocab: "• <span class='hl-vocab'>warehouse</span>: nhà kho"
+        },
+        {
+            id: 30, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-30.mp3", correct: "C",
+            script_en: "Q: Where is the lecture being held?<br>(A) Next week works for me.<br>(B) A well-known economist.<br>(C) Oh, I didn't think you could make it.",
+            script_vi: "Hỏi: Bài giảng đang được tổ chức ở đâu?<br>(A) Tuần sau đối với tôi là được.<br>(B) Một nhà kinh tế học nổi tiếng.<br>(C) Ồ, tôi đã không nghĩ bạn có thể đến được.",
+            explains: [
+                { opt: "A", text: "<strong>Sai.</strong> Trả lời cho When.", type: "wrong" },
+                { opt: "B", text: "<strong>Sai.</strong> Trả lời cho Who.", type: "wrong" },
+                { opt: "C", text: "<strong>Đúng.</strong> Phản hồi gián tiếp bằng sự ngạc nhiên <span class='hl-right'>(didn't think you could make it)</span>.", type: "correct" }
+            ], vocab: "• <span class='hl-vocab'>make it</span>: đến kịp giờ, tham dự"
+        },
+        {
+            id: 31, audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-31.mp3", correct: "B",
+            script_en: "Q: Have the results of the product testing come in yet?<br>(A) Another focus group.<br>(B) They weren't what we expected.<br>(C) To reschedule a launch date.",
+            script_vi: "Hỏi: Đã có kết quả kiểm tra sản phẩm chưa?<br>(A) Một nhóm tập trung khác.<br>(B) Chúng không giống như những gì chúng tôi mong đợi.<br>(C) Để dời ngày ra mắt.",
+            explains: [
+                { opt: "A", text: "<strong>Sai.</strong> Trả lời cho câu hỏi Who.", type: "wrong" },
+                { opt: "B", text: "<strong>Đúng.</strong> Khẳng định gián tiếp (đã có) và chia sẻ thêm về kết quả <span class='hl-right'>(weren't what we expected)</span>.", type: "correct" },
+                { opt: "C", text: "<strong>Sai.</strong> Trả lời cho câu hỏi Why.", type: "wrong" }
+            ], vocab: "• <span class='hl-vocab'>focus group</span>: nhóm tập trung<br>• <span class='hl-vocab'>reschedule</span>: dời lịch"
         }
     ];
 
@@ -424,7 +615,7 @@
         document.getElementById('final-score').innerText = `${correctCount}/${questions.length}`;
         if(correctCount === questions.length) {
             document.getElementById('score-comment').innerText = "Trùm Part 2 đây rồi! Điểm tuyệt đối! 🎉";
-        } else if(correctCount >= 3) {
+        } else if(correctCount >= 18) {
             document.getElementById('score-comment').innerText = "Rất tốt! Chú ý thêm các bẫy đồng âm nhé! 🌟";
         } else {
             document.getElementById('score-comment').innerText = "Part 2 toàn bẫy thôi, đọc kỹ giải thích để rút kinh nghiệm nhé! 💪";
@@ -464,7 +655,7 @@
 
         // Từ vựng
         const vocabSection = document.getElementById('vocab-section');
-        if(q.vocab.trim() !== "") {
+        if(q.vocab && q.vocab.trim() !== "") {
             document.getElementById('modal-vocab').innerHTML = q.vocab;
             vocabSection.style.display = 'block';
         } else {
