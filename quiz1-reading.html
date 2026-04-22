@@ -269,6 +269,39 @@
         .text-highlight-answer { background-color: #b2fab4; font-weight: bold; padding: 2px 6px; border-radius: 6px; color: #1e6b2e;}
 
         @keyframes slideIn { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+   /* --- CUSTOM MODALS (CONFIRM & RESULT) --- */
+        .custom-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 99999;
+        }
+        .custom-modal {
+            background: white; padding: 40px; border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(136, 176, 75, 0.15);
+            width: 90%; max-width: 450px; text-align: center;
+            border: 2px solid var(--border);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .custom-modal h2 { font-family: 'Lora', serif; color: var(--primary-dark); font-size: 26px; margin-top: 0; }
+        .modal-actions { display: flex; gap: 15px; margin-top: 25px; justify-content: center; }
+        
+        .btn-cancel {
+            background: #f5f5f5; color: #666; border: 2px solid #ddd; padding: 12px 20px;
+            border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; font-family: inherit; flex: 1;
+        }
+        .btn-cancel:hover { background: #e0e0e0; border-color: #ccc; }
+        
+        .btn-confirm {
+            background: var(--primary); color: white; border: none; padding: 12px 20px;
+            border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; font-family: inherit; flex: 1;
+            box-shadow: 0 4px 0 var(--primary-dark);
+        }
+        .btn-confirm:active { transform: translateY(4px); box-shadow: none; }
     </style>
 </head>
 <body>
@@ -348,7 +381,25 @@
 
     </div>
 </div>
+<div id="confirmOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2>Xác nhận nộp bài</h2>
+        <p style="font-size: 18px; color: #555; margin-bottom: 10px;">Bạn có chắc chắn muốn nộp bài để xem đáp án và giải thích chi tiết không?</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeConfirmModal()">Quay lại làm tiếp</button>
+            <button class="btn-confirm" onclick="executeSubmit()">Nộp bài</button>
+        </div>
+    </div>
+</div>
 
+<div id="resultOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2>🎉 Chúc mừng!</h2>
+        <p style="font-size: 16px; color: #666;">Bạn đã hoàn thành bài thi</p>
+        <div id="resultMessage" style="margin: 20px 0; line-height: 1.8;"></div>
+        <button class="btn-confirm" style="width: 100%; margin-top: 10px;" onclick="closeResultModal()">Xem giải thích chi tiết</button>
+    </div>
+</div>
 <footer>
     <div style="font-size:15px; font-weight:bold; color:var(--text-light); text-transform:uppercase; margin-right:20px; flex-shrink: 0;">Bảng điều hướng nhanh:</div>
     <div class="nav-scroller" id="navPalette"></div>
@@ -613,69 +664,125 @@
     }
 
     // --- SUBMIT & TIMER & EXPLANATION ---
-    function submitTest(confirmSubmit) {
+    // --- GRADING & EXPLANATIONS ---
+    function submitTest(manual) {
         if (isSubmitted) return;
-        if (confirmSubmit && !confirm("Bạn đã chắc chắn kiểm tra kỹ và muốn nộp bài chưa?")) return;
+        if (manual) {
+            // Hiển thị Popup xác nhận nộp bài thay vì dùng confirm()
+            document.getElementById('confirmOverlay').style.display = 'flex';
+            return;
+        } else {
+            // Hết giờ -> Nộp luôn không cần hỏi
+            executeSubmit();
+        }
+    }
+
+    function closeConfirmModal() {
+        document.getElementById('confirmOverlay').style.display = 'none';
+    }
+
+    function closeResultModal() {
+        document.getElementById('resultOverlay').style.display = 'none';
+    }
+
+    function executeSubmit() {
+        // Đóng popup xác nhận nếu nó đang mở
+        document.getElementById('confirmOverlay').style.display = 'none';
         
         isSubmitted = true;
         clearInterval(timerInterval);
         
+        // Khóa toàn bộ input
         document.querySelectorAll('input, select').forEach(el => el.disabled = true);
         
         let score = 0;
-        questions.forEach(q => {
-            let userAns = document.getElementById(`ans-${q.id}`).value.trim().toUpperCase();
-            let isCorrect = (userAns === q.ans);
 
-            let fb = document.getElementById(`fb-${q.id}`);
-            let expContainer = document.getElementById(`exp-${q.id}`);
-
-            if(isCorrect && userAns !== "") {
-                score++;
-                if(fb) { fb.innerHTML = "✓ Đúng"; fb.className = "feedback correct"; }
-            } else {
-                if(fb) { fb.innerHTML = `✗ Sai (Key: <span class="text-highlight-answer">${q.ans}</span>)`; fb.className = "feedback wrong"; }
+        for (let i = 1; i <= 40; i++) {
+            let userAns = "";
+            let el = document.getElementById(`ans-${i}`);
+            let feedbackEl = document.getElementById(`fb-${i}`);
+            let expContainer = document.getElementById(`exp-${i}`);
+            
+            // Fix for table items
+            if (!feedbackEl && i >= 14 && i <= 18) {
+                let container = document.getElementById('fb-container-14-18');
+                let rowInfo = document.createElement('div');
+                rowInfo.style.display = "flex"; rowInfo.style.alignItems = "center"; rowInfo.style.flexWrap = "wrap";
+                
+                let span = document.createElement('span'); span.id = `fb-${i}`;
+                let expBox = document.createElement('div'); expBox.id = `exp-${i}`; expBox.style.width = "100%";
+                
+                let label = document.createElement('b'); label.innerText = `Câu ${i}: `; label.style.marginRight = "10px";
+                
+                rowInfo.appendChild(label);
+                rowInfo.appendChild(span);
+                rowInfo.appendChild(expBox);
+                container.appendChild(rowInfo);
+                
+                feedbackEl = span;
+                expContainer = expBox;
             }
 
-            // Gắn giải thích chi tiết & Bật Highlight trên Passage
-            if(expContainer && explanations[q.id]) {
-                let expData = explanations[q.id];
-                
-                if(expData.colorClass) {
-                    let targetEvidence = document.getElementById(`ev-${q.id}`);
-                    if(targetEvidence) {
-                        targetEvidence.classList.add(expData.colorClass);
-                    }
+            if (el) {
+                userAns = el.value.trim().toUpperCase();
+            } else {
+                let radios = document.getElementsByName(`q${i}`);
+                for (let r of radios) if (r.checked) userAns = r.value;
+            }
+
+            let correctAns = answerKey[i];
+            let cleanUser = userAns.replace(/[^A-Z0-9%]/g, "");
+            let cleanKey = correctAns.replace(/[^A-Z0-9%]/g, "");
+            
+            let isCorrect = (cleanUser === cleanKey);
+            if (isCorrect) score++;
+
+            // Render Feedback mark
+            if(feedbackEl) {
+                if(isCorrect) {
+                    feedbackEl.innerHTML = `✓ Đúng`;
+                    feedbackEl.className = "feedback correct";
+                } else {
+                    feedbackEl.innerHTML = `✗ Sai (Đáp án: <span class="text-highlight-answer">${correctAns}</span>)`;
+                    feedbackEl.className = "feedback wrong";
                 }
-
-                let colorDotHtml = expData.colorClass ? `<span class="color-dot ${expData.colorClass}"></span>` : '';
+            }
+            
+            // Render Detailed Explanation
+            if(expContainer && explanations[i]) {
+                let expData = explanations[i];
+                let quoteHtml = expData.quote ? `<div class="exp-quote">"${expData.quote}"</div>` : '';
                 let vocabHtml = expData.vocab ? `<div class="exp-vocab">${expData.vocab}</div>` : '';
-                let tipHtml = expData.tip ? `<div style="margin-top:10px; color:#E76F51; font-weight:700;">📌 Mẹo: ${expData.tip}</div>` : '';
-                let locateBtnHtml = expData.colorClass ? `<button class="locate-btn" onclick="scrollToEvidence(${q.id})">📍 Xem trong bài</button>` : '';
-                let transHtml = expData.translation ? `<div class="exp-translation"><b>🇻🇳 Dịch câu hỏi:</b> ${expData.translation}</div>` : '';
-
+                let tipHtml = expData.tip ? `<div style="margin-top:8px; color:#d87059; font-weight:600;">📌 Mẹo: ${expData.tip}</div>` : '';
+                
                 expContainer.innerHTML = `
                     <div class="exp-box show">
-                        <div class="exp-title">
-                            <div class="exp-title-left">${colorDotHtml}💡 Giải thích chi tiết Câu ${q.id}</div>
-                            ${locateBtnHtml}
-                        </div>
-                        ${transHtml}
+                        <div class="exp-title">💡 Giải thích chi tiết Câu ${i}</div>
+                        ${quoteHtml}
                         <div class="exp-text">${expData.exp}</div>
                         ${vocabHtml}
                         ${tipHtml}
                     </div>
                 `;
             }
-
-            let nav = document.getElementById(`nav-${q.id}`);
-            nav.style.background = isCorrect ? "#e8f5e9" : "#ffebee";
+            
+            // Update Navigator dots
+            let nav = document.getElementById(`nav-${i}`);
+            nav.style.background = isCorrect ? "#c8e6c9" : "#ffcdd2";
             nav.style.color = isCorrect ? "#2e7d32" : "#c62828";
-            nav.style.border = isCorrect ? "2px solid #81c784" : "2px solid #ef9a9a";
-        });
+            nav.style.borderColor = isCorrect ? "#81c784" : "#ef9a9a";
+        }
+
+        // Show highlight feature for reading text
+        document.getElementById('passagePane').style.backgroundColor = "#fff";
         
+        // Final UI Alert (thay vì dùng alert mặc định)
+        document.getElementById('resultMessage').innerHTML = `
+            <strong style="font-size: 26px; color: var(--accent); display: block; margin-bottom: 10px;">Số câu đúng: ${score}/40</strong>
+            <strong style="font-size: 26px; color: var(--primary);">Band Score: ${calculateBand(score)}</strong>
+        `;
         setTimeout(() => {
-            alert(`🎉 CHÚC MỪNG BẠN ĐÃ HOÀN THÀNH!\n\nSố câu đúng: ${score}/13\n\nHãy chú ý các vùng được HIGHLIGHT MÀU bên bài đọc, chúng tương ứng với các dấu chấm màu trong phần giải thích nhé!`);
+            document.getElementById('resultOverlay').style.display = 'flex';
         }, 500);
     }
 
