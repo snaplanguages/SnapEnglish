@@ -134,6 +134,27 @@
             font-size: 14px; font-weight: bold; z-index: 10;
         }
 
+        /* Filter Section */
+        .filters-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        .filters-container > div {
+            flex: 1;
+            min-width: 150px;
+        }
+        .filters-container input, .filters-container select {
+            padding: 8px;
+            font-size: 12px;
+            border: 1px solid #ddd;
+        }
+
         /* History Table */
         .table-container {
             width: 100%; overflow-x: auto; max-height: 350px; overflow-y: auto;
@@ -269,6 +290,28 @@
                         <h3 style="margin: 0;">Lịch Sử Luyện Tập</h3>
                         <button class="btn btn-reset" onclick="resetAll()">Xóa toàn bộ</button>
                     </div>
+
+                    <div class="filters-container">
+                        <div>
+                            <label style="font-size: 11px; font-weight: bold; color: #666;">🔍 Tìm tên đề:</label>
+                            <input type="text" id="searchTest" placeholder="VD: ETS 2024..." oninput="renderTable()">
+                        </div>
+                        <div>
+                            <label style="font-size: 11px; font-weight: bold; color: #666;">🎯 Kỹ năng:</label>
+                            <select id="filterSkill" onchange="renderTable()">
+                                <option value="All">Tất cả kỹ năng</option>
+                                <option value="Listening">Listening</option>
+                                <option value="Reading">Reading</option>
+                                <option value="Speaking">Speaking</option>
+                                <option value="Writing">Writing</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size: 11px; font-weight: bold; color: #666;">🧩 Lọc Part:</label>
+                            <input type="text" id="filterPart" placeholder="VD: Part 5, Full..." oninput="renderTable()">
+                        </div>
+                    </div>
+
                     <div class="table-container">
                         <table id="historyTable">
                             <thead>
@@ -457,19 +500,34 @@
             setTimeout(() => { toast.classList.remove('show'); }, 6000);
         }
 
+        /* Update: Function renderTable now includes filtering logic */
         function renderTable() {
             const tbody = document.getElementById('historyTableBody');
             tbody.innerHTML = '';
             
-            const reversed = [...records].reverse();
+            // Lấy giá trị từ các ô nhập/chọn bộ lọc
+            const searchTerm = document.getElementById('searchTest').value.toLowerCase();
+            const filterSkill = document.getElementById('filterSkill').value;
+            const filterPart = document.getElementById('filterPart').value.toLowerCase();
+
+            // Lọc dữ liệu
+            let filteredRecords = records.filter(record => {
+                const matchName = record.testName.toLowerCase().includes(searchTerm);
+                const matchSkill = filterSkill === 'All' || record.skill === filterSkill;
+                const partValue = record.partName ? record.partName.toLowerCase() : 'full/khác';
+                const matchPart = partValue.includes(filterPart);
+                
+                return matchName && matchSkill && matchPart;
+            });
+
+            const reversed = [...filteredRecords].reverse();
 
             if (reversed.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: #999;">Chưa có dữ liệu luyện tập</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: #999; padding: 20px;">Không tìm thấy dữ liệu phù hợp với bộ lọc 🕵️‍♂️</td></tr>`;
                 return;
             }
 
             reversed.forEach(record => {
-                // Tương thích ngược với các dữ liệu cũ chưa có trường partName
                 const displayPart = record.partName ? record.partName : 'Full/Khác';
 
                 const tr = document.createElement('tr');
