@@ -122,22 +122,21 @@
         /* LAYOUTS */
         /* Part 1 & 3,4 Split */
         .split-layout { display: flex; gap: 30px; align-items: flex-start; }
-        /* Đã fix: Thêm giới hạn chiều cao & thanh cuộn cho cột chứa Script */
+       /* 1. Sửa lại cột chứa Script để bám dính màn hình */
         .split-media { 
             flex: 1; 
-            position: sticky; 
-            top: 90px; /* Cố định ngay dưới Header */
-            max-height: calc(100vh - 130px); /* Chiều cao tối đa vừa màn hình */
-            overflow-y: auto; /* Bật thanh cuộn nội bộ */
+            position: sticky !important; 
+            top: 10px; /* Cố định khi cuộn */
+            align-self: flex-start; /* Quan trọng để Sticky hoạt động */
+            max-height: calc(100vh - 100px); 
+            overflow-y: auto; 
             background: #F8FAFC; padding: 20px; border-radius: 12px; 
             border: 1px dashed #CBD5E1; text-align: center;
-            scroll-behavior: smooth;
         }
-        /* Làm đẹp thanh cuộn nội bộ */
         .split-media::-webkit-scrollbar { width: 6px; }
         .split-media::-webkit-scrollbar-thumb { background: #B2BEC3; border-radius: 10px; }
 
-        /* THANH TRƯỢT KÉO THẢ GIỮA 2 CỘT */
+        /* 2. Thanh kéo trượt cũng bám dính theo Script */
         .resizer {
             width: 8px;
             background-color: #DFE6E9;
@@ -145,7 +144,10 @@
             border-radius: 4px;
             transition: background 0.2s;
             flex-shrink: 0;
-            margin-top: 15px;
+            position: sticky;
+            top: 10px;
+            height: calc(100vh - 100px);
+            align-self: flex-start;
         }
         .resizer:hover, .resizer.dragging {
             background-color: var(--primary);
@@ -1073,15 +1075,14 @@
         p2HTML += `</div>`;
         main.innerHTML += p2HTML;
 
-       // Render Part 3 & 4 (Đã chèn Resizer & Cố định ID để kéo thả)
+       // Render Part 3 & 4 (Đã sửa lỗi cản trở Sticky bám dính màn hình)
         const renderPassage = (data, title) => {
             let html = `<div id="part${title.includes('3') ? 3 : 4}" class="part-container">
                 <div class="part-title">${title}</div>
                 <div class="part-desc">Listen to the talks and answer the questions.</div>`;
             data.forEach(p => {
                 html += `
-                <div class="q-card" style="padding:0; overflow:hidden;">
-                    <div class="split-layout" id="layout-${p.id}" style="padding:30px;">
+                <div class="q-card" style="padding:0;"> <div class="split-layout" id="layout-${p.id}" style="padding:30px;">
                         
                         <div class="split-media" id="media-${p.id}">
                             <div style="font-weight:800; color:var(--primary-dark); margin-bottom:15px;">Questions ${p.id}</div>
