@@ -90,44 +90,51 @@ header {
 ::-webkit-scrollbar-thumb { background: #d0d6cc; border-radius: 5px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-/* --- OVERLAY & MODALS (Cài đặt, Nộp bài) --- */
-.custom-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(255,255,255,0.85); backdrop-filter: blur(8px);
-    display: none; align-items: center; justify-content: center; z-index: 99999;
-}
-.custom-modal {
-    background: white; padding: 40px; border-radius: 25px;
-    box-shadow: 0 15px 40px rgba(136, 176, 75, 0.15);
-    width: 90%; max-width: 450px; text-align: center; border: 2px solid var(--border);
-}
-.mode-btn {
-    display: block; width: 100%; padding: 15px; margin: 15px 0;
-    border-radius: 15px; font-size: 18px; font-weight: 700; cursor: pointer; transition: 0.3s;
+/* --- NÚT ĐIỀU HƯỚNG TRÊN HEADER --- */
+.btn-toggle-nav {
+    background: #fff0eb; color: #d87059; border: none; padding: 10px 20px;
+    border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s;
     font-family: inherit;
 }
-.mode-practice { background: #fff0eb; color: #d87059; border: 2px solid #ffccbc; }
-.mode-practice:hover, .mode-practice.selected { background: var(--accent); color: white; border-color: var(--accent); }
-.mode-mock { background: #e8f5e9; color: var(--primary-dark); border: 2px solid #c8e6c9; }
-.mode-mock:hover, .mode-mock.selected { background: var(--primary); color: white; border-color: var(--primary); }
+.btn-toggle-nav:hover { background: #ffe4d6; transform: translateY(-2px); }
 
-#timeInputBox input { width: 100px; padding: 10px; font-size: 18px; text-align: center; border-radius: 8px; border: 2px solid var(--border); outline: none; font-family: inherit;}
-.start-btn, .btn-confirm { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 15px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s;}
-.btn-cancel { background: #f5f5f5; color: #666; border: 2px solid #ddd; padding: 12px 25px; border-radius: 15px; font-size: 16px; font-weight: 700; cursor: pointer;}
-.modal-actions { display: flex; gap: 15px; margin-top: 25px; justify-content: center; }
-        footer {
-    height: 120px; /* Tăng chiều cao footer một chút để chứa nhiều hàng */
-    background: #fff; border-top: 2px solid var(--border);
-    display: flex; flex-direction: column; justify-content: center; padding: 10px 30px;
-    z-index: 100;
+/* --- DROPDOWN MENU CÂU HỎI --- */
+.nav-panel {
+    position: fixed; top: 80px; right: 30px; width: 340px;
+    background: white; border: 2px solid var(--border); border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 999;
+    opacity: 0; visibility: hidden; transform: translateY(-15px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex; flex-direction: column;
 }
-.nav-scroller { 
-    display: flex; gap: 8px; flex-wrap: wrap; 
-    overflow-y: auto; max-height: 80px; padding-right: 10px;
+.nav-panel.show { opacity: 1; visibility: visible; transform: translateY(0); }
+
+.nav-panel-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 15px 20px; border-bottom: 2px solid var(--border); background: #fafbfc;
+    border-radius: 13px 13px 0 0;
 }
-/* Tùy chỉnh thanh cuộn nhỏ gọn cho bảng điều hướng */
+.nav-panel-header h3 { margin: 0; font-size: 16px; color: var(--primary-dark); font-family: 'Quicksand', sans-serif;}
+.nav-panel-header button { background: none; border: none; font-size: 20px; cursor: pointer; color: #888; padding: 0; transition: 0.2s;}
+.nav-panel-header button:hover { color: var(--wrong); transform: scale(1.1);}
+
+.nav-scroller {
+    padding: 15px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+    max-height: 60vh; overflow-y: auto;
+}
 .nav-scroller::-webkit-scrollbar { width: 6px; }
 .nav-scroller::-webkit-scrollbar-thumb { background: #d0d6cc; border-radius: 3px; }
+
+.nav-dot {
+    width: 100%; aspect-ratio: 1; border: 2px solid #eee; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600;
+    cursor: pointer; color: #999; background: white; transition: 0.2s;
+}
+.nav-dot:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px);}
+.nav-dot.done { background: #edf2ea; color: var(--primary-dark); border-color: #c1d5a4; }
+
+/* Do đã bỏ Footer, ta kéo dài màn hình làm bài ra mức tối đa */
+.container { height: calc(100vh - var(--header-h)); }
     </style>
 </head>
 <body>
@@ -144,9 +151,10 @@ header {
         </div>
 
         <div class="controls">
-            <div class="timer-box">⏱ <span id="timer">00:00</span></div>
-            <button class="btn-submit" onclick="submitTest(true)">NỘP BÀI</button>
-        </div>
+    <div class="timer-box">⏱ <span id="timer">00:00</span></div>
+    <button class="btn-toggle-nav" onclick="toggleNav()">📍 Bảng câu hỏi</button>
+    <button class="btn-submit" onclick="submitTest(true)">NỘP BÀI</button>
+</div>
     </header>
 
     <div class="container" id="mainContainer">
@@ -172,11 +180,13 @@ header {
         </div>
     </div>
 
-    <footer>
-        <div style="font-size:14px; font-weight:bold; color:var(--text-light); text-transform:uppercase; margin-bottom:5px;">Bảng điều hướng nhanh</div>
-        <div class="nav-scroller" id="navPalette">
-            </div>
-    </footer>
+    <div class="nav-panel" id="navPanel">
+    <div class="nav-panel-header">
+        <h3>Danh sách câu hỏi</h3>
+        <button onclick="toggleNav()">✖</button>
+    </div>
+    <div class="nav-scroller" id="navPalette"></div>
+</div>
 <div id="setupOverlay" class="custom-overlay">
     <div class="custom-modal">
         <h2 style="color: var(--primary-dark); font-family: 'Lora', serif; font-size:28px;">Cài đặt bài làm ✨</h2>
@@ -882,7 +892,19 @@ let timerInterval = null;
 let isSubmitted = false;
 const answerKey = {}; // Sẽ được tự động điền từ toeicData
 let allQuestionIds = []; // Lưu trữ ID để làm bảng điều hướng
+// --- TOGGLE NAVIGATION MENU ---
+function toggleNav() {
+    document.getElementById('navPanel').classList.toggle('show');
+}
 
+// Bấm ra ngoài khoảng trắng sẽ tự động đóng Menu
+document.addEventListener('click', function(e) {
+    let panel = document.getElementById('navPanel');
+    let btn = document.querySelector('.btn-toggle-nav');
+    if (panel && btn && panel.classList.contains('show') && !panel.contains(e.target) && !btn.contains(e.target)) {
+        panel.classList.remove('show');
+    }
+});
 // --- SETUP MODAL LOGIC ---
 function selectMode(mode) {
     currentMode = mode;
@@ -1081,6 +1103,7 @@ function checkNav(id) {
 }
 
 function scrollToQuestion(id) {
+    document.getElementById('navPanel').classList.remove('show'); // Dòng chèn thêm
     let group = 1;
     if (toeicData.part6.some(p => p.questions.some(q => q.id == id))) group = 2;
     if (toeicData.part7.some(p => p.questions.some(q => q.id == id))) group = 3;
