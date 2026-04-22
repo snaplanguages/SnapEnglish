@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giải thích chi tiết Part 7 | SnapEnglish</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --primary-dark: #1e40af;
+            --accent: #f59e0b;
+            --bg-body: #f8fafc;
+            --text-main: #334155;
+            --border: #e2e8f0;
+            --correct: #16a34a;
+            --correct-bg: #dcfce7;
+            --wrong: #dc2626;
+            --wrong-bg: #fee2e2;
+            --highlight: #fef08a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* HEADER */
+        header {
+            background: #fff;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .brand {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand span {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-outline {
+            background: #fff;
+            border: 2px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover { background: var(--bg-body); border-color: #cbd5e1; }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 0 var(--primary-dark);
+        }
+
+        .btn-primary:active { transform: translateY(4px); box-shadow: none; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        /* MAIN LAYOUT */
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .passage-section {
+            flex: 6;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid var(--border);
+            background: #fff;
+        }
+
+        .passage-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .col-eng, .col-vie {
+            padding: 30px;
+            line-height: 1.8;
+            font-size: 17px;
+            overflow-y: auto;
+        }
+
+        .col-eng { border-right: 1px dashed var(--border); }
+        .col-vie { background: #fafaf9; color: #57534e; }
+        
+        .col-title {
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 10px;
+        }
+
+        .question-section {
+            flex: 4;
+            padding: 30px;
+            overflow-y: auto;
+            background: var(--bg-body);
+        }
+
+        /* HIGHLIGHT EVIDENCE EFFECT */
+        .ev-box {
+            border-radius: 4px;
+            transition: all 0.4s ease;
+            padding: 2px;
+            border: 1px solid transparent;
+        }
+
+        .ev-box.focus-blink {
+            background-color: var(--highlight) !important;
+            border-color: #eab308;
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4);
+            z-index: 10;
+            position: relative;
+            color: #1e3a8a;
+            font-weight: 600;
+        }
+
+        /* QUESTION CARDS */
+        .q-card {
+            background: #fff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+        .q-text {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #0f172a;
+        }
+
+        .q-text-vi {
+            font-size: 16px;
+            color: #64748b;
+            font-style: italic;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .option {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border: 2px solid var(--border);
+            font-size: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .opt-en { font-weight: 600; }
+        .opt-vi { font-size: 14px; color: #64748b; font-style: italic; }
+
+        .option.is-correct {
+            background: var(--correct-bg);
+            border-color: var(--correct);
+        }
+
+        .option.is-correct .opt-en { color: #166534; }
+
+        /* EXPLANATION BOX */
+        .exp-box {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--primary-light);
+            border-radius: 12px;
+            border-left: 5px solid var(--primary);
+        }
+
+        .exp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #bfdbfe;
+            padding-bottom: 10px;
+        }
+
+        .exp-title {
+            font-weight: 800;
+            color: var(--primary-dark);
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-locate {
+            background: #fff;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-locate:hover { background: var(--primary); color: white; }
+
+        .exp-content { line-height: 1.7; font-size: 16px; margin-bottom: 15px; }
+        
+        .exp-vocab {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .exp-vocab ul { padding-left: 20px; margin: 0; }
+        .exp-vocab li { margin-bottom: 5px; }
+        .exp-vocab b { color: var(--primary-dark); background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
+
+        /* DOC BOX STYLING */
+        .doc-box { border: 1px solid #cbd5e1; padding: 20px; border-radius: 8px; background: #fff; }
+        .email-header { background: #f8fafc; padding: 10px; border-bottom: 1px solid #e2e8f0; margin-bottom: 15px; font-size: 15px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand"><span>SnapEnglish</span> Giải Thích Chi Tiết Part 7</div>
+    <div class="nav-controls">
+        <span id="progress-text" style="font-weight: 700; color: #64748b; margin-right: 15px;">Đoạn 1 / 4</span>
+        <button class="btn btn-outline" id="btn-prev" onclick="navigate(-1)">⬅ Quay lại</button>
+        <button class="btn btn-primary" id="btn-next" onclick="navigate(1)">Đoạn tiếp theo ➡</button>
+    </div>
+</header>
+
+<div class="container">
+    <div class="passage-section">
+        <div class="passage-grid">
+            <div class="col-eng">
+                <div class="col-title">🇬🇧 Bài đọc gốc (English)</div>
+                <div id="eng-content"></div>
+            </div>
+            <div class="col-vie">
+                <div class="col-title">🇻🇳 Bản dịch (Vietnamese)</div>
+                <div id="vie-content"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="question-section" id="questions-container">
+        </div>
+</div>
+
+<script>
+    // DỮ LIỆU BÀI TẬP VÀ GIẢI THÍCH
+    const reviewData = [
+        {
+            // PASSAGE 1: Câu 47-48 (Làm mẫu cấu trúc)
+            id: 1,
+            engHtml: `
+                <div class="doc-box">
+                    <h3 style="text-align: center; color: #1e3a8a;">NOTICE</h3>
+                    <p>We are pleased to announce that Teresa Park has joined the <span id="ev-47" class="ev-box">Severin Law Firm</span> as an associate attorney. Ms. Park graduated with high honors from Naridell University Law School, where she specialized in copyright and trademark law. While attending school, she worked as a clerk in the legal aid office at the university.</p><br>
+                    <p>This past summer, she completed an internship at Delmar and Associates, a legal firm whose client base includes writers, musicians, and other professionals in the publishing industry. Ms. Park has an exceptional record of service and will be a valuable asset to our team. <span id="ev-48" class="ev-box">Please join us this Thursday at 3:00 P.M. in the main conference room to welcome her to our office.</span></p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box">
+                    <h3 style="text-align: center; color: #1e3a8a;">THÔNG BÁO</h3>
+                    <p>Chúng tôi vui mừng thông báo rằng Teresa Park đã gia nhập <strong>Văn phòng Luật Severin</strong> với tư cách là luật sư cộng sự. Cô Park tốt nghiệp loại xuất sắc tại Trường Luật Đại học Naridell, nơi cô chuyên về luật bản quyền và thương hiệu. Trong thời gian đi học, cô đã làm thư ký tại văn phòng trợ giúp pháp lý tại trường đại học.</p><br>
+                    <p>Mùa hè vừa qua, cô đã hoàn thành kỳ thực tập tại Delmar và Cộng sự, một công ty luật có cơ sở khách hàng bao gồm các nhà văn, nhạc sĩ và các chuyên gia khác trong ngành xuất bản. Cô Park có thành tích phục vụ xuất sắc và sẽ là một tài sản quý giá cho đội ngũ của chúng tôi. <strong>Vui lòng tham gia cùng chúng tôi vào lúc 3:00 chiều Thứ Năm tuần này tại phòng họp chính để chào mừng cô ấy đến văn phòng của chúng ta.</strong></p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 47,
+                    qEng: "Where is the notice most likely posted?",
+                    qVie: "Thông báo này có khả năng được đăng ở đâu?",
+                    options: [
+                        { key: "A", en: "In a law office", vi: "Tại một văn phòng luật", isCorrect: true },
+                        { key: "B", en: "In a talent agency", vi: "Tại một cơ quan tài năng", isCorrect: false },
+                        { key: "C", en: "In a recording studio", vi: "Tại một phòng thu âm", isCorrect: false },
+                        { key: "D", en: "In a publishing company", vi: "Tại một công ty xuất bản", isCorrect: false }
+                    ],
+                    evidenceId: "ev-47",
+                    expText: "Thông báo ghi rõ cô Teresa Park gia nhập <strong>Severin Law Firm</strong> (Văn phòng luật Severin) với tư cách là Associate Attorney (Luật sư cộng sự). Các đáp án khác như phòng thu âm hay công ty xuất bản chỉ là nhóm khách hàng cũ ở nơi thực tập trước đây của cô ấy.",
+                    vocab: "<li><b>Law firm</b>: Văn phòng luật</li><li><b>Associate Attorney</b>: Luật sư cộng sự</li><li><b>Specialize in</b>: Chuyên về lĩnh vực gì</li>"
+                },
+                {
+                    id: 48,
+                    qEng: "What are employees invited to do on Thursday?",
+                    qVie: "Nhân viên được mời làm gì vào thứ Năm?",
+                    options: [
+                        { key: "A", en: "Watch a musical performance", vi: "Xem trình diễn ca nhạc", isCorrect: false },
+                        { key: "B", en: "Join a community service group", vi: "Tham gia nhóm dịch vụ cộng đồng", isCorrect: false },
+                        { key: "C", en: "Attend a professional conference", vi: "Tham dự một hội nghị chuyên gia", isCorrect: false },
+                        { key: "D", en: "Meet a new staff member", vi: "Gặp nhân viên mới", isCorrect: true }
+                    ],
+                    evidenceId: "ev-48",
+                    expText: "Câu cuối cùng của đoạn văn đề cập: <em>'Please join us this Thursday... to welcome her to our office'</em> (Vui lòng tham gia cùng chúng tôi vào thứ Năm... để chào mừng cô ấy đến văn phòng). Mục đích chính là gặp gỡ và chào đón nhân viên mới.",
+                    vocab: "<li><b>Welcome</b>: Chào đón</li><li><b>Main conference room</b>: Phòng họp chính</li>"
+                }
+            ]
+        },
+        {
+            // PASSAGE 9: Câu 69-71 (Bạn yêu cầu bổ sung)
+            id: 2,
+            engHtml: `
+                <div class="doc-box">
+                    <div class="email-header">
+                        <strong>To:</strong> Mercedes Salinas &lt;msalinas@fithealthplanning.bm&gt;<br>
+                        <strong>From:</strong> Leonard Cowden &lt;lcowden@srhealthcenter.bm&gt;<br>
+                        <strong>Date:</strong> 16 April<br>
+                        <strong>Subject:</strong> Bermuda Healthy Living Conference
+                    </div>
+                    <p>Dear Ms. Salinas,</p><br>
+                    <p><span id="ev-69" class="ev-box">I'm excited that you have agreed to be one of the speakers</span> at our second annual Bermuda Healthy Living Conference on 12 May. I realize the invitation was last minute, and I
