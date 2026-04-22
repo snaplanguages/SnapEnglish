@@ -6,314 +6,157 @@
     <title>Test 1 - 2018 | SnapEnglish</title>
      <link rel="icon" type="image/png" href="ảnh.png">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
 
-        body {
-            font-family: 'Nunito', sans-serif;
-            background-color: transparent;
-            color: #4a4a4a;
-            display: flex;
-            justify-content: center;
-            padding: 20px 0;
-            margin: 0;
-        }
+:root {
+    --primary: #88b04b;      
+    --primary-dark: #6a8a3a;
+    --accent: #ff9f89;       
+    --bg-body: #f7f9f4;      
+    --bg-pane: #ffffff;
+    --text-main: #4a4a4a;
+    --text-light: #888;
+    --border: #e0e5df;
+    --highlight: #fff59d;    
+    --correct: #6a994e;
+    --wrong: #bc4749;
+    --exp-bg: #f1f8e9;       
+    --header-h: 70px;
+    --footer-h: 80px;
+}
 
-        .quiz-container {
-            background-color: #fffaf0; 
-            width: 100%;
-            max-width: 650px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            padding: 40px;
-            box-sizing: border-box;
-            border: 2px solid #fce4ec; 
-        }
+* { box-sizing: border-box; }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            border-bottom: 2px dashed #ffcdd2;
-            padding-bottom: 15px;
-        }
+body {
+    margin: 0; padding: 0;
+    font-family: 'Quicksand', sans-serif;
+    background: var(--bg-body);
+    color: var(--text-main);
+    height: 100vh;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+}
 
-        .title {
-            font-size: 22px;
-            font-weight: 700;
-            color: #d88c9a; 
-            margin: 0;
-        }
+/* --- HEADER --- */
+header {
+    height: var(--header-h); background: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 30px; z-index: 100;
+}
 
-        .progress {
-            font-size: 16px;
-            font-weight: 600;
-            color: #8da399; 
-            background-color: #e8f5e9;
-            padding: 5px 15px;
-            border-radius: 20px;
-        }
+.brand { font-size: 24px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+.brand span { background: var(--primary); color: white; padding: 4px 10px; border-radius: 10px; font-size: 16px; }
 
-        .question-text {
-            font-size: 18px;
-            line-height: 1.6;
-            font-weight: 600;
-            margin-bottom: 25px;
-            color: #333;
-        }
+.tab-container { display: flex; background: #edf2ea; padding: 5px; border-radius: 25px; gap: 5px; }
+.tab-btn {
+    border: none; background: transparent; padding: 10px 25px; font-size: 16px;
+    font-family: inherit; font-weight: 600; color: var(--text-light);
+    cursor: pointer; border-radius: 20px; transition: all 0.3s;
+}
+.tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
 
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 35px;
-        }
+.controls { display: flex; gap: 20px; align-items: center; }
+.timer-box { 
+    font-family: 'Quicksand', sans-serif; font-weight: 700; color: var(--accent); 
+    background: #fff0eb; padding: 10px 20px; border-radius: 15px; font-size: 20px;
+}
+.btn-submit { 
+    background: var(--primary); color: white; border: none; padding: 10px 25px; 
+    border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s;
+    font-family: inherit; box-shadow: 0 4px 0 var(--primary-dark);
+}
+.btn-submit:active { transform: translateY(4px); box-shadow: none; }
 
-        .option {
-            background-color: #ffffff;
-            border: 2px solid #e1e8ed;
-            border-radius: 12px;
-            padding: 15px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-        }
+/* --- LAYOUT CHIA CỘT TỐI ƯU --- */
+.container { 
+    display: flex; 
+    height: calc(100vh - var(--header-h) - var(--footer-h)); 
+    width: 100%; max-width: 100%;
+    margin: 0 auto;
+}
 
-        .option:hover {
-            background-color: #f0f8ff;
-            border-color: #bde0fe;
-        }
+.pane {
+    flex: 1; padding: 40px 50px; overflow-y: auto;
+    position: relative; scroll-behavior: smooth;
+}
+.pane-left { 
+    background: #fff; border-right: 2px solid var(--border); 
+    font-size: 19px; line-height: 2; text-align: justify; color: #444;
+}
+.pane-right { background: #fafbfc; }
 
-        .option.selected {
-            background-color: #e8f4f8; 
-            border-color: #a2d2ff;
-            color: #2b6cb0;
-            font-weight: 600;
-            box-shadow: 0 4px 10px rgba(162, 210, 255, 0.3);
-        }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: #d0d6cc; border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+/* --- FOOTER --- */
+footer {
+    height: var(--footer-h); background: #fff; border-top: 2px solid var(--border);
+    display: flex; flex-direction: column; justify-content: center; padding: 0 30px;
+    z-index: 100;
+}
+.nav-scroller { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; align-items: center; }
+.nav-dot {
+    min-width: 40px; height: 40px; border: 2px solid #eee; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600;
+    cursor: pointer; color: #999; background: white; transition: 0.2s; flex-shrink: 0;
+}
+.nav-dot:hover { border-color: var(--primary); color: var(--primary); }
+.nav-dot.done { background: #edf2ea; color: var(--primary-dark); border-color: #c1d5a4; }
+.nav-dot.active-q { background: var(--primary); color: white; border-color: var(--primary); }
 
-        .btn {
-            padding: 12px 25px;
-            font-size: 16px;
-            font-weight: 700;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Nunito', sans-serif;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-prev {
-            background-color: #f1f3f5;
-            color: #868e96;
-        }
-
-        .btn-prev:hover {
-            background-color: #e9ecef;
-            color: #495057;
-        }
-
-        .btn-next {
-            background-color: #ffb4a2; 
-            color: #fff;
-            margin-left: auto;
-        }
-
-        .btn-next:hover {
-            background-color: #e5989b;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(229, 152, 155, 0.4);
-        }
-
-        .btn-submit {
-            background-color: #b5e2fa; 
-            color: #0f4c75;
-            margin-left: auto;
-            display: none;
-        }
-
-        .btn-submit:hover {
-            background-color: #8bbce1;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(139, 188, 225, 0.4);
-        }
-
-        .btn-explain {
-            background-color: #cdb4db; 
-            color: #fff;
-            margin-top: 20px;
-        }
-
-        .btn-explain:hover {
-            background-color: #b089c7;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(176, 137, 199, 0.4);
-        }
-
-        #result-container {
-            display: none;
-            text-align: center;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .score-circle {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, #ffc3a0 0%, #ffafbd 100%);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0 auto 20px auto;
-            color: white;
-            font-size: 28px;
-            font-weight: 700;
-            box-shadow: 0 10px 20px rgba(255, 175, 189, 0.4);
-        }
-
-        .result-message {
-            font-size: 20px;
-            color: #d88c9a;
-            margin-bottom: 20px;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .hidden {
-            display: none !important;
-        }
-        /* --- OVERLAYS & MODALS (POPUP) --- */
-        .custom-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.85); backdrop-filter: blur(8px);
-            display: none; align-items: center; justify-content: center;
-            z-index: 99999;
-        }
-        .custom-modal {
-            background: white; padding: 40px; border-radius: 25px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
-            width: 90%; max-width: 450px; text-align: center;
-            border: 2px solid #ffcdd2;
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-family: 'Nunito', sans-serif;
-        }
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .custom-modal h2 { color: #d88c9a; font-size: 26px; margin-top: 0; }
-        
-        #timeInputBox { margin: 30px 0; }
-        #timeInput { 
-            width: 100px; padding: 10px; font-size: 18px; text-align: center; 
-            border: 2px solid #e1e8ed; border-radius: 10px; font-family: inherit; outline: none;
-        }
-        
-        .modal-actions { display: flex; gap: 15px; margin-top: 25px; justify-content: center; }
-        .btn-cancel {
-            background: #f1f3f5; color: #666; border: none; padding: 12px 20px;
-            border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; flex: 1;
-        }
-        .btn-confirm {
-            background: #ffb4a2; color: white; border: none; padding: 12px 20px;
-            border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; flex: 1;
-        }
-        .start-btn {
-            background: #ffb4a2; color: white; border: none; padding: 12px 35px;
-            border-radius: 50px; font-size: 18px; font-weight: 700; cursor: pointer;
-            margin-top: 20px; box-shadow: 0 5px 15px rgba(229, 152, 155, 0.4);
-        }
-        .timer-box {
-            font-size: 18px; font-weight: 700; color: #d88c9a;
-            background: #fff0f3; padding: 6px 15px; border-radius: 15px;
-            border: 2px solid #ffe3e3; margin-left: 15px;
-        }
     </style>
 </head>
 <body>
 
-<div class="quiz-container" id="quiz-app">
-    <div id="question-container">
-        <div class="header">
-            <div style="display: flex; align-items: center;">
-                <h2 class="title">Test 1</h2>
-                <div class="timer-box">⏱ <span id="timer">00:00</span></div>
-            </div>
-            <div class="progress" id="progress-text">Câu 1 / 100</div>
+    <header>
+        <div class="brand">
+            <span>SnapEnglish</span> TOEIC Reading Test 1
         </div>
         
-        <div class="question-text" id="question-text">
-            Đang tải câu hỏi...
-        </div>
-        
-        <div class="options" id="options-container">
+        <div class="tab-container">
+            <button class="tab-btn active" onclick="switchTab(1)">Part 5</button>
+            <button class="tab-btn" onclick="switchTab(2)">Part 6</button>
+            <button class="tab-btn" onclick="switchTab(3)">Part 7</button>
         </div>
 
         <div class="controls">
-            <button class="btn btn-prev hidden" id="btn-prev" onclick="prevQuestion()">Quay lại</button>
-            <button class="btn btn-next" id="btn-next" onclick="nextQuestion()">Tiếp theo</button>
-           <button class="btn btn-submit" id="btn-submit" onclick="askSubmit()">Nộp bài</button>
+            <div class="timer-box">⏱ <span id="timer">00:00</span></div>
+            <button class="btn-submit" onclick="submitTest(true)">NỘP BÀI</button>
         </div>
-    </div>
+    </header>
 
-    <div id="result-container">
-        <h2 class="title" style="margin-bottom: 25px;">Kết quả của bạn</h2>
-        <div class="score-circle" id="score-display">0/30</div>
-        <div class="result-message" id="result-message">Chúc mừng bạn đã hoàn thành bài thi!</div>
-        <a href="toeic-reading-test-1-2018-answers-reading.html" class="btn btn-explain">Xem Giải Thích Chi Tiết</a>
-    </div>
-</div>
-<div id="setupOverlay" class="custom-overlay" style="display: flex;">
-    <div class="custom-modal">
-        <h2>Chào mừng đến với Test 1 - 2018 ✨</h2>
-        <p style="font-size: 18px; color: #666; margin-bottom: 20px;">Hãy cài đặt thời gian để bắt đầu luyện tập nhé!</p>
+    <div class="container" id="mainContainer">
         
-        <div id="timeInputBox">
-            <label style="font-size: 18px; font-weight: bold; color: #555;">Thời gian (phút): </label>
-            <input type="number" id="timeInput" value="15" min="1" max="60">
+        <div class="pane pane-left" id="passagePane">
+            <div id="passage-content-container">
+                <h2 style="color: #6a8a3a; text-align: center; margin-top: 50px;">Hãy chọn Part bạn muốn làm ở Header nhé!</h2>
+            </div>
         </div>
-        
-        <button class="start-btn" onclick="askReady()">Sẵn sàng (OK)</button>
-    </div>
-</div>
 
-<div id="startConfirmOverlay" class="custom-overlay">
-    <div class="custom-modal">
-        <h2>Xác nhận bắt đầu</h2>
-        <p id="startConfirmMsg" style="font-size: 18px; color: #555; margin-bottom: 20px; white-space: pre-line;"></p>
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeStartConfirmModal()">Huỷ</button>
-            <button class="btn-confirm" onclick="startTestActual()">OK</button>
-        </div>
-    </div>
-</div>
+        <div class="pane pane-right">
+            <div id="q-group-1" class="question-group active">
+                <div id="render-part5"></div>
+            </div>
 
-<div id="confirmOverlay" class="custom-overlay">
-    <div class="custom-modal">
-        <h2>Xác nhận nộp bài</h2>
-        <p style="font-size: 18px; color: #555; margin-bottom: 10px;">Bạn có chắc chắn muốn nộp bài để xem đáp án và điểm số không?</p>
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeConfirmModal()">Quay lại</button>
-            <button class="btn-confirm" onclick="submitQuiz()">Nộp bài</button>
+            <div id="q-group-2" class="question-group" style="display: none;">
+                <div id="render-part6"></div>
+            </div>
+
+            <div id="q-group-3" class="question-group" style="display: none;">
+                <div id="render-part7"></div>
+            </div>
         </div>
     </div>
-</div>
-<script>
+
+    <footer>
+        <div style="font-size:14px; font-weight:bold; color:var(--text-light); text-transform:uppercase; margin-bottom:5px;">Bảng điều hướng nhanh</div>
+        <div class="nav-scroller" id="navPalette">
+            </div>
+    </footer>
+
+    <script>
   const toeicData = {
     part5: [
         { id: 101, q: "Dr.Braun will write —--- letters only for interns who master every task expected of a junior copy editor.", options: ["recommends", "recommendation", "recommended", "recommending"], a: "recommendation" },
