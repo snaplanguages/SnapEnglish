@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giải thích chi tiết Part 5 - Test 2 | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fdf6f6;
+            color: #444;
+            line-height: 1.6;
+            padding: 20px;
+            margin: 0;
+        }
+
+        /* Mở rộng toàn màn hình theo yêu cầu */
+        .container {
+            width: 100%;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .header-title {
+            text-align: center;
+            color: #d88c9a;
+            font-size: 32px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            border-bottom: 2px solid #ffcfd2;
+            display: inline-block;
+            width: 100%;
+            padding-bottom: 15px;
+        }
+
+        .progress-indicator {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #7986cb;
+            margin-bottom: 30px;
+            background: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .center-wrapper {
+            text-align: center;
+        }
+
+        /* Thẻ chứa nội dung giải thích */
+        .answer-card {
+            display: none; /* Ẩn tất cả theo mặc định */
+            background: #fff;
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(216, 140, 154, 0.15);
+            border-left: 6px solid #ffcfd2;
+            animation: fadeIn 0.4s ease-in-out;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .answer-card.active {
+            display: block; /* Chỉ hiện thẻ đang active */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-num {
+            font-weight: 700;
+            color: #d88c9a;
+            font-size: 24px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .sentence {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+            background: #fdfdfd;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px dashed #e0e0e0;
+        }
+
+        .correct-ans {
+            color: #2e7d32;
+            background-color: #e8f5e9;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 18px;
+            display: inline-block;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 5px rgba(46, 125, 50, 0.1);
+        }
+
+        .explanation-box {
+            background-color: #fafafa;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .exp-section-title {
+            font-weight: 700;
+            color: #7986cb;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .exp-section-title:first-child { margin-top: 0; }
+
+        .exp-list {
+            margin: 0 0 20px 0;
+            padding-left: 20px;
+            font-size: 17px;
+        }
+        
+        .exp-list li { margin-bottom: 10px; }
+
+        .vocab-box {
+            background-color: #fff3e0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 5px solid #ffb74d;
+            font-size: 17px;
+        }
+
+        .translation {
+            color: #6d4c41;
+            font-size: 18px;
+            font-style: italic;
+            border-top: 2px dashed #ffe0b2;
+            margin-top: 20px;
+            padding-top: 20px;
+            font-weight: 600;
+        }
+
+        /* Navigation Buttons */
+        .navigation-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            margin-bottom: 50px;
+        }
+
+        .nav-btn {
+            padding: 15px 35px;
+            font-size: 18px;
+            font-weight: 700;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .nav-btn-prev {
+            background-color: #f1f3f5;
+            color: #868e96;
+        }
+
+        .nav-btn-prev:hover:not(:disabled) {
+            background-color: #e9ecef;
+            color: #495057;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn-next {
+            background-color: #ffb4a2; 
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(255, 180, 162, 0.3);
+        }
+
+        .nav-btn-next:hover:not(:disabled) {
+            background-color: #e5989b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(229, 152, 155, 0.4);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="header-title">Giải Thích Chi Tiết - TOEIC Reading Part 5 (Test 2)</h1>
+    
+    <div class="center-wrapper">
+        <div class="progress-indicator" id="progress-text">Câu 1 / 30</div>
+    </div>
+
+    <div class="answer-card" id="card-0">
+        <div class="question-num">Câu 1</div>
+        <div class="sentence">The travel ------ will be processed as soon as they are received.</div>
+        <div class="correct-ans">Đáp án: documents</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Chỗ trống đứng sau mạo từ "The" và danh từ bổ nghĩa "travel", cần một <strong>Danh từ chính</strong> làm chủ ngữ.</li>
+                <li>Phía sau ta thấy động từ to be chia ở dạng số nhiều "<strong>are</strong> received" và đại từ thay thế là "<strong>they</strong>", suy ra chủ ngữ bắt buộc phải là <strong>danh từ số nhiều</strong>. Chọn "documents".</li>
+            </ul>
+            <div class="exp-section-title">❌ Tại sao các đáp án khác sai?</div>
+            <ul class="exp-list">
+                <li><strong>document (n):</strong> Danh từ số ít, không phù hợp với đại từ "they" và động từ "are" phía sau.</li>
+                <li><strong>documented (v-ed/adj):</strong> Sai từ loại.</li>
+                <li><strong>documenting (v-ing):</strong> Sai từ loại.</li>
+            </ul>
+            <div class="vocab-box">
+                <strong>📝 Cấu trúc & Từ vựng:</strong><br>
+                - travel document (n): giấy tờ/tài liệu du lịch<br>
+                - process (v): xử lý<br>
+                - as soon as: ngay khi
+            </div>
+            <div class="translation">👉 Dịch: Các tài liệu du lịch sẽ được xử lý ngay khi chúng được nhận.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-1">
+        <div class="question-num">Câu 2</div>
+        <div class="sentence">------ change your seating assignment, visit the reservations page on our Web site.</div>
+        <div class="correct-ans">Đáp án: To</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Chỗ trống đứng đầu câu, theo sau là một động từ nguyên mẫu "change" (thay đổi). Cấu trúc <strong>To + V-nguyên mẫu</strong> đứng đầu câu được dùng để chỉ mục đích (Để làm gì đó, hãy...).</li>
+            </ul>
+            <div class="exp-section-title">❌ Tại sao các đáp án khác sai?</div>
+            <ul class="exp-list">
+                <li><strong>For (prep):</strong> Cần cộng với V-ing hoặc Danh từ (For changing...).</li>
+                <li><strong>Across (prep):</strong> Ngang qua (chỉ vị trí). Sai cấu trúc.</li>
+                <li><strong>With (prep):</strong> Với. Sai cấu trúc.</li>
+            </ul>
+            <div class="vocab-box">
+                <strong>📝 Cấu trúc & Từ vựng:</strong><br>
+                - seating assignment (n): vị trí chỗ ngồi được sắp xếp<br>
+                - reservation (n): sự đặt trước
+            </div>
+            <div class="translation">👉 Dịch: ĐỂ thay đổi chỗ ngồi của bạn, hãy truy cập trang đặt chỗ trên trang web của chúng tôi.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-2">
+        <div class="question-num">Câu 3</div>
+        <div class="sentence">The president of Somchai Bank rides ------ bicycle to work every day, except when it rains.</div>
+        <div class="correct-ans">Đáp án: his</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Chỗ trống đứng trước danh từ "bicycle" (xe đạp). Để xác định quyền sở hữu chiếc xe của vị chủ tịch (The president), ta cần một <strong>Tính từ sở hữu</strong>. Chọn "his".</li>
+            </ul>
+            <div class="exp-section-title">❌ Tại sao các đáp án khác sai?</div>
+            <ul class="exp-list">
+                <li><strong>he:</strong> Đại từ chủ ngữ, không đứng trước danh từ.</li>
+                <li><strong>him:</strong> Đại từ tân ngữ, đứng sau động từ hoặc giới từ.</li>
+                <li><strong>himself:</strong> Đại từ phản thân, dùng để nhấn mạnh chính người đó tự thực hiện hành động.</li>
+            </ul>
+            <div class="vocab-box">
+                <strong>📝 Cấu trúc & Từ vựng:</strong><br>
+                - president (n): chủ tịch<br>
+                - except when: ngoại trừ khi
+            </div>
+            <div class="translation">👉 Dịch: Chủ tịch của ngân hàng Somchai đạp chiếc xe CỦA ÔNG ẤY đi làm mỗi ngày, ngoại trừ khi trời mưa.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-3">
+        <div class="question-num">Câu 4</div>
+        <div class="sentence">Agents who have not yet registered for next week's Insurance Excellence Forum must do so ------.</div>
+        <div class="correct-ans">Đáp án: immediately</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Câu đã có đầy đủ thành phần ngữ pháp cơ bản (must do so). Chỗ trống nằm ở cuối câu, cần một <strong>Trạng từ</strong> bổ nghĩa cho hành động "do so" (tức là hành động đăng ký). "Immediately" (ngay lập tức) mang nghĩa đốc thúc, rất phù hợp ngữ cảnh.</li>
+            </ul>
+            <div class="exp-section-title">❌ Tại sao các đáp án khác sai?</div>
+            <ul class="exp-list">
+                <li><strong>closely (adv):</strong> Một cách chặt chẽ, sát sao. Thường đi với "work closely", "monitor closely".</li>
+                <li><strong>formerly (adv):</strong> Trước đây (= previously). Không dùng với động từ mang tính tương lai/yêu cầu.</li>
+                <li><strong>nearly (adv):</strong> Gần như.</li>
+            </ul>
+            <div class="vocab-box">
+                <strong>📝 Cấu trúc & Từ vựng:</strong><br>
+                - register for (v): đăng ký cho<br>
+                - do so (v): làm như vậy (thay thế cho hành động đã nhắc trước đó)
+            </div>
+            <div class="translation">👉 Dịch: Các đại lý chưa đăng ký cho Diễn đàn Xuất sắc Bảo hiểm vào tuần tới phải làm điều đó NGAY LẬP TỨC.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-4">
+        <div class="question-num">Câu 5</div>
+        <div class="sentence">Matos Realty has developed two ------ methods of identifying undervalued properties.</div>
+        <div class="correct-ans">Đáp án: different</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Vị trí trống nằm giữa số từ "two" và danh từ "methods". Ta cần một <strong>Tính từ</strong> để bổ nghĩa cho danh từ "methods" (phương pháp). Chọn "different" (khác biệt/khác nhau).</li>
+            </ul>
+            <div class="exp-section-title">❌ Tại sao các đáp án khác sai?</div>
+            <ul class="exp-list">
+                <li><strong>differently (adv):</strong> Trạng từ không đứng trước danh từ.</li>
+                <li><strong>difference / differences (n):</strong> Danh từ sự khác biệt. Ghép vào tạo thành cụm N+N không có nghĩa hợp lý.</li>
+            </ul>
+            <div class="vocab-box">
+                <strong>📝 Cấu trúc & Từ vựng:</strong><br>
+                - develop (v): phát triển<br>
+                - identify (v): nhận dạng, xác định<br>
+                - undervalued property (n): bất động sản bị định giá thấp
+            </div>
+            <div class="translation">👉 Dịch: Matos Realty vừa phát triển hai phương pháp KHÁC NHAU để xác định các bất động sản bị định giá thấp.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-5">
+        <div class="question-num">Câu 6</div>
+        <div class="sentence">Wearing lab coats and safety goggles is a ------ for all laboratory workers.</div>
+        <div class="correct-ans">Đáp án: requirement</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Đứng sau mạo từ "a" ta cần một danh từ số ít. Dựa vào ngữ cảnh bắt buộc an toàn lao động, "requirement" (yêu cầu/sự bắt buộc) là hợp lý nhất.</li>
+            </ul>
+            <div class="exp-section-title">❌ Tại sao các đáp án khác sai?</div>
+            <ul class="exp-list">
+                <li><strong>training (n):</strong> Sự đào tạo. Việc mặc áo không phải là sự đào tạo.</li>
+                <li><strong>fulfillment (n):</strong> Sự hoàn thành.</li>
+                <li><strong>specialization (n):</strong> Sự chuyên môn hóa.</li>
+            </ul>
+            <div class="vocab-box">
+                <strong>📝 Cấu trúc & Từ vựng:</strong><br>
+                - lab coat (n): áo choàng phòng thí nghiệm<br>
+                - safety goggles (n): kính bảo hộ
+            </div>
+            <div class="translation">👉 Dịch: Mặc áo khoác phòng thí nghiệm và đeo kính bảo hộ là một YÊU CẦU đối với tất cả nhân viên phòng thí nghiệm.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-6">
+        <div class="question-num">Câu 7</div>
+        <div class="sentence">The manufacturer ------ that the filter be cleaned at least once a month for optimal performance.</div>
+        <div class="correct-ans">Đáp án: recommends</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Đây là cấu trúc <strong>Câu giả định (Subjunctive)</strong>: <strong>S + suggest / recommend / request + that + S + (should) + V-nguyên mẫu</strong>.</li>
+                <li>Dấu hiệu nhận biết là động từ "be cleaned" ở vế sau được giữ nguyên mẫu (không chia "is" hay "are"). Do đó, vế trước cần động từ mang tính chất đề xuất. Chọn "recommends" (đề xuất).</li>
+            </ul>
+            <div class="exp-section-title">❌ Tại sao các đáp án khác sai?</div>
+            <ul class="exp-list">
+                <li><strong>remembers (v):</strong> Nhớ. Không dùng trong cấu trúc giả định V-bare.</li>
+                <li><strong>recognizes (v):</strong> Nhận ra, công nhận.</li>
+                <li><strong>registers (v):</strong> Đăng ký.</li>
+            </ul>
+            <div class="translation">👉 Dịch: Nhà sản xuất KHUYẾN NGHỊ rằng bộ lọc nên được làm sạch ít nhất mỗi tháng một lần để có hiệu suất tối ưu.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-7">
+        <div class="question-num">Câu 8</div>
+        <div class="sentence">Before selecting a Dagle steel door, measure the door opening ------.</div>
+        <div class="correct-ans">Đáp án: carefully</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Câu kết thúc bằng tân ngữ "the door opening". Vị trí cuối câu này cần một <strong>Trạng từ</strong> để bổ nghĩa cách thức cho động từ mệnh lệnh "measure" (hãy đo lường như thế nào?). Chọn "carefully" (một cách cẩn thận).</li>
+            </ul>
+            <div class="exp-section-title">❌ Tại sao các đáp án khác sai?</div>
+            <ul class="exp-list">
+                <li><strong>careful (adj):</strong> Tính từ, không đứng sau tân ngữ để bổ nghĩa cho động từ.</li>
+                <li><strong>caring (adj/v-ing):</strong> Chu đáo, quan tâm.</li>
+                <li><strong>cares (v):</strong> Động từ chia số ít. Sai ngữ pháp.</li>
+            </ul>
+            <div class="vocab-box">
+                <strong>📝 Cấu trúc & Từ vựng:</strong><br>
+                - measure (v): đo lường<br>
+                - door opening (n): khoảng trống cửa (kích thước khung cửa)
+            </div>
+            <div class="translation">👉 Dịch: Trước khi chọn cửa thép Dagle, hãy đo kích thước khung cửa MỘT CÁCH CẨN THẬN.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-8">
+        <div class="question-num">Câu 9</div>
+        <div class="sentence">Okpara employees should contact their supervisors by 10:00 A.M. ------ they expect to miss a day of work.</div>
+        <div class="correct-ans">Đáp án: if</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Chỗ trống dùng để nối 2 mệnh đề: "nên liên lạc với giám sát" và "họ dự định nghỉ làm". Đây là mối quan hệ điều kiện, chọn liên từ <strong>"if"</strong> (nếu).</li>
+            </ul>
+            <div class="exp-section-title">❌ Tại sao các đáp án khác sai?</div>
+            <ul class="exp-list">
+                <li><strong>soon (adv):</strong> Sớm. Không phải liên từ. Dùng trong "as soon as".</li>
+                <li><strong>only (adv):</strong> Chỉ. Không nối được 2 mệnh đề ở vị trí này.</li>
+                <li><strong>then (adv):</strong> Sau đó. Biểu thị trình tự thời gian, sai logic câu.</li>
+            </ul>
+            <div class="translation">👉 Dịch: Nhân viên của Okpara nên liên hệ với giám sát viên của họ trước 10 giờ sáng NẾU họ dự định nghỉ làm một ngày.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-9">
+        <div class="question-num">Câu 10</div>
+        <div class="sentence">The director has requested a ------ of the costs of short- and long-term rental agreements.</div>
+        <div class="correct-ans">Đáp án: comparison</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Sau mạo từ "a" ta cần một danh từ. Chọn danh từ <strong>comparison</strong> (sự so sánh). Cụm "a comparison of A and B".</li>
+            </ul>
+            <div class="exp-section-title">❌ Tại sao các đáp án khác sai?</div>
+            <ul class="exp-list">
+                <li><strong>comparable (adj):</strong> Có thể so sánh được, tương đương.</li>
+                <li><strong>compared (v-ed):</strong> Động từ quá khứ / PII.</li>
+                <li><strong>comparative (adj):</strong> Tương đối.</li>
+            </ul>
+            <div class="vocab-box">
+                <strong>📝 Cấu trúc & Từ vựng:</strong><br>
+                - rental agreement (n): hợp đồng thuê mướn
+            </div>
+            <div class="translation">👉 Dịch: Giám đốc đã yêu cầu một SỰ SO SÁNH chi phí giữa hợp đồng thuê ngắn hạn và dài hạn.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-10">
+        <div class="question-num">Câu 11</div>
+        <div class="sentence">Ms. Yi of Lakesview Catering says that five trays of appetizers are more than ------ for fifty guests.</div>
+        <div class="correct-ans">Đáp án: enough</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Cụm từ diễn đạt quen thuộc: <strong>more than enough</strong> (thừa sức, quá đủ, nhiều hơn mức cần thiết). Phù hợp với văn cảnh bàn tiệc.</li>
+            </ul>
+            <div class="exp-section-title">❌ Tại sao các đáp án khác sai?</div>
+            <ul class="exp-list">
+                <li><strong>able (adj):</strong> Có khả năng (be able to).</li>
+                <li><strong>numerous (adj):</strong> Nhiều, đông đảo.</li>
+                <li><strong>sure (adj):</strong> Chắc chắn.</li>
+            </ul>
+            <div class="translation">👉 Dịch: Cô Yi của Lakesview Catering nói rằng năm khay món khai vị là dư sức ĐỦ cho 50 khách.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-11">
+        <div class="question-num">Câu 12</div>
+        <div class="sentence">Canada's Pan Rail Corporation will no longer ------ freight into the United States.</div>
+        <div class="correct-ans">Đáp án: transport</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Sau trợ động từ tương lai "will" (và trạng từ phủ định no longer), động từ chính bắt buộc phải ở dạng <strong>Nguyên mẫu (V-bare)</strong>. Chọn "transport".</li>
+            </ul>
+            <div class="translation">👉 Dịch: Tập đoàn Pan Rail của Canada sẽ không còn VẬN CHUYỂN hàng hóa vào Hoa Kỳ nữa.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-12">
+        <div class="question-num">Câu 13</div>
+        <div class="sentence">According to experts, Flash Maxe dishwashing detergent consistently delivers ------ results.</div>
+        <div class="correct-ans">Đáp án: exceptional</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Đứng trước danh từ "results", ta cần một <strong>Tính từ</strong> để mô tả tính chất của kết quả. Chọn "exceptional" (xuất sắc, ngoại lệ).</li>
+            </ul>
+            <div class="exp-section-title">❌ Tại sao các đáp án khác sai?</div>
+            <ul class="exp-list">
+                <li><strong>exceptionally (adv):</strong> Sai từ loại. Trạng từ chỉ đứng trước tính từ hoặc động từ.</li>
+                <li><strong>exception / exceptions (n):</strong> Danh từ (Sự ngoại lệ).</li>
+            </ul>
+            <div class="translation">👉 Dịch: Theo các chuyên gia, nước rửa bát Flash Maxe luôn mang lại kết quả XUẤT SẮC.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-13">
+        <div class="question-num">Câu 14</div>
+        <div class="sentence">When picking up identification badges, employees need to show ------ of employment at Ekmekci Associates.</div>
+        <div class="correct-ans">Đáp án: proof</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Sau động từ "show" ta cần một danh từ làm tân ngữ. "<strong>proof of employment</strong>" là cụm từ chuẩn mang nghĩa "bằng chứng làm việc / giấy xác nhận công tác".</li>
+            </ul>
+            <div class="exp-section-title">❌ Tại sao các đáp án khác sai?</div>
+            <ul class="exp-list">
+                <li><strong>process (n):</strong> Quy trình.</li>
+                <li><strong>analysis (n):</strong> Sự phân tích.</li>
+                <li><strong>basis (n):</strong> Cơ sở, nền tảng.</li>
+            </ul>
+            <div class="translation">👉 Dịch: Khi nhận thẻ tên, nhân viên cần xuất trình BẰNG CHỨNG làm việc tại Ekmekci Associates.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-14">
+        <div class="question-num">Câu 15</div>
+        <div class="sentence">Roxy Koenig is ------ seeking a new venue for her summer concert since the Hazelton Music Hall is being renovated.</div>
+        <div class="correct-ans">Đáp án: actively</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Câu đang chia ở thì hiện tại tiếp diễn (is + V-ing). Chỗ trống nằm giữa to be và V-ing, cần một <strong>Trạng từ</strong> để bổ nghĩa cho hành động "seeking" (tìm kiếm). Chọn "actively" (một cách tích cực).</li>
+            </ul>
+            <div class="translation">👉 Dịch: Roxy Koenig đang TÍCH CỰC tìm kiếm một địa điểm mới cho buổi hòa nhạc mùa hè của mình vì Hội trường Âm nhạc Hazelton đang được tu sửa.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-15">
+        <div class="question-num">Câu 16</div>
+        <div class="sentence">Prospective tenants must provide at least two references ------ their application.</div>
+        <div class="correct-ans">Đáp án: along with</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Sau chỗ trống là cụm danh từ "their application", do đó ta cần một giới từ hoặc cụm giới từ mang nghĩa "cùng với". Chọn "<strong>along with</strong>".</li>
+            </ul>
+            <div class="exp-section-title">❌ Tại sao các đáp án khác sai?</div>
+            <ul class="exp-list">
+                <li><strong>too (adv):</strong> Cũng. Đứng cuối câu.</li>
+                <li><strong>in addition (adv):</strong> Thêm vào đó. Phải có "to" (in addition to) mới cộng được với Danh từ.</li>
+                <li><strong>moreover (adv):</strong> Hơn nữa. Nối 2 mệnh đề.</li>
+            </ul>
+            <div class="translation">👉 Dịch: Khách thuê tiềm năng phải cung cấp ít nhất hai người giới thiệu CÙNG VỚI đơn đăng ký của họ.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-16">
+        <div class="question-num">Câu 17</div>
+        <div class="sentence">While Ms. Molinsky has little experience in technical support, her knowledge of computer systems is -------.</div>
+        <div class="correct-ans">Đáp án: extensive</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Câu sử dụng "While" chỉ sự tương phản. Vế trước "little experience" (ít kinh nghiệm) thì vế sau phải mang nghĩa tích cực. "<strong>extensive knowledge</strong>" là cụm từ rất hay gặp trong TOEIC, nghĩa là "kiến thức sâu rộng".</li>
+            </ul>
+            <div class="translation">👉 Dịch: Mặc dù cô Molinsky có ít kinh nghiệm trong hỗ trợ kỹ thuật, kiến thức về hệ thống máy tính của cô lại rất SÂU RỘNG.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-17">
+        <div class="question-num">Câu 18</div>
+        <div class="sentence">Please refer to the attached flowchart, which describes the ------ of responsibilities among the various leadership positions.</div>
+        <div class="correct-ans">Đáp án: division</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Cụm từ "<strong>division of responsibilities</strong>" nghĩa là "sự phân công/chia sẻ trách nhiệm". Rất phù hợp với ngữ cảnh sơ đồ tổ chức (flowchart).</li>
+            </ul>
+            <div class="translation">👉 Dịch: Vui lòng tham khảo sơ đồ đính kèm, cái mà mô tả SỰ PHÂN CÔNG trách nhiệm giữa các vị trí lãnh đạo khác nhau.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-18">
+        <div class="question-num">Câu 19</div>
+        <div class="sentence">A good project manager strives ------ communication between departments whenever possible.</div>
+        <div class="correct-ans">Đáp án: to enhance</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Cấu trúc cố định: <strong>strive to do something</strong> (cố gắng/phấn đấu làm gì đó). Do đó chọn "to enhance".</li>
+            </ul>
+            <div class="translation">👉 Dịch: Một quản lý dự án giỏi luôn cố gắng NÂNG CAO sự giao tiếp giữa các phòng ban bất cứ khi nào có thể.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-19">
+        <div class="question-num">Câu 20</div>
+        <div class="sentence">Same-day appointments can usually be scheduled, although not ------ with your usual doctor.</div>
+        <div class="correct-ans">Đáp án: necessarily</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Cụm từ "<strong>not necessarily</strong>" mang nghĩa "không nhất thiết là". Đây là cụm trạng từ cực kỳ phổ biến trong văn phong giao tiếp và thương mại.</li>
+            </ul>
+            <div class="translation">👉 Dịch: Lịch hẹn trong ngày thường có thể được sắp xếp, mặc dù KHÔNG NHẤT THIẾT là với bác sĩ quen thuộc của bạn.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-20">
+        <div class="question-num">Câu 21</div>
+        <div class="sentence">Mr. Vieira is ------ with introducing several changes that have helped Stacatti Stationery increase business.</div>
+        <div class="correct-ans">Đáp án: credited</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Cấu trúc cố định: <strong>be credited with + V-ing/N</strong> (được công nhận là người có công làm gì đó).</li>
+            </ul>
+            <div class="translation">👉 Dịch: Ông Vieira ĐƯỢC GHI NHẬN CÔNG LAO vì đã đưa ra một số thay đổi giúp Văn phòng phẩm Stacatti tăng cường kinh doanh.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-21">
+        <div class="question-num">Câu 22</div>
+        <div class="sentence">In the photograph, President Tang can be seen standing ------ Dr. Dervishi.</div>
+        <div class="correct-ans">Đáp án: opposite</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Chỉ vị trí tương quan giữa 2 người trong ảnh. <strong>Opposite</strong> (đối diện) hoạt động như một giới từ chỉ vị trí.</li>
+            </ul>
+            <div class="translation">👉 Dịch: Trong bức ảnh, có thể thấy Chủ tịch Tang đang đứng ĐỐI DIỆN Tiến sĩ Dervishi.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-22">
+        <div class="question-num">Câu 23</div>
+        <div class="sentence">The new location of the Bentler Company is easily ------ by car or bus.</div>
+        <div class="correct-ans">Đáp án: accessible</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Sau to be (is) và trạng từ (easily) cần một <strong>Tính từ</strong>. "<strong>easily accessible</strong>" (dễ dàng tiếp cận/đi tới) là collocation chuẩn dùng cho địa điểm.</li>
+            </ul>
+            <div class="translation">👉 Dịch: Địa điểm mới của Công ty Bentler rất DỄ DÀNG ĐI ĐẾN bằng ô tô hoặc xe buýt.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-23">
+        <div class="question-num">Câu 24</div>
+        <div class="sentence">A rise in energy prices will mostly affect businesses ------ energy consumption is high.</div>
+        <div class="correct-ans">Đáp án: whose</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Ta có 2 danh từ đứng cạnh nhau "businesses" (các doanh nghiệp) và "energy consumption" (sự tiêu thụ năng lượng). Để chỉ sự sở hữu (tiêu thụ năng lượng CỦA doanh nghiệp), ta dùng đại từ quan hệ <strong>whose</strong>.</li>
+            </ul>
+            <div class="translation">👉 Dịch: Việc tăng giá năng lượng sẽ chủ yếu ảnh hưởng đến các doanh nghiệp MÀ CÓ mức tiêu thụ năng lượng cao.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-24">
+        <div class="question-num">Câu 25</div>
+        <div class="sentence">City officials have ------ Harmon Avenue businesses that street repairs will be completed within 48 hours.</div>
+        <div class="correct-ans">Đáp án: assured</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Cấu trúc: <strong>assure sb that...</strong> (đảm bảo với ai đó rằng...). Điền "assured" là hoàn toàn chính xác về mặt ngữ nghĩa và cấu trúc tân ngữ.</li>
+            </ul>
+            <div class="translation">👉 Dịch: Các quan chức thành phố đã ĐẢM BẢO VỚI các doanh nghiệp trên đại lộ Harmon rằng việc sửa đường sẽ hoàn thành trong vòng 48 giờ.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-25">
+        <div class="question-num">Câu 26</div>
+        <div class="sentence">Nominations for the ------ seat on the Gitterman Holdings Board of Trustees must be submitted by Friday.</div>
+        <div class="correct-ans">Đáp án: vacant</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Bổ nghĩa cho danh từ "seat" (chỗ ngồi/vị trí) trong hội đồng, ta dùng tính từ "<strong>vacant</strong>" (trống, khuyết).</li>
+            </ul>
+            <div class="translation">👉 Dịch: Các đề cử cho vị trí TRỐNG trong Hội đồng Quản trị Gitterman Holdings phải được nộp trước thứ Sáu.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-26">
+        <div class="question-num">Câu 27</div>
+        <div class="sentence">Our department ------ the policy meeting last Monday, but we had a scheduling conflict.</div>
+        <div class="correct-ans">Đáp án: would have attended</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Mệnh đề phía sau "but we had..." chỉ ra một sự thật trong quá khứ (đã có xung đột lịch). Do đó vế trước diễn tả một <strong>hành động trái với thực tế ở quá khứ</strong> (Đáng lẽ ra đã tham dự). Dùng cấu trúc câu điều kiện loại 3 ẩn: <strong>would have + V3/ed</strong>.</li>
+            </ul>
+            <div class="translation">👉 Dịch: Bộ phận của chúng tôi ĐÁNG LẼ ĐÃ THAM DỰ cuộc họp chính sách vào thứ Hai tuần trước, nhưng chúng tôi bị trùng lịch.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-27">
+        <div class="question-num">Câu 28</div>
+        <div class="sentence">------ the effectiveness of Maisey Stanton's leadership on the town council, she will likely win next week's mayoral election.</div>
+        <div class="correct-ans">Đáp án: Given</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Phía sau là một cụm danh từ "the effectiveness...", ta cần một giới từ. <strong>Given + N/V-ing</strong> mang nghĩa là "Dựa vào, xét đến". Cực kỳ hay thi TOEIC.</li>
+            </ul>
+            <div class="translation">👉 Dịch: XÉT ĐẾN sự hiệu quả trong vai trò lãnh đạo của Maisey Stanton tại hội đồng thị trấn, cô ấy có khả năng sẽ giành chiến thắng trong cuộc bầu cử thị trưởng vào tuần tới.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-28">
+        <div class="question-num">Câu 29</div>
+        <div class="sentence">Barner Corporation's record profits resulted from the recent ------ to identify operating efficiencies.</div>
+        <div class="correct-ans">Đáp án: initiative</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Sau tính từ "recent" cần một Danh từ. Chọn <strong>initiative</strong> (sáng kiến, bước đầu). Mặc dù có đuôi -ive nhưng đây là một danh từ rất hay gặp.</li>
+            </ul>
+            <div class="translation">👉 Dịch: Lợi nhuận kỷ lục của tập đoàn Barner là kết quả của SÁNG KIẾN gần đây nhằm xác định hiệu suất hoạt động.</div>
+        </div>
+    </div>
+
+    <div class="answer-card" id="card-29">
+        <div class="question-num">Câu 30</div>
+        <div class="sentence">Customers still tend to place short notices in the classified section ------ there is no longer a mandated word limit.</div>
+        <div class="correct-ans">Đáp án: even though</div>
+        <div class="explanation-box">
+            <div class="exp-section-title">📌 Phân tích đáp án:</div>
+            <ul class="exp-list">
+                <li>Phía sau là một mệnh đề (there is...). Dựa vào ngữ nghĩa (Vẫn có xu hướng viết ngắn gọn MẶC DÙ không còn bị giới hạn chữ), liên từ chỉ sự nhượng bộ <strong>even though</strong> là chuẩn xác nhất.</li>
+            </ul>
+            <div class="translation">👉 Dịch: Khách hàng vẫn có xu hướng đăng những thông báo ngắn gọn trong mục rao vặt MẶC DÙ không còn quy định giới hạn số chữ nữa.</div>
+        </div>
+    </div>
+
+    <div class="navigation-controls">
+        <button class="nav-btn nav-btn-prev" id="btn-back" onclick="prevCard()" disabled>← Quay lại</button>
+        <button class="nav-btn nav-btn-next" id="btn-next" onclick="nextCard()">Tiếp theo →</button>
+    </div>
+
+</div>
+
+<script>
+    let currentCardIndex = 0;
+    const totalCards = 30; // 30 câu hỏi
+    
+    // Khởi tạo hiển thị
+    function showCard(index) {
+        // Ẩn tất cả
+        for (let i = 0; i < totalCards; i++) {
+            let card = document.getElementById('card-' + i);
+            if(card) card.classList.remove('active');
+        }
+        
+        // Hiện card mục tiêu
+        let activeCard = document.getElementById('card-' + index);
+        if(activeCard) activeCard.classList.add('active');
+        
+        // Cập nhật số thứ tự
+        document.getElementById('progress-text').innerText = `Câu ${index + 1} / ${totalCards}`;
+        
+        // Vô hiệu hóa nút Quay lại ở câu đầu tiên
+        document.getElementById('btn-back').disabled = (index === 0);
+        
+        // Vô hiệu hóa nút Tiếp theo ở câu cuối cùng
+        document.getElementById('btn-next').disabled = (index === totalCards - 1);
+        
+        // Cuộn lên đầu thẻ một cách mượt mà
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+
+    function nextCard() {
+        if (currentCardIndex < totalCards - 1) {
+            currentCardIndex++;
+            showCard(currentCardIndex);
+        }
+    }
+
+    function prevCard() {
+        if (currentCardIndex > 0) {
+            currentCardIndex--;
+            showCard(currentCardIndex);
+        }
+    }
+
+    // Chạy mặc định khi load trang
+    window.onload = () => {
+        showCard(0);
+    };
+</script>
+
+</body>
+</html>
