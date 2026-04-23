@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 28: Ultimate Mega Review (14-27) | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette pastel: Rose Water - Sky Blue - Mint Pearl */
+            --pastel-rose: #ffe4e6;
+            --pastel-sky: #e0f2fe;
+            --pastel-mint: #d1fae5;
+            
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.95);
+            --text-main: #0f172a; 
+            --text-sub: #334155;
+            --correct-color: #059669; 
+            --wrong-color: #e11d48;   
+            --accent-color: #0369a1;  /* Xanh lam đậm làm điểm nhấn trưởng thành */
+        }
+
+        /* Ẩn nguồn trích dẫn theo yêu cầu */
+        .hidden-cite {
+            display: none !important;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--pastel-rose) 0%, var(--pastel-sky) 50%, var(--pastel-mint) 100%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Container mở rộng toàn màn hình */
+        .full-screen-container {
+            width: 100%;
+            padding: 30px 50px;
+            box-sizing: border-box;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 10px;
+        }
+        h1 {
+            color: var(--accent-color);
+            font-size: 42px;
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.9);
+            margin-bottom: 10px;
+        }
+
+        /* Content Sections */
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(3, 105, 161, 0.08);
+        }
+
+        /* Quiz Interface */
+        .question-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question-text {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--accent-color);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background: rgba(255,255,255,0.95);
+            border: 2px solid transparent;
+            padding: 15px 20px;
+            border-radius: 14px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 17px;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-main);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .option-btn:hover {
+            background: white;
+            border-color: rgba(3, 105, 161, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .option-btn.selected-correct {
+            background: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+
+        .option-btn.selected-wrong {
+            background: var(--wrong-color);
+            color: white;
+            border-color: var(--wrong-color);
+        }
+
+        .option-btn.show-correct {
+            background: white;
+            color: var(--correct-color);
+            border-color: var(--correct-color);
+            box-shadow: 0 0 0 2px var(--correct-color) inset;
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Detailed Explanation Box */
+        .explanation-box {
+            margin-top: 25px;
+            padding: 20px 25px;
+            border-radius: 16px;
+            background: rgba(250, 250, 250, 0.95);
+            display: none;
+            animation: fadeIn 0.5s ease;
+            border-left: 5px solid var(--accent-color);
+        }
+        
+        .exp-status { font-weight: 700; font-size: 20px; margin-bottom: 15px; }
+        .exp-correct { color: var(--correct-color); }
+        .exp-wrong { color: var(--wrong-color); }
+
+        .exp-section { margin-bottom: 12px; }
+        .exp-title { font-weight: 700; color: var(--accent-color); display: block; margin-bottom: 4px;}
+        .reason-correct { color: #059669; font-weight: 600; }
+        .reason-wrong { color: #e11d48; font-size: 15px; margin-top: 5px; display: block;}
+        
+        /* Navigation Buttons (Next/Back) */
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding: 20px 0;
+            border-top: 2px dashed rgba(3, 105, 161, 0.2);
+        }
+
+        .nav-btn {
+            padding: 14px 35px;
+            border-radius: 50px;
+            background: var(--accent-color);
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(3, 105, 161, 0.25);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(3, 105, 161, 0.35);
+        }
+
+        .nav-btn.btn-back {
+            background: white;
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            .options-grid { grid-template-columns: 1fr; }
+            .full-screen-container { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="full-screen-container">
+        <header>
+            <h1>✨ Unit 28: Ultimate Mega Review (14-27)</h1>
+            <p style="font-size: 18px; font-weight: 500; color: var(--text-sub);">Hành trình chinh phục 32 câu hỏi hóc búa quét sạch ngữ pháp & Collocations</p>
+        </header>
+
+        <div id="overview" class="section active">
+            <div class="glass-card" style="text-align: center;">
+                <h2 style="color: var(--accent-color); font-size: 32px; margin-top: 0;">Sẵn sàng cho thử thách cuối cùng? 🚀</h2>
+                <p style="font-size: 18px;">Bạn đã yêu cầu "thật nhiều bài tập", và đây là hệ thống 32 câu hỏi chia làm 4 trạm:</p>
+                <ul style="text-align: left; max-width: 650px; margin: 20px auto; font-size: 17px; line-height: 1.8;">
+                    <li><b>Trạm 1 (8 câu):</b> Đại Từ & Danh Từ (Units 14 - 18).</li>
+                    <li><b>Trạm 2 (8 câu):</b> Tính Từ & Trạng Từ (Units 19 - 24).</li>
+                    <li><b>Trạm 3 (8 câu):</b> Động Từ & Giới Từ (Units 25 - 26).</li>
+                    <li><b>Trạm 4 (8 câu):</b> Liên Từ & Siêu Bẫy Tổng Hợp (Unit 27 & Mix).</li>
+                </ul>
+                <p style="font-weight: 600; color: #b45309;">Bài học này khá dài, hãy giữ sự tập trung cao độ nhé!</p>
+            </div>
+
+            <div class="nav-controls" style="justify-content: flex-end;">
+                <button class="nav-btn" onclick="navigateTo('task1')">Khởi động: Trạm 1 ➡️</button>
+            </div>
+        </div>
+
+        <div id="task1" class="section">
+            <div class="glass-card" style="padding: 20px; margin-bottom: 20px; text-align: center;">
+                <h2 style="margin: 0; color: var(--accent-color);">🎯 Trạm 1: Đại Từ & Danh Từ (Units 14-18)</h2>
+            </div>
+            <div id="task1-container"></div>
+            <div class="nav-controls">
+                <button class="nav-btn btn-back" onclick="navigateTo('overview')">⬅️ Back: Overview</button>
+                <button class="nav-btn" onclick="navigateTo('task2')">Tiếp tục: Trạm 2 ➡️</button>
+            </div>
+        </div>
+
+        <div id="task2" class="section">
+            <div class="glass-card" style="padding: 20px; margin-bottom: 20px; text-align: center;">
+                <h2 style="margin: 0; color: var(--accent-color);">🚀 Trạm 2: Tính Từ & Trạng Từ (Units 19-24)</h2>
+            </div>
+            <div id="task2-container"></div>
+            <div class="nav-controls">
+                <button class="nav-btn btn-back" onclick="navigateTo('task1')">⬅️ Back: Trạm 1</button>
+                <button class="nav-btn" onclick="navigateTo('task3')">Tiếp tục: Trạm 3 ➡️</button>
+            </div>
+        </div>
+
+        <div id="task3" class="section">
+            <div class="glass-card" style="padding: 20px; margin-bottom: 20px; text-align: center;">
+                <h2 style="margin: 0; color: var(--accent-color);">🔥 Trạm 3: Động Từ & Giới Từ (Units 25-26)</h2>
+            </div>
+            <div id="task3-container"></div>
+            <div class="nav-controls">
+                <button class="nav-btn btn-back" onclick="navigateTo('task2')">⬅️ Back: Trạm 2</button>
+                <button class="nav-btn" onclick="navigateTo('task4')">Tiếp tục: Trạm 4 ➡️</button>
+            </div>
+        </div>
+
+        <div id="task4" class="section">
+            <div class="glass-card" style="padding: 20px; margin-bottom: 20px; text-align: center;">
+                <h2 style="margin: 0; color: var(--accent-color);">🌪️ Trạm 4: Liên Từ & Siêu Bẫy (Unit 27 & Mix)</h2>
+            </div>
+            <div id="task4-container"></div>
+            <div class="nav-controls">
+                <button class="nav-btn btn-back" onclick="navigateTo('task3')">⬅️ Back: Trạm 3</button>
+                <button class="nav-btn" onclick="alert('TUYỆT ĐỈNH! Bạn đã hoàn thành xong 32 câu hỏi khó nhằn của Mega Review Unit 28! 🎉')">✅ HOÀN THÀNH KHOÁ HỌC</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // TRẠM 1: ĐẠI TỪ & DANH TỪ
+        const task1Data = [
+            {
+                q: "1. The marketing manager introduced _______ to the new clients at the seminar. <span class='hidden-cite'></span>",
+                opts: ["him", "his", "himself", "he"],
+                ans: 2,
+                expCorrect: "Đáp án C. Câu có chủ ngữ (The manager) và người được giới thiệu là cùng một người. Đại từ phản thân 'himself' dùng để nhấn mạnh hành động tác động ngược lại người thực hiện (tự giới thiệu mình). <span class='hidden-cite'></span>",
+                expWrong: "• him: dùng khi giới thiệu một người nam khác.<br>• his: cần danh từ theo sau.<br>• he: chỉ đứng làm chủ ngữ. <span class='hidden-cite'></span>"
+            },
+            {
+                q: "2. The revenue figures of this quarter are much higher than _______ of the previous quarter. <span class='hidden-cite'></span>",
+                opts: ["that", "this", "those", "these"],
+                ans: 2,
+                expCorrect: "Đáp án C. Cấu trúc so sánh tránh lặp từ. 'The revenue figures' là danh từ số nhiều -> dùng đại từ chỉ định 'those' (those of = the revenue figures of). <span class='hidden-cite'></span>",
+                expWrong: "• that: dùng cho danh từ số ít hoặc không đếm được.<br>• this/these: không dùng trong cấu trúc so sánh 'than...of'. <span class='hidden-cite'></span>"
+            },
+            {
+                q: "3. We cannot implement the new system without the director's _______. <span class='hidden-cite'></span>",
+                opts: ["approve", "approving", "approval", "approved"],
+                ans: 2,
+                expCorrect: "Đáp án C. Đứng sau sở hữu cách (director's) bắt buộc phải là một Danh từ. 'approval' (sự phê duyệt) là một danh từ mang đuôi bẫy -al. <span class='hidden-cite'></span>",
+                expWrong: "• A, B, D là các dạng của động từ 'approve'. Rất nhiều người nhầm đuôi -al là tính từ. <span class='hidden-cite'></span>"
+            },
+            {
+                q: "4. The consultant provided some valuable _______ on how to improve staff productivity. <span class='hidden-cite'></span>",
+                opts: ["advices", "advice", "an advice", "advicing"],
+                ans: 1,
+                expCorrect: "Đáp án B. 'advice' (lời khuyên) là danh từ KHÔNG ĐẾM ĐƯỢC. Do đó, nó không bao giờ thêm 's' hoặc đi với 'a/an'. <span class='hidden-cite'></span>",
+                expWrong: "• advices (sai quy tắc không đếm được).<br>• an advice (sai mạo từ). <span class='hidden-cite'></span>"
+            },
+            {
+                q: "5. The _______ of this revolutionary software is a 25-year-old programmer. <span class='hidden-cite'></span>",
+                opts: ["create", "creation", "creator", "creative"],
+                ans: 2,
+                expCorrect: "Đáp án C. Bẫy Danh từ chỉ người/vật. Ngữ cảnh nhắc đến 'a 25-year-old programmer' (chỉ người) -> Phải chọn danh từ chỉ người 'creator' (người sáng tạo). <span class='hidden-cite'></span>",
+                expWrong: "• creation: sự sáng tạo (chỉ vật).<br>• create (động từ), creative (tính từ). <span class='hidden-cite'></span>"
+            },
+            {
+                q: "6. The company decided to launch a massive advertising _______ to attract younger customers. <span class='hidden-cite'></span>",
+                opts: ["session", "campaign", "agency", "policy"],
+                ans: 1,
+                expCorrect: "Đáp án B. Noun Collocation: 'advertising campaign' mang nghĩa là 'chiến dịch quảng cáo'. Cụm từ cố định rất hay thi. <span class='hidden-cite'></span>",
+                expWrong: "• session (thường đi với training).<br>• policy (thường đi với company). <span class='hidden-cite'></span>"
+            },
+            {
+                q: "7. We need to hire a certified _______ to audit the annual financial records. <span class='hidden-cite'></span>",
+                opts: ["account", "accounting", "accountant", "accountable"],
+                ans: 2,
+                expCorrect: "Đáp án C. Sau 'a certified' (một ... được cấp phép) cần Danh từ chỉ người. 'accountant' (kế toán viên) có đuôi chỉ người -ant. <span class='hidden-cite'></span>",
+                expWrong: "• account (tài khoản).<br>• accountable (tính từ). <span class='hidden-cite'></span>"
+            },
+            {
+                q: "8. _______ candidate is required to submit a detailed resume before the deadline. <span class='hidden-cite'></span>",
+                opts: ["All", "Many", "Some", "Each"],
+                ans: 3,
+                expCorrect: "Đáp án D. 'candidate' là danh từ đếm được SỐ ÍT. Từ hạn định 'Each' đi với danh từ số ít. <span class='hidden-cite'></span>",
+                expWrong: "• All, Many, Some bắt buộc phải đi với danh từ đếm được SỐ NHIỀU (candidates). <span class='hidden-cite'></span>"
+            }
+        ];
+
+        // TRẠM 2: TÍNH TỪ & TRẠNG TỪ
+        const task2Data = [
+            {
+                q: "1. The new health insurance policy is ________ beneficial to all employees. <span class='hidden-cite'></span>",
+                opts: ["high", "height", "highly", "highest"],
+                ans: 2,
+                expCorrect: "Đáp án C. Vị trí: Đứng trước tính từ 'beneficial' cần một Trạng từ (Adv + Adj) để bổ nghĩa mức độ. 'highly beneficial' = cực kỳ có lợi. <span class='hidden-cite'></span>",
+                expWrong: "• high, highest (tính từ).<br>• height (danh từ). <span class='hidden-cite'></span>"
+            },
+            {
+                q: "2. Traveling by train is a more _________ way to commute than taking a taxi. <span class='hidden-cite'></span>",
+                opts: ["economic", "economical", "economically", "economics"],
+                ans: 1,
+                expCorrect: "Đáp án B. Đứng trước danh từ 'way' cần Tính từ. Cặp từ dễ nhầm: 'economic' (thuộc về kinh tế) và 'economical' (tiết kiệm, kinh tế). Đi lại bằng tàu là cách tiết kiệm -> economical. <span class='hidden-cite'></span>",
+                expWrong: "• economic (dùng cho chính sách, khủng hoảng kinh tế).<br>• economically (trạng từ). <span class='hidden-cite'></span>"
+            },
+            {
+                q: "3. The board members were ________ by the rapid growth of the startup. <span class='hidden-cite'></span>",
+                opts: ["astonish", "astonishing", "astonished", "astonishment"],
+                ans: 2,
+                expCorrect: "Đáp án C. Bẫy đuôi -ed/-ing. Đuôi -ed dùng để chỉ CẢM XÚC của con người (bị tác động bởi sự vật). Thành viên HĐQT cảm thấy kinh ngạc -> astonished. <span class='hidden-cite'></span>",
+                expWrong: "• astonishing: dùng để mô tả tính chất sự vật (ví dụ: astonishing growth). <span class='hidden-cite'></span>"
+            },
+            {
+                q: "4. ________, the outdoor event was cancelled due to the heavy thunderstorm. <span class='hidden-cite'></span>",
+                opts: ["Fortunate", "Fortunately", "Unfortunate", "Unfortunately"],
+                ans: 3,
+                expCorrect: "Đáp án D. Cần một Trạng từ đứng đầu câu để bổ nghĩa cho toàn bộ mệnh đề (sự kiện bị hủy). Sự việc mang tính tiêu cực -> Unfortunately (Thật không may). <span class='hidden-cite'></span>",
+                expWrong: "• A, C (tính từ).<br>• B (Fortunately - mang nghĩa tích cực). <span class='hidden-cite'></span>"
+            },
+            {
+                q: "5. The vice president arrived ________ for the emergency meeting. <span class='hidden-cite'></span>",
+                opts: ["late", "lately", "latest", "later"],
+                ans: 0,
+                expCorrect: "Đáp án A. Động từ 'arrived' cần trạng từ. Bẫy: 'late' vừa là tính từ vừa là trạng từ mang nghĩa 'muộn'. 'lately' là trạng từ mang nghĩa 'gần đây' (recently). Ngữ cảnh đến họp muộn -> late. <span class='hidden-cite'></span>",
+                expWrong: "• lately (gần đây - thường dùng với thì Hoàn thành). <span class='hidden-cite'></span>"
+            },
+            {
+                q: "6. We must take _________ action to prevent the system from collapsing. <span class='hidden-cite'></span>",
+                opts: ["promptly", "prompt", "promptness", "prompted"],
+                ans: 1,
+                expCorrect: "Đáp án B. Vị trí: Đứng trước danh từ 'action' cần một Tính từ. 'prompt' (nhanh chóng, kịp thời) là tính từ bổ nghĩa cho hành động. <span class='hidden-cite'></span>",
+                expWrong: "• promptly (trạng từ).<br>• promptness (danh từ). <span class='hidden-cite'></span>"
+            },
+            {
+                q: "7. The initial proposal was ________ rejected by the financial committee. <span class='hidden-cite'></span>",
+                opts: ["completely", "heavily", "deeply", "increasingly"],
+                ans: 0,
+                expCorrect: "Đáp án A. Collocation: 'completely rejected' hoặc 'completely different'. Bổ nghĩa cho từ chối thì dùng 'hoàn toàn' (completely). <span class='hidden-cite'></span>",
+                expWrong: "• heavily (thường đi với committed).<br>• deeply (thường đi với hurt, divided). <span class='hidden-cite'></span>"
+            },
+            {
+                q: "8. Over the last quarter, our overseas sales have decreased ________. <span class='hidden-cite'></span>",
+                opts: ["substance", "substantial", "substantially", "substantiate"],
+                ans: 2,
+                expCorrect: "Đáp án C. Động từ 'decreased' (giảm) cần một Trạng từ để bổ nghĩa mức độ. 'substantially' (một cách đáng kể) là đáp án đúng. <span class='hidden-cite'></span>",
+                expWrong: "• A (danh từ).<br>• B (tính từ).<br>• D (động từ). <span class='hidden-cite'></span>"
+            }
+        ];
+
+        // TRẠM 3: ĐỘNG TỪ & GIỚI TỪ
+        const task3Data = [
+            {
+                q: "1. If you have any inquiries, please ________ to the questionnaire as soon as possible. <span class='hidden-cite'></span>",
+                opts: ["reply", "respond", "answer", "contact"],
+                ans: 1,
+                expCorrect: "Đáp án B. Verb + Preposition: 'respond to' (phản hồi lại cái gì). <span class='hidden-cite'></span>",
+                expWrong: "• reply (thường đi với to, nhưng respond to phổ biến hơn trong ngữ cảnh trang trọng của TOEIC). Answer và contact không đi với 'to'. (Note: reply to cũng đúng, nhưng respond to questionnaire là collocation chuẩn mực). <span class='hidden-cite'></span>"
+            },
+            {
+                q: "2. The ultimate success of the renovation project ________ heavily on your team's dedication. <span class='hidden-cite'></span>",
+                opts: ["consists", "interferes", "depends", "cooperates"],
+                ans: 2,
+                expCorrect: "Đáp án C. Verb + Preposition: 'depend on' hoặc 'rely on' mang nghĩa là phụ thuộc vào, dựa vào. <span class='hidden-cite'></span>",
+                expWrong: "• consists of (bao gồm).<br>• interferes with (can thiệp).<br>• cooperates with (hợp tác). <span class='hidden-cite'></span>"
+            },
+            {
+                q: "3. The executive committee will ________ a meeting tomorrow to discuss the budget. <span class='hidden-cite'></span>",
+                opts: ["hold", "apply", "draw", "overcome"],
+                ans: 0,
+                expCorrect: "Đáp án A. Verb Collocation: 'hold a meeting' hoặc 'chair a meeting' (tổ chức / chủ trì cuộc họp). <span class='hidden-cite'></span>",
+                expWrong: "• apply for (nộp đơn).<br>• draw attention (thu hút sự chú ý). <span class='hidden-cite'></span>"
+            },
+            {
+                q: "4. After graduating, she decided to ________ an ambition in graphic design. <span class='hidden-cite'></span>",
+                opts: ["pursue", "launch", "limit", "settle"],
+                ans: 0,
+                expCorrect: "Đáp án A. Verb Collocation: 'pursue an ambition' (theo đuổi hoài bão). Tương tự pursue a career/goal. <span class='hidden-cite'></span>",
+                expWrong: "• launch a campaign.<br>• limit the amount.<br>• settle a dispute. <span class='hidden-cite'></span>"
+            },
+            {
+                q: "5. Both departments finally ________ an agreement after hours of heated debate. <span class='hidden-cite'></span>",
+                opts: ["expressed", "caused", "reached", "fought"],
+                ans: 2,
+                expCorrect: "Đáp án C. Verb Collocation: 'reach an agreement' (đạt được sự đồng thuận). <span class='hidden-cite'></span>",
+                expWrong: "• express concern.<br>• cause trouble. <span class='hidden-cite'></span>"
+            },
+            {
+                q: "6. The implementation of the new regulation might ________ a lot of unforeseen problems. <span class='hidden-cite'></span>",
+                opts: ["cause", "conclude", "dismiss", "secure"],
+                ans: 0,
+                expCorrect: "Đáp án A. Verb Collocation: 'cause problems/trouble' (gây ra rắc rối/vấn đề). <span class='hidden-cite'></span>",
+                expWrong: "• conclude an agreement.<br>• dismiss a claim.<br>• secure payment. <span class='hidden-cite'></span>"
+            },
+            {
+                q: "7. Despite the harsh market conditions, Mr. Smith succeeded ________ closing the deal. <span class='hidden-cite'></span>",
+                opts: ["on", "with", "in", "from"],
+                ans: 2,
+                expCorrect: "Đáp án C. Verb + Preposition: 'succeed in + V-ing/N' (thành công trong việc gì). <span class='hidden-cite'></span>",
+                expWrong: "• Các giới từ còn lại không kết hợp với 'succeed'. <span class='hidden-cite'></span>"
+            },
+            {
+                q: "8. The finance director must account ________ the missing funds from the annual budget. <span class='hidden-cite'></span>",
+                opts: ["to", "for", "with", "about"],
+                ans: 1,
+                expCorrect: "Đáp án B. Verb + Preposition: 'account for' (giải thích cho / chiếm bao nhiêu phần). <span class='hidden-cite'></span>",
+                expWrong: "• Không có account to/with/about trong ngữ cảnh này. <span class='hidden-cite'></span>"
+            }
+        ];
+
+        // TRẠM 4: LIÊN TỪ & SIÊU BẪY
+        const task4Data = [
+            {
+                q: "1. Not only the employees but also the manager ________ attending the training seminar. <span class='hidden-cite'></span>",
+                opts: ["is", "are", "have", "were"],
+                ans: 0,
+                expCorrect: "Đáp án A. Liên từ tương quan 'Not only A but also B'. Động từ chia theo chủ ngữ B (gần nhất). 'the manager' là số ít -> chọn 'is'. <span class='hidden-cite'></span>",
+                expWrong: "• B, C, D đều chia cho số nhiều (bẫy chia theo employees). <span class='hidden-cite'></span>"
+            },
+            {
+                q: "2. _______ the CEO nor the directors agree with the expansion plan. <span class='hidden-cite'></span>",
+                opts: ["Either", "Both", "Neither", "Not only"],
+                ans: 2,
+                expCorrect: "Đáp án C. Có chữ 'nor' ở giữa câu. Cặp liên từ tương quan cố định là 'Neither A nor B' (Cả A và B đều không). <span class='hidden-cite'></span>",
+                expWrong: "• Either đi với or.<br>• Both đi với and. <span class='hidden-cite'></span>"
+            },
+            {
+                q: "3. She was exhausted after the flight, _______ she continued to work on the report. <span class='hidden-cite'></span>",
+                opts: ["so", "or", "yet", "for"],
+                ans: 2,
+                expCorrect: "Đáp án C. Liên từ đẳng lập (FANBOYS). Hai vế mang nghĩa tương phản (rất mệt >< vẫn tiếp tục làm). Chọn 'yet' (nhưng). Có thể dùng 'but'. <span class='hidden-cite'></span>",
+                expWrong: "• so (vì vậy).<br>• for (bởi vì). <span class='hidden-cite'></span>"
+            },
+            {
+                q: "4. Both the printer and the scanner ________ broken and need to be replaced. <span class='hidden-cite'></span>",
+                opts: ["is", "are", "has", "was"],
+                ans: 1,
+                expCorrect: "Đáp án B. Cấu trúc 'Both A and B' luôn luôn chia động từ ở số nhiều. 'are' là động từ to be số nhiều ở hiện tại. <span class='hidden-cite'></span>",
+                expWrong: "• is, has, was đều là số ít. <span class='hidden-cite'></span>"
+            },
+            {
+                q: "5. (Siêu Bẫy) The proposal met with the board's official ________. <span class='hidden-cite'></span>",
+                opts: ["approve", "approving", "approval", "approved"],
+                ans: 2,
+                expCorrect: "Đáp án C. Đứng sau tính từ 'official' cần một Danh từ. Bẫy kinh điển: 'approval' (sự phê duyệt) là một danh từ đuôi -al. <span class='hidden-cite'></span>",
+                expWrong: "• Rất dễ chọn sai nếu nhầm -al là tính từ. <span class='hidden-cite'></span>"
+            },
+            {
+                q: "6. (Siêu Bẫy) This machinery is highly ________ and must be returned to the manufacturer. <span class='hidden-cite'></span>",
+                opts: ["defect", "defective", "defects", "defectively"],
+                ans: 1,
+                expCorrect: "Đáp án B. Đứng sau trạng từ 'highly' cần một Tính từ. 'defective' (bị lỗi, hỏng hóc) là tính từ đuôi -ive. <span class='hidden-cite'></span>",
+                expWrong: "• A, C (danh từ/động từ).<br>• D (trạng từ). <span class='hidden-cite'></span>"
+            },
+            {
+                q: "7. (Siêu Bẫy) Because of the system error, ________ luggage was lost at the airport. <span class='hidden-cite'></span>",
+                opts: ["many", "a few", "a great deal of", "several"],
+                ans: 2,
+                expCorrect: "Đáp án C. 'luggage' (hành lý) là danh từ KHÔNG ĐẾM ĐƯỢC. 'a great deal of' là lượng từ đi được với danh từ không đếm được. <span class='hidden-cite'></span>",
+                expWrong: "• many, a few, several BẮT BUỘC đi với danh từ số nhiều đếm được. <span class='hidden-cite'></span>"
+            },
+            {
+                q: "8. (Siêu Bẫy) The supervisor asked us to work overtime to ________ the deadline. <span class='hidden-cite'></span>",
+                opts: ["meet", "hold", "draw", "cause"],
+                ans: 0,
+                expCorrect: "Đáp án A. Collocation kinh điển: 'meet the deadline' (kịp thời hạn). <span class='hidden-cite'></span>",
+                expWrong: "• Các động từ còn lại ghép vào sẽ hoàn toàn vô nghĩa. <span class='hidden-cite'></span>"
+            }
+        ];
+
+        // Hàm điều hướng
+        function navigateTo(sectionId) {
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Render Quiz chung
+        function renderQuiz(data, containerId) {
+            const container = document.getElementById(containerId);
+            let html = '';
+
+            data.forEach((item, index) => {
+                html += `
+                <div class="question-card" id="q-${containerId}-${index}">
+                    <div class="question-text">${item.q}</div>
+                    <div class="options-grid">
+                        ${item.opts.map((opt, i) => `
+                            <button class="option-btn" onclick="checkAnswer(this, ${index}, ${i}, '${containerId}', ${item.ans})">
+                                ${String.fromCharCode(65 + i)}. ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="explanation-box" id="exp-${containerId}-${index}">
+                        <div class="exp-status" id="status-${containerId}-${index}"></div>
+                        <div class="exp-section">
+                            <span class="exp-title">✅ Giải mã đáp án:</span>
+                            <span class="reason-correct">${item.expCorrect}</span>
+                        </div>
+                        <div class="exp-section">
+                            <span class="exp-title">❌ Phân tích bẫy:</span>
+                            <span class="reason-wrong">${item.expWrong}</span>
+                        </div>
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Logic check đáp án
+        function checkAnswer(btn, qIndex, selectedOpt, containerId, correctOpt) {
+            const qCard = document.getElementById(`q-${containerId}-${qIndex}`);
+            const buttons = qCard.querySelectorAll('.option-btn');
+            const expBox = document.getElementById(`exp-${containerId}-${qIndex}`);
+            const statusText = document.getElementById(`status-${containerId}-${qIndex}`);
+
+            // Khóa nút
+            buttons.forEach(b => b.disabled = true);
+
+            if (selectedOpt === correctOpt) {
+                btn.classList.add('selected-correct');
+                statusText.innerHTML = "✨ Đỉnh cao! Kiến thức ngữ pháp của bạn quá vững vàng!";
+                statusText.className = "exp-status exp-correct";
+            } else {
+                btn.classList.add('selected-wrong');
+                statusText.innerHTML = "🥺 Dính bẫy rồi! Nhớ đọc thật kỹ phần phân tích nhé!";
+                statusText.className = "exp-status exp-wrong";
+                // Đánh dấu đáp án đúng
+                buttons[correctOpt].classList.add('show-correct');
+            }
+
+            // Mở giải thích
+            expBox.style.display = "block";
+        }
+
+        // Khởi tạo tất cả các trạm
+        renderQuiz(task1Data, 'task1-container');
+        renderQuiz(task2Data, 'task2-container');
+        renderQuiz(task3Data, 'task3-container');
+        renderQuiz(task4Data, 'task4-container');
+    </script>
+
+</body>
+</html>
