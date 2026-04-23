@@ -699,29 +699,32 @@
         
         if (savedAnswersJSON) {
             const userAnswers = JSON.parse(savedAnswersJSON);
-            const answerCards = document.querySelectorAll('.answer-card');
+            // Lấy tất cả các hộp giải thích của Part 6
+            const expBoxes = document.querySelectorAll('.exp-box');
             
-            // Mảng đáp án đúng để đối chiếu
-            const correctAnswers = [
-                "recommendation", "appointment", "eligible", "required", "confirmation",
-                "us", "early", "returned", "automatically", "project",
-                "who", "proposed", "within", "leaves", "similar",
-                "promote", "easily", "beginning", "very", "before",
-                "participation", "factor", "regarding", "creatively", "submit",
-                "themselves", "clearly", "While", "as soon as", "compliance"
-            ];
+            // Bộ đáp án chuẩn cho 16 câu Part 6 - Test 1 2018
+            const correctAnswers = {
+                31: "A", 32: "D", 33: "B", 34: "C",
+                35: "C", 36: "D", 37: "B", 38: "A",
+                39: "B", 40: "A", 41: "A", 42: "C",
+                43: "A", 44: "B", 45: "D", 46: "C"
+            };
 
-            answerCards.forEach((card, index) => {
-                const userAnswer = userAnswers[index];
-                const correctAnswer = correctAnswers[index];
+            expBoxes.forEach((box) => {
+                // Rút trích số câu hỏi từ thẻ (ví dụ "Câu 31" -> lấy số 31)
+                const qNumberText = box.querySelector('.q-number').innerText;
+                const qId = parseInt(qNumberText.replace(/\D/g, '')); 
                 
-                // Tạo thẻ hiển thị kết quả của người dùng
+                const userAnswer = userAnswers[qId];
+                const correctAnswer = correctAnswers[qId];
+                
+                // Tạo thẻ hiển thị kết quả
                 const resultDiv = document.createElement('div');
-                resultDiv.style.margin = "10px 0 20px 0";
+                resultDiv.style.margin = "15px 0 10px 0";
                 resultDiv.style.fontWeight = "700";
-                resultDiv.style.padding = "12px 15px";
+                resultDiv.style.padding = "10px 15px";
                 resultDiv.style.borderRadius = "8px";
-                resultDiv.style.fontSize = "16px";
+                resultDiv.style.fontSize = "15px";
                 resultDiv.style.display = "inline-block";
 
                 if (!userAnswer) {
@@ -730,23 +733,24 @@
                     resultDiv.style.color = "#6c757d";
                     resultDiv.style.border = "1px solid #dee2e6";
                 } else if (userAnswer === correctAnswer) {
-                    resultDiv.innerHTML = `Bạn đã chọn: <strong>${userAnswer}</strong> <span>✅ Đúng</span>`;
-                    resultDiv.style.backgroundColor = "#e8f5e9"; // Xanh pastel
+                    resultDiv.innerHTML = `Bạn đã chọn: <strong>(${userAnswer})</strong> <span style="margin-left: 8px;">✅ Đúng</span>`;
+                    resultDiv.style.backgroundColor = "#e8f5e9"; 
                     resultDiv.style.color = "#2e7d32";
                     resultDiv.style.border = "1px solid #c8e6c9";
                 } else {
-                    resultDiv.innerHTML = `Bạn đã chọn: <strong>${userAnswer}</strong> <span>❌ Sai</span>`;
-                    resultDiv.style.backgroundColor = "#ffebee"; // Đỏ pastel
+                    resultDiv.innerHTML = `Bạn đã chọn: <strong>(${userAnswer})</strong> <span style="margin-left: 8px;">❌ Sai</span>`;
+                    resultDiv.style.backgroundColor = "#ffebee"; 
                     resultDiv.style.color = "#c62828";
                     resultDiv.style.border = "1px solid #ffcdd2";
                 }
                 
-                // Chèn kết quả vào ngay trước thẻ giải thích
-                const explanationBox = card.querySelector('.explanation-box');
-                card.insertBefore(resultDiv, explanationBox);
+                // Chèn kết quả vào ngay dưới thẻ chứa đáp án đúng (.ans-text)
+                const ansTextElement = box.querySelector('.ans-text');
+                ansTextElement.parentNode.insertBefore(resultDiv, ansTextElement.nextSibling);
             });
         }
     });
 </script>
+    
 </body>
 </html>
