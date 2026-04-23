@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 3 Test 1 | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #A18CD1; 
+            --primary-hover: #8e75c0;
+            --secondary: #FBC2EB; 
+            --accent: #FFB347; 
+            --blue-pastel: #C2E9FB;
+            --blue-dark: #2c6a85;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --bg-main: #F4F7F6;
+            --white: #FFFFFF;
+            --brand-pink: #FF6B72;
+            --brand-text: #2D3748;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Quicksand', sans-serif; }
+
+        body {
+            background: var(--bg-main);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Branding Header */
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            width: 100%;
+            max-width: 1100px;
+        }
+        .brand-badge {
+            background-color: var(--brand-pink);
+            color: var(--white);
+            font-weight: 800;
+            font-size: 26px;
+            padding: 8px 20px;
+            border-radius: 15px;
+            letter-spacing: -0.5px;
+        }
+        .brand-title {
+            color: var(--brand-text);
+            font-weight: 800;
+            font-size: 30px;
+            letter-spacing: -0.5px;
+        }
+
+        .layout-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .layout-container {
+            display: flex;
+            gap: 25px;
+            max-width: 1100px;
+            width: 100%;
+            height: 80vh;
+            min-height: 600px;
+        }
+
+        /* LEFT PANEL */
+        .sidebar {
+            flex: 1;
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(161, 140, 209, 0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .progress-section { text-align: center; }
+        .progress-circle {
+            width: 150px; height: 150px; border-radius: 50%;
+            background: conic-gradient(var(--primary) 0%, #eee 0);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px; position: relative; transition: background 0.5s;
+        }
+        .progress-circle::after { content: ""; position: absolute; width: 120px; height: 120px; background: var(--white); border-radius: 50%; }
+        .progress-text { position: relative; z-index: 1; font-size: 28px; font-weight: 700; color: var(--primary); }
+
+        .instructions { background: var(--blue-pastel); padding: 20px; border-radius: 15px; color: var(--blue-dark); }
+        .instructions h3 { margin-bottom: 15px; font-size: 18px; }
+        .instructions ul { list-style: none; }
+        .instructions li { margin-bottom: 12px; font-size: 14.5px; line-height: 1.5; }
+        kbd { background: var(--white); border: 1px solid #ccc; border-radius: 4px; padding: 3px 8px; font-family: monospace; font-size: 13px; font-weight: bold; box-shadow: 0 2px 0 #ccc; }
+
+        /* RIGHT PANEL */
+        .main-content {
+            flex: 2; background: var(--white); border-radius: 20px; padding: 35px;
+            box-shadow: 0 10px 30px rgba(161, 140, 209, 0.15); display: flex; flex-direction: column; position: relative;
+        }
+
+        .settings-bar { display: flex; justify-content: flex-end; gap: 15px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px dashed #eee; }
+        .setting-group { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text-light); }
+        select { padding: 6px 12px; border-radius: 8px; border: 1px solid #ddd; outline: none; cursor: pointer; font-family: 'Quicksand', sans-serif; font-weight: 600; }
+
+        .audio-section { text-align: center; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px;}
+        
+        /* Speaker Badges */
+        .speaker-badge { display: inline-block; padding: 8px 30px; border-radius: 20px; font-weight: bold; font-size: 16px; }
+        .speaker-male { background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; }
+        .speaker-female { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+
+        .btn-play { background: var(--primary); color: white; border: none; padding: 15px 35px; border-radius: 50px; font-size: 18px; cursor: pointer; transition: 0.3s; font-weight: 700; box-shadow: 0 4px 15px rgba(161, 140, 209, 0.4);}
+        .btn-play:hover { background: var(--primary-hover); transform: translateY(-2px); }
+
+        .input-section { flex-grow: 1; display: flex; flex-direction: column; }
+        .message { text-align: center; font-weight: 600; margin-bottom: 15px; min-height: 24px; color: #e53935; }
+        
+        textarea { width: 100%; height: 120px; padding: 20px; border: 2px solid #e0e0e0; border-radius: 15px; font-size: 20px; outline: none; transition: 0.3s; resize: none; color: var(--text-dark); line-height: 1.6; }
+        textarea:focus { border-color: var(--primary); }
+
+        .actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+        .btn { padding: 12px 25px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; font-weight: 700; transition: 0.3s; }
+        .btn-enter { background: var(--blue-dark); color: var(--white); }
+        .btn-enter:hover { background: #1f4a5e; }
+        .btn-hint { background: var(--secondary); color: #7a3b69; }
+        .btn-hint:hover { background: #e3a9d3; }
+
+        /* MODAL POPUP */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: white; width: 90%; max-width: 550px; padding: 35px;
+            border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: left; position: relative; max-height: 90vh; overflow-y: auto;
+        }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .modal-content h3 { color: #2e7d32; font-size: 22px; margin-bottom: 15px; text-align: center; }
+        .modal-script { font-size: 20px; font-weight: 700; color: var(--primary); margin-bottom: 10px; text-align: center; padding-bottom: 15px; border-bottom: 2px dashed #eee;}
+        .modal-content p { margin-bottom: 10px; line-height: 1.6; font-size: 16px; }
+        .vocab-list { list-style-type: none; padding-left: 0; margin-top: 10px;}
+        .vocab-list li { margin-bottom: 8px; background: #f9f9f9; padding: 8px 15px; border-radius: 8px;}
+        .vocab-list li strong { color: var(--accent); font-size: 16px;}
+        
+        .btn-next-modal { width: 100%; background: var(--primary); color: white; margin-top: 20px; padding: 15px; font-size: 18px; }
+        .btn-next-modal:hover { background: var(--primary-hover); }
+
+        /* END SCREEN */
+        .end-screen { display: none; text-align: center; padding-top: 20px;}
+        .transcript-box { text-align: left; background: #fafafa; padding: 25px; border-radius: 15px; height: 350px; overflow-y: auto; margin: 25px 0; border: 1px solid #eee; line-height: 1.8; font-size: 16px;}
+
+        @media (max-width: 850px) {
+            .layout-container { flex-direction: column; height: auto; }
+            .sidebar { flex: none; width: 100%; order: 2; }
+            .main-content { flex: none; width: 100%; order: 1; min-height: 500px;}
+            .header-brand { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout-wrapper">
+    <div class="header-brand">
+        <div class="brand-badge">SnapEnglish</div>
+        <div class="brand-title">Part 3 Practice</div>
+    </div>
+
+    <div class="layout-container" id="app">
+        <div class="sidebar">
+            <div class="progress-section">
+                <h2 style="color: var(--text-dark); margin-bottom: 25px; font-size: 22px;">Tiến độ bài học</h2>
+                <div class="progress-circle" id="progress-ring"><div class="progress-text"><span id="progress-percent">0</span>%</div></div>
+                <p style="color: var(--text-light); font-weight: 600; margin-top: 15px;">Câu: <span id="current-sentence-num">1</span> / <span id="total-sentences"></span></p>
+                <p style="font-size: 14px; color: #888; margin-top: 5px;">Số lần luyện tập: <span id="study-count">0</span></p>
+            </div>
+            <div class="instructions">
+                <h3>⌨️ Hướng dẫn phím tắt</h3>
+                <ul>
+                    <li><kbd>Ctrl</kbd> Lặp lại Audio.</li>
+                    <li><kbd>Tab</kbd> Gợi ý từ tiếp theo.</li>
+                    <li><kbd>Enter</kbd> Kiểm tra đáp án / Chuyển câu.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div id="learning-screen" style="display: flex; flex-direction: column; height: 100%;">
+                <div class="settings-bar">
+                    <div class="setting-group">
+                        <label>Tốc độ:</label>
+                        <select id="speed-setting">
+                            <option value="0.7">0.7x</option>
+                            <option value="0.9" selected>0.9x</option>
+                            <option value="1.0">1.0x</option>
+                            <option value="1.2">1.2x</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label>Lặp tự động:</label>
+                        <select id="repeat-setting">
+                            <option value="1" selected>1 lần</option>
+                            <option value="2">2 lần</option>
+                            <option value="3">3 lần</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="audio-section">
+                    <div id="speaker-label" class="speaker-badge speaker-male">👨 Man</div>
+                    <button class="btn-play" onclick="playAudio()">🔊 Nghe Audio (Ctrl)</button>
+                </div>
+                
+                <div class="message" id="system-message"></div>
+
+                <div class="input-section">
+                    <textarea id="user-input" placeholder="Lắng nghe hội thoại và gõ vào đây..." autofocus></textarea>
+                    
+                    <div class="actions">
+                        <button class="btn btn-enter" onclick="handleEnterAction()">Kiểm tra (Enter)</button>
+                        <button class="btn btn-hint" onclick="giveHint()">💡 Gợi ý (Tab)</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="end-screen" class="end-screen">
+                <h2 style="color: var(--primary); font-size: 28px;">Tuyệt vời! Hoàn thành Test 🏆</h2>
+                <div class="transcript-box" id="full-transcript"></div>
+                <div class="actions">
+                    <button class="btn btn-enter" onclick="restartLesson()">🔄 Luyện tập lại</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="feedback-modal">
+    <div class="modal-content">
+        <h3>🎉 Chính xác!</h3>
+        <div class="modal-script" id="trans-en"></div>
+        <p><strong>🇻🇳 Nghĩa:</strong> <span id="trans-vi"></span></p>
+        <p id="grammar-container"><strong>📖 Ngữ pháp:</strong> <span id="trans-grammar"></span></p>
+        <ul class="vocab-list" id="trans-vocab"></ul>
+        <button class="btn btn-next-modal" onclick="nextSentence()">Qua câu tiếp theo (Enter) ➔</button>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu trích xuất từ file docx (Đoạn hội thoại câu 32 - 34)
+    const lessonData = [
+        { en: "I'm glad your store carries the new EPG8 smartphone.", vi: "Thật vui vì cửa hàng của bạn có bán mẫu điện thoại thông minh EPG8 mới.", speaker: "Man", gender: "male", grammar: "", vocab: ["carry (bán, có sẵn)", "smartphone (điện thoại thông minh)"] },
+        { en: "I've been waiting a long time to get it.", vi: "Tôi đã đợi mua nó từ lâu rồi.", speaker: "Man", gender: "male", grammar: "Thì hiện tại hoàn thành tiếp diễn (have been V-ing) diễn tả hành động bắt đầu trong quá khứ kéo dài liên tục đến hiện tại.", vocab: [] },
+        { en: "Yes, there's been a lot of interest in this phone.", vi: "Vâng, có rất nhiều sự quan tâm dành cho chiếc điện thoại này.", speaker: "Woman", gender: "female", grammar: "", vocab: ["interest (sự quan tâm)"] },
+        { en: "What colors does it come in?", vi: "Nó có những màu nào?", speaker: "Man", gender: "male", grammar: "", vocab: ["come in (được sản xuất với, ra mắt với)"] },
+        { en: "Three: white, black, and gold.", vi: "Ba màu: trắng, đen và vàng.", speaker: "Woman", gender: "female", grammar: "", vocab: [] },
+        { en: "However, since the phone has been in such high demand, our store doesn't have all three colors in stock now.", vi: "Tuy nhiên, vì nhu cầu mua điện thoại này quá cao, nên cửa hàng chúng tôi hiện không có sẵn cả ba màu trong kho.", speaker: "Woman", gender: "female", grammar: "since = bởi vì (chỉ lý do).", vocab: ["high demand (nhu cầu cao)", "in stock (có sẵn trong kho)"] },
+        { en: "Oh. What colors do you have?", vi: "Ồ. Các bạn đang có màu gì?", speaker: "Man", gender: "male", grammar: "", vocab: [] },
+        { en: "Let's see. We have black phones, but no white or gold.", vi: "Để tôi xem nào. Chúng tôi có điện thoại màu đen, nhưng không có màu trắng hay vàng.", speaker: "Woman", gender: "female", grammar: "", vocab: [] },
+        { en: "We can place an order from the warehouse...", vi: "Chúng tôi có thể đặt hàng từ kho...", speaker: "Woman", gender: "female", grammar: "", vocab: ["place an order (đặt hàng)", "warehouse (nhà kho)"] },
+        { en: "The black phone looks nice. I think that's the one I'll get.", vi: "Điện thoại màu đen trông đẹp đấy. Tôi nghĩ tôi sẽ lấy cái đó.", speaker: "Man", gender: "male", grammar: "", vocab: [] },
+        { en: "OK. Follow me to the register and I'll ring up your purchase.", vi: "Vâng. Hãy theo tôi đến quầy thu ngân và tôi sẽ tính tiền cho bạn.", speaker: "Woman", gender: "female", grammar: "", vocab: ["register (quầy thu ngân)", "ring up (tính tiền)", "purchase (món hàng mua/giao dịch)"] },
+        { en: "Then I'll activate the device for you.", vi: "Sau đó tôi sẽ kích hoạt thiết bị cho bạn.", speaker: "Woman", gender: "female", grammar: "", vocab: ["activate (kích hoạt)", "device (thiết bị)"] }
+    ];
+
+    let currentIndex = 0;
+    let currentPlayCount = 0;
+    let playTimeout;
+    const synth = window.speechSynthesis;
+    let maleVoice = null;
+    let femaleVoice = null;
+
+    const msgBox = document.getElementById("system-message");
+    const inputField = document.getElementById("user-input");
+    const modalOverlay = document.getElementById("feedback-modal");
+    const labelDisplay = document.getElementById("speaker-label");
+
+    function loadVoices() {
+        let voices = synth.getVoices();
+        if(voices.length === 0) return;
+        maleVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Male') || v.name.includes('David') || v.name.includes('Google UK English Male'))) || voices.find(v => v.lang.startsWith('en'));
+        femaleVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Zira') || v.name.includes('Google US English'))) || voices.find(v => v.lang.startsWith('en'));
+    }
+
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    window.onload = () => {
+        loadVoices();
+        let count = localStorage.getItem('part3_count') || 0;
+        document.getElementById('study-count').innerText = count;
+        document.getElementById('total-sentences').innerText = lessonData.length;
+        
+        let savedIndex = parseInt(localStorage.getItem('part3_progress'));
+        if (!isNaN(savedIndex) && savedIndex < lessonData.length) {
+            currentIndex = savedIndex;
+        }
+
+        updateUI();
+    };
+
+    function updateUI() {
+        updateProgress();
+        document.getElementById('current-sentence-num').innerText = currentIndex + 1;
+        
+        const data = lessonData[currentIndex];
+        
+        // Update Speaker Label
+        if (data.gender === "male") {
+            labelDisplay.innerText = "👨 " + data.speaker;
+            labelDisplay.className = "speaker-badge speaker-male";
+        } else {
+            labelDisplay.innerText = "👩 " + data.speaker;
+            labelDisplay.className = "speaker-badge speaker-female";
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Control') {
+            e.preventDefault();
+            playAudio();
+        } else if (e.key === 'Tab') {
+            e.preventDefault();
+            giveHint();
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            handleEnterAction();
+        }
+    });
+
+    function handleEnterAction() {
+        if (modalOverlay.style.display === "flex") {
+            nextSentence();
+        } else {
+            checkAnswer();
+        }
+    }
+
+    function playAudio() {
+        currentPlayCount = 0;
+        clearTimeout(playTimeout);
+        triggerAudioLoop();
+    }
+
+    function triggerAudioLoop() {
+        if (synth.speaking) synth.cancel();
+        
+        const data = lessonData[currentIndex];
+        const utterThis = new SpeechSynthesisUtterance(data.en);
+        utterThis.lang = 'en-US';
+        utterThis.rate = parseFloat(document.getElementById('speed-setting').value);
+        
+        if (data.gender === 'female' && femaleVoice) utterThis.voice = femaleVoice;
+        else if (data.gender === 'male' && maleVoice) utterThis.voice = maleVoice;
+        
+        utterThis.onend = () => {
+            currentPlayCount++;
+            const maxRepeat = parseInt(document.getElementById('repeat-setting').value);
+            if (currentPlayCount < maxRepeat) {
+                playTimeout = setTimeout(triggerAudioLoop, 500);
+            }
+        };
+        
+        synth.speak(utterThis);
+        if (modalOverlay.style.display !== "flex") inputField.focus();
+    }
+
+    function normalizeText(text) { return text.toLowerCase().replace(/[.,?!–\-:"]/g, '').trim(); }
+
+    function checkAnswer() {
+        const userInput = normalizeText(inputField.value);
+        const targetText = normalizeText(lessonData[currentIndex].en);
+        
+        if (userInput === targetText) {
+            msgBox.innerText = "";
+            showModal();
+        } else {
+            const userWords = userInput.split(' ').filter(w => w !== "");
+            const targetWords = targetText.split(' ');
+
+            if (userWords.length === 0) {
+                msgBox.innerText = "Bạn chưa gõ gì cả. Nhấn Ctrl để nghe nhé!";
+                return;
+            }
+
+            let wrongIndex = -1;
+            for (let i = 0; i < userWords.length; i++) {
+                if (userWords[i] !== targetWords[i]) {
+                    wrongIndex = i;
+                    break;
+                }
+            }
+
+            if (wrongIndex !== -1) {
+                msgBox.innerText = `Lỗi ở từ thứ ${wrongIndex + 1}. Nhấn Tab để được gợi ý!`;
+            } else if (userWords.length < targetWords.length) {
+                msgBox.innerText = "Chưa hết câu, hãy nghe thêm và gõ tiếp nhé!";
+            } else {
+                msgBox.innerText = "Có lỗi sai chính tả nhỏ, hãy kiểm tra lại.";
+            }
+        }
+    }
+
+    function giveHint() {
+        if (modalOverlay.style.display === "flex") return;
+
+        const userInput = inputField.value;
+        const targetWords = lessonData[currentIndex].en.split(' ');
+        const userWords = userInput.trim().split(' ').filter(w => w !== "");
+
+        let hintWord = targetWords[userWords.length];
+        for (let i = 0; i < userWords.length; i++) {
+            if (normalizeText(userWords[i]) !== normalizeText(targetWords[i])) {
+                hintWord = targetWords[i];
+                inputField.value = targetWords.slice(0, i).join(' ') + (i > 0 ? " " : "");
+                break;
+            }
+        }
+
+        if (hintWord) {
+            inputField.value += (inputField.value.length > 0 && !inputField.value.endsWith(' ') ? ' ' : '') + hintWord + ' ';
+            msgBox.innerText = "Đã điền từ tiếp theo!";
+        }
+    }
+
+    function showModal() {
+        inputField.blur();
+        const data = lessonData[currentIndex];
+        
+        document.getElementById("trans-en").innerText = data.en;
+        document.getElementById("trans-vi").innerText = data.vi;
+        
+        const grammarContainer = document.getElementById("grammar-container");
+        if(data.grammar) {
+            grammarContainer.style.display = "block";
+            document.getElementById("trans-grammar").innerText = data.grammar;
+        } else {
+            grammarContainer.style.display = "none";
+        }
+        
+        const vocabList = document.getElementById("trans-vocab");
+        vocabList.innerHTML = "";
+        if(data.vocab && data.vocab.length > 0) {
+            data.vocab.forEach(v => {
+                let li = document.createElement("li");
+                let parts = v.split(" (");
+                li.innerHTML = `<strong>${parts[0]}</strong> (${parts[1]}`;
+                vocabList.appendChild(li);
+            });
+        }
+        
+        modalOverlay.style.display = "flex";
+    }
+
+    function nextSentence() {
+        modalOverlay.style.display = "none";
+        currentIndex++;
+        inputField.value = "";
+        msgBox.innerText = "";
+        
+        if (currentIndex < lessonData.length) {
+            localStorage.setItem('part3_progress', currentIndex);
+            updateUI();
+            playAudio();
+        } else {
+            finishLesson();
+        }
+    }
+
+    function updateProgress() {
+        const percent = Math.round((currentIndex / lessonData.length) * 100);
+        document.getElementById("progress-percent").innerText = percent;
+        document.getElementById("progress-ring").style.background = `conic-gradient(var(--primary) ${percent}%, #eee 0)`;
+    }
+
+    function finishLesson() {
+        document.getElementById("learning-screen").style.display = "none";
+        document.getElementById("end-screen").style.display = "block";
+        
+        let count = parseInt(localStorage.getItem('part3_count')) || 0;
+        count++;
+        localStorage.setItem('part3_count', count);
+        document.getElementById('study-count').innerText = count;
+
+        localStorage.removeItem('part3_progress');
+
+        const transcriptBox = document.getElementById("full-transcript");
+        let htmlContent = "";
+
+        lessonData.forEach(d => {
+            const color = d.gender === 'male' ? '#1565c0' : '#c62828';
+            
+            htmlContent += `<p style="margin-bottom:12px;">
+                <strong style="color:${color}">${d.speaker}:</strong> <span style="font-weight: 500;">${d.en}</span><br>
+                <span style="color:#666; font-size: 14px;">${d.vi}</span>
+            </p>`;
+        });
+        transcriptBox.innerHTML = htmlContent;
+    }
+
+    function restartLesson() {
+        localStorage.setItem('part3_progress', 0);
+        location.reload();
+    }
+</script>
+
+</body>
+</html>
