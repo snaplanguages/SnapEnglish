@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giải thích chi tiết Part 7 - Test 2 | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --primary-dark: #1e40af;
+            --accent: #f59e0b;
+            --bg-body: #f8fafc;
+            --text-main: #334155;
+            --border: #e2e8f0;
+            --correct: #16a34a;
+            --correct-bg: #dcfce7;
+            --wrong: #dc2626;
+            --wrong-bg: #fee2e2;
+            --highlight: #fef08a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* HEADER */
+        header {
+            background: #fff;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .brand {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand span {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-outline {
+            background: #fff;
+            border: 2px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover { background: var(--bg-body); border-color: #cbd5e1; }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 0 var(--primary-dark);
+        }
+
+        .btn-primary:active { transform: translateY(4px); box-shadow: none; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        /* MAIN LAYOUT */
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .passage-section {
+            flex: 6;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid var(--border);
+            background: #fff;
+        }
+
+        .passage-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .col-eng, .col-vie {
+            padding: 30px;
+            line-height: 1.8;
+            font-size: 17px;
+            overflow-y: auto;
+        }
+
+        .col-eng { border-right: 1px dashed var(--border); }
+        .col-vie { background: #fafaf9; color: #57534e; }
+        
+        .col-title {
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 10px;
+        }
+
+        .question-section {
+            flex: 4;
+            padding: 30px;
+            overflow-y: auto;
+            background: var(--bg-body);
+        }
+
+        /* HIGHLIGHT EVIDENCE EFFECT */
+        .ev-box {
+            border-radius: 4px;
+            transition: all 0.4s ease;
+            padding: 2px;
+            border: 1px solid transparent;
+        }
+
+        .ev-box.focus-blink {
+            background-color: var(--highlight) !important;
+            border-color: #eab308;
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4);
+            z-index: 10;
+            position: relative;
+            color: #1e3a8a;
+            font-weight: 600;
+        }
+
+        /* QUESTION CARDS */
+        .q-card {
+            background: #fff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+        .q-text { font-size: 18px; font-weight: 700; margin-bottom: 15px; color: #0f172a; }
+        .q-text-vi { font-size: 16px; color: #64748b; font-style: italic; margin-bottom: 20px; font-weight: 400; }
+
+        .option {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border: 2px solid var(--border);
+            font-size: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .opt-en { font-weight: 600; }
+        .opt-vi { font-size: 14px; color: #64748b; font-style: italic; }
+
+        .option.is-correct { background: var(--correct-bg); border-color: var(--correct); }
+        .option.is-correct .opt-en { color: #166534; }
+
+        /* EXPLANATION BOX */
+        .exp-box {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--primary-light);
+            border-radius: 12px;
+            border-left: 5px solid var(--primary);
+        }
+        .exp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px dashed #bfdbfe; padding-bottom: 10px; }
+        .exp-title { font-weight: 800; color: var(--primary-dark); font-size: 18px; display: flex; align-items: center; gap: 8px; }
+        .btn-locate { background: #fff; border: 2px solid var(--primary); color: var(--primary); padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.2s; }
+        .btn-locate:hover { background: var(--primary); color: white; }
+        .exp-content { line-height: 1.7; font-size: 16px; margin-bottom: 15px; }
+        .exp-vocab { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .exp-vocab ul { padding-left: 20px; margin: 0; }
+        .exp-vocab li { margin-bottom: 5px; }
+        .exp-vocab b { color: var(--primary-dark); background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
+
+        .doc-box { border: 1px solid #cbd5e1; padding: 20px; border-radius: 8px; background: #fff; margin-bottom: 20px; }
+        .email-header { background: #f8fafc; padding: 10px; border-bottom: 1px solid #e2e8f0; margin-bottom: 15px; font-size: 15px; }
+        .center-text { text-align: center; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand"><span>SnapEnglish</span> Giải Thích Chi Tiết Part 7 - Test 2</div>
+    <div class="nav-controls">
+        <span id="progress-text" style="font-weight: 700; color: #64748b; margin-right: 15px;">Đoạn 1 / 6</span>
+        <button class="btn btn-outline" id="btn-prev" onclick="navigate(-1)">⬅ Quay lại</button>
+        <button class="btn btn-primary" id="btn-next" onclick="navigate(1)">Đoạn tiếp theo ➡</button>
+    </div>
+</header>
+
+<div class="container">
+    <div class="passage-section">
+        <div class="passage-grid">
+            <div class="col-eng">
+                <div class="col-title">🇬🇧 Bài đọc gốc (English)</div>
+                <div id="eng-content"></div>
+            </div>
+            <div class="col-vie">
+                <div class="col-title">🇻🇳 Bản dịch (Vietnamese)</div>
+                <div id="vie-content"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="question-section" id="questions-container"></div>
+</div>
+
+<script>
+    const reviewData = [
+        {
+            // PASSAGE 1: Câu 147-148
+            id: 1,
+            engHtml: `
+                <div class="doc-box">
+                    <p><strong>From:</strong> Amar Hadi, 555-0174<br>
+                    <strong>To:</strong> Wendy Sorenson<br>
+                    <strong>Monday, September 19, 10:48 A.M.</strong></p>
+                    <br>
+                    <p>Wendy, my computer battery is almost dead. <span id="ev-148" class="ev-box">I left my power cord at the office.</span> <span id="ev-147" class="ev-box">Could you call my next sales client and tell her I'll be about 30 minutes late?</span> <span id="ev-148-2" class="ev-box">Driving back to the office to get the cord now.</span></p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box">
+                    <p><strong>Từ:</strong> Amar Hadi, 555-0174<br>
+                    <strong>Tới:</strong> Wendy Sorenson<br>
+                    <strong>Thứ Hai, Ngày 19 Tháng 9, 10:48 Sáng</strong></p>
+                    <br>
+                    <p>Wendy, pin máy tính của tôi sắp hết rồi. Tôi đã để quên dây nguồn ở văn phòng. Cô có thể gọi cho khách hàng sắp tới của tôi và báo cô ấy tôi sẽ đến muộn khoảng 30 phút được không? Tôi đang lái xe quay lại văn phòng để lấy dây nguồn đây.</p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 147,
+                    qEng: "Why did Mr. Hadi send the text message to Ms. Sorenson?",
+                    qVie: "Tại sao ông Hadi gửi tin nhắn văn bản cho cô Sorenson?",
+                    options: [
+                        { key: "A", en: "To ask if she found his power cord", vi: "Để hỏi xem cô ấy đã tìm thấy dây nguồn của ông chưa", isCorrect: false },
+                        { key: "B", en: "To request that she contact a customer", vi: "Để yêu cầu cô ấy liên hệ với một khách hàng", isCorrect: true },
+                        { key: "C", en: "To remind her to recharge a device", vi: "Để nhắc nhở cô ấy sạc lại một thiết bị", isCorrect: false },
+                        { key: "D", en: "To confirm the location of a sales appointment", vi: "Để xác nhận vị trí của một cuộc hẹn bán hàng", isCorrect: false }
+                    ],
+                    evidenceId: "ev-147",
+                    expText: "Ông Hadi nhắn: <em>'Could you call my next sales client and tell her I'll be about 30 minutes late?'</em> (Cô có thể gọi cho khách hàng sắp tới của tôi và báo cô ấy tôi sẽ đến muộn khoảng 30 phút được không?). Hành động 'gọi khách hàng' tương đương với việc 'liên hệ khách hàng' (contact a customer).",
+                    vocab: "<li><b>Power cord</b>: Dây nguồn</li><li><b>Client</b>: Khách hàng</li><li><b>Request</b>: Yêu cầu</li>"
+                },
+                {
+                    id: 148,
+                    qEng: "What will Mr. Hadi probably do next?",
+                    qVie: "Ông Hadi có thể sẽ làm gì tiếp theo?",
+                    options: [
+                        { key: "A", en: "Look for his computer", vi: "Tìm kiếm máy tính của anh ấy", isCorrect: false },
+                        { key: "B", en: "Return to his office", vi: "Quay trở lại văn phòng của anh ấy", isCorrect: true },
+                        { key: "C", en: "Buy a power cord", vi: "Mua một sợi dây nguồn", isCorrect: false },
+                        { key: "D", en: "Call technical support", vi: "Gọi cho bộ phận hỗ trợ kỹ thuật", isCorrect: false }
+                    ],
+                    evidenceId: "ev-148-2",
+                    expText: "Cuối tin nhắn ông Hadi cho biết: <em>'Driving back to the office to get the cord now.'</em> (Tôi đang lái xe quay lại văn phòng để lấy dây nguồn đây). Tức là ông ấy đang quay trở lại văn phòng (Return to his office).",
+                    vocab: "<li><b>Return</b>: Quay trở lại</li><li><b>Probably</b>: Rất có thể, có khả năng</li>"
+                }
+            ]
+        },
+        {
+            // PASSAGE 2: Câu 149-150
+            id: 2,
+            engHtml: `
+                <div class="doc-box">
+                    <h3 class="center-text">Around Town</h3><br>
+                    <p><span id="ev-149" class="ev-box">Bright Sky Café owner Marta Padilla has signed a lease for a second restaurant at 422 Oak Street.</span> The building, adjacent to Cade Theater, formerly housed a branch of Haldon Bank.</p><br>
+                    <p>Ms. Padilla's new venture, to be called Tierra Bistro, will start service on June 5. At first, however, the bistro will be open only during the evening hours. The idea is to <span id="ev-150" class="ev-box">attract a following, especially among theatergoers</span>, before adding a lunch service.</p><br>
+                    <p>Ms. Padilla's successful original eatery, Bright Sky Café, is situated on Second Street, close to the Wynn Farmers Market bus stop. Executive Chef Armando Lucca will oversee both locations.</p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box">
+                    <h3 class="center-text">Dạo Quanh Thị Trấn</h3><br>
+                    <p>Chủ sở hữu Bright Sky Café, Marta Padilla, đã ký hợp đồng thuê một nhà hàng thứ hai tại 422 Oak Street. Tòa nhà nằm ngay cạnh Nhà hát Cade, trước đây là trụ sở của một chi nhánh Ngân hàng Haldon.</p><br>
+                    <p>Dự án kinh doanh mới của cô Padilla, được gọi là Tierra Bistro, sẽ bắt đầu phục vụ vào ngày 5 tháng 6. Tuy nhiên, ban đầu quán chỉ mở cửa vào buổi tối. Ý tưởng là để thu hút khách hàng, đặc biệt là những người đi xem nhà hát, trước khi bổ sung thêm dịch vụ bữa trưa.</p><br>
+                    <p>Quán ăn ban đầu rất thành công của cô Padilla, Bright Sky Café, nằm trên đường Second Street, gần bến xe buýt Chợ Nông sản Wynn. Bếp trưởng điều hành Armando Lucca sẽ giám sát cả hai địa điểm này.</p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 149,
+                    qEng: "What is the purpose of the article?",
+                    qVie: "Mục đích của bài báo là gì?",
+                    options: [
+                        { key: "A", en: "To profile a successful property sales agent", vi: "Để giới thiệu một đại lý bán bất động sản thành công", isCorrect: false },
+                        { key: "B", en: "To discuss the opening of a new business", vi: "Để thảo luận về việc khai trương một doanh nghiệp mới", isCorrect: true },
+                        { key: "C", en: "To report on a restaurant's relocation", vi: "Để báo cáo về việc di dời của một nhà hàng", isCorrect: false },
+                        { key: "D", en: "To announce a change in ownership", vi: "Để thông báo sự thay đổi về quyền sở hữu", isCorrect: false }
+                    ],
+                    evidenceId: "ev-149",
+                    expText: "Ngay đoạn đầu, bài báo cho biết Marta Padilla <em>'signed a lease for a second restaurant'</em> (đã ký hợp đồng thuê một nhà hàng thứ hai) và đoạn sau đề cập đến ngày bắt đầu mở cửa kinh doanh (start service on June 5). Đây là thông báo về việc khai trương một cơ sở kinh doanh mới.",
+                    vocab: "<li><b>Sign a lease</b>: Ký hợp đồng thuê (nhà/đất)</li><li><b>Venture</b>: Dự án kinh doanh</li>"
+                },
+                {
+                    id: 150,
+                    qEng: "What is indicated about Tierra Bistro?",
+                    qVie: "Điều gì được chỉ ra về nhà hàng Tierra Bistro?",
+                    options: [
+                        { key: "A", en: "It is scheduled to begin serving lunch on June 5.", vi: "Nó được lên lịch bắt đầu phục vụ bữa trưa vào ngày 5/6.", isCorrect: false },
+                        { key: "B", en: "It is located near a public transportation route.", vi: "Nó nằm gần tuyến giao thông công cộng.", isCorrect: false },
+                        { key: "C", en: "It is Ms. Padilla's first restaurant.", vi: "Nó là nhà hàng đầu tiên của bà Padilla.", isCorrect: false },
+                        { key: "D", en: "It is expected to receive business from theater patrons.", vi: "Nó dự kiến sẽ nhận được khách hàng từ những người đi xem hát.", isCorrect: true }
+                    ],
+                    evidenceId: "ev-150",
+                    expText: "Đoạn 2 cho biết nhà hàng mở cửa buổi tối nhằm mục đích: <em>'attract a following, especially among theatergoers'</em> (thu hút khách, đặc biệt là những người đi xem nhà hát). Điều này chứng tỏ nhà hàng mong đợi khách tới từ rạp hát kế bên.",
+                    vocab: "<li><b>Theatergoer</b>: Người hay đi xem hát/kịch</li><li><b>Patron</b>: Khách hàng quen, người bảo trợ</li>"
+                }
+            ]
+        },
+        {
+            // PASSAGE 3: Câu 151-153
+            id: 3,
+            engHtml: `
+                <div class="doc-box">
+                    <div class="email-header">
+                        <div><strong>To:</strong> Garston Architects Ltd. staff</div>
+                        <div><strong>From:</strong> Archie Wentworth, Senior Partner</div>
+                        <div><strong>Re:</strong> All-staff meeting</div>
+                        <div><strong>Date:</strong> 20 March</div>
+                    </div>
+                    <p>To All Staff,</p><br>
+                    <p>Next Monday, 27 March, we will have a special guest at our all-staff meeting in room 203. Vera Pavlovich is a senior architect at the Nørgaard-Holm Firm in Copenhagen, where she has worked for the past four years. <span id="ev-151" class="ev-box">She led the design of Copenhagen's Lund House as well as the Iversen Building in Stockholm. Both buildings have won international awards for their sleek, innovative designs.</span></p><br>
+                    <p>Before making a name for herself in Europe, Ms. Pavlovich spent eight years in New York City at the Ellison-Grant Architect Group. <span id="ev-152" class="ev-box">It was at Ellison-Grant that I had the chance to collaborate with her on several projects.</span></p><br>
+                    <p>Ms. Pavlovich <span id="ev-153" class="ev-box">will be here in Edinburgh</span> next week and has agreed to give a talk at our meeting about several of her internationally acclaimed design projects. All staff are urged to attend.</p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box">
+                    <div class="email-header">
+                        <div><strong>Tới:</strong> Nhân viên công ty Garston Architects Ltd.</div>
+                        <div><strong>Từ:</strong> Archie Wentworth, Đối tác cấp cao</div>
+                        <div><strong>V/v:</strong> Cuộc họp toàn thể nhân viên</div>
+                        <div><strong>Ngày:</strong> 20 Tháng 3</div>
+                    </div>
+                    <p>Gửi Toàn thể Nhân viên,</p><br>
+                    <p>Thứ Hai tới, 27 tháng 3, chúng ta sẽ có một vị khách đặc biệt tại cuộc họp toàn thể nhân viên ở phòng 203. Vera Pavlovich là một kiến trúc sư cấp cao tại Công ty Nørgaard-Holm ở Copenhagen, nơi cô ấy đã làm việc trong bốn năm qua. Cô đã lãnh đạo việc thiết kế Tòa nhà Lund ở Copenhagen cũng như Tòa nhà Iversen ở Stockholm. Cả hai tòa nhà đều đã giành được các giải thưởng quốc tế cho thiết kế sáng tạo, kiểu dáng đẹp mắt.</p><br>
+                    <p>Trước khi tạo dựng được tên tuổi ở Châu Âu, cô Pavlovich đã dành tám năm ở Thành phố New York tại Tập đoàn Kiến trúc sư Ellison-Grant. Chính tại Ellison-Grant, tôi đã có cơ hội hợp tác với cô ấy trong một số dự án.</p><br>
+                    <p>Cô Pavlovich sẽ có mặt ở Edinburgh vào tuần tới và đã đồng ý phát biểu tại cuộc họp của chúng ta về một số dự án thiết kế được quốc tế ca ngợi của cô. Toàn thể nhân viên được khuyến khích tham dự.</p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 151,
+                    qEng: "What does the memo discuss?",
+                    qVie: "Thông báo này thảo luận về điều gì?",
+                    options: [
+                        { key: "A", en: "Plans to open a branch office", vi: "Kế hoạch mở một văn phòng chi nhánh", isCorrect: false },
+                        { key: "B", en: "The hiring of a new staff member", vi: "Việc thuê một nhân viên mới", isCorrect: false },
+                        { key: "C", en: "Suggestions about a project", vi: "Các gợi ý về một dự án", isCorrect: false },
+                        { key: "D", en: "An architect's achievements", vi: "Thành tựu của một kiến trúc sư", isCorrect: true }
+                    ],
+                    evidenceId: "ev-151",
+                    expText: "Bản thông báo giới thiệu khách mời Vera Pavlovich và chủ yếu liệt kê các thành tựu của cô: thiết kế Tòa nhà Lund và Tòa nhà Iversen, giành giải thưởng quốc tế, có tên tuổi ở Châu Âu. Đó chính là 'thành tựu' (achievements) của một kiến trúc sư.",
+                    vocab: "<li><b>Achievement</b>: Thành tựu</li><li><b>Innovative</b>: Sáng tạo, đổi mới</li>"
+                },
+                {
+                    id: 152,
+                    qEng: "What does Mr. Wentworth indicate about Ms. Pavlovich?",
+                    qVie: "Ông Wentworth chỉ ra điều gì về cô Pavlovich?",
+                    options: [
+                        { key: "A", en: "She will do design work for one of his firm's projects.", vi: "Cô ấy sẽ làm công việc thiết kế cho một trong các dự án của công ty ông.", isCorrect: false },
+                        { key: "B", en: "She plans to open her own firm.", vi: "Cô ấy dự định mở công ty riêng.", isCorrect: false },
+                        { key: "C", en: "She is a former colleague of his.", vi: "Cô ấy là đồng nghiệp cũ của ông ấy.", isCorrect: true },
+                        { key: "D", en: "She is in the process of moving to a new city.", vi: "Cô ấy đang trong quá trình chuyển đến thành phố mới.", isCorrect: false }
+                    ],
+                    evidenceId: "ev-152",
+                    expText: "Người viết memo (Mr. Wentworth) chia sẻ rằng: <em>'It was at Ellison-Grant that I had the chance to collaborate with her on several projects.'</em> (Chính tại công ty Ellison-Grant, tôi đã có cơ hội hợp tác với cô ấy). Vì họ từng làm việc chung, cô ấy chính là một đồng nghiệp cũ (former colleague).",
+                    vocab: "<li><b>Colleague</b>: Đồng nghiệp</li><li><b>Collaborate</b>: Hợp tác</li>"
+                },
+                {
+                    id: 153,
+                    qEng: "Where is Garston Architects Ltd. located?",
+                    qVie: "Garston Architects Ltd. nằm ở đâu?",
+                    options: [
+                        { key: "A", en: "In Edinburgh", vi: "Ở Edinburgh", isCorrect: true },
+                        { key: "B", en: "In New York City", vi: "Ở New York City", isCorrect: false },
+                        { key: "C", en: "In Stockholm", vi: "Ở Stockholm", isCorrect: false },
+                        { key: "D", en: "In Copenhagen", vi: "Ở Copenhagen", isCorrect: false }
+                    ],
+                    evidenceId: "ev-153",
+                    expText: "Email do người quản lý của Garston Architects gửi nhân viên của họ tại văn phòng, và có nói: <em>'Ms. Pavlovich will be here in Edinburgh next week...'</em> (Cô Pavlovich sẽ ở đây tại Edinburgh vào tuần tới...). 'Here in Edinburgh' chứng tỏ văn phòng công ty này đặt tại Edinburgh.",
+                    vocab: "<li><b>Located</b>: Được đặt tại, nằm ở</li>"
+                }
+            ]
+        },
+        {
+            // PASSAGE 4: Câu 154-155
+            id: 4,
+            engHtml: `
+                <div class="doc-box" style="background: #f8fafc; padding: 20px;">
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <div style="align-self: flex-start; max-width: 85%; background: #ffffff; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 18px 18px 18px 0;">
+                            <strong style="color: #475569; font-size: 0.85em;">Arthur Chen</strong>
+                            <p style="margin-top: 4px;">Eleanor sent you an e-mail with the sales figures a little while ago. She's been wondering when she'll hear back from you.</p>
+                            <div style="text-align: right; font-size: 0.7em; color: #94a3b8; margin-top: 4px;">5:49 P.M.</div>
+                        </div>
+
+                        <div style="align-self: flex-end; max-width: 85%; background: #e0e7ff; border: 1px solid #c7d2fe; padding: 12px 16px; border-radius: 18px 18px 0 18px;">
+                            <strong style="color: #4338ca; font-size: 0.85em;">Diego Montes</strong>
+                            <p style="margin-top: 4px;"><span id="ev-154" class="ev-box">I'm not at my desk.</span> Do you think she's concerned because the numbers are lower than expected?</p>
+                            <div style="text-align: right; font-size: 0.7em; color: #4338ca; margin-top: 4px;">5:50 P.M.</div>
+                        </div>
+                        
+                        <div style="align-self: flex-start; max-width: 85%; background: #ffffff; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 18px 18px 18px 0;">
+                            <strong style="color: #475569; font-size: 0.85em;">Arthur Chen</strong>
+                            <p style="margin-top: 4px;">Possibly.</p>
+                        </div>
+                        
+                        <div style="align-self: flex-end; max-width: 85%; background: #e0e7ff; border: 1px solid #c7d2fe; padding: 12px 16px; border-radius: 18px 18px 0 18px;">
+                            <strong style="color: #4338ca; font-size: 0.85em;">Diego Montes</strong>
+                            <p style="margin-top: 4px;"><span id="ev-154-2" class="ev-box">I got called away to check the bottling machine.</span> It's acting up. ... <span id="ev-155" class="ev-box">Why don't you arrange a conference call for Thursday afternoon?</span></p>
+                            <div style="text-align: right; font-size: 0.7em; color: #4338ca; margin-top: 4px;">5:51 - 5:54 P.M.</div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box" style="background: #f8fafc; padding: 20px;">
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <div style="align-self: flex-start; max-width: 85%; background: #ffffff; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 18px 18px 18px 0;">
+                            <strong style="color: #475569; font-size: 0.85em;">Arthur Chen</strong>
+                            <p style="margin-top: 4px;">Eleanor đã gửi cho anh một e-mail với số liệu bán hàng cách đây một lúc. Cô ấy đang tự hỏi khi nào sẽ nhận được phản hồi từ anh.</p>
+                        </div>
+
+                        <div style="align-self: flex-end; max-width: 85%; background: #e0e7ff; border: 1px solid #c7d2fe; padding: 12px 16px; border-radius: 18px 18px 0 18px;">
+                            <strong style="color: #4338ca; font-size: 0.85em;">Diego Montes</strong>
+                            <p style="margin-top: 4px;">Tôi đang không ở bàn làm việc. Anh có nghĩ cô ấy lo lắng vì những con số thấp hơn dự kiến không?</p>
+                        </div>
+                        
+                        <div style="align-self: flex-start; max-width: 85%; background: #ffffff; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 18px 18px 18px 0;">
+                            <strong style="color: #475569; font-size: 0.85em;">Arthur Chen</strong>
+                            <p style="margin-top: 4px;">Có thể.</p>
+                        </div>
+
+                        <div style="align-self: flex-end; max-width: 85%; background: #e0e7ff; border: 1px solid #c7d2fe; padding: 12px 16px; border-radius: 18px 18px 0 18px;">
+                            <strong style="color: #4338ca; font-size: 0.85em;">Diego Montes</strong>
+                            <p style="margin-top: 4px;">Tôi bị gọi đi để kiểm tra máy đóng chai. Nó đang dở chứng. ... Tại sao anh không sắp xếp một cuộc gọi hội nghị vào chiều thứ Năm nhỉ?</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 154,
+                    qEng: "At 5:50 P.M., what does Mr. Montes most likely mean when he writes, 'I'm not at my desk'?",
+                    qVie: "Lúc 5:50 P.M., ông Montes rất có thể có ý gì khi viết 'Tôi không có ở bàn làm việc'?",
+                    options: [
+                        { key: "A", en: "He has left for the day.", vi: "Ông ấy đã về nhà/nghỉ làm trong ngày.", isCorrect: false },
+                        { key: "B", en: "He will miss an appointment.", vi: "Ông ấy sẽ lỡ một cuộc hẹn.", isCorrect: false },
+                        { key: "C", en: "He is visiting Mr. Chen's office.", vi: "Ông ấy đang ghé thăm văn phòng ông Chen.", isCorrect: false },
+                        { key: "D", en: "He cannot respond to Eleanor.", vi: "Ông ấy không thể trả lời Eleanor.", isCorrect: true }
+                    ],
+                    evidenceId: "ev-154",
+                    expText: "Chen báo rằng Eleanor đang chờ phản hồi email. Montes trả lời 'Tôi không ở bàn làm việc', và giải thích thêm là 'bị gọi đi kiểm tra máy móc'. Tức là ông ấy đang giải thích lý do tại sao chưa thể đọc hay trả lời email của Eleanor ngay lúc này.",
+                    vocab: "<li><b>Respond</b>: Phản hồi, trả lời</li><li><b>Act up</b>: (Máy móc) giở chứng, hư hỏng nhẹ</li>"
+                },
+                {
+                    id: 155,
+                    qEng: "What task is Mr. Chen asked to do?",
+                    qVie: "Nhiệm vụ gì ông Chen được yêu cầu làm?",
+                    options: [
+                        { key: "A", en: "Review documents", vi: "Xem xét tài liệu", isCorrect: false },
+                        { key: "B", en: "Schedule a meeting", vi: "Sắp xếp một cuộc họp", isCorrect: true },
+                        { key: "C", en: "Confirm travel plans", vi: "Xác nhận kế hoạch đi lại", isCorrect: false },
+                        { key: "D", en: "Repair some equipment", vi: "Sửa chữa thiết bị", isCorrect: false }
+                    ],
+                    evidenceId: "ev-155",
+                    expText: "Montes bảo Chen: <em>'Why don't you arrange a conference call for Thursday afternoon?'</em> (Tại sao anh không sắp xếp một cuộc gọi hội nghị vào chiều thứ Năm?). 'Arrange a conference call' chính là lên lịch một cuộc họp từ xa (Schedule a meeting).",
+                    vocab: "<li><b>Arrange</b>: Sắp xếp</li><li><b>Conference call</b>: Cuộc gọi hội nghị, họp trực tuyến</li>"
+                }
+            ]
+        },
+        {
+            // PASSAGE 5: Câu 156-158
+            id: 5,
+            engHtml: `
+                <div class="doc-box">
+                    <div class="center-text">
+                        <h3>Calmont Art Museum</h3>
+                    </div><br>
+                    <p>Dear Mr. Sayre:</p><br>
+                    <p>As a Calmont Art Museum member, you will soon be able to take advantage of our Member Appreciation Month discounts. <strong>[1]</strong>. From 1 to 31 January, members will receive an extra 20 percent savings on all gift-shop items. <span id="ev-156" class="ev-box">Members will also be offered a complimentary cup of coffee or tea with their meal in the café.</span> Additionally, those who become first-time members by 31 January will receive a 10 percent membership fee discount. <strong>[2]</strong>. So encourage your friends to go online and sign up.</p><br>
+                    <p><span id="ev-158" class="ev-box"><strong>[3]</strong></span>. <span id="ev-157" class="ev-box">Every Friday of the month, the previously closed third-floor galleries, which feature sculptures and paintings by contemporary Bermudian artists, will be open to all visitors until 9:00 P.M.</span> Photographs of select artwork from these galleries can be viewed on our Web site.</p><strong>[4]</strong><p>We hope to see you in the coming month.</p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box">
+                    <div class="center-text">
+                        <h3>Bảo tàng Nghệ thuật Calmont</h3>
+                    </div><br>
+                    <p>Ông Sayre thân mến:</p><br>
+                    <p>Là một thành viên của Bảo tàng Nghệ thuật Calmont, ông sẽ sớm có thể tận dụng các khoản giảm giá trong Tháng Tri ân Thành viên của chúng tôi. <strong>[1]</strong>. Từ ngày 1 đến 31 tháng 1, thành viên sẽ nhận được thêm 20% tiền tiết kiệm cho tất cả các mặt hàng ở cửa hàng quà tặng. Thành viên cũng sẽ được cung cấp một tách trà hoặc cà phê miễn phí kèm với bữa ăn của họ trong quán cà phê (nhà hàng). Ngoài ra, những người trở thành thành viên lần đầu trước ngày 31/1 sẽ được giảm 10% phí thành viên. <strong>[2]</strong>. Vì vậy hãy khuyến khích bạn bè lên mạng đăng ký.</p><br>
+                    <p><strong>[3]</strong>. Vào mỗi thứ Sáu trong tháng, các phòng trưng bày tầng 3 trước đây bị đóng cửa, vốn nổi bật với các tác phẩm điêu khắc và hội họa của các nghệ sĩ đương đại Bermuda, sẽ mở cửa cho tất cả du khách đến 9:00 tối. Hình ảnh của các tác phẩm nghệ thuật chọn lọc từ các phòng này có thể được xem trên trang web của chúng tôi.</p><strong>[4]</strong><p>Chúng tôi hy vọng sẽ gặp lại ông trong tháng tới.</p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 156,
+                    qEng: "What is true about the Calmont Art Museum building?",
+                    qVie: "Điều gì đúng về tòa nhà Bảo tàng Nghệ thuật Calmont?",
+                    options: [
+                        { key: "A", en: "It has a restaurant.", vi: "Nó có một nhà hàng.", isCorrect: true },
+                        { key: "B", en: "It will be closing for one month.", vi: "Nó sẽ đóng cửa trong một tháng.", isCorrect: false },
+                        { key: "C", en: "It will have photographs on display.", vi: "Nó sẽ có những bức ảnh được trưng bày.", isCorrect: false },
+                        { key: "D", en: "It has a studio for art classes.", vi: "Nó có một phòng thu cho lớp học nghệ thuật.", isCorrect: false }
+                    ],
+                    evidenceId: "ev-156",
+                    expText: "Thư viết: <em>'...with their meal in the café'</em> (kèm theo bữa ăn của họ trong quán café). Một nơi bán đồ ăn ('meal' - bữa ăn) trong tòa nhà bảo tàng đồng nghĩa với việc tòa nhà này có nhà hàng / khu vực ăn uống.",
+                    vocab: "<li><b>Complimentary</b>: Miễn phí</li><li><b>Meal</b>: Bữa ăn</li>"
+                },
+                {
+                    id: 157,
+                    qEng: "According to the letter, what will be different on Fridays?",
+                    qVie: "Theo như bức thư, điều gì sẽ khác biệt vào các ngày thứ Sáu?",
+                    options: [
+                        { key: "A", en: "Museum admission will be free.", vi: "Vé vào bảo tàng sẽ miễn phí.", isCorrect: false },
+                        { key: "B", en: "Additional galleries will be open.", vi: "Có thêm các phòng trưng bày được mở cửa.", isCorrect: true },
+                        { key: "C", en: "Hours at the gift shop will be extended.", vi: "Giờ hoạt động tại cửa hàng quà tặng sẽ được kéo dài.", isCorrect: false },
+                        { key: "D", en: "Bermudian artwork will be on sale.", vi: "Các tác phẩm nghệ thuật Bermudian sẽ được giảm giá.", isCorrect: false }
+                    ],
+                    evidenceId: "ev-157",
+                    expText: "Bảo tàng cho biết: <em>'Every Friday of the month, the previously closed third-floor galleries... will be open'</em> (Vào mỗi thứ sáu, các phòng trưng bày trên tầng ba trước đây bị đóng cửa... nay sẽ mở cửa). Tức là bảo tàng mở thêm khu vực trưng bày mới vào thứ Sáu.",
+                    vocab: "<li><b>Gallery</b>: Phòng trưng bày nghệ thuật</li><li><b>Previously</b>: Trước đây</li>"
+                },
+                {
+                    id: 158,
+                    qEng: "In which of the positions marked [1], [2], [3], and [4] does the following sentence best belong? 'January is a wonderful time to visit the museum for another reason.'",
+                    qVie: "Ở các vị trí được đánh dấu [1]-[4], câu sau đây phù hợp nhất ở đâu? 'Tháng Một là một thời điểm tuyệt vời để đến thăm bảo tàng vì một lý do khác.'",
+                    options: [
+                        { key: "A", en: "[1]", vi: "Vị trí [1]", isCorrect: false },
+                        { key: "B", en: "[2]", vi: "Vị trí [2]", isCorrect: false },
+                        { key: "C", en: "[3]", vi: "Vị trí [3]", isCorrect: true },
+                        { key: "D", en: "[4]", vi: "Vị trí [4]", isCorrect: false }
+                    ],
+                    evidenceId: "ev-158",
+                    expText: "Vị trí [3] nằm ở đầu đoạn văn thứ hai. Đoạn thứ nhất đã nêu lý do đầu tiên là tháng Tri ân thành viên (ưu đãi mua sắm, tặng cafe). Câu cần chèn giới thiệu 'một lý do khác' (for another reason) và đoạn ngay sau nó nói về việc mở cửa phòng trưng bày ở tầng 3 vào tối thứ Sáu hàng tuần. Việc chèn vào [3] tạo sự chuyển ý hoàn hảo giữa hai đoạn.",
+                    vocab: "<li><b>Reason</b>: Lý do</li><li><b>Another</b>: Một cái khác</li>"
+                }
+            ]
+        },
+        {
+            // PASSAGE 6: Câu 159-160
+            id: 6,
+            engHtml: `
+                <div class="doc-box">
+                    <div class="email-header">
+                        <div><strong>To:</strong> Moana Dixon</div>
+                        <div><strong>From:</strong> So-Hyun Ahn</div>
+                        <div><strong>Subject:</strong> Jemina Toys' anniversary</div>
+                    </div>
+                    <p>Dear Vice President Dixon,</p><br>
+                    <p><span id="ev-159" class="ev-box">Several high-profile events and a mix of advertisements are now in place for Jemina Toys' celebration</span> of fifty years in Korea. The kickoff banquet will be held at the Grand Harper Hotel in Seoul on 2 August. We're eager to hear your decision about whether you will join us as our guest of honour. You'll find an invitation attached.</p><br>
+                    <p><span id="ev-159-2" class="ev-box">We just arranged advertising for a series of in-store anniversary sales</span> that will launch periodically over the remainder of the year. We'll also be sending out press releases before each of these.</p><br>
+                    <p><span id="ev-160" class="ev-box">I'll provide you with a complete schedule once it is finalized.</span></p><br>
+                    <p>Sincerely,<br>So-Hyun Ahn</p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box">
+                    <div class="email-header">
+                        <div><strong>Tới:</strong> Moana Dixon</div>
+                        <div><strong>Từ:</strong> So-Hyun Ahn</div>
+                        <div><strong>Chủ đề:</strong> Lễ kỷ niệm của Đồ chơi Jemina</div>
+                    </div>
+                    <p>Kính gửi Phó Chủ tịch Dixon,</p><br>
+                    <p>Một số sự kiện cấp cao và sự kết hợp của các quảng cáo hiện đang được chuẩn bị cho lễ kỷ niệm 50 năm của Đồ chơi Jemina tại Hàn Quốc. Tiệc khai mạc sẽ được tổ chức tại Khách sạn Grand Harper ở Seoul vào ngày 2 tháng 8. Chúng tôi rất mong đợi được nghe quyết định của bà về việc liệu bà có tham gia cùng chúng tôi với tư cách là khách mời danh dự hay không. Bà sẽ thấy một thiệp mời được đính kèm.</p><br>
+                    <p>Chúng tôi vừa mới sắp xếp quảng cáo cho một loạt các đợt giảm giá kỷ niệm tại cửa hàng sẽ ra mắt định kỳ trong phần còn lại của năm. Chúng tôi cũng sẽ gửi các thông cáo báo chí trước mỗi sự kiện này.</p><br>
+                    <p>Tôi sẽ cung cấp cho bà một lịch trình hoàn chỉnh sau khi nó được hoàn tất.</p><br>
+                    <p>Trân trọng,<br>So-Hyun Ahn</p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 159,
+                    qEng: "What is the purpose of the e-mail?",
+                    qVie: "Mục đích của e-mail là gì?",
+                    options: [
+                        { key: "A", en: "To inquire about discounted products", vi: "Để hỏi về các sản phẩm được giảm giá", isCorrect: false },
+                        { key: "B", en: "To confirm a hotel reservation", vi: "Để xác nhận đặt phòng khách sạn", isCorrect: false },
+                        { key: "C", en: "To agree to attend a dinner", vi: "Để đồng ý tham gia một bữa tối", isCorrect: false },
+                        { key: "D", en: "To report on promotional plans", vi: "Để báo cáo về các kế hoạch khuyến mãi / quảng bá", isCorrect: true }
+                    ],
+                    evidenceId: "ev-159",
+                    expText: "Người viết gửi báo cáo về quá trình chuẩn bị kỷ niệm 50 năm, liệt kê các sự kiện nổi bật, chiến dịch quảng cáo và các đợt sale tại cửa hàng. Đây chính là bản cập nhật báo cáo các kế hoạch quảng bá (promotional plans) của chi nhánh tại Hàn Quốc.",
+                    vocab: "<li><b>High-profile event</b>: Sự kiện cấp cao, gây chú ý</li><li><b>Promotional plan</b>: Kế hoạch quảng bá / khuyến mãi</li>"
+                },
+                {
+                    id: 160,
+                    qEng: "What does Ms. Ahn promise to send later?",
+                    qVie: "Cô Ahn hứa sẽ gửi gì sau đó?",
+                    options: [
+                        { key: "A", en: "A revised invitation", vi: "Một thiệp mời được sửa đổi", isCorrect: false },
+                        { key: "B", en: "A list of upcoming events", vi: "Danh sách các sự kiện sắp diễn ra", isCorrect: true },
+                        { key: "C", en: "A travel itinerary", vi: "Lịch trình chuyến đi", isCorrect: false },
+                        { key: "D", en: "A report of recent sales", vi: "Báo cáo doanh số bán hàng gần đây", isCorrect: false }
+                    ],
+                    evidenceId: "ev-160",
+                    expText: "Ở câu cuối cùng, cô Ahn viết: <em>'I'll provide you with a complete schedule once it is finalized.'</em> (Tôi sẽ cung cấp cho bà một lịch trình hoàn chỉnh sau khi nó hoàn tất). Lịch trình này chính là danh sách sắp xếp các sự kiện sắp tới.",
+                    vocab: "<li><b>Schedule</b>: Lịch trình</li><li><b>Upcoming events</b>: Các sự kiện sắp diễn ra</li><li><b>Finalize</b>: Hoàn tất</li>"
+                }
+            ]
+        }
+    ];
+
+    // LƯU TRỮ TRẠNG THÁI
+    let currentPassageIdx = 0;
+
+    // HÀM RENDER (TẠO GIAO DIỆN HTML) TỪ DỮ LIỆU
+    function renderPassage(idx) {
+        const data = reviewData[idx];
+        
+        // Cập nhật trạng thái Text
+        document.getElementById('progress-text').innerText = `Đoạn ${idx + 1} / ${reviewData.length}`;
+        
+        // Render 2 cột bài đọc
+        document.getElementById('eng-content').innerHTML = data.engHtml;
+        document.getElementById('vie-content').innerHTML = data.vieHtml;
+
+        // Render các thẻ Câu hỏi
+        let qHtml = '';
+        data.questions.forEach(q => {
+            let optsHtml = '';
+            q.options.forEach(opt => {
+                let statusClass = opt.isCorrect ? 'is-correct' : '';
+                let checkIcon = opt.isCorrect ? '✅' : '';
+                
+                optsHtml += `
+                    <div class="option ${statusClass}">
+                        <div class="opt-en"><strong>${opt.key}.</strong> ${opt.en} ${checkIcon}</div>
+                        <div class="opt-vi">${opt.vi}</div>
+                    </div>
+                `;
+            });
+
+            qHtml += `
+                <div class="q-card">
+                    <div class="q-text">Câu ${q.id}: ${q.qEng}</div>
+                    <div class="q-text-vi">${q.qVie}</div>
+                    <div class="options-container">${optsHtml}</div>
+                    
+                    <div class="exp-box">
+                        <div class="exp-header">
+                            <div class="exp-title">💡 Giải thích Câu ${q.id}</div>
+                            <button class="btn-locate" onclick="scrollToEvidence('${q.evidenceId}')">📍 Xem dẫn chứng</button>
+                        </div>
+                        <div class="exp-content">${q.expText}</div>
+                        <div class="exp-vocab">
+                            <div style="font-weight:800; color:var(--primary-dark); margin-bottom:8px; text-transform:uppercase; font-size:14px; letter-spacing:1px;">📚 Từ vựng / Ngữ pháp:</div>
+                            <ul>${q.vocab}</ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        document.getElementById('questions-container').innerHTML = qHtml;
+
+        // TỰ ĐỘNG TÔ MÀU PASTEL CHO CÁC DẪN CHỨNG
+        const pastelColors = [
+            { bg: '#ffadad', text: '#5a1c1c' }, // Đỏ pastel
+            { bg: '#ffd6a5', text: '#663d14' }, // Cam pastel
+            { bg: '#caffbf', text: '#1f4d1f' }, // Xanh lá pastel
+            { bg: '#9bf6ff', text: '#16565c' }, // Xanh dương pastel
+            { bg: '#a0c4ff', text: '#1c3666' }, // Xanh biển pastel
+            { bg: '#bdb2ff', text: '#352666' }  // Tím pastel
+        ];
+
+        const colorMap = {};
+        let colorIndex = 0;
+        
+        document.querySelectorAll('.passage-grid .ev-box').forEach((el) => {
+            const evId = el.getAttribute('id');
+            if (evId && !colorMap[evId]) {
+                colorMap[evId] = pastelColors[colorIndex % pastelColors.length];
+                colorIndex++;
+            }
+            const color = evId ? colorMap[evId] : pastelColors[colorIndex % pastelColors.length];
+            el.style.backgroundColor = color.bg;
+            el.style.color = color.text;
+            el.style.padding = '2px 6px';
+            el.style.borderRadius = '6px';
+            el.style.fontWeight = '600';
+            el.style.border = 'none';
+        });
+
+        // Cập nhật nút điều hướng
+        document.getElementById('btn-prev').disabled = idx === 0;
+        document.getElementById('btn-next').disabled = idx === reviewData.length - 1;
+    }
+
+    // HÀM ĐIỀU HƯỚNG
+    function navigate(dir) {
+        let newIdx = currentPassageIdx + dir;
+        if(newIdx >= 0 && newIdx < reviewData.length) {
+            currentPassageIdx = newIdx;
+            renderPassage(currentPassageIdx);
+            document.querySelector('.passage-grid').scrollTop = 0;
+            document.getElementById('questions-container').scrollTop = 0;
+        }
+    }
+
+    // HÀM CUỘN ĐẾN DẪN CHỨNG
+    function scrollToEvidence(evId) {
+        const evElement = document.getElementById(evId);
+        if(evElement) {
+            evElement.scrollIntoView({behavior: "smooth", block: "center"});
+            evElement.classList.remove("focus-blink");
+            void evElement.offsetWidth; 
+            evElement.classList.add("focus-blink");
+            setTimeout(() => evElement.classList.remove("focus-blink"), 2000);
+        }
+    }
+
+    window.onload = () => { renderPassage(0); };
+</script>
+
+</body>
+</html>
