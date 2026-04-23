@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 10: Câu điều kiện | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette màu pastel mới: Mint - Peach - Baby Blue */
+            --pastel-mint: #d1fae5;
+            --pastel-peach: #ffedd5;
+            --pastel-blue: #e0f2fe;
+            
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.9);
+            --text-main: #334155;
+            --text-sub: #64748b;
+            --correct-color: #10b981; 
+            --wrong-color: #f43f5e;   
+            --accent-color: #0f766e;  /* Xanh cổ vịt tạo sự trưởng thành */
+        }
+
+        /* Ẩn hoàn toàn trích dẫn khỏi giao diện hiển thị */
+        .hidden-cite {
+            display: none !important;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--pastel-mint) 0%, var(--pastel-peach) 50%, var(--pastel-blue) 100%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Mở rộng toàn màn hình theo yêu cầu */
+        .full-screen-container {
+            width: 100%;
+            padding: 20px 40px;
+            box-sizing: border-box;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+        h1 {
+            color: var(--accent-color);
+            font-size: 40px;
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.8);
+            margin-bottom: 10px;
+        }
+
+        /* Content Sections */
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        }
+
+        h2.card-title {
+            color: #d97706;
+            border-bottom: 2px dashed #fcd34d;
+            padding-bottom: 15px;
+            margin-top: 0;
+            font-size: 26px;
+        }
+
+        h3.trap-title {
+            color: var(--accent-color);
+            margin-top: 25px;
+            font-size: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.7);
+        }
+        th {
+            background: rgba(224, 242, 254, 0.7);
+            color: var(--accent-color);
+            font-weight: 700;
+        }
+
+        /* Quiz Interface */
+        .question-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question-text {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--accent-color);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background: rgba(255,255,255,0.8);
+            border: 2px solid transparent;
+            padding: 15px 20px;
+            border-radius: 14px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 17px;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-main);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .option-btn:hover {
+            background: white;
+            border-color: rgba(15, 118, 110, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .option-btn.selected-correct {
+            background: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+
+        .option-btn.selected-wrong {
+            background: var(--wrong-color);
+            color: white;
+            border-color: var(--wrong-color);
+        }
+
+        .option-btn.show-correct {
+            background: white;
+            color: var(--correct-color);
+            border-color: var(--correct-color);
+            box-shadow: 0 0 0 2px var(--correct-color) inset;
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Detailed Explanation Box */
+        .explanation-box {
+            margin-top: 25px;
+            padding: 20px 25px;
+            border-radius: 16px;
+            background: white;
+            display: none;
+            animation: fadeIn 0.5s ease;
+            border-left: 5px solid var(--accent-color);
+        }
+        
+        .exp-status { font-weight: 700; font-size: 20px; margin-bottom: 15px; }
+        .exp-correct { color: var(--correct-color); }
+        .exp-wrong { color: var(--wrong-color); }
+
+        .exp-section { margin-bottom: 12px; }
+        .exp-title { font-weight: 700; color: var(--accent-color); display: block; margin-bottom: 4px;}
+        .reason-correct { color: #059669; font-weight: 500; }
+        .reason-wrong { color: #e11d48; font-size: 15px; margin-top: 5px; display: block;}
+        
+        /* Navigation Buttons (Next/Back) */
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding: 20px 0;
+            border-top: 2px dashed rgba(255,255,255,0.5);
+        }
+
+        .nav-btn {
+            padding: 12px 30px;
+            border-radius: 50px;
+            background: var(--accent-color);
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(15, 118, 110, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(15, 118, 110, 0.4);
+        }
+
+        .nav-btn.btn-back {
+            background: white;
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            .options-grid { grid-template-columns: 1fr; }
+            .full-screen-container { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="full-screen-container">
+        <header>
+            <h1>✨ Unit 10: Câu Điều Kiện & Đảo Ngữ</h1>
+            <p style="font-size: 18px; font-weight: 500;">Khám phá bộ quy tắc Conditional Sentences chuyên sâu</p>
+        </header>
+
+        <div id="theory" class="section active">
+            
+            <div class="glass-card">
+                <h2 class="card-title">1. Ba loại Câu Điều Kiện cơ bản <span class="hidden-cite">[cite: 12, 15, 18]</span></h2>
+                
+                <table>
+                    <tr>
+                        <th>Loại</th>
+                        <th>Cấu trúc <span class="hidden-cite">[cite: 14, 17, 20]</span></th>
+                        <th>Cách dùng</th>
+                    </tr>
+                    <tr>
+                        <td><b>Loại 1</b> <span class="hidden-cite">[cite: 12]</span></td>
+                        <td>If S + V(hiện tại đơn), S + will + V(nguyên thể)</td>
+                        <td>Điều kiện có thể xảy ra ở hiện tại hoặc tương lai. <span class="hidden-cite">[cite: 13]</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Loại 2</b> <span class="hidden-cite">[cite: 15]</span></td>
+                        <td>If S + V(quá khứ đơn), S + would + V(nguyên thể)</td>
+                        <td>Điều kiện không có thật ở hiện tại. (To be luôn dùng 'were') <span class="hidden-cite">[cite: 16, 17]</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Loại 3</b> <span class="hidden-cite">[cite: 18]</span></td>
+                        <td>If S + V(quá khứ hoàn thành), S + would have + PII</td>
+                        <td>Điều kiện không có thật ở quá khứ. <span class="hidden-cite">[cite: 19]</span></td>
+                    </tr>
+                </table>
+
+                <div style="margin-top: 20px; background: rgba(255,255,255,0.6); padding: 15px; border-radius: 12px;">
+                    💡 <b>Mẹo "Lùi Thì":</b> Các cấu trúc liên quan logic với nhau qua việc lùi thì từ Hiện tại -> Quá khứ -> Quá khứ hoàn thành. <span class="hidden-cite">[cite: 22, 23, 24, 25]</span>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <h2 class="card-title">2. Câu Điều Kiện Hỗn Hợp & Đảo Ngữ <span class="hidden-cite">[cite: 26, 32, 35]</span></h2>
+                
+                <h3 class="trap-title">🔥 Hỗn hợp (Loại 2 & 3) <span class="hidden-cite">[cite: 27, 28]</span></h3>
+                <p>Giả định một điều kiện trong quá khứ, nhưng kết quả ảnh hưởng đến hiện tại. <span class="hidden-cite">[cite: 29]</span></p>
+                <p><b>Cấu trúc:</b> If S + V(quá khứ hoàn thành), S + would + V(nguyên thể) now. <span class="hidden-cite">[cite: 31]</span></p>
+
+                <h3 class="trap-title">🔥 Bẫy Đảo Ngữ thường gặp trong TOEIC <span class="hidden-cite">[cite: 32, 35]</span></h3>
+                <ul>
+                    <li><b>Đảo ngữ loại 1:</b> Should + S + V(nguyên thể), Mệnh đề chính. <span class="hidden-cite">[cite: 34]</span></li>
+                    <li><b>Đảo ngữ loại 3:</b> Had + S + PII, Mệnh đề chính. <span class="hidden-cite">[cite: 37]</span></li>
+                </ul>
+            </div>
+
+            <div class="nav-controls" style="justify-content: flex-end;">
+                <button class="nav-btn" onclick="navigateTo('task1')">Next: Task 1 (Cơ bản) ➡️</button>
+            </div>
+        </div>
+
+        <div id="task1" class="section">
+            <div class="glass-card" style="padding: 20px; margin-bottom: 20px; text-align: center;">
+                <h2 style="margin: 0; color: var(--accent-color);">🎯 Task 1: Nhận diện Câu Điều Kiện Cơ Bản</h2>
+            </div>
+            
+            <div id="task1-container"></div>
+
+            <div class="nav-controls">
+                <button class="nav-btn btn-back" onclick="navigateTo('theory')">⬅️ Back: Lý thuyết</button>
+                <button class="nav-btn" onclick="navigateTo('task2')">Next: Task 2 (Nâng cao) ➡️</button>
+            </div>
+        </div>
+
+        <div id="task2" class="section">
+            <div class="glass-card" style="padding: 20px; margin-bottom: 20px; text-align: center;">
+                <h2 style="margin: 0; color: var(--accent-color);">🚀 Task 2: Vượt ải Hỗn Hợp & Đảo Ngữ</h2>
+            </div>
+            
+            <div id="task2-container"></div>
+
+            <div class="nav-controls">
+                <button class="nav-btn btn-back" onclick="navigateTo('task1')">⬅️ Back: Task 1</button>
+                <button class="nav-btn" onclick="alert('Chúc mừng bạn đã hoàn thành xuất sắc Unit 10! 🎉')">✅ Hoàn thành bài học</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // DỮ LIỆU CÂU HỎI TASK 1
+        const task1Data = [
+            {
+                q: "1. If the client _______ the contract by 5 PM, we will start the project tomorrow. <span class='hidden-cite'></span>",
+                opts: ["signs", "signed", "will sign", "had signed"],
+                ans: 0,
+                expCorrect: "Đáp án A. Đây là câu điều kiện loại 1 (sự việc có thể xảy ra). Mệnh đề chính dùng 'will start', do đó mệnh đề If dùng Hiện tại đơn.",
+                expWrong: "• B (signed): Dùng cho loại 2 (quá khứ đơn).<br>• C (will sign): Mệnh đề If không chứa 'will'.<br>• D (had signed): Dùng cho loại 3."
+            },
+            {
+                q: "2. If I _______ the CEO of this company, I would increase the marketing budget. <span class='hidden-cite'></span>",
+                opts: ["am", "was", "were", "had been"],
+                ans: 2,
+                expCorrect: "Đáp án C. Câu điều kiện loại 2 (không có thật ở hiện tại). Mệnh đề chính dùng 'would increase'. Đối với động từ to be trong loại 2, luôn dùng 'were' cho mọi ngôi. <span class='hidden-cite'>[cite: 17]</span>",
+                expWrong: "• A (am): Sai thì.<br>• B (was): Ít được ưu tiên trong ngữ pháp chuẩn TOEIC dù văn nói có thể gặp.<br>• D (had been): Dùng cho loại 3."
+            },
+            {
+                q: "3. If she had read the instruction carefully, she _______ the machine. <span class='hidden-cite'></span>",
+                opts: ["wouldn't break", "won't break", "didn't break", "wouldn't have broken"],
+                ans: 3,
+                expCorrect: "Đáp án D. Mệnh đề If dùng Quá khứ hoàn thành (had read) -> Đây là câu điều kiện loại 3. Mệnh đề chính chia 'would have + PII'. <span class='hidden-cite'>[cite: 20]</span>",
+                expWrong: "• A (wouldn't break): Dùng cho loại 2.<br>• B (won't break): Dùng cho loại 1.<br>• C (didn't break): Sai cấu trúc câu điều kiện."
+            },
+            {
+                q: "4. You will get a discount if you _______ more than 100 items. <span class='hidden-cite'></span>",
+                opts: ["ordered", "order", "will order", "have ordered"],
+                ans: 1,
+                expCorrect: "Đáp án B. Câu điều kiện loại 1, mệnh đề chính là 'will get', mệnh đề If (dù đứng sau) vẫn chia Hiện tại đơn.",
+                expWrong: "• A (ordered): Quá khứ đơn (loại 2).<br>• C (will order): Không dùng tương lai trong mệnh đề If.<br>• D (have ordered): Sai cấu trúc."
+            },
+            {
+                q: "5. If they _______ earlier, they would have caught the flight. <span class='hidden-cite'></span>",
+                opts: ["left", "have left", "had left", "leave"],
+                ans: 2,
+                expCorrect: "Đáp án C. Mệnh đề chính dùng 'would have caught' (loại 3). Suy ra mệnh đề If cần chia Quá khứ hoàn thành (had + PII).",
+                expWrong: "• A, D: Dùng cho loại 2 và 1.<br>• B: Sai thì (Hiện tại hoàn thành không dùng trong mệnh đề If cơ bản)."
+            }
+        ];
+
+        // DỮ LIỆU CÂU HỎI TASK 2
+        const task2Data = [
+            {
+                q: "1. If he had studied hard last year, he _______ a better job now. <span class='hidden-cite'></span>",
+                opts: ["would have", "would have had", "will have", "has"],
+                ans: 0,
+                expCorrect: "Đáp án A. Câu điều kiện hỗn hợp 3-2. Nguyên nhân ở quá khứ (had studied), kết quả ở hiện tại (now). Cấu trúc: If S + QKHT, S + would + V now. <span class='hidden-cite'>[cite: 31]</span>",
+                expWrong: "• B (would have had): Là loại 3 thuần, không phù hợp vì có dấu hiệu 'now' ở mệnh đề chính.<br>• C, D: Sai hoàn toàn về sự hòa hợp thì."
+            },
+            {
+                q: "2. _______ you need any further assistance, please contact our support team. <span class='hidden-cite'></span>",
+                opts: ["If", "Should", "Had", "Were"],
+                ans: 1,
+                expCorrect: "Đáp án B. Đảo ngữ câu điều kiện loại 1. Thay vì dùng 'If you should need', ta đảo 'Should' lên đầu câu và bỏ 'If'. <span class='hidden-cite'>[cite: 34]</span>",
+                expWrong: "• A (If): Thiếu động từ chính (nếu dùng If thì phải là If you need).<br>• C, D: Đảo ngữ của loại 3 và loại 2, nhưng ngữ cảnh là câu mệnh lệnh (please contact) thuộc loại 1."
+            },
+            {
+                q: "3. _______ the manager informed us, we would have prepared better. <span class='hidden-cite'></span>",
+                opts: ["Have", "Should", "Were", "Had"],
+                ans: 3,
+                expCorrect: "Đáp án D. Đảo ngữ câu điều kiện loại 3. Mệnh đề chính là 'would have prepared'. Cấu trúc đảo: Had + S + PII. <span class='hidden-cite'>[cite: 37]</span>",
+                expWrong: "• A (Have): Sai cấu trúc.<br>• B (Should): Dùng cho loại 1.<br>• C (Were): Dùng cho đảo ngữ loại 2."
+            },
+            {
+                q: "4. If I had taken the map, I _______ lost now. <span class='hidden-cite'></span>",
+                opts: ["wouldn't have been", "won't be", "am not", "wouldn't be"],
+                ans: 3,
+                expCorrect: "Đáp án D. Câu điều kiện hỗn hợp. Giả định trái quá khứ (had taken), kết quả ở hiện tại (now). Mệnh đề chính: S + would + V. <span class='hidden-cite'>[cite: 31]</span>",
+                expWrong: "• A: Câu điều kiện loại 3 thuần túy (không hợp vì có now).<br>• B, C: Sai cấu trúc câu điều kiện không có thật."
+            },
+            {
+                q: "5. _______ he not driven so fast, the accident wouldn't have happened. <span class='hidden-cite'></span>",
+                opts: ["If", "Had", "Did", "Should"],
+                ans: 1,
+                expCorrect: "Đáp án B. Đảo ngữ loại 3 thể phủ định. Cấu trúc: Had + S + not + PII. Mệnh đề chính là 'wouldn't have happened'. <span class='hidden-cite'>[cite: 37]</span>",
+                expWrong: "• A (If): Cần phải là 'If he had not driven'.<br>• C (Did): Không dùng mượn trợ động từ Did trong loại 3.<br>• D (Should): Dùng cho loại 1."
+            }
+        ];
+
+        // Hàm điều hướng Section (Manual Navigation)
+        function navigateTo(sectionId) {
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Render Questions
+        function renderQuiz(data, containerId) {
+            const container = document.getElementById(containerId);
+            let html = '';
+
+            data.forEach((item, index) => {
+                html += `
+                <div class="question-card" id="q-${containerId}-${index}">
+                    <div class="question-text">${item.q}</div>
+                    <div class="options-grid">
+                        ${item.opts.map((opt, i) => `
+                            <button class="option-btn" onclick="checkAnswer(this, ${index}, ${i}, '${containerId}', ${item.ans})">
+                                ${String.fromCharCode(65 + i)}. ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="explanation-box" id="exp-${containerId}-${index}">
+                        <div class="exp-status" id="status-${containerId}-${index}"></div>
+                        <div class="exp-section">
+                            <span class="exp-title">✅ Tại sao chọn đáp án này?</span>
+                            <span class="reason-correct">${item.expCorrect}</span>
+                        </div>
+                        <div class="exp-section">
+                            <span class="exp-title">❌ Phân tích các đáp án sai:</span>
+                            <span class="reason-wrong">${item.expWrong}</span>
+                        </div>
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Hàm kiểm tra đáp án
+        function checkAnswer(btn, qIndex, selectedOpt, containerId, correctOpt) {
+            const qCard = document.getElementById(`q-${containerId}-${qIndex}`);
+            const buttons = qCard.querySelectorAll('.option-btn');
+            const expBox = document.getElementById(`exp-${containerId}-${qIndex}`);
+            const statusText = document.getElementById(`status-${containerId}-${qIndex}`);
+
+            // Vô hiệu hóa nút sau khi chọn
+            buttons.forEach(b => b.disabled = true);
+
+            if (selectedOpt === correctOpt) {
+                btn.classList.add('selected-correct');
+                statusText.innerHTML = "✨ Rất xuất sắc, đúng rồi nè!";
+                statusText.className = "exp-status exp-correct";
+            } else {
+                btn.classList.add('selected-wrong');
+                statusText.innerHTML = "🥺 Tiếc quá, chưa chính xác!";
+                statusText.className = "exp-status exp-wrong";
+                // Hiển thị đáp án đúng
+                buttons[correctOpt].classList.add('show-correct');
+            }
+
+            // Hiện khung giải thích chi tiết
+            expBox.style.display = "block";
+        }
+
+        // Khởi tạo
+        renderQuiz(task1Data, 'task1-container');
+        renderQuiz(task2Data, 'task2-container');
+    </script>
+
+</body>
+</html>
