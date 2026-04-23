@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test 2 - 2018 | SnapEnglish</title>
+     <link rel="icon" type="image/png" href="ảnh.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
+
+:root {
+    --primary: #88b04b;      
+    --primary-dark: #6a8a3a;
+    --accent: #ff9f89;       
+    --bg-body: #f7f9f4;      
+    --bg-pane: #ffffff;
+    --text-main: #4a4a4a;
+    --text-light: #888;
+    --border: #e0e5df;
+    --highlight: #fff59d;    
+    --correct: #6a994e;
+    --wrong: #bc4749;
+    --exp-bg: #f1f8e9;       
+    --header-h: 70px;
+    --footer-h: 80px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0; padding: 0;
+    font-family: 'Quicksand', sans-serif;
+    background: var(--bg-body);
+    color: var(--text-main);
+    height: 100vh;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+}
+
+/* --- HEADER --- */
+header {
+    height: var(--header-h); background: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 30px; z-index: 100;
+}
+
+.brand { font-size: 24px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+.brand span { background: var(--primary); color: white; padding: 4px 10px; border-radius: 10px; font-size: 16px; }
+
+.tab-container { display: flex; background: #edf2ea; padding: 5px; border-radius: 25px; gap: 5px; }
+.tab-btn {
+    border: none; background: transparent; padding: 10px 25px; font-size: 16px;
+    font-family: inherit; font-weight: 600; color: var(--text-light);
+    cursor: pointer; border-radius: 20px; transition: all 0.3s;
+}
+.tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+
+.controls { display: flex; gap: 20px; align-items: center; }
+.timer-box { 
+    font-family: 'Quicksand', sans-serif; font-weight: 700; color: var(--accent); 
+    background: #fff0eb; padding: 10px 20px; border-radius: 15px; font-size: 20px;
+}
+.btn-submit { 
+    background: var(--primary); color: white; border: none; padding: 10px 25px; 
+    border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s;
+    font-family: inherit; box-shadow: 0 4px 0 var(--primary-dark);
+}
+.btn-submit:active { transform: translateY(4px); box-shadow: none; }
+
+/* --- LAYOUT CHIA CỘT TỐI ƯU --- */
+.container { 
+    display: flex; 
+    height: calc(100vh - var(--header-h) - var(--footer-h)); 
+    width: 100%; max-width: 100%;
+    margin: 0 auto;
+}
+
+.pane {
+    flex: 1; padding: 40px 50px; overflow-y: auto;
+    position: relative; scroll-behavior: smooth;
+}
+.pane-left { 
+    background: #fff; border-right: 2px solid var(--border); 
+    font-size: 19px; line-height: 2; text-align: justify; color: #444;
+}
+.pane-right { background: #fafbfc; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: #d0d6cc; border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+        /* --- GIẢI THÍCH CHI TIẾT (EXPLANATION BOX) --- */
+.exp-box {
+    display: none; background: var(--exp-bg); border-left: 5px solid var(--primary);
+    padding: 20px; margin-top: 15px; border-radius: 0 12px 12px 0; width: 100%;
+    font-size: 17px; line-height: 1.8; color: #333; animation: slideIn 0.4s;
+}
+.exp-box.show { display: block; }
+.exp-title { font-weight: 700; color: var(--primary-dark); margin-bottom: 10px; font-size: 19px; display: flex; align-items: center; gap: 8px; }
+.exp-quote { font-style: italic; background: white; padding: 10px 15px; border-radius: 8px; color: #555; margin-bottom: 12px; border: 1px dashed #c1d5a4; }
+.exp-text { margin-bottom: 10px; }
+.exp-vocab { font-size: 16px; color: #6a8a3a; background: #e8f5e9; padding: 10px; border-radius: 8px; }
+.exp-vocab b { color: #2e7d32; }
+
+@keyframes slideIn { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+/* --- HIỆU ỨNG NHẤP NHÁY DẪN CHỨNG --- */
+.focus-blink {
+    background-color: #ffeb3b !important; /* Màu vàng sáng */
+    color: #000 !important;
+    border-radius: 4px;
+    box-shadow: 0 0 8px rgba(255, 235, 59, 0.8);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+.evIdence-text {
+    transition: all 0.3s ease; /* Hiệu ứng mượt mà khi đổi màu */
+}
+        /* --- HIGHLIGHT --- */
+.highlight { 
+    background-color: var(--highlight); 
+    cursor: pointer; 
+    border-radius: 4px; 
+    padding: 2px 0; 
+    transition: 0.2s;
+}
+.highlight:hover {
+    background-color: #fff176; /* Đậm hơn một chút khi di chuột vào để dễ xóa */
+}
+/* --- NÚT ĐIỀU HƯỚNG TRÊN HEADER --- */
+.btn-toggle-nav {
+    background: #fff0eb; color: #d87059; border: none; padding: 10px 20px;
+    border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s;
+    font-family: inherit;
+}
+.btn-toggle-nav:hover { background: #ffe4d6; transform: translateY(-2px); }
+
+/* --- DROPDOWN MENU CÂU HỎI --- */
+.nav-panel {
+    position: fixed; top: 80px; right: 30px; width: 340px;
+    background: white; border: 2px solid var(--border); border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 999;
+    opacity: 0; visibility: hidden; transform: translateY(-15px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex; flex-direction: column;
+}
+.nav-panel.show { opacity: 1; visibility: visible; transform: translateY(0); }
+
+.nav-panel-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 15px 20px; border-bottom: 2px solid var(--border); background: #fafbfc;
+    border-radius: 13px 13px 0 0;
+}
+.nav-panel-header h3 { margin: 0; font-size: 16px; color: var(--primary-dark); font-family: 'Quicksand', sans-serif;}
+.nav-panel-header button { background: none; border: none; font-size: 20px; cursor: pointer; color: #888; padding: 0; transition: 0.2s;}
+.nav-panel-header button:hover { color: var(--wrong); transform: scale(1.1);}
+
+.nav-scroller {
+    padding: 15px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+    max-height: 60vh; overflow-y: auto;
+}
+.nav-scroller::-webkit-scrollbar { width: 6px; }
+.nav-scroller::-webkit-scrollbar-thumb { background: #d0d6cc; border-radius: 3px; }
+
+.nav-dot {
+    width: 100%; aspect-ratio: 1; border: 2px solid #eee; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600;
+    cursor: pointer; color: #999; background: white; transition: 0.2s;
+}
+.nav-dot:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px);}
+.nav-dot.done { background: #edf2ea; color: var(--primary-dark); border-color: #c1d5a4; }
+/* --- CSS CHO CÁC BẢNG THÔNG BÁO (MODAL/OVERLAY) --- */
+.custom-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    display: none; /* JS sẽ đổi thành flex khi cần hiện */
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.custom-modal {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 450px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+.mode-btn {
+    display: block;
+    width: 100%;
+    margin: 15px 0;
+    padding: 12px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    background: transparent;
+    font-size: 16px;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+    transition: 0.2s;
+    font-family: inherit;
+}
+
+.mode-btn:hover {
+    border-color: var(--primary);
+    background: #f1f8e9;
+}
+
+.mode-btn.selected {
+    border-color: var(--primary);
+    background: #edf2ea;
+    color: var(--primary-dark);
+}
+
+.start-btn, .btn-confirm {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    font-family: inherit;
+}
+
+.start-btn:hover, .btn-confirm:hover {
+    background: var(--primary-dark);
+}
+
+.btn-cancel {
+    background: #f1f1f1;
+    color: #555;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.btn-cancel:hover {
+    background: #e2e2e2;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 25px;
+    gap: 15px;
+}
+
+/* CSS cho tính năng Highlight chuột phải */
+.highlight {
+    background-color: var(--highlight);
+    border-radius: 3px;
+}
+/* Do đã bỏ Footer, ta kéo dài màn hình làm bài ra mức tối đa */
+.container { height: calc(100vh - var(--header-h)); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <span>SnapEnglish</span> TOEIC Reading Test 2
+        </div>
+        
+        <div class="tab-container">
+            <button class="tab-btn active" onclick="switchTab(1)">Part 5</button>
+            <button class="tab-btn" onclick="switchTab(2)">Part 6</button>
+            <button class="tab-btn" onclick="switchTab(3)">Part 7</button>
+        </div>
+
+        <div class="controls">
+    <div class="timer-box">⏱ <span id="timer">00:00</span></div>
+    <button class="btn-toggle-nav" onclick="toggleNav()">📍 Bảng câu hỏi</button>
+    <button class="btn-submit" onclick="submitTest(true)">NỘP BÀI</button>
+</div>
+    </header>
+
+    <div class="container" id="mainContainer">
+        
+        <div class="pane pane-left" id="passagePane">
+            <div id="passage-content-container">
+                <h2 style="color: #6a8a3a; text-align: center; margin-top: 50px;">Hãy chọn Part bạn muốn làm ở Header nhé!</h2>
+            </div>
+        </div>
+
+        <div class="pane pane-right">
+            <div id="q-group-1" class="question-group active">
+                <div id="render-part5"></div>
+            </div>
+
+            <div id="q-group-2" class="question-group" style="display: none;">
+                <div id="render-part6"></div>
+            </div>
+
+            <div id="q-group-3" class="question-group" style="display: none;">
+                <div id="render-part7"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-panel" id="navPanel">
+    <div class="nav-panel-header">
+        <h3>Danh sách câu hỏi</h3>
+        <button onclick="toggleNav()">✖</button>
+    </div>
+    <div class="nav-scroller" id="navPalette"></div>
+</div>
+<div id="setupOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2 style="color: var(--primary-dark); font-family: 'Lora', serif; font-size:28px;">Cài đặt bài làm ✨</h2>
+        <button class="mode-btn mode-practice" onclick="selectMode('practice')">🎯 Luyện Tập</button>
+        <button class="mode-btn mode-mock" onclick="selectMode('mock')">🏆 Thi Thử (75 phút)</button>
+        <div id="timeInputBox" style="display: none; margin: 20px 0;">
+            <label style="font-weight: bold; color: #555; font-size:18px;">Thời gian (phút): </label>
+            <input type="number" id="timeInput" value="75" min="5" max="180">
+        </div>
+        <button class="start-btn" id="startBtn" style="display: none; width: 100%; margin-top:10px;" onclick="askReady()">Bắt đầu</button>
+    </div>
+</div>
+
+<div id="startConfirmOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2 style="color: var(--primary-dark); font-family: 'Lora', serif;">Xác nhận</h2>
+        <p id="startConfirmMsg" style="font-size: 18px; line-height: 1.6; color:#555;"></p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeStartConfirmModal()">Huỷ</button>
+            <button class="btn-confirm" onclick="startTestActual()">OK</button>
+        </div>
+    </div>
+</div>
+
+<div id="confirmOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2 style="color: var(--primary-dark); font-family: 'Lora', serif;">Nộp bài</h2>
+        <p style="font-size: 18px; color:#555;">Bạn có chắc chắn muốn nộp bài?</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeConfirmModal()">Quay lại</button>
+            <button class="btn-confirm" onclick="executeSubmit()">Nộp bài</button>
+        </div>
+    </div>
+</div>
+
+<div id="resultOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2 style="color: var(--primary-dark); font-family: 'Lora', serif;">🎉 Hoàn thành!</h2>
+        <div id="resultMessage" style="margin: 20px 0; line-height:1.6;"></div>
+        <button class="btn-confirm" style="width: 100%;" onclick="closeResultModal()">Xem đáp án & Giải thích</button>
+    </div>
+</div>
+
+<div id="ctxMenu" style="position: absolute; display: none; background: white; box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-radius: 12px; z-index: 99999; overflow:hidden;">
+    <button onclick="doHighlight()" style="display:block; width:100%; padding:12px 20px; border:none; background:none; cursor:pointer; text-align:left; font-weight:600; color:#555; font-family:inherit;">🖍 Highlight (Vàng)</button>
+    <button onclick="removeHighlight()" style="display:block; width:100%; padding:12px 20px; border:none; background:none; cursor:pointer; text-align:left; font-weight:600; color:#e06666; font-family:inherit;">🗑 Xóa Highlight</button>
+</div>
+    <script>
+  const toeicData = {
+    part5: [
+      [
+  { id: 101, q: "The travel ------ will be processed as soon as they are received.", options: ["document", "documents", "documented", "documenting"], a: "documents" },
+  { id: 102, q: "------ change your seating assignment, visit the reservations page on our Web site.", options: ["For", "Across", "With", "To"], a: "To" },
+  { id: 103, q: "The president of Somchai Bank rides ------ bicycle to work every day, except when it rains.", options: ["he", "him", "his", "himself"], a: "his" },
+  { id: 104, q: "Agents who have not yet registered for next week's Insurance Excellence Forum must do so ------.", options: ["closely", "formerly", "nearly", "immediately"], a: "immediately" },
+  { id: 105, q: "Matos Realty has developed two ------ methods of identifying undervalued properties.", options: ["different", "differently", "difference", "differences"], a: "different" },
+  { id: 106, q: "Wearing lab coats and safety goggles is a ------ for all laboratory workers.", options: ["training", "fulfillment", "specialization", "requirement"], a: "requirement" },
+  { id: 107, q: "The manufacturer ------ that the filter be cleaned at least once a month for optimal performance.", options: ["remembers", "recognizes", "recommends", "registers"], a: "recommends" },
+  { id: 108, q: "Before selecting a Dagle steel door, measure the door opening ------.", options: ["careful", "caring", "carefully", "cares"], a: "carefully" },
+  { id: 109, q: "Okpara employees should contact their supervisors by 10:00 A.M. ------ they expect to miss a day of work.", options: ["if", "soon", "only", "then"], a: "if" },
+  { id: 110, q: "The director has requested a ------ of the costs of short- and long-term rental agreements.", options: ["comparable", "comparison", "compared", "comparative"], a: "comparison" },
+  { id: 111, q: "Ms. Yi of Lakesview Catering says that five trays of appetizers are more than ------ for fifty guests.", options: ["able", "numerous", "sure", "enough"], a: "enough" },
+  { id: 112, q: "Canada's Pan Rail Corporation will no longer ------ freight into the United States.", options: ["transport", "transporting", "transports", "transported"], a: "transport" },
+  { id: 113, q: "According to experts, Flash Maxe dishwashing detergent consistently delivers ------ results.", options: ["exceptionally", "exceptional", "exception", "exceptions"], a: "exceptional" },
+  { id: 114, q: "When picking up identification badges, employees need to show ------ of employment at Ekmekci Associates.", options: ["process", "analysis", "proof", "basis"], a: "proof" },
+  { id: 115, q: "Roxy Koenig is ------ seeking a new venue for her summer concert since the Hazelton Music Hall is being renovated.", options: ["actively", "activity", "active", "activate"], a: "actively" },
+  { id: 116, q: "Prospective tenants must provide at least two references ------ their application.", options: ["too", "in addition", "moreover", "along with"], a: "along with" },
+  { id: 117, q: "While Ms. Molinsky has little experience in technical support, her knowledge of computer systems is -------.", options: ["extensive", "clever", "considered", "eager"], a: "extensive" },
+  { id: 118, q: "Please refer to the attached flowchart, which describes the ------ of responsibilities among the various leadership positions.", options: ["support", "attention", "division", "statement"], a: "division" },
+  { id: 119, q: "A good project manager strives ------ communication between departments whenever possible.", options: ["to enhance", "enhances", "is enhancing", "enhanced"], a: "to enhance" },
+  { id: 120, q: "Same-day appointments can usually be scheduled, although not ------ with your usual doctor.", options: ["expectedly", "necessarily", "preventively", "permanently"], a: "necessarily" },
+  { id: 121, q: "Mr. Vieira is ------ with introducing several changes that have helped Stacatti Stationery increase business.", options: ["credited", "scored", "agreed", "relied"], a: "credited" },
+  { id: 122, q: "In the photograph, President Tang can be seen standing ------ Dr. Dervishi.", options: ["from", "reverse", "opposite", "distant"], a: "opposite" },
+  { id: 123, q: "The new location of the Bentler Company is easily ------ by car or bus.", options: ["access", "accessibly", "accessible", "accessibility"], a: "accessible" },
+  { id: 124, q: "A rise in energy prices will mostly affect businesses ------ energy consumption is high.", options: ["its", "which", "whose", "more"], a: "whose" },
+  { id: 125, q: "City officials have ------ Harmon Avenue businesses that street repairs will be completed within 48 hours.", options: ["assured", "arranged", "disclosed", "committed"], a: "assured" },
+  { id: 126, q: "Nominations for the ------ seat on the Gitterman Holdings Board of Trustees must be submitted by Friday.", options: ["approaching", "adjustable", "vacant", "united"], a: "vacant" },
+  { id: 127, q: "Our department ------ the policy meeting last Monday, but we had a scheduling conflict.", options: ["can attend", "must have attended", "should attend", "would have attended"], a: "would have attended" },
+  { id: 128, q: "------ the effectiveness of Maisey Stanton's leadership on the town council, she will likely win next week's mayoral election.", options: ["Since", "Given", "Among", "Upon"], a: "Given" },
+  { id: 129, q: "Barner Corporation's record profits resulted from the recent ------ to identify operating efficiencies.", options: ["initiative", "initiating", "initiation", "initiator"], a: "initiative" },
+  { id: 130, q: "Customers still tend to place short notices in the classified section ------ there is no longer a mandated word limit.", options: ["as if", "so that", "in case", "even though"], a: "even though" }
+];
+       part6: [
+        {
+          passageId: "p6-1",
+          passage: `<p>
+          To: Dominic Campion &lt;campion571@email.co.uk&gt;<br>From: Customer Service &lt;cust-serv@takada.co.jp&gt;<br>Date: Friday, 2 November 9:49 P.M.<br>Subject: Web site inquiry</p><p>
+                    <br>Dear Mr. Campion:<br><br>
+                    Thank you for your recent comment on our Web site about the instruction manual for the BX2000 miniature camera.<br><br>
+                    We <span id="clue-131" class="hl-peach">agree with you</span> <b>(131) ____________</b> the instructions for uploading pictures to a mobile phone are <span id="clue-132" class="hl-orange">potentially confusing</span>. <b>(132) __________</b>. Our documentation team <span id="clue-133" class="hl-yellow">has therefore revised</span> the section to clarify the type of cable and software needed in order to transfer pictures from your camera.<br><br>
+                    You can find the <b>(134) _____________</b> <span id="clue-134" class="hl-peach">version</span> of the manual in the Product Information section of our Web site, or we can send you a print version in the mail if you prefer. Delivery usually takes 1 to 2 weeks.</p><p>Sincerely,<br>Madoka Kanemitsu<br>Customer service representative<br>Takada Camera Company</p>`,
+          questions: [
+                { id: 131, options: { A: "that", B: "on", C: "what", D: "of" }, correct: "A" },
+                { id: 132, options: { A: "The BX2000 camera is one of our top-selling models.", B: "Instruction manuals can be downloaded from our Web site.", C: "We received similar feedback from other customers.", D: "We are always looking for talented staff to join our team." }, correct: "C" },
+                { id: 133, options: { A: "instead", B: "likewise", C: "therefore", D: "nevertheless" }, correct: "C" },
+                { id: 134, options: { A: "original", B: "updated", C: "absolute", D: "focused" }, correct: "B" }
+            ]
+        },
+         {
+            passageId: "p6-2",
+            passage: `<p>To: saul_ortega@jmail.net<br>From: k_morris@tknmanufacturing.com<br>Date: October 18<br>Subject: Factory Manager position</p><p>Dear Mr. Ortega,</p><p>You are officially invited to a second interview. This time, I will be meeting only with the <span id="clue-135" class="hl-peach">top candidates</span> to determine who is most <b>(135) _________</b> for the manager position. I believe you possess many of the <b>(136) _______</b> we are <span id="clue-136" class="hl-orange">looking for</span>.<br><br>
+                    I trust that you <span id="clue-137" class="hl-yellow">remain interested</span> in this job opportunity. <b>(137) _________</b> would a 1:00 P.M. appointment next Tuesday work for you? Please prepare a <span id="clue-138" class="hl-peach">proposal</span> that explains how you would increase production... <b>(138) ________</b>.
+        `,
+           questions: [
+                { id: 135, options: { A: "suiting", B: "suitable", C: "suit", D: "suits" }, correct: "B" },
+                { id: 136, options: { A: "agreements", B: "performances", C: "qualities", D: "promotions" }, correct: "C" },
+                { id: 137, options: { A: "Despite that", B: "If so", C: "However", D: "For example" }, correct: "B" },
+                { id: 138, options: { A: "I would certainly be happy to write a job reference for you.", B: "My assistant will train you in your new duties.", C: "I look forward to hearing your vision for an efficient workplace.", D: "Your new product ideas were especially informative." }, correct: "C" }
+            ]
+        },
+         {passageId: "p6-3",
+            passage: `<p><b>Do You Wear Eyeglasses? Contact Culler Solutions Today!</b></p><p>In June, Culler Solutions will be conducting a consumer study on behalf of Optometrica 21. To this end, we are <b>(139) _____</b> <span id="clue-139" class="hl-peach">eyeglass wearers</span> between the ages of 21 and 65. Participants must have a <span id="clue-141" class="hl-orange">prescription</span> that is less than two years old <b>(140) __________</b> <span id="clue-140" class="hl-yellow">the start</span> of the study. <b>(141) _________</b>.<br><br>
+                    Interested individuals are requested to fill out a short survey at cullersolutions.com/eyeglass_study. Qualified applicants will be contacted by a member of our staff. Upon <span id="clue-142" class="hl-peach">completion</span> of the study, each participant <b>(142) ________</b> a gift card valued at $100.</p>
+                `,
+              { id: 139, options: { A: "seeking", B: "insuring", C: "promoting", D: "showing" }, correct: "A" },
+                { id: 140, options: { A: "except for", B: "as", C: "because of", D: "at" }, correct: "D" },
+                { id: 141, options: { A: "We reserve the right to order discounted eyeglass frames.", B: "We will need to request a copy of the document for confirmation.", C: "We will enclose a copy of the document in the packet.", D: "We ask that you submit payment for the prescription promptly." }, correct: "B" },
+                { id: 142, options: { A: "will receive", B: "had received", C: "to receive", D: "to be received" }, correct: "A" }
+            ]
+        },
+      {passageId: "p6-4",
+            passage: `<p><b>Sunnyville Daily Times</b></p><p><b>Local News</b></p><p>(5 May)-On Monday, following a city council meeting, Mayor Tom Biel announced the introduction of training programs for aspiring city transportation workers. During the press conference, he noted the current <b>(143) _______</b> for both <span id="clue-143" class="hl-peach">drivers and mechanics</span>. <b>(144) ______</b>, he pointed to a <span id="clue-144" class="hl-orange">wave of employee retirements</span> as having triggered these urgent staffing needs. The announcement <b>(145) _______</b> <span id="clue-145" class="hl-yellow">with approval</span> by most city officials. However, Nelton District Representative Laura Ochoa was <span id="clue-146" class="hl-peach">unconvinced</span>. <b>(146) ____</b>.
+                `,
+        questions: [
+                { id: 143, options: { A: "settlement", B: "reduction", C: "demand", D: "difficulty" }, correct: "C" },
+                { id: 144, options: { A: "Specifically", B: "Undoubtedly", C: "Regardless", D: "Besides" }, correct: "A" },
+                { id: 145, options: { A: "will be meeting", B: "to meet", C: "had been meeting", D: "was met" }, correct: "D" },
+                { id: 146, options: { A: "She expects ticket prices to fall in response to complaints.", B: "She thinks the driver's license test should be more thorough.", C: "She wants to recruit workers who are already skilled.", D: "She feels it is too early to start replacing the city's buses." }, correct: "C" }
+            ]
+        }
+    ]
+
+
+
+
+
+
+     };
+// --- MODE & TIMER STATE ---
+let currentMode = '';
+let testDuration = 0; // seconds
+let timerInterval = null;
+let isSubmitted = false;
+const answerKey = {}; // Sẽ được tự động điền từ toeicData
+let allQuestionIds = []; // Lưu trữ ID để làm bảng điều hướng
+// --- TOGGLE NAVIGATION MENU ---
+function toggleNav() {
+    document.getElementById('navPanel').classList.toggle('show');
+}
+
+// Bấm ra ngoài khoảng trắng sẽ tự động đóng Menu
+document.addEventListener('click', function(e) {
+    let panel = document.getElementById('navPanel');
+    let btn = document.querySelector('.btn-toggle-nav');
+    if (panel && btn && panel.classList.contains('show') && !panel.contains(e.target) && !btn.contains(e.target)) {
+        panel.classList.remove('show');
+    }
+});
+// --- SETUP MODAL LOGIC ---
+function selectMode(mode) {
+    currentMode = mode;
+    document.querySelector('.mode-practice').classList.toggle('selected', mode === 'practice');
+    document.querySelector('.mode-mock').classList.toggle('selected', mode === 'mock');
+    
+    document.getElementById('timeInputBox').style.display = (mode === 'practice') ? 'block' : 'none';
+    document.getElementById('startBtn').style.display = 'inline-block';
+}
+
+function askReady() {
+    let confirmMsg = currentMode === 'mock' 
+        ? "Bạn chọn Thi Thử (75 phút chuẩn TOEIC Reading).\nBạn đã sẵn sàng bước vào bài làm chưa?" 
+        : `Bạn chọn Luyện Tập (${document.getElementById('timeInput').value} phút).\nBạn đã sẵn sàng chưa?`;
+        
+    document.getElementById('startConfirmMsg').innerText = confirmMsg;
+    document.getElementById('startConfirmOverlay').style.display = 'flex';
+}
+
+function closeStartConfirmModal() {
+    document.getElementById('startConfirmOverlay').style.display = 'none';
+}
+
+function startTestActual() {
+    document.getElementById('startConfirmOverlay').style.display = 'none';
+    
+    let minutes = (currentMode === 'mock') ? 75 : parseInt(document.getElementById('timeInput').value);
+    if(isNaN(minutes) || minutes < 1) minutes = 75;
+    testDuration = minutes * 60;
+    
+    document.getElementById('setupOverlay').style.display = 'none';
+    startTimer();
+}
+
+// --- HÀM TÔ MÀU DẪN CHỨNG HIỆN SẴN ---
+function applyEvidenceColors() {
+    const pastelColors = [
+        { bg: '#ffadad', text: '#5a1c1c' }, // Đỏ pastel
+        { bg: '#ffd6a5', text: '#663d14' }, // Cam pastel
+        { bg: '#caffbf', text: '#1f4d1f' }, // Xanh lá pastel
+        { bg: '#9bf6ff', text: '#16565c' }, // Xanh dương pastel
+        { bg: '#a0c4ff', text: '#1c3666' }, // Xanh biển pastel
+        { bg: '#bdb2ff', text: '#352666' }, // Tím pastel
+        { bg: '#ffc6ff', text: '#661a66' }, // Hồng pastel
+        { bg: '#e2f0cb', text: '#3e5222' }  // Xanh rêu pastel
+    ];
+
+    let colorIndex = 0;
+    let usedColors = {}; 
+
+    let evElements = document.querySelectorAll('.ev-box');
+
+    evElements.forEach(el => {
+        let idString = el.id;
+        if (!idString) return;
+        let match = idString.match(/ev-(\d+)/);
+        if (match) {
+            let qId = match[1];
+            if (!usedColors[qId]) {
+                usedColors[qId] = pastelColors[colorIndex % pastelColors.length];
+                colorIndex++;
+            }
+            el.style.backgroundColor = usedColors[qId].bg;
+            el.style.color = usedColors[qId].text;
+            el.style.padding = "2px 5px";
+            el.style.borderRadius = "6px";
+            el.style.fontWeight = "600";
+            el.style.transition = "all 0.3s ease";
+        }
+    });
+}
+
+// --- INIT ---
+window.onload = function() {
+    renderDynamicContent();
+    switchTab(1); 
+    document.getElementById('setupOverlay').style.display = 'flex';
+}
+
+// --- RENDER FUNCTIONS (Lõi xử lý TOEIC Data) ---
+function renderDynamicContent() {
+    let part5Html = '';
+    let part6Html = '';
+    let part7Html = '';
+    let leftPaneHtml = ''; // Biến lưu toàn bộ bài đọc để nhét sang cột trái
+
+    // 1. Render Part 5
+    if(toeicData.part5) {
+        part5Html += `<div class="instruction" style="background:#e8f5e9; color:#2e7d32; padding:15px; border-radius:12px; margin-bottom:25px; font-weight:bold;"> <u>Part 5: Incomplete Sentences</u><br>Choose the word or phrase that best completes the sentence.</div>`;
+        toeicData.part5.forEach(q => {
+            part5Html += createTOEICQuestion(q);
+            allQuestionIds.push(q.id);
+            answerKey[q.id] = formatAnswer(q.options, q.a || q.correct);
+        });
+        document.getElementById('render-part5').innerHTML = part5Html;
+    }
+
+    // 2. Render Part 6
+    if(toeicData.part6) {
+        part6Html += `<div class="instruction" style="background:#e8f5e9; color:#2e7d32; padding:15px; border-radius:12px; margin-bottom:25px; font-weight:bold;"> <u>Part 6: Text Completion</u><br>Choose the best word or phrase for each blank.</div>`;
+        toeicData.part6.forEach(passageObj => {
+            leftPaneHtml += `<div id="passage-${passageObj.passageId}" class="passage-text-content" style="display:none; margin-bottom: 30px;">${passageObj.passage}</div>`;
+            part6Html += createQuestionsBlock(passageObj);
+        });
+        document.getElementById('render-part6').innerHTML = part6Html;
+    }
+
+    // 3. Render Part 7
+    if(toeicData.part7) {
+        part7Html += `<div class="instruction" style="background:#e8f5e9; color:#2e7d32; padding:15px; border-radius:12px; margin-bottom:25px; font-weight:bold;"> <u>Part 7: Reading Comprehension</u><br>Read the passages and answer the questions.</div>`;
+        toeicData.part7.forEach(passageObj => {
+            leftPaneHtml += `<div id="passage-${passageObj.passageId}" class="passage-text-content" style="display:none; margin-bottom: 30px;">${passageObj.passage}</div>`;
+            part7Html += createQuestionsBlock(passageObj);
+        });
+        document.getElementById('render-part7').innerHTML = part7Html;
+    }
+
+    // Đổ nội dung bài đọc vào cột trái
+    document.getElementById('passage-content-container').innerHTML += leftPaneHtml;
+
+    // 4. Khởi tạo Footer Navigation Dots
+    const nav = document.getElementById("navPalette");
+    // Lọc bỏ undefined nếu mảng bị lỗi
+    allQuestionIds = allQuestionIds.filter(id => id); 
+    allQuestionIds.sort((a, b) => a - b);
+    allQuestionIds.forEach(id => {
+        let dot = document.createElement("div");
+        dot.className = "nav-dot"; 
+        dot.id = `nav-${id}`; 
+        dot.innerText = id;
+        dot.onclick = () => scrollToQuestion(id);
+        nav.appendChild(dot);
+    });
+
+    // --- GỌI HÀM TÔ MÀU DẪN CHỨNG Ở ĐÂY ---
+    applyEvidenceColors(); 
+}
+
+// Helper: Chuyển đáp án Text thành A, B, C, D
+function formatAnswer(options, answer) {
+    if(!options) return answer;
+    if(Array.isArray(options)) {
+        let labels = ["A", "B", "C", "D"];
+        let idx = options.indexOf(answer);
+        return idx !== -1 ? labels[idx] : answer;
+    }
+    return answer; 
+}
+
+// Helper: Tạo HTML cho 1 câu hỏi trắc nghiệm
+function createTOEICQuestion(qObj) {
+    if(!qObj || !qObj.id) return ""; // Bypass lỗi nếu cấu trúc data sai
+    let text = qObj.q || qObj.text || "";
+    let opts = qObj.options;
+    let optsHTML = "";
+
+    let inputStyle = `margin-right:12px; transform:scale(1.3); cursor:pointer;`;
+    let labelStyle = `display:block; margin:10px 0; padding:12px; border-radius:10px; cursor:pointer; border:1px solid transparent; transition:0.2s; font-size:18px;`;
+
+    if (Array.isArray(opts)) {
+        let labels = ["A", "B", "C", "D"];
+        opts.forEach((opt, i) => {
+            optsHTML += `<label class="mc-option" style="${labelStyle}" onmouseover="this.style.background='#edf2ea'" onmouseout="this.style.background='transparent'"><input type="radio" name="q${qObj.id}" value="${labels[i]}" style="${inputStyle}" onclick="checkNav(${qObj.id})"> <b>${labels[i]}.</b> ${opt}</label>`;
+        });
+    } else {
+        for (let key in opts) {
+            optsHTML += `<label class="mc-option" style="${labelStyle}" onmouseover="this.style.background='#edf2ea'" onmouseout="this.style.background='transparent'"><input type="radio" name="q${qObj.id}" value="${key}" style="${inputStyle}" onclick="checkNav(${qObj.id})"> <b>${key}.</b> ${opts[key]}</label>`;
+        }
+    }
+
+    return `<div class="q-row" id="q-row-${qObj.id}" style="margin-bottom:25px; display:flex;">
+                <div class="q-num" style="min-width:35px; height:35px; background:#7FA99B; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; margin-right:15px; flex-shrink:0;">${qObj.id}</div>
+                <div class="q-text" style="flex:1; font-size:18px; line-height:1.8;">
+                    <b>${text}</b><br>${optsHTML}
+                    <span id="fb-${qObj.id}" class="feedback" style="font-weight:bold; margin-left:10px;"></span>
+                    <div id="exp-${qObj.id}"></div>
+                </div>
+            </div>`;
+}
+
+// Helper: Gom nhóm câu hỏi cho Part 6 & 7 (Cột phải)
+function createQuestionsBlock(passageObj) {
+    // Thêm onmouseenter để tự động hiện đoạn văn tương ứng bên cột trái khi cuộn chuột vào câu hỏi
+    let html = `<div class="questions-block" style="margin-bottom: 40px; background: white; padding: 25px; border-radius: 12px; border: 2px solid var(--border); box-shadow:0 4px 10px rgba(0,0,0,0.02);" onmouseenter="showPassage('${passageObj.passageId}')">`;
+    html += `<div style="color:var(--primary); font-weight:bold; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">📝 Questions for Passage: ${passageObj.passageId}</div>`;
+    
+    // Fix lỗi cú pháp cho passage p7-13 & p7-14 của bạn
+    let validQuestions = passageObj.questions.filter(q => q && q.id); 
+
+    validQuestions.forEach(q => {
+        html += createTOEICQuestion(q);
+        allQuestionIds.push(q.id);
+        answerKey[q.id] = formatAnswer(q.options, q.a || q.correct);
+    });
+    html += `</div>`;
+    return html;
+}
+
+// --- LOGIC GIAO DIỆN & ĐIỀU HƯỚNG ---
+function switchTab(n) {
+    document.querySelectorAll('.tab-btn').forEach((b, i) => { b.classList.toggle('active', i + 1 === n); });
+    document.querySelectorAll('.question-group').forEach((q, i) => { q.style.display = (i + 1 === n) ? 'block' : 'none'; });
+    
+    // Ẩn tất cả đoạn văn
+    document.querySelectorAll('.passage-text-content').forEach(p => p.style.display = 'none');
+
+    let passagePane = document.getElementById('passagePane');
+    let introText = document.getElementById('passage-content-container').querySelector('h2');
+    
+    if(n === 1) {
+        if(introText) introText.innerHTML = `Part 5: Incomplete Sentences<br><br><span style="font-size:18px; color:#555; font-weight:normal;">👉 Hãy đọc kỹ và chọn đáp án đúng bên cột phải nhé!</span>`;
+    } else {
+        if(introText) introText.innerHTML = `Passage<br><span style="font-size:18px; color:#888; font-weight:normal;">(Cuộn chuột vào nhóm câu hỏi bên phải để xem đoạn văn tương ứng)</span>`;
+    }
+    
+    document.querySelector('.pane-left').scrollTop = 0;
+    document.querySelector('.pane-right').scrollTop = 0;
+}
+
+// Hiển thị đoạn văn tương ứng bên cột trái
+function showPassage(passageId) {
+    document.querySelectorAll('.passage-text-content').forEach(p => p.style.display = 'none');
+    let p = document.getElementById(`passage-${passageId}`);
+    if (p) p.style.display = 'block';
+}
+
+function checkNav(id) {
+    if(isSubmitted) return;
+    let val = "";
+    let radios = document.getElementsByName(`q${id}`);
+    for (let r of radios) if (r.checked) val = r.value;
+
+    let nav = document.getElementById(`nav-${id}`);
+    if(nav) {
+        if (val) nav.classList.add("done");
+        else nav.classList.remove("done");
+    }
+}
+
+function scrollToQuestion(id) {
+    document.getElementById('navPanel').classList.remove('show'); // Dòng chèn thêm
+    let group = 1;
+    if (toeicData.part6.some(p => p.questions.some(q => q.id == id))) group = 2;
+    if (toeicData.part7.some(p => p.questions.some(q => q.id == id))) group = 3;
+    
+    switchTab(group);
+    
+    setTimeout(() => {
+        let el = document.getElementById(`q-row-${id}`);
+        if (el) {
+            el.scrollIntoView({behavior: "smooth", block: "center"});
+            el.style.transition = "background 0.5s";
+            el.style.background = "#fff9c4";
+            setTimeout(() => el.style.background = "transparent", 1000);
+            
+            // Kích hoạt hiển thị đoạn văn luôn
+            let parentBlock = el.closest('.questions-block');
+            if(parentBlock) {
+                // Kích hoạt event onmouseenter bằng code
+                let mouseEvent = new MouseEvent('mouseenter');
+                parentBlock.dispatchEvent(mouseEvent);
+            }
+        }
+    }, 100);
+}
+
+// --- TIMER ---
+function startTimer() {
+    let display = document.getElementById("timer");
+    timerInterval = setInterval(function () {
+        let m = Math.floor(testDuration / 60);
+        let s = testDuration % 60;
+        display.textContent = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+        if (--testDuration < 0) { 
+            clearInterval(timerInterval); 
+            submitTest(false); 
+        }
+    }, 1000);
+}
+// --- HÀM CUỘN VÀ TẠO HIỆU ỨNG NHẤN MẠNH ---
+function scrollToEvidence(evId) {
+    const evElement = document.getElementById(evId);
+    if(evElement) {
+        // Cuộn đoạn văn chứa dẫn chứng vào giữa màn hình
+        evElement.scrollIntoView({behavior: "smooth", block: "center"});
+        
+        // Tạo hiệu ứng phát sáng viền để thu hút sự chú ý mà không đè mất màu pastel
+        let originalBoxShadow = evElement.style.boxShadow || "none";
+        
+        // Làm nổi bật bằng shadow viền xám đậm
+        evElement.style.boxShadow = "0 0 0 3px rgba(0,0,0,0.4), 0 4px 10px rgba(0,0,0,0.2)";
+        evElement.style.transform = "scale(1.02)";
+        evElement.style.display = "inline-block";
+        
+        // Tắt nổi bật sau 1.5 giây
+        setTimeout(() => {
+            evElement.style.boxShadow = originalBoxShadow;
+            evElement.style.transform = "scale(1)";
+        }, 1500);
+    } else {
+        alert("Chưa được gắn ID dẫn chứng trong bài đọc!");
+    }
+}
+// --- GRADING ---
+function submitTest(manual) {
+    if (isSubmitted) return;
+    if (manual) document.getElementById('confirmOverlay').style.display = 'flex';
+    else executeSubmit();
+}
+
+function closeConfirmModal() { document.getElementById('confirmOverlay').style.display = 'none'; }
+function closeResultModal() { document.getElementById('resultOverlay').style.display = 'none'; }
+
+function executeSubmit() {
+    document.getElementById('confirmOverlay').style.display = 'none';
+    isSubmitted = true;
+    clearInterval(timerInterval);
+    document.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    
+    let score = 0;
+    let totalQuestions = allQuestionIds.length;
+
+    allQuestionIds.forEach(id => {
+        let userAns = "";
+        let radios = document.getElementsByName(`q${id}`);
+        for (let r of radios) if (r.checked) userAns = r.value;
+
+        let correctAns = answerKey[id];
+        let isCorrect = (userAns === correctAns);
+        if (isCorrect) score++;
+
+        let feedbackEl = document.getElementById(`fb-${id}`);
+        if(feedbackEl) {
+            if(isCorrect) {
+                feedbackEl.innerHTML = `<span style="color:var(--correct);">✓ Đúng</span>`;
+            } else {
+                feedbackEl.innerHTML = `<span style="color:var(--wrong);">✗ Sai (Đáp án: <span style="background:#dce775; color:#333; padding:2px 5px; border-radius:4px;">${correctAns}</span>)</span>`;
+            }
+        }
+        
+        let nav = document.getElementById(`nav-${id}`);
+        if(nav) {
+            nav.style.background = isCorrect ? "#c8e6c9" : "#ffcdd2";
+            nav.style.color = isCorrect ? "#2e7d32" : "#c62828";
+            nav.style.borderColor = isCorrect ? "#81c784" : "#ef9a9a";
+        }
+
+        
+        let expContainer = document.getElementById(`exp-${id}`);
+        if(expContainer && explanations[id]) {
+            let expData = explanations[id];
+            let quoteHtml = expData.quote ? `<div class="exp-quote">"${expData.quote}"</div>` : '';
+            let vocabHtml = expData.vocab ? `<div class="exp-vocab">${expData.vocab}</div>` : '';
+            let tipHtml = expData.tip ? `<div style="margin-top:8px; color:#d87059; font-weight:600;">📌 Mẹo: ${expData.tip}</div>` : '';
+            let evHtml = expData.evId ? `<button onclick="scrollToEvidence('${expData.evId}')" style="margin-top:12px; background:#fff9c4; border:1px solid #fbc02d; color:#f57f17; padding:8px 15px; border-radius:8px; cursor:pointer; font-weight:700; font-family:inherit; font-size:15px; transition:0.2s;" onmouseover="this.style.background='#fff59d'" onmouseout="this.style.background='#fff9c4'">🔍 Xem dẫn chứng trong bài</button>` : '';
+            
+            expContainer.innerHTML = `
+                <div class="exp-box show">
+                    <div class="exp-title">💡 Giải thích chi tiết Câu ${id}</div>
+                    ${quoteHtml}
+                    <div class="exp-text">${expData.exp}</div>
+                    ${vocabHtml}
+                    ${tipHtml}
+                    ${evHtml} </div>
+            `;
+        }
+    });
+
+    let toeicScore = calculateToeicReading(score, totalQuestions);
+    document.getElementById('resultMessage').innerHTML = `
+        <strong style="font-size: 20px; color: #555; display: block; margin-bottom: 10px;">Số câu đúng: ${score}/${totalQuestions}</strong>
+        <strong style="font-size: 32px; color: var(--primary);">Điểm Reading ước lượng: ${toeicScore}/495</strong>
+    `;
+    setTimeout(() => { document.getElementById('resultOverlay').style.display = 'flex'; }, 500);
+}
+
+function calculateToeicReading(raw, total) {
+    if (raw === 0) return 5;
+    let percent = raw / total;
+    let score = Math.round((percent * 495) / 5) * 5; 
+    return score > 495 ? 495 : (score < 5 ? 5 : score);
+}
+
+// --- HIGHLIGHT SYSTEM ---
+const mainContainer = document.getElementById("mainContainer");
+const menu = document.getElementById("ctxMenu");
+let targetElement = null;
+let selectedRange = null;
+
+// Chuyển menu sang fixed để bám đúng con trỏ chuột dù đang cuộn ở cột nào
+menu.style.position = "fixed";
+
+mainContainer.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    targetElement = null; selectedRange = null;
+    
+    // Nếu click chuột phải vào vùng đã highlight -> Hiện nút Xóa
+    if (e.target.classList.contains("highlight")) {
+        targetElement = e.target;
+        showMenu(e.clientX, e.clientY, "remove");
+        return;
+    }
+    
+    // Nếu bôi đen văn bản mới -> Hiện nút Thêm
+    let sel = window.getSelection();
+    if (sel.toString().trim().length > 0 && mainContainer.contains(sel.anchorNode)) {
+        selectedRange = sel.getRangeAt(0);
+        showMenu(e.clientX, e.clientY, "add");
+    } else {
+        menu.style.display = "none";
+    }
+});
+
+// Bấm chuột trái ra ngoài thì ẩn menu
+document.addEventListener("click", (e) => { 
+    if (menu && !menu.contains(e.target)) menu.style.display = "none"; 
+});
+
+function showMenu(x, y, mode) {
+    menu.style.display = "block";
+    let mw = menu.offsetWidth;
+    let mh = menu.offsetHeight;
+    
+    // Chống tràn màn hình
+    let left = x + mw > window.innerWidth ? window.innerWidth - mw - 10 : x;
+    let top = y + mh > window.innerHeight ? window.innerHeight - mh - 10 : y;
+    
+    menu.style.left = left + "px";
+    menu.style.top = top + "px";
+    
+    menu.children[0].style.display = (mode === "add") ? "block" : "none";
+    menu.children[1].style.display = (mode === "remove") ? "block" : "none";
+}
+
+function doHighlight() {
+    if (selectedRange) {
+        try { 
+            let span = document.createElement("span");
+            span.className = "highlight";
+            selectedRange.surroundContents(span); 
+        } catch(e) {
+            // Cảnh báo nếu người dùng bôi đen vắt ngang qua 2 đoạn văn (xuống dòng)
+            alert("Lưu ý: Chỉ có thể bôi vàng các cụm từ nằm trong cùng một đoạn văn. Vui lòng không bôi đen vắt ngang qua các khoảng ngắt dòng nhé!");
+        }
+        window.getSelection().removeAllRanges();
+    }
+    menu.style.display = "none";
+}
+
+function removeHighlight() {
+    if (targetElement) {
+        let text = document.createTextNode(targetElement.textContent);
+        targetElement.parentNode.replaceChild(text, targetElement);
+        mainContainer.normalize(); // Nối lại văn bản liền mạch
+    }
+    menu.style.display = "none";
+}
+</script>
+
+</body>
+</html>
