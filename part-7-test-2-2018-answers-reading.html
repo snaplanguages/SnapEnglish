@@ -1926,56 +1926,58 @@ Sole Assortment will serve women who work in the surrounding area.</span> Becaus
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Lấy dữ liệu người dùng đã lưu
+        // Lấy dữ liệu đáp án người dùng đã lưu từ trang Test
         const savedAnswersJSON = localStorage.getItem('snapEnglish_userAnswers');
         
         if (savedAnswersJSON) {
             const userAnswers = JSON.parse(savedAnswersJSON);
-            const answerCards = document.querySelectorAll('.answer-card');
-            
-            // Mảng đáp án đúng để đối chiếu
-            const correctAnswers = [
-                "recommendation", "appointment", "eligible", "required", "confirmation",
-                "us", "early", "returned", "automatically", "project",
-                "who", "proposed", "within", "leaves", "similar",
-                "promote", "easily", "beginning", "very", "before",
-                "participation", "factor", "regarding", "creatively", "submit",
-                "themselves", "clearly", "While", "as soon as", "compliance"
-            ];
+            const expBoxes = document.querySelectorAll('.exp-box');
 
-            answerCards.forEach((card, index) => {
-                const userAnswer = userAnswers[index];
-                const correctAnswer = correctAnswers[index];
+            expBoxes.forEach((box) => {
+                const qNumberElement = box.querySelector('.q-number');
+                const ansTextElement = box.querySelector('.ans-text');
                 
-                // Tạo thẻ hiển thị kết quả của người dùng
-                const resultDiv = document.createElement('div');
-                resultDiv.style.margin = "10px 0 20px 0";
-                resultDiv.style.fontWeight = "700";
-                resultDiv.style.padding = "12px 15px";
-                resultDiv.style.borderRadius = "8px";
-                resultDiv.style.fontSize = "16px";
-                resultDiv.style.display = "inline-block";
+                if (qNumberElement && ansTextElement) {
+                    // Lấy số thứ tự câu hỏi (ví dụ "Câu 147" -> 147)
+                    const qId = parseInt(qNumberElement.innerText.replace(/\D/g, '')); 
+                    
+                    // Tự động quét và lấy đáp án đúng (A, B, C, D) từ thẻ HTML
+                    const correctAnswerMatch = ansTextElement.innerText.match(/\(([A-D])\)/);
+                    const correctAnswer = correctAnswerMatch ? correctAnswerMatch[1] : null;
+                    
+                    const userAnswer = userAnswers[qId];
+                    
+                    // Chỉ tạo thẻ hiển thị nếu quét được đáp án
+                    if (correctAnswer) {
+                        const resultDiv = document.createElement('div');
+                        resultDiv.style.margin = "15px 0 10px 0";
+                        resultDiv.style.fontWeight = "700";
+                        resultDiv.style.padding = "10px 15px";
+                        resultDiv.style.borderRadius = "8px";
+                        resultDiv.style.fontSize = "15px";
+                        resultDiv.style.display = "inline-block";
 
-                if (!userAnswer) {
-                    resultDiv.innerHTML = "Bạn chưa chọn đáp án ⚪";
-                    resultDiv.style.backgroundColor = "#f1f3f5";
-                    resultDiv.style.color = "#6c757d";
-                    resultDiv.style.border = "1px solid #dee2e6";
-                } else if (userAnswer === correctAnswer) {
-                    resultDiv.innerHTML = `Bạn đã chọn: <strong>${userAnswer}</strong> <span>✅ Đúng</span>`;
-                    resultDiv.style.backgroundColor = "#e8f5e9"; // Xanh pastel
-                    resultDiv.style.color = "#2e7d32";
-                    resultDiv.style.border = "1px solid #c8e6c9";
-                } else {
-                    resultDiv.innerHTML = `Bạn đã chọn: <strong>${userAnswer}</strong> <span>❌ Sai</span>`;
-                    resultDiv.style.backgroundColor = "#ffebee"; // Đỏ pastel
-                    resultDiv.style.color = "#c62828";
-                    resultDiv.style.border = "1px solid #ffcdd2";
+                        if (!userAnswer) {
+                            resultDiv.innerHTML = "Bạn chưa chọn đáp án ⚪";
+                            resultDiv.style.backgroundColor = "#f1f3f5";
+                            resultDiv.style.color = "#6c757d";
+                            resultDiv.style.border = "1px solid #dee2e6";
+                        } else if (userAnswer === correctAnswer) {
+                            resultDiv.innerHTML = `Bạn đã chọn: <strong>(${userAnswer})</strong> <span style="margin-left: 8px;">✅ Đúng</span>`;
+                            resultDiv.style.backgroundColor = "#e8f5e9"; 
+                            resultDiv.style.color = "#2e7d32";
+                            resultDiv.style.border = "1px solid #c8e6c9";
+                        } else {
+                            resultDiv.innerHTML = `Bạn đã chọn: <strong>(${userAnswer})</strong> <span style="margin-left: 8px;">❌ Sai</span>`;
+                            resultDiv.style.backgroundColor = "#ffebee"; 
+                            resultDiv.style.color = "#c62828";
+                            resultDiv.style.border = "1px solid #ffcdd2";
+                        }
+                        
+                        // Chèn kết quả vào ngay dưới thẻ chứa đáp án đúng
+                        ansTextElement.parentNode.insertBefore(resultDiv, ansTextElement.nextSibling);
+                    }
                 }
-                
-                // Chèn kết quả vào ngay trước thẻ giải thích
-                const explanationBox = card.querySelector('.explanation-box');
-                card.insertBefore(resultDiv, explanationBox);
             });
         }
     });
