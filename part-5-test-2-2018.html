@@ -197,6 +197,52 @@
         .hidden {
             display: none !important;
         }
+        /* --- OVERLAYS & MODALS (POPUP) --- */
+        .custom-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 99999;
+        }
+        .custom-modal {
+            background: white; padding: 40px; border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            width: 90%; max-width: 450px; text-align: center;
+            border: 2px solid #ffcdd2;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-family: 'Nunito', sans-serif;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .custom-modal h2 { color: #d88c9a; font-size: 26px; margin-top: 0; }
+        
+        #timeInputBox { margin: 30px 0; }
+        #timeInput { 
+            width: 100px; padding: 10px; font-size: 18px; text-align: center; 
+            border: 2px solid #e1e8ed; border-radius: 10px; font-family: inherit; outline: none;
+        }
+        
+        .modal-actions { display: flex; gap: 15px; margin-top: 25px; justify-content: center; }
+        .btn-cancel {
+            background: #f1f3f5; color: #666; border: none; padding: 12px 20px;
+            border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; flex: 1;
+        }
+        .btn-confirm {
+            background: #ffb4a2; color: white; border: none; padding: 12px 20px;
+            border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; flex: 1;
+        }
+        .start-btn {
+            background: #ffb4a2; color: white; border: none; padding: 12px 35px;
+            border-radius: 50px; font-size: 18px; font-weight: 700; cursor: pointer;
+            margin-top: 20px; box-shadow: 0 5px 15px rgba(229, 152, 155, 0.4);
+        }
+        .timer-box {
+            font-size: 18px; font-weight: 700; color: #d88c9a;
+            background: #fff0f3; padding: 6px 15px; border-radius: 15px;
+            border: 2px solid #ffe3e3; margin-left: 15px;
+        }
     </style>
 </head>
 <body>
@@ -204,7 +250,10 @@
 <div class="quiz-container" id="quiz-app">
     <div id="question-container">
         <div class="header">
-            <h2 class="title">Part 5 Practice - Test 2</h2>
+            <div style="display: flex; align-items: center;">
+                <h2 class="title">Part 5 Practice</h2>
+                <div class="timer-box">⏱ <span id="timer">00:00</span></div>
+            </div>
             <div class="progress" id="progress-text">Câu 1 / 30</div>
         </div>
         
@@ -214,11 +263,46 @@
         
         <div class="options" id="options-container">
         </div>
+        <div id="setupOverlay" class="custom-overlay" style="display: flex;">
+    <div class="custom-modal">
+        <h2>Chào mừng đến với Part 5 ✨</h2>
+        <p style="font-size: 18px; color: #666; margin-bottom: 20px;">Hãy cài đặt thời gian để bắt đầu luyện tập nhé!</p>
+        
+        <div id="timeInputBox">
+            <label style="font-size: 18px; font-weight: bold; color: #555;">Thời gian (phút): </label>
+            <input type="number" id="timeInput" value="15" min="1" max="60">
+        </div>
+        
+        <button class="start-btn" onclick="askReady()">Sẵn sàng (OK)</button>
+    </div>
+</div>
 
+<div id="startConfirmOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2>Xác nhận bắt đầu</h2>
+        <p id="startConfirmMsg" style="font-size: 18px; color: #555; margin-bottom: 20px; white-space: pre-line;"></p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeStartConfirmModal()">Huỷ</button>
+            <button class="btn-confirm" onclick="startTestActual()">OK</button>
+        </div>
+    </div>
+</div>
+
+<div id="confirmOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2>Xác nhận nộp bài</h2>
+        <p style="font-size: 18px; color: #555; margin-bottom: 10px;">Bạn có chắc chắn muốn nộp bài để xem đáp án và điểm số không?</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeConfirmModal()">Quay lại</button>
+            <button class="btn-confirm" onclick="submitQuiz()">Nộp bài</button>
+        </div>
+    </div>
+</div>
+<script>
         <div class="controls">
             <button class="btn btn-prev hidden" id="btn-prev" onclick="prevQuestion()">Quay lại</button>
             <button class="btn btn-next" id="btn-next" onclick="nextQuestion()">Tiếp theo</button>
-            <button class="btn btn-submit" id="btn-submit" onclick="submitQuiz()">Nộp bài</button>
+            <button class="btn btn-submit" id="btn-submit" onclick="askSubmit()">Nộp bài</button>
         </div>
     </div>
 
@@ -263,7 +347,55 @@
         { q: "Barner Corporation's record profits resulted from the recent ------ to identify operating efficiencies.", options: ["initiative", "initiating", "initiation", "initiator"], a: "initiative" },
         { q: "Customers still tend to place short notices in the classified section ------ there is no longer a mandated word limit.", options: ["as if", "so that", "in case", "even though"], a: "even though" }
     ];
+let testDuration = 0;
+    let timerInterval = null;
+    let isSubmitted = false;
+    function askReady() {
+        let minutes = parseInt(document.getElementById('timeInput').value);
+        if(isNaN(minutes) || minutes < 1) minutes = 15; // Part 5 mặc định gợi ý 15p
 
+        let confirmMsg = `Bạn đã cài đặt thời gian làm bài là ${minutes} phút.\nBạn đã chuẩn bị tinh thần chưa?`;
+        
+        document.getElementById('startConfirmMsg').innerText = confirmMsg;
+        document.getElementById('startConfirmOverlay').style.display = 'flex';
+    }
+
+    function closeStartConfirmModal() {
+        document.getElementById('startConfirmOverlay').style.display = 'none';
+    }
+
+    function startTestActual() {
+        document.getElementById('startConfirmOverlay').style.display = 'none';
+        document.getElementById('setupOverlay').style.display = 'none';
+        
+        let minutes = parseInt(document.getElementById('timeInput').value);
+        if(isNaN(minutes) || minutes < 1) minutes = 15;
+        testDuration = minutes * 60;
+        
+        startTimer();
+    }
+
+    function startTimer() {
+        let display = document.getElementById("timer");
+        timerInterval = setInterval(() => {
+            let m = Math.floor(testDuration / 60);
+            let s = testDuration % 60;
+            display.textContent = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+            if (--testDuration < 0) { 
+                clearInterval(timerInterval); 
+                submitQuiz(); // Hết giờ tự động nộp
+            }
+        }, 1000);
+    }
+
+    function askSubmit() {
+        if (isSubmitted) return;
+        document.getElementById('confirmOverlay').style.display = 'flex';
+    }
+
+    function closeConfirmModal() {
+        document.getElementById('confirmOverlay').style.display = 'none';
+    }
     let currentQuestionIndex = 0;
     const userAnswers = new Array(questions.length).fill(null);
 
@@ -327,6 +459,9 @@
     }
 
     function submitQuiz() {
+        document.getElementById('confirmOverlay').style.display = 'none';
+        isSubmitted = true;
+        clearInterval(timerInterval);
         let correctCount = 0;
         for (let i = 0; i < questions.length; i++) {
             if (userAnswers[i] === questions[i].a) {
