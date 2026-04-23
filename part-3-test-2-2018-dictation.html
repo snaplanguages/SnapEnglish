@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 3 Test 2 | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* TÔNG MÀU MỚI: Ocean Blue & Coral */
+        :root {
+            --primary: #0284C7;         /* Light Blue 600 */
+            --primary-hover: #0369A1;   /* Light Blue 700 */
+            --secondary: #E0F2FE;       /* Light Blue 100 */
+            --accent: #F97316;          /* Orange 500 (Coral) */
+            --blue-pastel: #F0F9FF;     /* Sky 50 */
+            --blue-dark: #0C4A6E;       /* Sky 900 */
+            --text-dark: #0F172A;       /* Slate 900 */
+            --text-light: #475569;      /* Slate 600 */
+            --bg-main: #F8FAFC;         /* Slate 50 */
+            --white: #FFFFFF;
+            --brand-pink: #F97316;      /* Coral cho Logo SnapEnglish */
+            --brand-text: #0F172A;
+            --error-glow: #E11D48;      /* Đỏ Rose 600 cho lỗi */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Quicksand', sans-serif; }
+
+        body {
+            background: var(--bg-main);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .layout-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+        .brand-badge {
+            background-color: var(--brand-pink);
+            color: var(--white);
+            font-weight: 800;
+            font-size: 26px;
+            padding: 8px 20px;
+            border-radius: 15px;
+            letter-spacing: -0.5px;
+        }
+        .brand-title {
+            color: var(--brand-text);
+            font-weight: 800;
+            font-size: 30px;
+            letter-spacing: -0.5px;
+        }
+
+        /* Giao diện mở rộng toàn màn hình */
+        .layout-container {
+            display: flex;
+            gap: 25px;
+            width: 100%;
+            height: 85vh;
+            min-height: 600px;
+        }
+
+        .sidebar {
+            flex: 1;
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(2, 132, 199, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .progress-section { text-align: center; }
+        .progress-circle {
+            width: 150px; height: 150px; border-radius: 50%;
+            background: conic-gradient(var(--primary) 0%, #eee 0);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px; position: relative; transition: background 0.5s;
+        }
+        .progress-circle::after { content: ""; position: absolute; width: 120px; height: 120px; background: var(--white); border-radius: 50%; }
+        .progress-text { position: relative; z-index: 1; font-size: 28px; font-weight: 700; color: var(--primary); }
+
+        .instructions { background: var(--blue-pastel); padding: 20px; border-radius: 15px; color: var(--blue-dark); }
+        .instructions h3 { margin-bottom: 15px; font-size: 18px; }
+        .instructions ul { list-style: none; }
+        .instructions li { margin-bottom: 12px; font-size: 14.5px; line-height: 1.5; }
+        kbd { background: var(--white); border: 1px solid #ccc; border-radius: 4px; padding: 3px 8px; font-family: monospace; font-size: 13px; font-weight: bold; box-shadow: 0 2px 0 #ccc; color: #333;}
+
+        .main-content {
+            flex: 3; background: var(--white); border-radius: 20px; padding: 35px;
+            box-shadow: 0 10px 30px rgba(2, 132, 199, 0.1); display: flex; flex-direction: column; position: relative;
+        }
+
+        .settings-bar { display: flex; justify-content: flex-end; gap: 15px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px dashed #eee; }
+        .setting-group { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text-light); }
+        select { padding: 6px 12px; border-radius: 8px; border: 1px solid #ddd; outline: none; cursor: pointer; font-family: 'Quicksand', sans-serif; font-weight: 600; color: var(--text-dark);}
+
+        .audio-section { text-align: center; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px;}
+        
+        .speaker-badge { display: inline-block; padding: 8px 30px; border-radius: 20px; font-weight: bold; font-size: 16px; }
+        .speaker-male { background: #E0F2FE; color: #0284C7; border: 1px solid #BAE6FD; }
+        .speaker-female { background: #FFEDD5; color: #C2410C; border: 1px solid #FED7AA; }
+
+        .btn-play { background: var(--primary); color: white; border: none; padding: 15px 35px; border-radius: 50px; font-size: 18px; cursor: pointer; transition: 0.3s; font-weight: 700; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3);}
+        .btn-play:hover { background: var(--primary-hover); transform: translateY(-2px); }
+
+        .input-section { flex-grow: 1; display: flex; flex-direction: column; }
+        
+        .message { text-align: center; margin-bottom: 10px; min-height: 45px; }
+        .glow-error {
+            color: var(--error-glow);
+            text-shadow: 0 0 12px rgba(225, 29, 72, 0.6);
+            font-weight: 800;
+            background: #FFF1F2;
+            padding: 2px 6px;
+            border-radius: 6px;
+            border: 2px dashed var(--error-glow);
+            display: inline-block;
+            transform: scale(1.05);
+        }
+        
+        textarea { width: 100%; height: 120px; padding: 20px; border: 2px solid #e0e0e0; border-radius: 15px; font-size: 22px; outline: none; transition: 0.3s; resize: none; color: var(--text-dark); line-height: 1.6; }
+        textarea:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(2, 132, 199, 0.2); }
+
+        .actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 15px; }
+        .btn { padding: 12px 25px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; font-weight: 700; transition: 0.3s; }
+        .btn-enter { background: var(--blue-dark); color: var(--white); }
+        .btn-enter:hover { background: #082F49; }
+        .btn-hint { background: var(--secondary); color: var(--blue-dark); }
+        .btn-hint:hover { background: #BAE6FD; }
+        .btn-nav { background: #E2E8F0; color: #334155; }
+        .btn-nav:hover { background: #CBD5E1; }
+
+        /* MODAL POPUP */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: white; width: 90%; max-width: 550px; padding: 35px;
+            border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: left; position: relative; max-height: 90vh; overflow-y: auto;
+        }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .modal-content h3 { color: #0EA5E9; font-size: 22px; margin-bottom: 15px; text-align: center; }
+        .modal-script { font-size: 20px; font-weight: 700; color: var(--primary); margin-bottom: 10px; text-align: center; padding-bottom: 15px; border-bottom: 2px dashed #eee;}
+        .modal-content p { margin-bottom: 10px; line-height: 1.6; font-size: 16px; }
+        
+        .btn-next-modal { width: 100%; background: var(--primary); color: white; margin-top: 20px; padding: 15px; font-size: 18px; }
+        .btn-next-modal:hover { background: var(--primary-hover); }
+
+        /* END SCREEN */
+        .end-screen { display: none; text-align: center; padding-top: 20px;}
+        .transcript-box { text-align: left; background: #F8FAFC; padding: 25px; border-radius: 15px; height: 400px; overflow-y: auto; margin: 25px 0; border: 1px solid #E2E8F0; line-height: 1.8; font-size: 16px;}
+
+        @media (max-width: 850px) {
+            .layout-container { flex-direction: column; height: auto; }
+            .sidebar { flex: none; width: 100%; order: 2; }
+            .main-content { flex: none; width: 100%; order: 1; min-height: 500px;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout-wrapper">
+    <div class="header-brand">
+        <div class="brand-badge">SnapEnglish</div>
+        <div class="brand-title">Part 3 Test 2</div>
+    </div>
+
+    <div class="layout-container" id="app">
+        <div class="sidebar">
+            <div class="progress-section">
+                <h2 style="color: var(--text-dark); margin-bottom: 25px; font-size: 22px;">Tiến độ bài học</h2>
+                <div class="progress-circle" id="progress-ring"><div class="progress-text"><span id="progress-percent">0</span>%</div></div>
+                <p style="color: var(--text-light); font-weight: 600; margin-top: 15px;">Câu: <span id="current-sentence-num">1</span> / <span id="total-sentences"></span></p>
+                <p style="font-size: 14px; color: #888; margin-top: 5px;">Số lần luyện tập: <span id="study-count">0</span></p>
+            </div>
+            <div class="instructions">
+                <h3>⌨️ Hướng dẫn phím tắt</h3>
+                <ul>
+                    <li><kbd>Ctrl</kbd> Lặp lại Audio.</li>
+                    <li><kbd>Tab</kbd> Gợi ý từ tiếp theo.</li>
+                    <li><kbd>Enter</kbd> Kiểm tra đáp án / Chuyển câu.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div id="learning-screen" style="display: flex; flex-direction: column; height: 100%;">
+                <div class="settings-bar">
+                    <div class="setting-group">
+                        <label>Tốc độ:</label>
+                        <select id="speed-setting">
+                            <option value="0.7">0.7x</option>
+                            <option value="0.9" selected>0.9x</option>
+                            <option value="1.0">1.0x</option>
+                            <option value="1.2">1.2x</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label>Lặp tự động:</label>
+                        <select id="repeat-setting">
+                            <option value="1" selected>1 lần</option>
+                            <option value="2">2 lần</option>
+                            <option value="3">3 lần</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="audio-section">
+                    <div id="speaker-label" class="speaker-badge speaker-male">👨 Man</div>
+                    <button class="btn-play" onclick="playAudio()">🔊 Nghe Audio (Ctrl)</button>
+                </div>
+                
+                <div class="message" id="system-message"></div>
+
+                <div class="input-section">
+                    <textarea id="user-input" placeholder="Lắng nghe hội thoại và gõ vào đây..." autofocus></textarea>
+                    
+                    <div class="actions">
+                        <button class="btn btn-nav" onclick="prevSentenceManual()">⬅️ Back</button>
+                        <button class="btn btn-enter" onclick="handleEnterAction()">Kiểm tra (Enter)</button>
+                        <button class="btn btn-hint" onclick="giveHint()">💡 Gợi ý (Tab)</button>
+                        <button class="btn btn-nav" onclick="nextSentenceManual()">Next ➡️</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="end-screen" class="end-screen">
+                <h2 style="color: var(--primary); font-size: 28px;">Tuyệt vời! Hoàn thành Test 🏆</h2>
+                <div class="transcript-box" id="full-transcript"></div>
+                <div class="actions">
+                    <button class="btn btn-enter" onclick="restartLesson()">🔄 Luyện tập lại</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="feedback-modal">
+    <div class="modal-content">
+        <h3>🎉 Chính xác!</h3>
+        <div class="modal-script" id="trans-en"></div>
+        <p><strong>🇻🇳 Nghĩa:</strong> <span id="trans-vi"></span></p>
+        <button class="btn btn-next-modal" onclick="nextSentence()">Qua câu tiếp theo (Enter) ➔</button>
+    </div>
+</div>
+
+<script>
+    // TOÀN BỘ DỮ LIỆU ĐƯỢC TRÍCH XUẤT TỪ PART 3 TEST 2 (Câu 32 đến 70)
+    const lessonData = [
+        // Conversation 32-34
+        { en: "Good afternoon. I'm Robert Merril. I have an appointment for a checkup with Dr. Sanchez at 1:00 P.M.", vi: "Chào buổi chiều. Tôi là Robert Merril. Tôi có hẹn khám sức khỏe với bác sĩ Sanchez vào lúc 1 giờ chiều.", speaker: "Man", gender: "male" },
+        { en: "Yes, I see your name on the list. Unfortunately, the doctor is running about twenty minutes behind schedule.", vi: "Vâng, tôi đã thấy tên ông trong danh sách. Rất tiếc là bác sĩ đang bị chậm so với lịch trình khoảng 20 phút.", speaker: "Woman", gender: "female" },
+        { en: "In that case, I'd better call my office to let them know I'll get back later than expected.", vi: "Trong trường hợp đó, tôi nên gọi điện về văn phòng để báo cho họ biết rằng tôi sẽ quay lại muộn hơn dự kiến.", speaker: "Man", gender: "male" },
+        { en: "Of course. But, could you go down to the cafeteria on the first floor to do that? We'd rather that you didn't make phone calls here in the waiting room.", vi: "Tất nhiên rồi. Nhưng ông có thể xuống quán ăn tự phục vụ ở tầng 1 để gọi điện không? Chúng tôi không muốn khách hàng gọi điện thoại ngay tại phòng chờ này.", speaker: "Woman", gender: "female" },
+
+        // Conversation 35-37
+        { en: "Hi. My name is Sandra Browning, and I recently applied for a credit card with you. I still haven't heard whether I've been approved for the card though.", vi: "Xin chào. Tên tôi là Sandra Browning, và gần đây tôi có nộp đơn đăng ký thẻ tín dụng bên mình. Tuy nhiên, tôi vẫn chưa nhận được thông báo liệu mình có được phê duyệt cấp thẻ hay chưa.", speaker: "Woman", gender: "female" },
+        { en: "I'm sorry, Ms. Browning. Let me check our records. Do you remember when you submitted the application?", vi: "Tôi rất tiếc, thưa bà Browning. Để tôi kiểm tra lại hồ sơ của chúng tôi. Bà có nhớ mình đã nộp đơn đăng ký khi nào không?", speaker: "Man", gender: "male" },
+        { en: "Um, I don't remember the exact day, but it was about a month ago. I sent it by mail.", vi: "Ừm, tôi không nhớ chính xác ngày nào, nhưng khoảng một tháng trước. Tôi đã gửi nó qua đường bưu điện.", speaker: "Woman", gender: "female" },
+        { en: "Hmm. Unfortunately, it looks like we never received your application. But we can complete the application over the phone. I can put your information directly into the computer so it will be processed right away.", vi: "Hừm. Thật không may, có vẻ như chúng tôi chưa từng nhận được đơn đăng ký của bà. Nhưng chúng ta có thể hoàn tất việc đăng ký qua điện thoại. Tôi có thể nhập trực tiếp thông tin của bà vào máy tính để nó được xử lý ngay lập tức.", speaker: "Man", gender: "male" },
+
+        // Conversation 38-40
+        { en: "Hi Lisa. I just got an e-mail that our clients from Singapore are attending a conference in New York at the end of the month. They were wondering if they could visit our offices since they'll already be in the area.", vi: "Chào Lisa. Tôi vừa nhận được một email thông báo rằng các khách hàng của chúng ta từ Singapore sẽ tham dự một hội nghị ở New York vào cuối tháng này. Họ đang thắc mắc liệu có thể ghé thăm văn phòng của chúng ta không vì khi đó họ đã ở sẵn khu vực này rồi.", speaker: "Man", gender: "male" },
+        { en: "Oh, this'll be a good opportunity to show them the new mobile phone app we're designing for them. Do you think the design team can finish it in time?", vi: "Ồ, đây sẽ là một cơ hội tốt để cho họ thấy ứng dụng điện thoại di động mới mà chúng ta đang thiết kế cho họ. Anh có nghĩ đội thiết kế có thể hoàn thành nó kịp lúc không?", speaker: "Woman", gender: "female" },
+        { en: "I think so, but I'd better tell the design team right away that we're moving up their deadline so it's ready in time for the client visit. They thought they'd have more time to complete the work.", vi: "Tôi nghĩ là được, nhưng tôi nên báo ngay cho đội thiết kế rằng chúng ta sẽ đẩy sớm thời hạn của họ lên để sản phẩm sẵn sàng kịp lúc cho chuyến thăm của khách hàng. Họ vốn nghĩ rằng mình sẽ có nhiều thời gian hơn để hoàn tất công việc.", speaker: "Man", gender: "male" },
+
+        // Conversation 41-43
+        { en: "Hi. I'm looking to buy another delivery vehicle for my catering business—one that will keep the food hot or cold.", vi: "Xin chào. Tôi đang tìm mua thêm một chiếc xe giao hàng khác cho doanh nghiệp cung cấp dịch vụ ăn uống của mình—một chiếc xe có thể giữ thức ăn nóng hoặc lạnh.", speaker: "Man", gender: "male" },
+        { en: "You've come to the right place—we have a lot of vehicles that'll suit your needs. And they all include heating and refrigeration compartments.", vi: "Ông đã đến đúng nơi rồi đấy—chúng tôi có rất nhiều loại xe phù hợp với nhu cầu của ông. Và tất cả chúng đều bao gồm các ngăn làm nóng và ngăn lạnh.", speaker: "Woman", gender: "female" },
+        { en: "Great, but my catering orders are usually quite small, so I don't need anything too big.", vi: "Tuyệt quá, nhưng các đơn hàng dịch vụ ăn uống của tôi thường khá nhỏ, vì vậy tôi không cần thứ gì đó quá lớn.", speaker: "Man", gender: "male" },
+        { en: "Our Series-Ten trucks are quite compact. There're a few in the parking lot. Why don't you take one out for a drive?", vi: "Các xe tải dòng Series-Ten của chúng tôi khá nhỏ gọn. Có một vài chiếc ở bãi đậu xe. Tại sao ông không lái thử một chiếc nhỉ?", speaker: "Woman", gender: "female" },
+
+        // Conversation 44-46
+        { en: "This has been a productive meeting. Thank you both for coming to discuss the Oakland building project.", vi: "Đây là một cuộc họp hiệu quả. Cảm ơn cả hai đã đến để thảo luận về dự án xây dựng Oakland.", speaker: "Man 1", gender: "male" },
+        { en: "Yes—Frederick's done a terrific job with the project so far, and I'm really looking forward to taking over from here.", vi: "Vâng—Cho đến nay Frederick đã làm một công việc tuyệt vời với dự án này, và tôi thực sự mong chờ được tiếp quản từ đây.", speaker: "Woman", gender: "female" },
+        { en: "Frederick, is there anything else Michelle needs to know?", vi: "Frederick, còn điều gì khác mà Michelle cần biết không?", speaker: "Man 1", gender: "male" },
+        { en: "Just one more thing—the client wants all communication in writing. So make sure you send e-mails confirming anything you discuss over the phone or in person.", vi: "Còn một điều nữa—khách hàng muốn mọi trao đổi đều phải bằng văn bản. Vì vậy, hãy chắc chắn rằng cô gửi email xác nhận lại bất cứ điều gì đã thảo luận qua điện thoại hoặc trực tiếp.", speaker: "Man 2 (Frederick)", gender: "male" },
+        { en: "Got it. So Frederick, I hear you'll be working overseas.", vi: "Tôi hiểu rồi. Vậy Frederick, tôi nghe nói anh sắp đi làm việc ở nước ngoài.", speaker: "Woman", gender: "female" },
+        { en: "Yeah, my next building project is in Cape Town, which is exciting since I've never been to South Africa before.", vi: "Vâng, dự án xây dựng tiếp theo của tôi là ở Cape Town, thật phấn khích vì tôi chưa bao giờ đến Nam Phi trước đây.", speaker: "Man 2 (Frederick)", gender: "male" },
+
+        // Conversation 47-49
+        { en: "Welcome to Lehmann Law Offices. How can I help you?", vi: "Chào mừng ông đến với Văn phòng Luật Lehmann. Tôi có thể giúp gì cho ông?", speaker: "Woman", gender: "female" },
+        { en: "I'm with Hannover Express Shipping, and I have a package here for Mr. Dennis Lehmann. Is he available to sign this form?", vi: "Tôi đến từ đơn vị vận chuyển Hannover Express, tôi có một kiện hàng ở đây cho ông Dennis Lehmann. Ông ấy có tiện ra ký tên vào mẫu đơn này không?", speaker: "Man", gender: "male" },
+        { en: "I can sign it for him, if that's all right.", vi: "Tôi có thể ký thay ông ấy, nếu điều đó không phiền.", speaker: "Woman", gender: "female" },
+        { en: "Sorry, this package must be signed for by Mr. Lehmann himself.", vi: "Xin lỗi, kiện hàng này phải do chính ông Lehmann ký nhận.", speaker: "Man", gender: "male" },
+        { en: "Well, Mr. Lehmann's in a meeting with clients right now.", vi: "Chà, ông Lehmann hiện đang họp với khách hàng mất rồi.", speaker: "Woman", gender: "female" },
+        { en: "OK, I'll stop by later.", vi: "Được rồi, tôi sẽ ghé lại sau.", speaker: "Man", gender: "male" },
+
+        // Conversation 50-52
+        { en: "Hi, Eunice. I called to get seats for the play we wanted to take our colleagues from Paris to, but there weren't any tickets left. Do you have any other ideas for activities?", vi: "Chào Eunice. Tôi đã gọi điện để đặt chỗ cho vở kịch mà chúng ta muốn đưa các đồng nghiệp từ Paris đi xem, nhưng không còn chiếc vé nào cả. Cô có ý tưởng nào khác cho các hoạt động không?", speaker: "Man", gender: "male" },
+        { en: "Oh, that's too bad. Well, the weather is supposed to be really nice this weekend. How about taking them out to dinner at Harbor View Restaurant? It's on a cruise ship on the riverfront, and I've taken people there before.", vi: "Ồ, tệ quá nhỉ. Chà, dự báo thời tiết cuối tuần này sẽ rất đẹp. Hay là chúng ta đưa họ đi ăn tối tại nhà hàng Harbor View? Nó nằm trên một chiếc du thuyền bên bờ sông, tôi đã từng đưa mọi người đến đó trước đây rồi.", speaker: "Woman", gender: "female" },
+        { en: "I've heard of that ship, and the view of the city from the river is supposed to be spectacular. Would you mind finding out how much the dinner cruise would cost?", vi: "Tôi đã nghe nói về con tàu đó, tầm nhìn ra thành phố từ phía dòng sông chắc hẳn sẽ rất ngoạn mục. Cô phiền kiểm tra giúp tôi chi phí cho chuyến du ngoạn ăn tối đó là bao nhiêu được không?", speaker: "Man", gender: "male" },
+
+        // Conversation 53-55
+        { en: "The last item on the agenda is next year's office renovations. The renovations will be pretty substantial, so we won't be able to hold client meetings here during that time. Does anyone have any suggestions?", vi: "Mục cuối cùng trong chương trình nghị sự là việc cải tạo văn phòng vào năm tới. Việc sửa sang sẽ khá quy mô, vì vậy chúng ta sẽ không thể tổ chức các cuộc họp khách hàng tại đây trong thời gian đó. Ai có gợi ý gì không?", speaker: "Man", gender: "male" },
+        { en: "Yuko and I were discussing this earlier and she mentioned an advertisement she saw in this morning's newspaper. What did it say again, Yuko?", vi: "Yuko và tôi đã thảo luận về vấn đề này lúc nãy và cô ấy có nhắc đến một mẩu quảng cáo trên tờ báo sáng nay. Nó viết gì thế nhỉ, Yuko?", speaker: "Woman 1", gender: "female" },
+        { en: "Well, it looks like there's a place not very far from here called Open Venue Solutions. They own the building and they rent out meeting rooms. I think this would work for us.", vi: "Chà, có vẻ như có một nơi không xa đây lắm tên là Open Venue Solutions. Họ sở hữu tòa nhà và cho thuê các phòng họp. Tôi nghĩ chỗ này sẽ phù hợp với chúng ta.", speaker: "Woman 2 (Yuko)", gender: "female" },
+        { en: "OK, Can you go there this afternoon and take a look around?", vi: "Được rồi, chiều nay cô có thể đến đó và xem qua một chút được không?", speaker: "Man", gender: "male" },
+        { en: "Sure, I'll do that.", vi: "Chắc chắn rồi, tôi sẽ làm việc đó.", speaker: "Woman 2 (Yuko)", gender: "female" },
+
+        // Conversation 56-58
+        { en: "Soo-mi, is everything ready for our interns' first day on Monday?", vi: "Soo-mi, mọi thứ đã sẵn sàng cho ngày đầu tiên của các thực tập sinh vào thứ Hai chưa?", speaker: "Man", gender: "male" },
+        { en: "Yes. Their office space is set up and I just put together their information packets.", vi: "Vâng. Không gian văn phòng của họ đã được thiết lập và tôi vừa chuẩn bị xong các bộ tài liệu thông tin cho họ.", speaker: "Woman", gender: "female" },
+        { en: "And... did you remember to ask some staff if they can come in early on Monday to greet the interns as they arrive?", vi: "Và... cô có nhớ hỏi một vài nhân viên xem họ có thể đến sớm vào thứ Hai để chào đón các thực tập sinh khi họ đến không?", speaker: "Man", gender: "male" },
+        { en: "Oh, thanks for reminding me. I'm sure I'll be able to find a few people willing to do that. But how will the interns know who the volunteers are?", vi: "Ồ, cảm ơn anh đã nhắc tôi. Tôi chắc chắn mình sẽ tìm được vài người sẵn lòng làm việc đó. Nhưng làm sao các thực tập sinh biết được ai là những người tình nguyện?", speaker: "Woman", gender: "female" },
+        { en: "Why don't you give volunteers a T-shirt with the company logo? We have some available. They're left from the ones we ordered for our last trade show. I'll go get them for you now.", vi: "Tại sao cô không đưa cho những người tình nguyện áo thun có logo công ty nhỉ? Chúng ta có sẵn một ít đấy. Đó là số áo còn thừa từ đợt chúng ta đặt cho triển lãm thương mại vừa rồi. Tôi sẽ đi lấy chúng cho cô ngay bây giờ.", speaker: "Man", gender: "male" },
+
+        // Conversation 59-61
+        { en: "Ansel, how did this morning's marketing meeting go? You were going to ask for help with our department's workload, right?", vi: "Ansel, cuộc họp tiếp thị sáng nay thế nào rồi? Anh định yêu cầu hỗ trợ cho khối lượng công việc của bộ phận mình, đúng không?", speaker: "Woman", gender: "female" },
+        { en: "Yes! The company director agreed to increase our marketing department's budget by two hundred thousand dollars.", vi: "Đúng vậy! Giám đốc công ty đã đồng ý tăng ngân sách cho bộ phận tiếp thị của chúng ta thêm 200.000 đô la.", speaker: "Man", gender: "male" },
+        { en: "That's a big increase from last year! Do you know how that money will be used?", vi: "Đó là một sự gia tăng lớn so với năm ngoái đấy! Cô có biết số tiền đó sẽ được sử dụng như thế nào không?", speaker: "Woman", gender: "female" },
+        { en: "Well, the department managers already agreed that most of the money will go towards hiring two new staff members. Having another artist and a digital advertising specialist would really help us deal with our workload.", vi: "Chà, các quản lý bộ phận đã đồng ý rằng hầu hết số tiền sẽ được dùng để thuê thêm hai nhân viên mới. Có thêm một họa sĩ và một chuyên gia quảng cáo kỹ thuật số sẽ thực sự giúp chúng ta xử lý khối lượng công việc hiện tại.", speaker: "Man", gender: "male" },
+
+        // Conversation 62-64
+        { en: "I can help the next customer.", vi: "Tôi có thể giúp vị khách tiếp theo.", speaker: "Man", gender: "male" },
+        { en: "Hi. I moved house recently, and I broke several dishes in the process. I ordered replacements online from your store. They were delivered yesterday, but the problem is, only three soup bowls were included instead of six.", vi: "Chào anh. Gần đây tôi có chuyển nhà và làm vỡ vài chiếc đĩa trong quá trình đó. Tôi đã đặt hàng thay thế trực tuyến từ cửa hàng của anh. Chúng được giao vào hôm qua, nhưng vấn đề là chỉ có ba chiếc bát súp được gửi kèm thay vì sáu chiếc.", speaker: "Woman", gender: "female" },
+        { en: "I'm sorry about that—can I see your packing slip?", vi: "Tôi rất tiếc về điều đó—tôi có thể xem phiếu đóng gói của cô không?", speaker: "Man", gender: "male" },
+        { en: "Yes—here it is.", vi: "Vâng—nó đây ạ.", speaker: "Woman", gender: "female" },
+        { en: "Hmm. Unfortunately, this dish pattern's been discontinued. You got our last three bowls with that pattern. So what I can do is give you a refund for the total cost of the bowls, and you can keep the three you received for free.", vi: "Hừm. Thật không may, mẫu đĩa này đã bị ngừng sản xuất. Cô đã nhận được ba chiếc bát cuối cùng của chúng tôi có mẫu đó rồi. Vì vậy, những gì tôi có thể làm là hoàn tiền toàn bộ chi phí của số bát súp đó cho cô, và cô có thể giữ lại ba chiếc đã nhận hoàn toàn miễn phí.", speaker: "Man", gender: "male" },
+        { en: "Thanks! I appreciate that.", vi: "Cảm ơn! Tôi rất trân trọng điều đó.", speaker: "Woman", gender: "female" },
+
+        // Conversation 65-67
+        { en: "I just checked the airline's Web site. James Kim won't be arriving on time.", vi: "Tôi vừa kiểm tra trang web của hãng hàng không. James Kim sẽ không đến đúng giờ đâu.", speaker: "Woman", gender: "female" },
+        { en: "Yeah, I heard a lot of the flights were delayed because of a storm.", vi: "Vâng, tôi nghe nói rất nhiều chuyến bay đã bị hoãn vì một cơn bão.", speaker: "Man", gender: "male" },
+        { en: "Well, I guess we can leave to pick him up later then.", vi: "Chà, tôi đoán vậy thì lát nữa chúng ta mới đi đón anh ấy cũng được.", speaker: "Woman", gender: "female" },
+        { en: "Actually, I heard that the traffic is horrible today, so let's just leave now, or else we might end up being late.", vi: "Thực ra, tôi nghe nói hôm nay giao thông rất kinh khủng, vì vậy hãy đi ngay bây giờ đi, nếu không chúng ta có thể sẽ bị muộn mất.", speaker: "Man", gender: "male" },
+        { en: "Oh, OK. And if we have enough time before he arrives, we can eat lunch at the airport.", vi: "Ồ, được thôi. Và nếu chúng ta có đủ thời gian trước khi anh ấy đến, chúng ta có thể ăn trưa tại sân bay.", speaker: "Woman", gender: "female" },
+
+        // Conversation 68-70
+        { en: "Hi, I'm looking for an Internet provider, so I thought I'd stop by to find out about your service plans.", vi: "Xin chào, tôi đang tìm kiếm một nhà cung cấp Internet, vì vậy tôi nghĩ mình nên ghé qua để tìm hiểu về các gói dịch vụ của bên mình.", speaker: "Man", gender: "male" },
+        { en: "Certainly. We offer the best prices in the area. As you can see from this chart, the longer your contract is, the lower the monthly cost.", vi: "Chắc chắn rồi. Chúng tôi cung cấp mức giá tốt nhất trong khu vực. Như ông có thể thấy từ biểu đồ này, thời hạn hợp đồng càng dài thì chi phí hàng tháng càng thấp.", speaker: "Woman", gender: "female" },
+        { en: "But what if I have to cancel the contract before it ends?", vi: "Nhưng nếu tôi phải hủy hợp đồng trước khi nó kết thúc thì sao?", speaker: "Man", gender: "male" },
+        { en: "Well... we do charge an extra fee for that.", vi: "Chà... chúng tôi có tính thêm một khoản phí phụ cho việc đó.", speaker: "Woman", gender: "female" },
+        { en: "Umm... I'm being transferred overseas in about a year, so I don't want the two-year plan. But I do want the lowest possible price.", vi: "Ừm... Tôi sẽ được thuyên chuyển công tác ra nước ngoài trong khoảng một năm tới, vì vậy tôi không muốn gói hai năm. Nhưng tôi muốn mức giá thấp nhất có thể.", speaker: "Man", gender: "male" },
+        { en: "OK, then the one-year plan would be the best. Would you like to sign the contract now?", vi: "Được rồi, vậy thì gói một năm sẽ là tốt nhất. Ông có muốn ký hợp đồng ngay bây giờ không?", speaker: "Woman", gender: "female" },
+        { en: "Sure, let's do that.", vi: "Chắc chắn rồi, hãy làm vậy đi.", speaker: "Man", gender: "male" }
+    ];
+
+    let currentIndex = 0;
+    let currentPlayCount = 0;
+    let playTimeout;
+    const synth = window.speechSynthesis;
+    let maleVoice = null;
+    let femaleVoice = null;
+
+    const msgBox = document.getElementById("system-message");
+    const inputField = document.getElementById("user-input");
+    const modalOverlay = document.getElementById("feedback-modal");
+    const labelDisplay = document.getElementById("speaker-label");
+
+    function loadVoices() {
+        let voices = synth.getVoices();
+        if(voices.length === 0) return;
+        maleVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Male') || v.name.includes('David') || v.name.includes('Google UK English Male'))) || voices.find(v => v.lang.startsWith('en'));
+        femaleVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Zira') || v.name.includes('Google US English'))) || voices.find(v => v.lang.startsWith('en'));
+    }
+
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    window.onload = () => {
+        loadVoices();
+        let count = localStorage.getItem('part3_test2_count') || 0;
+        document.getElementById('study-count').innerText = count;
+        document.getElementById('total-sentences').innerText = lessonData.length;
+        
+        let savedIndex = parseInt(localStorage.getItem('part3_test2_progress'));
+        if (!isNaN(savedIndex) && savedIndex < lessonData.length) {
+            currentIndex = savedIndex;
+        }
+
+        updateUI();
+    };
+
+    function updateUI() {
+        updateProgress();
+        document.getElementById('current-sentence-num').innerText = currentIndex + 1;
+        
+        const data = lessonData[currentIndex];
+        
+        // Update Speaker Label
+        if (data.gender === "male") {
+            labelDisplay.innerText = "👨 " + data.speaker;
+            labelDisplay.className = "speaker-badge speaker-male";
+        } else {
+            labelDisplay.innerText = "👩 " + data.speaker;
+            labelDisplay.className = "speaker-badge speaker-female";
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Control') {
+            e.preventDefault();
+            playAudio();
+        } else if (e.key === 'Tab') {
+            e.preventDefault();
+            giveHint();
+        } else if (e.key === 'Enter' && modalOverlay.style.display !== "flex") {
+            e.preventDefault();
+            handleEnterAction();
+        }
+    });
+
+    function handleEnterAction() {
+        if (modalOverlay.style.display === "flex") {
+            nextSentence();
+        } else {
+            checkAnswer();
+        }
+    }
+
+    function playAudio() {
+        currentPlayCount = 0;
+        clearTimeout(playTimeout);
+        triggerAudioLoop();
+    }
+
+    function triggerAudioLoop() {
+        if (synth.speaking) synth.cancel();
+        
+        const data = lessonData[currentIndex];
+        const utterThis = new SpeechSynthesisUtterance(data.en);
+        utterThis.lang = 'en-US';
+        utterThis.rate = parseFloat(document.getElementById('speed-setting').value);
+        
+        if (data.gender === 'female' && femaleVoice) utterThis.voice = femaleVoice;
+        else if (data.gender === 'male' && maleVoice) utterThis.voice = maleVoice;
+        
+        utterThis.onend = () => {
+            currentPlayCount++;
+            const maxRepeat = parseInt(document.getElementById('repeat-setting').value);
+            if (currentPlayCount < maxRepeat) {
+                playTimeout = setTimeout(triggerAudioLoop, 500);
+            }
+        };
+        
+        synth.speak(utterThis);
+        if (modalOverlay.style.display !== "flex") inputField.focus();
+    }
+
+    function normalizeText(text) { return text.toLowerCase().replace(/[.,?!–\-:;"]/g, '').trim(); }
+
+    function checkAnswer() {
+        const rawUserInput = inputField.value;
+        const userInput = normalizeText(rawUserInput);
+        const targetText = normalizeText(lessonData[currentIndex].en);
+        
+        if (userInput === targetText) {
+            msgBox.innerText = "";
+            showModal();
+        } else {
+            const userWordsNorm = userInput.split(' ').filter(w => w !== "");
+            const targetWordsNorm = targetText.split(' ');
+            
+            // Tách từ thô để highlight chính xác vị trí đang nhập
+            const rawWords = rawUserInput.trim().split(/\s+/);
+
+            if (userWordsNorm.length === 0) {
+                msgBox.innerText = "Bạn chưa gõ gì cả. Nhấn Ctrl để nghe nhé!";
+                return;
+            }
+
+            let wrongIndex = -1;
+            for (let i = 0; i < userWordsNorm.length; i++) {
+                if (userWordsNorm[i] !== targetWordsNorm[i]) {
+                    wrongIndex = i;
+                    break;
+                }
+            }
+
+            if (wrongIndex !== -1) {
+                // Tính vị trí cần select (bôi đen) để hỗ trợ gõ lại nhanh
+                let startPos = 0;
+                for (let k = 0; k < wrongIndex; k++) {
+                    startPos += rawWords[k].length + 1; // +1 là dấu khoảng trắng
+                }
+                
+                const leadingSpaces = inputField.value.length - inputField.value.trimStart().length;
+                startPos += leadingSpaces;
+                let endPos = startPos + rawWords[wrongIndex].length;
+
+                // Tự động bôi đen chữ sai
+                inputField.focus();
+                inputField.setSelectionRange(startPos, endPos);
+
+                // Hiển thị đoạn text nhấp nháy đỏ dưới thông báo
+                let displayHTML = rawWords.map((w, idx) => {
+                    if (idx === wrongIndex) {
+                        return `<span class="glow-error">${w}</span>`;
+                    }
+                    return w;
+                }).join(' ');
+
+                msgBox.innerHTML = `Vị trí sai:<br><div style="margin-top:12px; font-size:19px; color:var(--text-dark); font-weight: 500;">${displayHTML}</div>`;
+                
+            } else if (userWordsNorm.length < targetWordsNorm.length) {
+                msgBox.innerText = "Chưa hết câu, hãy nghe thêm và gõ tiếp nhé!";
+                inputField.focus();
+                inputField.setSelectionRange(inputField.value.length, inputField.value.length);
+            } else {
+                msgBox.innerText = "Có lỗi sai chính tả nhỏ, hãy kiểm tra lại.";
+            }
+        }
+    }
+
+    function giveHint() {
+        if (modalOverlay.style.display === "flex") return;
+
+        const rawUserInput = inputField.value;
+        const userInput = normalizeText(rawUserInput);
+        const targetText = normalizeText(lessonData[currentIndex].en);
+        
+        const targetWordsRaw = lessonData[currentIndex].en.split(' ');
+        const targetWordsNorm = targetText.split(' ');
+        const userWords = userInput.split(' ').filter(w => w !== "");
+
+        let hintWord = targetWordsRaw[userWords.length];
+        for (let i = 0; i < userWords.length; i++) {
+            if (userWords[i] !== targetWordsNorm[i]) {
+                hintWord = targetWordsRaw[i];
+                inputField.value = targetWordsRaw.slice(0, i).join(' ') + (i > 0 ? " " : "");
+                break;
+            }
+        }
+
+        if (hintWord) {
+            inputField.value += (inputField.value.length > 0 && !inputField.value.endsWith(' ') ? ' ' : '') + hintWord + ' ';
+            msgBox.innerText = "Đã điền từ tiếp theo!";
+        }
+    }
+
+    function showModal() {
+        inputField.blur();
+        const data = lessonData[currentIndex];
+        
+        document.getElementById("trans-en").innerText = data.en;
+        document.getElementById("trans-vi").innerText = data.vi;
+        
+        modalOverlay.style.display = "flex";
+        document.querySelector('.btn-next-modal').focus();
+    }
+
+    function prevSentenceManual() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            resetForNewSentence();
+        }
+    }
+
+    function nextSentenceManual() {
+        if (currentIndex < lessonData.length - 1) {
+            currentIndex++;
+            resetForNewSentence();
+        } else {
+            finishLesson();
+        }
+    }
+    
+    function resetForNewSentence() {
+        modalOverlay.style.display = "none";
+        inputField.value = "";
+        msgBox.innerHTML = "";
+        localStorage.setItem('part3_test2_progress', currentIndex);
+        updateUI();
+        playAudio();
+    }
+
+    function nextSentence() {
+        modalOverlay.style.display = "none";
+        currentIndex++;
+        inputField.value = "";
+        msgBox.innerHTML = "";
+        
+        if (currentIndex < lessonData.length) {
+            localStorage.setItem('part3_test2_progress', currentIndex);
+            updateUI();
+            playAudio();
+        } else {
+            finishLesson();
+        }
+    }
+
+    function updateProgress() {
+        const percent = Math.round((currentIndex / lessonData.length) * 100);
+        document.getElementById("progress-percent").innerText = percent;
+        document.getElementById("progress-ring").style.background = `conic-gradient(var(--primary) ${percent}%, #eee 0)`;
+    }
+
+    function finishLesson() {
+        document.getElementById("learning-screen").style.display = "none";
+        document.getElementById("end-screen").style.display = "block";
+        
+        let count = parseInt(localStorage.getItem('part3_test2_count')) || 0;
+        count++;
+        localStorage.setItem('part3_test2_count', count);
+        document.getElementById('study-count').innerText = count;
+
+        localStorage.removeItem('part3_test2_progress');
+
+        const transcriptBox = document.getElementById("full-transcript");
+        let htmlContent = "";
+
+        lessonData.forEach(d => {
+            const color = d.gender === 'male' ? '#0284C7' : '#C2410C';
+            htmlContent += `<p style="margin-bottom:12px; padding-left: 10px;">
+                <strong style="color:${color}">${d.speaker}:</strong> <span style="font-weight: 500;">${d.en}</span><br>
+                <span style="color:var(--text-light); font-size: 14px;">${d.vi}</span>
+            </p>`;
+        });
+        transcriptBox.innerHTML = htmlContent;
+    }
+
+    function restartLesson() {
+        localStorage.setItem('part3_test2_progress', 0);
+        location.reload();
+    }
+</script>
+
+</body>
+</html>
