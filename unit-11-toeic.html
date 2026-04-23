@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 11: Mệnh đề quan hệ | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette màu pastel mới: Soft Indigo - Soft Fuchsia - Soft Rose */
+            --pastel-indigo: #e0e7ff;
+            --pastel-fuchsia: #fae8ff;
+            --pastel-rose: #ffe4e6;
+            
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.9);
+            --text-main: #312e81; /* Chữ màu tím than đậm cho dễ đọc */
+            --text-sub: #4f46e5;
+            --correct-color: #10b981; 
+            --wrong-color: #f43f5e;   
+            --accent-color: #4338ca;  /* Tím đậm làm điểm nhấn trưởng thành */
+        }
+
+        /* Ẩn hoàn toàn trích dẫn khỏi giao diện hiển thị */
+        .hidden-cite {
+            display: none !important;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--pastel-indigo) 0%, var(--pastel-fuchsia) 50%, var(--pastel-rose) 100%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Container mở rộng toàn màn hình */
+        .full-screen-container {
+            width: 100%;
+            padding: 30px 50px;
+            box-sizing: border-box;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 10px;
+        }
+        h1 {
+            color: var(--accent-color);
+            font-size: 42px;
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.9);
+            margin-bottom: 10px;
+        }
+
+        /* Content Sections */
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(67, 56, 202, 0.05);
+        }
+
+        h2.card-title {
+            color: #be185d;
+            border-bottom: 2px dashed #fbcfe8;
+            padding-bottom: 15px;
+            margin-top: 0;
+            font-size: 26px;
+        }
+
+        h3.trap-title {
+            color: var(--accent-color);
+            margin-top: 25px;
+            font-size: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.8);
+        }
+        th {
+            background: rgba(224, 231, 255, 0.8);
+            color: var(--accent-color);
+            font-weight: 700;
+        }
+
+        /* Quiz Interface */
+        .question-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question-text {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--accent-color);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background: rgba(255,255,255,0.9);
+            border: 2px solid transparent;
+            padding: 15px 20px;
+            border-radius: 14px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 17px;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-main);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .option-btn:hover {
+            background: white;
+            border-color: rgba(67, 56, 202, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .option-btn.selected-correct {
+            background: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+
+        .option-btn.selected-wrong {
+            background: var(--wrong-color);
+            color: white;
+            border-color: var(--wrong-color);
+        }
+
+        .option-btn.show-correct {
+            background: white;
+            color: var(--correct-color);
+            border-color: var(--correct-color);
+            box-shadow: 0 0 0 2px var(--correct-color) inset;
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Detailed Explanation Box */
+        .explanation-box {
+            margin-top: 25px;
+            padding: 20px 25px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.95);
+            display: none;
+            animation: fadeIn 0.5s ease;
+            border-left: 5px solid var(--accent-color);
+        }
+        
+        .exp-status { font-weight: 700; font-size: 20px; margin-bottom: 15px; }
+        .exp-correct { color: var(--correct-color); }
+        .exp-wrong { color: var(--wrong-color); }
+
+        .exp-section { margin-bottom: 12px; }
+        .exp-title { font-weight: 700; color: var(--accent-color); display: block; margin-bottom: 4px;}
+        .reason-correct { color: #059669; font-weight: 600; }
+        .reason-wrong { color: #e11d48; font-size: 15px; margin-top: 5px; display: block;}
+        
+        /* Navigation Buttons (Next/Back) */
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding: 20px 0;
+            border-top: 2px dashed rgba(67, 56, 202, 0.2);
+        }
+
+        .nav-btn {
+            padding: 14px 35px;
+            border-radius: 50px;
+            background: var(--accent-color);
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(67, 56, 202, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(67, 56, 202, 0.4);
+        }
+
+        .nav-btn.btn-back {
+            background: white;
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            .options-grid { grid-template-columns: 1fr; }
+            .full-screen-container { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="full-screen-container">
+        <header>
+            <h1>✨ Unit 11: Đại từ & Trạng từ quan hệ</h1>
+            <p style="font-size: 18px; font-weight: 500; color: var(--text-sub);">Làm chủ cấu trúc Relative Pronouns & Adverbs</p>
+        </header>
+
+        <div id="theory" class="section active">
+            
+            <div class="glass-card">
+                <h2 class="card-title">1. Đại từ quan hệ (Relative Pronouns) <span class="hidden-cite">[cite: 39]</span></h2>
+                
+                <table>
+                    <tr>
+                        <th>Đại từ <span class="hidden-cite">[cite: 41]</span></th>
+                        <th>Thay cho <span class="hidden-cite">[cite: 41]</span></th>
+                        <th>Cách dùng <span class="hidden-cite">[cite: 41]</span></th>
+                    </tr>
+                    <tr>
+                        <td><b>Who</b> <span class="hidden-cite">[cite: 41]</span></td>
+                        <td>Người <span class="hidden-cite">[cite: 41]</span></td>
+                        <td>Đóng vai trò Chủ ngữ/Tân ngữ: N (person) + who + V/ S + V <span class="hidden-cite">[cite: 41]</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Which</b> <span class="hidden-cite">[cite: 41]</span></td>
+                        <td>Vật <span class="hidden-cite">[cite: 41]</span></td>
+                        <td>Đóng vai trò Chủ ngữ/Tân ngữ: N (thing) + which + V/ S + V <span class="hidden-cite">[cite: 41]</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Whom</b> <span class="hidden-cite">[cite: 41]</span></td>
+                        <td>Người <span class="hidden-cite">[cite: 41]</span></td>
+                        <td>Chỉ đóng vai trò Tân ngữ: N (person) + whom + S + V <span class="hidden-cite">[cite: 41]</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Whose</b> <span class="hidden-cite">[cite: 41]</span></td>
+                        <td>Sở hữu <span class="hidden-cite">[cite: 41]</span></td>
+                        <td>Sở hữu của người/vật: N + whose + N <span class="hidden-cite">[cite: 41]</span></td>
+                    </tr>
+                </table>
+
+                <h3 class="trap-title">🔥 Đặc biệt: Cách dùng "That" <span class="hidden-cite">[cite: 42]</span></h3>
+                <p><b>Có thể thay thế:</b> who/ whom/ which <span class="hidden-cite">[cite: 43]</span>.</p>
+                <p style="color: #059669; font-weight: 600;">✔️ Bắt buộc dùng "That" khi: <span class="hidden-cite">[cite: 43]</span></p>
+                <ul>
+                    <li>Tồn tại 2 chủ ngữ cả người và vật (VD: The man and his dog...). <span class="hidden-cite">[cite: 43]</span></li>
+                    <li>Đứng trước danh từ là: all, every, any, each, the only, the very, hoặc danh từ đi với "the". <span class="hidden-cite">[cite: 43]</span></li>
+                </ul>
+                <p style="color: #e11d48; font-weight: 600;">❌ KHÔNG được dùng "That" khi: <span class="hidden-cite">[cite: 43]</span></p>
+                <ul>
+                    <li>Đứng trước hoặc sau giới từ (VD: about that). <span class="hidden-cite">[cite: 43]</span></li>
+                    <li>Đứng sau dấu phẩy (trong mệnh đề quan hệ không xác định). <span class="hidden-cite">[cite: 43]</span></li>
+                    <li>Đứng sau tên riêng. <span class="hidden-cite">[cite: 43]</span></li>
+                </ul>
+            </div>
+
+            <div class="glass-card">
+                <h2 class="card-title">2. Trạng từ quan hệ (Relative Adverbs) <span class="hidden-cite">[cite: 44]</span></h2>
+                <table>
+                    <tr>
+                        <th>Trạng từ <span class="hidden-cite">[cite: 45]</span></th>
+                        <th>Chức năng <span class="hidden-cite">[cite: 45]</span></th>
+                        <th>Cấu trúc <span class="hidden-cite">[cite: 45]</span></th>
+                    </tr>
+                    <tr>
+                        <td><b>When</b> (in/on which) <span class="hidden-cite">[cite: 45]</span></td>
+                        <td>Đại diện cụm thời gian <span class="hidden-cite">[cite: 45]</span></td>
+                        <td>N (time) + when + S + V <span class="hidden-cite">[cite: 45]</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Where</b> (in/at which) <span class="hidden-cite">[cite: 45]</span></td>
+                        <td>Đại diện nơi chốn <span class="hidden-cite">[cite: 45]</span></td>
+                        <td>N (place) + where + S + V <span class="hidden-cite">[cite: 45]</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Why</b> (for which) <span class="hidden-cite">[cite: 45]</span></td>
+                        <td>Đại diện lý do <span class="hidden-cite">[cite: 45]</span></td>
+                        <td>N (reason) + why + S + V <span class="hidden-cite">[cite: 45]</span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="nav-controls" style="justify-content: flex-end;">
+                <button class="nav-btn" onclick="navigateTo('task1')">Next: Task 1 (Cơ bản) ➡️</button>
+            </div>
+        </div>
+
+        <div id="task1" class="section">
+            <div class="glass-card" style="padding: 20px; margin-bottom: 20px; text-align: center;">
+                <h2 style="margin: 0; color: var(--accent-color);">🎯 Task 1: Nhận diện Đại từ & Trạng từ quan hệ</h2>
+            </div>
+            
+            <div id="task1-container"></div>
+
+            <div class="nav-controls">
+                <button class="nav-btn btn-back" onclick="navigateTo('theory')">⬅️ Back: Lý thuyết</button>
+                <button class="nav-btn" onclick="navigateTo('task2')">Next: Task 2 (Nâng cao) ➡️</button>
+            </div>
+        </div>
+
+        <div id="task2" class="section">
+            <div class="glass-card" style="padding: 20px; margin-bottom: 20px; text-align: center;">
+                <h2 style="margin: 0; color: var(--accent-color);">🚀 Task 2: Chinh phục bẫy "That" & "Whose"</h2>
+            </div>
+            
+            <div id="task2-container"></div>
+
+            <div class="nav-controls">
+                <button class="nav-btn btn-back" onclick="navigateTo('task1')">⬅️ Back: Task 1</button>
+                <button class="nav-btn" onclick="alert('Chúc mừng bạn đã hoàn thành xuất sắc Unit 11! 🎉')">✅ Hoàn thành bài học</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // DỮ LIỆU CÂU HỎI TASK 1
+        const task1Data = [
+            {
+                q: "1. The woman _______ is standing next to the door is my new manager.",
+                opts: ["whom", "who", "which", "whose"],
+                ans: 1,
+                expCorrect: "Đáp án B. 'The woman' là danh từ chỉ người. Vị trí cần điền đóng vai trò làm Chủ ngữ cho động từ 'is standing', do đó dùng 'who' (N person + who + V). <span class='hidden-cite'>[cite: 41]</span>",
+                expWrong: "• A (whom): Chỉ làm tân ngữ (whom + S + V). <span class='hidden-cite'>[cite: 41]</span><br>• C (which): Dùng cho vật. <span class='hidden-cite'>[cite: 41]</span><br>• D (whose): Cần có danh từ theo sau chỉ sở hữu (whose + N). <span class='hidden-cite'>[cite: 41]</span>"
+            },
+            {
+                q: "2. Do you still remember the day _______ we first met in Paris?",
+                opts: ["where", "which", "when", "why"],
+                ans: 2,
+                expCorrect: "Đáp án C. 'the day' là danh từ chỉ thời gian (N time), trạng từ quan hệ thay thế là 'when' (when + S + V). <span class='hidden-cite'>[cite: 45]</span>",
+                expWrong: "• A (where): Dùng cho nơi chốn. <span class='hidden-cite'>[cite: 45]</span><br>• B (which): Nếu dùng which phải có giới từ (on which).<br>• D (why): Dùng cho lý do. <span class='hidden-cite'>[cite: 45]</span>"
+            },
+            {
+                q: "3. The laptop _______ I bought last week is already broken.",
+                opts: ["who", "whom", "where", "which"],
+                ans: 3,
+                expCorrect: "Đáp án D. 'The laptop' là danh từ chỉ vật (N thing). Đóng vai trò tân ngữ cho 'bought', ta dùng 'which'. (N thing + which + S + V). <span class='hidden-cite'>[cite: 41]</span>",
+                expWrong: "• A, B (who/whom): Dùng cho người. <span class='hidden-cite'>[cite: 41]</span><br>• C (where): Dùng cho nơi chốn. <span class='hidden-cite'>[cite: 45]</span>"
+            },
+            {
+                q: "4. I want to visit the island _______ they filmed that famous movie.",
+                opts: ["when", "which", "where", "whom"],
+                ans: 2,
+                expCorrect: "Đáp án C. 'the island' là danh từ chỉ nơi chốn (N place). Trạng từ quan hệ thay thế là 'where' (where + S + V). <span class='hidden-cite'>[cite: 45]</span>",
+                expWrong: "• A (when): Thời gian.<br>• B (which): Nếu dùng which phải có giới từ (on/in which).<br>• D (whom): Chỉ người."
+            },
+            {
+                q: "5. He is the man _______ I respect the most in this company.",
+                opts: ["which", "whom", "whose", "where"],
+                ans: 1,
+                expCorrect: "Đáp án B. 'the man' là danh từ chỉ người, vị trí cần điền làm tân ngữ cho động từ 'respect' (I respect him). Cấu trúc: N person + whom + S + V. <span class='hidden-cite'>[cite: 41]</span>",
+                expWrong: "• A (which): Chỉ vật.<br>• C (whose): Chỉ sở hữu (whose + N). <span class='hidden-cite'>[cite: 41]</span><br>• D (where): Nơi chốn."
+            }
+        ];
+
+        // DỮ LIỆU CÂU HỎI TASK 2
+        const task2Data = [
+            {
+                q: "1. The little boy and his cute puppy _______ are playing in the garden live next door.",
+                opts: ["who", "which", "that", "whom"],
+                ans: 2,
+                expCorrect: "Đáp án C. Cụm 'The little boy and his cute puppy' chứa cả danh từ chỉ người (boy) và vật (puppy). Trong trường hợp này, bắt buộc phải dùng 'that'. <span class='hidden-cite'>[cite: 43]</span>",
+                expWrong: "• A (who): Không dùng cho 'puppy'.<br>• B (which): Không dùng cho 'boy'.<br>• D (whom): Chỉ đóng vai trò tân ngữ và chỉ người."
+            },
+            {
+                q: "2. Mr. John, _______ is a famous architect, designed this building.",
+                opts: ["that", "who", "whom", "which"],
+                ans: 1,
+                expCorrect: "Đáp án B. Mệnh đề có dấu phẩy (mệnh đề quan hệ không xác định). Không được dùng 'that' sau dấu phẩy hoặc tên riêng. 'Mr. John' là người, làm chủ ngữ nên dùng 'who'. <span class='hidden-cite'>[cite: 43]</span>",
+                expWrong: "• A (that): Bị loại do đứng sau dấu phẩy và tên riêng. <span class='hidden-cite'>[cite: 43]</span><br>• C (whom): Đóng vai trò tân ngữ.<br>• D (which): Dùng cho vật."
+            },
+            {
+                q: "3. This is the only solution _______ can resolve our current financial crisis.",
+                opts: ["which", "what", "that", "where"],
+                ans: 2,
+                expCorrect: "Đáp án C. Trước danh từ 'solution' có cụm từ chỉ định 'the only'. Theo quy tắc, khi có 'all, every, the only, the very...', ta bắt buộc ưu tiên dùng 'that'. <span class='hidden-cite'>[cite: 43]</span>",
+                expWrong: "• A (which): Về ngữ pháp cơ bản có thể thay thế cho vật, nhưng do có 'the only' nên 'that' là đáp án đúng nhất.<br>• B, D: Sai cấu trúc mệnh đề quan hệ."
+            },
+            {
+                q: "4. The customer _______ credit card was declined is waiting at the counter.",
+                opts: ["who", "whom", "whose", "that"],
+                ans: 2,
+                expCorrect: "Đáp án C. 'credit card' thuộc sở hữu của 'the customer' (thẻ tín dụng của khách hàng). Cấu trúc sở hữu: N + whose + N. <span class='hidden-cite'>[cite: 41]</span>",
+                expWrong: "• A (who): Dùng làm chủ ngữ (who + V).<br>• B (whom): Làm tân ngữ (whom + S + V).<br>• D (that): Không thể hiện sự sở hữu."
+            },
+            {
+                q: "5. The proposal about _______ we were discussing yesterday has been approved.",
+                opts: ["that", "which", "whom", "where"],
+                ans: 1,
+                expCorrect: "Đáp án B. Đại từ quan hệ đứng ngay sau giới từ 'about'. Theo quy tắc, KHÔNG được dùng 'that' đứng sau giới từ (about that ❌). 'proposal' là vật nên dùng 'about which'. <span class='hidden-cite'>[cite: 43]</span>",
+                expWrong: "• A (that): Không đứng sau giới từ. <span class='hidden-cite'>[cite: 43]</span><br>• C (whom): Dùng cho người.<br>• D (where): Không kết hợp với giới từ theo cách này."
+            }
+        ];
+
+        // Hàm điều hướng Section (Manual Navigation)
+        function navigateTo(sectionId) {
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Render Questions
+        function renderQuiz(data, containerId) {
+            const container = document.getElementById(containerId);
+            let html = '';
+
+            data.forEach((item, index) => {
+                html += `
+                <div class="question-card" id="q-${containerId}-${index}">
+                    <div class="question-text">${item.q}</div>
+                    <div class="options-grid">
+                        ${item.opts.map((opt, i) => `
+                            <button class="option-btn" onclick="checkAnswer(this, ${index}, ${i}, '${containerId}', ${item.ans})">
+                                ${String.fromCharCode(65 + i)}. ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="explanation-box" id="exp-${containerId}-${index}">
+                        <div class="exp-status" id="status-${containerId}-${index}"></div>
+                        <div class="exp-section">
+                            <span class="exp-title">✅ Phân tích đáp án đúng:</span>
+                            <span class="reason-correct">${item.expCorrect}</span>
+                        </div>
+                        <div class="exp-section">
+                            <span class="exp-title">❌ Tại sao các đáp án kia sai?</span>
+                            <span class="reason-wrong">${item.expWrong}</span>
+                        </div>
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Hàm kiểm tra đáp án
+        function checkAnswer(btn, qIndex, selectedOpt, containerId, correctOpt) {
+            const qCard = document.getElementById(`q-${containerId}-${qIndex}`);
+            const buttons = qCard.querySelectorAll('.option-btn');
+            const expBox = document.getElementById(`exp-${containerId}-${qIndex}`);
+            const statusText = document.getElementById(`status-${containerId}-${qIndex}`);
+
+            // Vô hiệu hóa các nút sau khi đã chọn
+            buttons.forEach(b => b.disabled = true);
+
+            if (selectedOpt === correctOpt) {
+                btn.classList.add('selected-correct');
+                statusText.innerHTML = "✨ Rất xuất sắc, đúng rồi nè!";
+                statusText.className = "exp-status exp-correct";
+            } else {
+                btn.classList.add('selected-wrong');
+                statusText.innerHTML = "🥺 Tiếc quá, chưa chính xác!";
+                statusText.className = "exp-status exp-wrong";
+                // Làm nổi bật đáp án đúng
+                buttons[correctOpt].classList.add('show-correct');
+            }
+
+            // Mở khung giải thích chi tiết
+            expBox.style.display = "block";
+        }
+
+        // Khởi tạo
+        renderQuiz(task1Data, 'task1-container');
+        renderQuiz(task2Data, 'task2-container');
+    </script>
+
+</body>
+</html>
