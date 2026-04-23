@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 1 Test 3 | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* TÔNG MÀU MỚI: Deep Indigo & Peach */
+        :root {
+            --primary: #4338CA;         /* Indigo 700 */
+            --primary-hover: #3730A3;   /* Indigo 800 */
+            --secondary: #E0E7FF;       /* Indigo 100 */
+            --accent: #FB923C;          /* Orange 400 (Peach) */
+            --blue-pastel: #EEF2FF;     /* Indigo 50 */
+            --blue-dark: #1E1B4B;       /* Indigo 950 */
+            --text-dark: #0F172A;       /* Slate 900 */
+            --text-light: #475569;      /* Slate 600 */
+            --bg-main: #F8FAFC;         /* Slate 50 */
+            --white: #FFFFFF;
+            --brand-pink: #F43F5E;      /* Rose 500 */
+            --brand-text: #0F172A;
+            --error-glow: #E11D48;      /* Đỏ báo lỗi */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Quicksand', sans-serif; }
+
+        body {
+            background: var(--bg-main);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Bố cục full màn hình (Gỡ bỏ max-width) */
+        .layout-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+        .brand-badge {
+            background-color: var(--brand-pink);
+            color: var(--white);
+            font-weight: 800;
+            font-size: 26px;
+            padding: 8px 20px;
+            border-radius: 15px;
+            letter-spacing: -0.5px;
+        }
+        .brand-title {
+            color: var(--brand-text);
+            font-weight: 800;
+            font-size: 30px;
+            letter-spacing: -0.5px;
+        }
+
+        .layout-container {
+            display: flex;
+            gap: 25px;
+            width: 100%;
+            height: 85vh;
+            min-height: 650px;
+        }
+
+        /* LEFT PANEL */
+        .sidebar {
+            flex: 1;
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(67, 56, 202, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .progress-section { text-align: center; }
+        .progress-circle {
+            width: 150px; height: 150px; border-radius: 50%;
+            background: conic-gradient(var(--primary) 0%, #eee 0);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px; position: relative; transition: background 0.5s;
+        }
+        .progress-circle::after { content: ""; position: absolute; width: 120px; height: 120px; background: var(--white); border-radius: 50%; }
+        .progress-text { position: relative; z-index: 1; font-size: 28px; font-weight: 700; color: var(--primary); }
+
+        .instructions { background: var(--blue-pastel); padding: 20px; border-radius: 15px; color: var(--blue-dark); }
+        .instructions h3 { margin-bottom: 15px; font-size: 18px; }
+        .instructions ul { list-style: none; }
+        .instructions li { margin-bottom: 12px; font-size: 14.5px; line-height: 1.5; }
+        kbd { background: var(--white); border: 1px solid #ccc; border-radius: 4px; padding: 3px 8px; font-family: monospace; font-size: 13px; font-weight: bold; box-shadow: 0 2px 0 #ccc; color: #333;}
+
+        /* RIGHT PANEL */
+        .main-content {
+            flex: 3; background: var(--white); border-radius: 20px; padding: 35px;
+            box-shadow: 0 10px 30px rgba(67, 56, 202, 0.1); display: flex; flex-direction: column; position: relative;
+        }
+
+        .settings-bar { display: flex; justify-content: flex-end; gap: 15px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px dashed #eee; }
+        .setting-group { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text-light); }
+        select { padding: 6px 12px; border-radius: 8px; border: 1px solid #ddd; outline: none; cursor: pointer; font-family: 'Quicksand', sans-serif; font-weight: 600; color: var(--text-dark);}
+
+        /* Vùng hiển thị ảnh Part 1 */
+        .image-section { text-align: center; margin-bottom: 15px; }
+        .part1-image { max-height: 250px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 2px solid #eee;}
+
+        .audio-section { text-align: center; margin-bottom: 15px; display: flex; justify-content: center; gap: 10px;}
+        .btn-play { background: var(--primary); color: white; border: none; padding: 15px 35px; border-radius: 50px; font-size: 18px; cursor: pointer; transition: 0.3s; font-weight: 700; box-shadow: 0 4px 15px rgba(67, 56, 202, 0.3);}
+        .btn-play:hover { background: var(--primary-hover); transform: translateY(-2px); }
+
+        .input-section { flex-grow: 1; display: flex; flex-direction: column; }
+        
+        /* Hiệu ứng báo lỗi phát sáng */
+        .message { text-align: center; margin-bottom: 10px; min-height: 45px; }
+        .glow-error {
+            color: var(--error-glow);
+            text-shadow: 0 0 12px rgba(225, 29, 72, 0.6);
+            font-weight: 800;
+            background: #FFF1F2;
+            padding: 2px 6px;
+            border-radius: 6px;
+            border: 2px dashed var(--error-glow);
+            display: inline-block;
+            transform: scale(1.05);
+        }
+        
+        textarea { width: 100%; height: 100px; padding: 20px; border: 2px solid #e0e0e0; border-radius: 15px; font-size: 22px; outline: none; transition: 0.3s; resize: none; color: var(--text-dark); line-height: 1.6; }
+        textarea:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(67, 56, 202, 0.2); }
+
+        .actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 15px; }
+        .btn { padding: 12px 25px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; font-weight: 700; transition: 0.3s; }
+        .btn-enter { background: var(--blue-dark); color: var(--white); }
+        .btn-enter:hover { background: #000000; }
+        .btn-hint { background: var(--secondary); color: var(--primary); }
+        .btn-hint:hover { background: #C7D2FE; }
+        .btn-nav { background: #E2E8F0; color: #334155; }
+        .btn-nav:hover { background: #CBD5E1; }
+
+        /* MODAL POPUP */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: white; width: 90%; max-width: 550px; padding: 35px;
+            border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: left; position: relative; max-height: 90vh; overflow-y: auto;
+        }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .modal-content h3 { color: #166534; font-size: 22px; margin-bottom: 15px; text-align: center; }
+        .modal-script { font-size: 20px; font-weight: 700; color: var(--primary); margin-bottom: 10px; text-align: center; padding-bottom: 15px; border-bottom: 2px dashed #eee;}
+        .modal-content p { margin-bottom: 10px; line-height: 1.6; font-size: 16px; }
+        .vocab-list { list-style-type: none; padding-left: 0; margin-top: 10px;}
+        .vocab-list li { margin-bottom: 8px; background: #F8FAFC; padding: 8px 15px; border-radius: 8px;}
+        .vocab-list li strong { color: var(--accent); font-size: 16px;}
+        
+        .btn-next-modal { width: 100%; background: var(--primary); color: white; margin-top: 20px; padding: 15px; font-size: 18px; }
+        .btn-next-modal:hover { background: var(--primary-hover); }
+
+        /* END SCREEN */
+        .end-screen { display: none; text-align: center; padding-top: 20px;}
+        .transcript-box { text-align: left; background: #F8FAFC; padding: 25px; border-radius: 15px; height: 400px; overflow-y: auto; margin: 25px 0; border: 1px solid #E2E8F0; line-height: 1.8; font-size: 16px;}
+
+        @media (max-width: 850px) {
+            .layout-container { flex-direction: column; height: auto; }
+            .sidebar { flex: none; width: 100%; order: 2; }
+            .main-content { flex: none; width: 100%; order: 1; min-height: 600px;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout-wrapper">
+    <div class="header-brand">
+        <div class="brand-badge">SnapEnglish</div>
+        <div class="brand-title">Part 1 Test 3</div>
+    </div>
+
+    <div class="layout-container" id="app">
+        <div class="sidebar">
+            <div class="progress-section">
+                <h2 style="color: var(--text-dark); margin-bottom: 25px; font-size: 22px;">Tiến độ bài học</h2>
+                <div class="progress-circle" id="progress-ring"><div class="progress-text"><span id="progress-percent">0</span>%</div></div>
+                <p style="color: var(--text-light); font-weight: 600; margin-top: 15px;">Câu: <span id="current-sentence-num">1</span> / <span id="total-sentences"></span></p>
+                <p style="font-size: 14px; color: #888; margin-top: 5px;">Số lần luyện tập: <span id="study-count">0</span></p>
+            </div>
+            <div class="instructions">
+                <h3>⌨️ Hướng dẫn phím tắt</h3>
+                <ul>
+                    <li><kbd>Ctrl</kbd> Lặp lại Audio.</li>
+                    <li><kbd>Tab</kbd> Gợi ý từ tiếp theo.</li>
+                    <li><kbd>Enter</kbd> Kiểm tra đáp án / Chuyển câu.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div id="learning-screen" style="display: flex; flex-direction: column; height: 100%;">
+                <div class="settings-bar">
+                    <div class="setting-group">
+                        <label>Tốc độ:</label>
+                        <select id="speed-setting">
+                            <option value="0.7">0.7x</option>
+                            <option value="0.9" selected>0.9x</option>
+                            <option value="1.0">1.0x</option>
+                            <option value="1.2">1.2x</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label>Lặp tự động:</label>
+                        <select id="repeat-setting">
+                            <option value="1" selected>1 lần</option>
+                            <option value="2">2 lần</option>
+                            <option value="3">3 lần</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="image-section">
+                    <img id="question-image" class="part1-image" src="" alt="Part 1 Question">
+                </div>
+
+                <div class="audio-section">
+                    <button class="btn-play" onclick="playAudio()">🔊 Nghe Audio (Ctrl)</button>
+                </div>
+                
+                <div class="message" id="system-message"></div>
+
+                <div class="input-section">
+                    <textarea id="user-input" placeholder="Lắng nghe câu miêu tả ảnh và gõ vào đây..." autofocus></textarea>
+                    
+                    <div class="actions">
+                        <button class="btn btn-nav" onclick="prevSentenceManual()">⬅️ Back</button>
+                        <button class="btn btn-enter" onclick="handleEnterAction()">Kiểm tra (Enter)</button>
+                        <button class="btn btn-hint" onclick="giveHint()">💡 Gợi ý (Tab)</button>
+                        <button class="btn btn-nav" onclick="nextSentenceManual()">Next ➡️</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="end-screen" class="end-screen">
+                <h2 style="color: var(--primary); font-size: 28px;">Tuyệt vời! Hoàn thành Test 🏆</h2>
+                <div class="transcript-box" id="full-transcript"></div>
+                <div class="actions">
+                    <button class="btn btn-enter" onclick="restartLesson()">🔄 Luyện tập lại</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="feedback-modal">
+    <div class="modal-content">
+        <h3>🎉 Chính xác!</h3>
+        <div class="modal-script" id="trans-en"></div>
+        <p><strong>🇻🇳 Nghĩa:</strong> <span id="trans-vi"></span></p>
+        <p id="grammar-container"><strong>📖 Ngữ pháp/Ghi chú:</strong> <span id="trans-grammar"></span></p>
+        <ul class="vocab-list" id="trans-vocab"></ul>
+        <button class="btn btn-next-modal" onclick="nextSentence()">Qua câu tiếp theo (Enter) ➔</button>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu trích xuất từ file "part 1 test 3 2018.docx"
+    const lessonData = [
+        // QUESTION 1
+        {
+            en: "One of the men is repairing a motorcycle.",
+            vi: "Một trong những người đàn ông đang sửa xe máy.",
+            grammar: "Đáp án sai về động từ. Một trong hai người đàn ông đang ngồi trên xe máy, nhưng không phải đang sửa xe máy (repairing a motorcycle) nên đây là đáp án sai.",
+            vocab: ["repair (sửa chữa)", "motorcycle (xe máy)", "board (lên, bước lên (tàu/xe))"],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-1-16.png"
+        },
+        {
+            en: "One of the men is boarding a boat.",
+            vi: "Một trong những người đàn ông đang lên thuyền.",
+            grammar: "Đáp án sai về động từ. Trong ảnh có thuyền, nhưng không có người nào đang lên thuyền (boarding a boat) nên đây là đáp án sai.",
+            vocab: [],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-1-16.png"
+        },
+        {
+            en: "One of the men is driving a car.",
+            vi: "Một trong những người đàn ông đang lái xe hơi.",
+            grammar: "Đáp án sai sử dụng danh từ không có trong ảnh. Trong ảnh không có ô tô (a car) nên đây là đáp án sai.",
+            vocab: [],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-1-16.png"
+        },
+        {
+            en: "One of the men is walking along the water.",
+            vi: "Một trong những người đàn ông đang đi dọc theo mép nước.",
+            grammar: "Đáp án đúng. Một trong hai người đàn ông đang đi dọc theo mép nước (walking along the water) nên đây là đáp án đúng.",
+            vocab: [],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-1-16.png"
+        },
+        
+        // QUESTION 2
+        {
+            en: "A woman is making a pot of coffee.",
+            vi: "Một người phụ nữ đang pha một ấm cà phê.",
+            grammar: "Đáp án sai sử dụng danh từ không có trong ảnh. Trong ảnh không thấy ấm cà phê (a pot of coffee) nên đây là đáp án sai.",
+            vocab: ["make coffee (pha cà phê)", "stack (xếp, xếp chồng lên)", "tray (khay)"],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-14.png"
+        },
+        {
+            en: "A woman is wearing a pair of gloves.",
+            vi: "Một người phụ nữ đang đeo một đôi găng tay.",
+            grammar: "Đáp án đúng. Trạng thái người phụ nữ đang đeo găng tay trên cả hai tay (wearing a pair of gloves) nên đây là đáp án đúng.",
+            vocab: [],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-14.png"
+        },
+        {
+            en: "A woman is stacking dishes.",
+            vi: "Một người phụ nữ đang xếp chồng các đĩa lên nhau.",
+            grammar: "Đáp án sai sử dụng danh từ không có trong ảnh. Trong ảnh không thấy đĩa (dishes) nên đây là đáp án sai.",
+            vocab: [],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-14.png"
+        },
+        {
+            en: "A woman is carrying some trays.",
+            vi: "Một người phụ nữ đang bưng vài cái khay.",
+            grammar: "Đáp án sai về động từ. Mặc dù trong ảnh có khay (some trays), nhưng người phụ nữ không có vẻ như đang bưng khay (carrying some trays) nên đây là đáp án sai.",
+            vocab: [],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-2-14.png"
+        },
+
+        // QUESTION 3
+        {
+            en: "Some people are watching a film.",
+            vi: "Vài người đang xem phim.",
+            grammar: "Đáp án sai về động từ. Mọi người đang nhìn diễn giả chứ không phải đang xem phim (watching a film) nên đây là đáp án sai.",
+            vocab: ["seat in a circle (ngồi thành vòng tròn)", "raise one's hand (giơ tay)"],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-3-15.png"
+        },
+        {
+            en: "Some people are seated in a circle.",
+            vi: "Vài người đang ngồi thành vòng tròn.",
+            grammar: "Đáp án sai về cụm giới từ. Mọi người đang ngồi (seated) nhưng không phải ngồi thành vòng tròn (in a circle) nên đây là đáp án sai.",
+            vocab: [],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-3-15.png"
+        },
+        {
+            en: "A man is speaking to a group of people.",
+            vi: "Một người đàn ông đang nói chuyện với một nhóm người.",
+            grammar: "Đáp án đúng. Một người đàn ông đang nói chuyện với một nhóm người (speaking to a group of people) nên đây là đáp án đúng.",
+            vocab: [],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-3-15.png"
+        },
+        {
+            en: "A woman is raising her hand.",
+            vi: "Một người phụ nữ đang giơ tay.",
+            grammar: "Đáp án sai về động từ. Trong ảnh không có người phụ nữ nào đang giơ tay (raising her hand) nên đây là đáp án sai.",
+            vocab: [],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-3-15.png"
+        },
+
+        // QUESTION 4
+        {
+            en: "Stones are rolling down a hill.",
+            vi: "Những hòn đá đang lăn xuống đồi.",
+            grammar: "Đáp án sai về động từ. Đây là cảnh đồ trang sức được trưng bày trên nền đá, không phải đá đang lăn xuống đồi (rolling down a hill) nên đây là đáp án sai.",
+            vocab: ["roll (lăn)", "on display (được trưng bày)", "stairs (cầu thang)", "try on (mặc thử, đeo thử)"],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-4-13.png"
+        },
+        {
+            en: "Some jewelry is on display.",
+            vi: "Một số đồ trang sức đang được trưng bày.",
+            grammar: "Đáp án đúng. Miêu tả chính xác trạng thái đồ trang sức (Some jewelry) đang được trưng bày (on display).",
+            vocab: [],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-4-13.png"
+        },
+        {
+            en: "A man is climbing some stairs.",
+            vi: "Một người đàn ông đang leo lên vài bậc cầu thang.",
+            grammar: "Đáp án sai về động từ. Trong ảnh có thấy cầu thang nhưng người đàn ông không leo lên cầu thang (climbing some stairs) nên đây là đáp án sai.",
+            vocab: [],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-4-13.png"
+        },
+        {
+            en: "A customer is trying on a necklace.",
+            vi: "Một khách hàng đang thử vòng cổ.",
+            grammar: "Đáp án sai sử dụng danh từ không có trong ảnh. Trong ảnh không thấy khách hàng (A customer) nên đây là đáp án sai.",
+            vocab: [],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-4-13.png"
+        },
+
+        // QUESTION 5
+        {
+            en: "A laptop has been stored on a bookshelf.",
+            vi: "Máy tính xách tay được cất trên giá sách.",
+            grammar: "Đáp án sai về cụm giới từ. Máy tính xách tay không nằm trên giá sách (on a bookshelf) mà nằm trên bàn (on a desk) nên đây là đáp án sai.",
+            vocab: ["laptop (máy tính xách tay)", "store (lưu trữ/cất giữ)", "bookshelf (giá sách)", "prop against (dựng tựa vào)", "separate (phân loại/tách ra)", "frame (đóng khung)"],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-5-13.png"
+        },
+        {
+            en: "A whiteboard is propped against a wall.",
+            vi: "Bảng trắng được dựng tựa vào tường.",
+            grammar: "Đáp án đúng. Bảng trắng đang được dựng tựa vào tường (propped against a wall).",
+            vocab: [],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-5-13.png"
+        },
+        {
+            en: "She's separating some papers into piles.",
+            vi: "Người phụ nữ đang phân loại giấy tờ thành từng cọc.",
+            grammar: "Đáp án sai về động từ. Mặc dù thấy có giấy tờ trong ảnh nhưng người phụ nữ không phải đang phân loại giấy tờ (is separating some papers) nên đây là đáp án sai.",
+            vocab: [],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-5-13.png"
+        },
+        {
+            en: "She's framing a piece of art.",
+            vi: "Người phụ nữ đang đóng khung một bức tranh.",
+            grammar: "Đáp án sai về động từ. Trong ảnh thấy có bức tranh nhưng người phụ nữ không phải đang đóng khung một bức tranh (framing a piece of art) nên đây là đáp án sai.",
+            vocab: [],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-5-13.png"
+        },
+
+        // QUESTION 6
+        {
+            en: "A sitting area is illuminated by floor lamps.",
+            vi: "Khu vực tiếp khách đang được chiếu sáng bởi đèn sàn.",
+            grammar: "Đáp án đúng. Trạng thái đèn sàn đang chiếu sáng khu vực tiếp khách (illuminated by floor lamps) nên đây là đáp án đúng.",
+            vocab: ["sitting area (khu vực tiếp khách/phòng khách)", "illuminate (chiếu sáng)", "floor lamp (đèn sàn/đèn đứng)", "refreshments (đồ ăn nhẹ/giải khát)", "armchair (ghế bành)", "face (hướng về/đối diện)", "carpeting (thảm)", "measure (đo lường)", "installation (sự lắp đặt)"],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-6-11.png"
+        },
+        {
+            en: "Refreshments have been left on a table.",
+            vi: "Đồ ăn nhẹ được để lại trên bàn.",
+            grammar: "Đáp án sai sử dụng danh từ không có trong ảnh. Trong ảnh không thấy đồ ăn nhẹ (Refreshments) nên đây là đáp án sai.",
+            vocab: [],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-6-11.png"
+        },
+        {
+            en: "The armchairs are facing the paintings.",
+            vi: "Những chiếc ghế bành đang đối diện với các bức tranh.",
+            grammar: "Đáp án sai về động từ. Trong ảnh có ghế bành (The armchairs) và tranh (the paintings) nhưng chúng không đối diện nhau (facing) nên đây là đáp án sai.",
+            vocab: [],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-6-11.png"
+        },
+        {
+            en: "Some carpeting is being measured for installation.",
+            vi: "Thảm đang được đo để lắp đặt.",
+            grammar: "Đáp án sai về động từ. Đây không phải là cảnh thảm đang được đo để lắp đặt (being measured for installation) mà thảm đã được lắp đặt sẵn rồi nên đây là đáp án sai.",
+            vocab: [],
+            image: "https://zenlishtoeic.vn/wp-content/uploads/2023/04/zenlish-6-11.png"
+        }
+    ];
+
+    let currentIndex = 0;
+    let currentPlayCount = 0;
+    let playTimeout;
+    const synth = window.speechSynthesis;
+    let mainVoice = null;
+
+    const msgBox = document.getElementById("system-message");
+    const inputField = document.getElementById("user-input");
+    const modalOverlay = document.getElementById("feedback-modal");
+    const imageDisplay = document.getElementById("question-image");
+
+    function loadVoices() {
+        let voices = synth.getVoices();
+        if(voices.length === 0) return;
+        mainVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Male') || v.name.includes('Google US English'))) || voices.find(v => v.lang.startsWith('en'));
+    }
+
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    window.onload = () => {
+        loadVoices();
+        let count = localStorage.getItem('part1_test3_count') || 0;
+        document.getElementById('study-count').innerText = count;
+        document.getElementById('total-sentences').innerText = lessonData.length;
+        
+        let savedIndex = parseInt(localStorage.getItem('part1_test3_progress'));
+        if (!isNaN(savedIndex) && savedIndex < lessonData.length) {
+            currentIndex = savedIndex;
+        }
+
+        updateUI();
+    };
+
+    function updateUI() {
+        updateProgress();
+        document.getElementById('current-sentence-num').innerText = currentIndex + 1;
+        
+        const data = lessonData[currentIndex];
+        // Cập nhật ảnh tương ứng với Part 1
+        imageDisplay.src = data.image;
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Control') {
+            e.preventDefault();
+            playAudio();
+        } else if (e.key === 'Tab') {
+            e.preventDefault();
+            giveHint();
+        } else if (e.key === 'Enter' && modalOverlay.style.display !== "flex") {
+            e.preventDefault();
+            handleEnterAction();
+        }
+    });
+
+    function handleEnterAction() {
+        if (modalOverlay.style.display === "flex") {
+            nextSentence();
+        } else {
+            checkAnswer();
+        }
+    }
+
+    function playAudio() {
+        currentPlayCount = 0;
+        clearTimeout(playTimeout);
+        triggerAudioLoop();
+    }
+
+    function triggerAudioLoop() {
+        if (synth.speaking) synth.cancel();
+        
+        const data = lessonData[currentIndex];
+        const utterThis = new SpeechSynthesisUtterance(data.en);
+        utterThis.lang = 'en-US';
+        utterThis.rate = parseFloat(document.getElementById('speed-setting').value);
+        
+        if (mainVoice) utterThis.voice = mainVoice;
+        
+        utterThis.onend = () => {
+            currentPlayCount++;
+            const maxRepeat = parseInt(document.getElementById('repeat-setting').value);
+            if (currentPlayCount < maxRepeat) {
+                playTimeout = setTimeout(triggerAudioLoop, 500);
+            }
+        };
+        
+        synth.speak(utterThis);
+        if (modalOverlay.style.display !== "flex") inputField.focus();
+    }
+
+    // Xóa dấu câu để hỗ trợ kiểm tra mượt mà hơn
+    function normalizeText(text) { return text.toLowerCase().replace(/[.,?!–\-:"]/g, '').trim(); }
+
+    function checkAnswer() {
+        const rawUserInput = inputField.value;
+        const userInput = normalizeText(rawUserInput);
+        const targetText = normalizeText(lessonData[currentIndex].en);
+        
+        if (userInput === targetText) {
+            msgBox.innerText = "";
+            showModal();
+        } else {
+            const userWordsNorm = userInput.split(' ').filter(w => w !== "");
+            const targetWordsNorm = targetText.split(' ');
+            
+            // Lấy từ thô (raw) để highlight chính xác vị trí trong khung nhập
+            const rawWords = rawUserInput.trim().split(/\s+/);
+
+            if (userWordsNorm.length === 0) {
+                msgBox.innerText = "Bạn chưa gõ gì cả. Nhấn Ctrl để nghe nhé!";
+                return;
+            }
+
+            let wrongIndex = -1;
+            for (let i = 0; i < userWordsNorm.length; i++) {
+                if (userWordsNorm[i] !== targetWordsNorm[i]) {
+                    wrongIndex = i;
+                    break;
+                }
+            }
+
+            if (wrongIndex !== -1) {
+                // Tính toán vị trí Select (bôi đen) bên trong Textarea để dễ gõ lại
+                let startPos = 0;
+                for (let k = 0; k < wrongIndex; k++) {
+                    startPos += rawWords[k].length + 1; // +1 là dấu cách
+                }
+                
+                // Tính luôn các khoảng trắng thừa ở đầu nếu có
+                const leadingSpaces = inputField.value.length - inputField.value.trimStart().length;
+                startPos += leadingSpaces;
+                let endPos = startPos + rawWords[wrongIndex].length;
+
+                // Tự động focus và bôi đen vùng sai
+                inputField.focus();
+                inputField.setSelectionRange(startPos, endPos);
+
+                // Hiển thị đoạn text với hiệu ứng Phát sáng tại đúng vị trí sai bên dưới
+                let displayHTML = rawWords.map((w, idx) => {
+                    if (idx === wrongIndex) {
+                        return `<span class="glow-error">${w}</span>`;
+                    }
+                    return w;
+                }).join(' ');
+
+                msgBox.innerHTML = `Vị trí sai:<br><div style="margin-top:12px; font-size:19px; color:var(--text-dark); font-weight: 500;">${displayHTML}</div>`;
+                
+            } else if (userWordsNorm.length < targetWordsNorm.length) {
+                msgBox.innerText = "Chưa hết câu, hãy nghe thêm và gõ tiếp nhé!";
+                inputField.focus();
+                inputField.setSelectionRange(inputField.value.length, inputField.value.length);
+            } else {
+                msgBox.innerText = "Có lỗi sai chính tả nhỏ, hãy kiểm tra lại.";
+            }
+        }
+    }
+
+    function giveHint() {
+        if (modalOverlay.style.display === "flex") return;
+
+        const rawUserInput = inputField.value;
+        const userInput = normalizeText(rawUserInput);
+        const targetText = normalizeText(lessonData[currentIndex].en);
+        
+        const targetWordsRaw = lessonData[currentIndex].en.split(' ');
+        const targetWordsNorm = targetText.split(' ');
+        const userWords = userInput.split(' ').filter(w => w !== "");
+
+        let hintWord = targetWordsRaw[userWords.length];
+        for (let i = 0; i < userWords.length; i++) {
+            if (userWords[i] !== targetWordsNorm[i]) {
+                hintWord = targetWordsRaw[i];
+                inputField.value = targetWordsRaw.slice(0, i).join(' ') + (i > 0 ? " " : "");
+                break;
+            }
+        }
+
+        if (hintWord) {
+            inputField.value += (inputField.value.length > 0 && !inputField.value.endsWith(' ') ? ' ' : '') + hintWord + ' ';
+            msgBox.innerText = "Đã điền từ tiếp theo!";
+        }
+    }
+
+    function showModal() {
+        inputField.blur();
+        const data = lessonData[currentIndex];
+        
+        document.getElementById("trans-en").innerText = data.en;
+        document.getElementById("trans-vi").innerText = data.vi;
+        
+        const grammarContainer = document.getElementById("grammar-container");
+        if(data.grammar) {
+            grammarContainer.style.display = "block";
+            document.getElementById("trans-grammar").innerText = data.grammar;
+        } else {
+            grammarContainer.style.display = "none";
+        }
+        
+        const vocabList = document.getElementById("trans-vocab");
+        vocabList.innerHTML = "";
+        if(data.vocab && data.vocab.length > 0) {
+            data.vocab.forEach(v => {
+                let li = document.createElement("li");
+                let parts = v.split(" (");
+                li.innerHTML = `<strong>${parts[0]}</strong> (${parts[1]}`;
+                vocabList.appendChild(li);
+            });
+        }
+        
+        modalOverlay.style.display = "flex";
+        document.querySelector('.btn-next-modal').focus();
+    }
+
+    function prevSentenceManual() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            resetForNewSentence();
+        }
+    }
+
+    function nextSentenceManual() {
+        if (currentIndex < lessonData.length - 1) {
+            currentIndex++;
+            resetForNewSentence();
+        } else {
+            finishLesson();
+        }
+    }
+    
+    function resetForNewSentence() {
+        modalOverlay.style.display = "none";
+        inputField.value = "";
+        msgBox.innerHTML = "";
+        localStorage.setItem('part1_test3_progress', currentIndex);
+        updateUI();
+        playAudio();
+    }
+
+    function nextSentence() {
+        modalOverlay.style.display = "none";
+        currentIndex++;
+        inputField.value = "";
+        msgBox.innerHTML = "";
+        
+        if (currentIndex < lessonData.length) {
+            localStorage.setItem('part1_test3_progress', currentIndex);
+            updateUI();
+            playAudio();
+        } else {
+            finishLesson();
+        }
+    }
+
+    function updateProgress() {
+        const percent = Math.round((currentIndex / lessonData.length) * 100);
+        document.getElementById("progress-percent").innerText = percent;
+        document.getElementById("progress-ring").style.background = `conic-gradient(var(--primary) ${percent}%, #eee 0)`;
+    }
+
+    function finishLesson() {
+        document.getElementById("learning-screen").style.display = "none";
+        document.getElementById("end-screen").style.display = "block";
+        
+        let count = parseInt(localStorage.getItem('part1_test3_count')) || 0;
+        count++;
+        localStorage.setItem('part1_test3_count', count);
+        document.getElementById('study-count').innerText = count;
+
+        localStorage.removeItem('part1_test3_progress');
+
+        const transcriptBox = document.getElementById("full-transcript");
+        let lastImage = "";
+        let htmlContent = "";
+
+        lessonData.forEach((d, idx) => {
+            if(d.image !== lastImage) {
+                htmlContent += `<div style="text-align:center; margin: 20px 0 10px;"><img src="${d.image}" style="max-height: 150px; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.1);"></div>`;
+                lastImage = d.image;
+            }
+            htmlContent += `<p style="margin-bottom:12px; padding-left: 10px;">
+                <strong>${(idx % 4) + 1}.</strong> <span style="color:var(--primary); font-weight:600;">${d.en}</span><br>
+                <span style="color:var(--text-light); font-size: 14px; padding-left: 18px;">${d.vi}</span>
+            </p>`;
+        });
+        transcriptBox.innerHTML = htmlContent;
+    }
+
+    function restartLesson() {
+        localStorage.setItem('part1_test3_progress', 0);
+        location.reload();
+    }
+</script>
+
+</body>
+</html>
