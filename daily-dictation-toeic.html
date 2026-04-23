@@ -1,1 +1,339 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOEIC Dictation | SnapEnglish</title>
+  <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Bảng màu SnapEnglish Pastel --- */
+        :root {
+            --primary-eng: #a29bfe; /* Tím pastel */
+            --secondary-eng: #c8c2f2; /* Tím nhạt */
+            --accent-eng: #e7a87c; /* Cam đất Snap */
+            --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            --text-main: #4a4a4a;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.9);
+        }
 
+        body { 
+            font-family: 'Quicksand', sans-serif; 
+            margin: 0;
+            padding: 50px 20px;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: var(--text-main);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* --- Background trang trí đặc trưng Snap --- */
+        .shape {
+            position: fixed;
+            z-index: -1;
+            filter: blur(60px);
+            opacity: 0.3;
+        }
+        .shape-1 { width: 300px; height: 300px; background: var(--primary-eng); top: -50px; right: -50px; border-radius: 50%; }
+        .shape-2 { width: 400px; height: 400px; background: var(--accent-eng); bottom: -100px; left: -100px; border-radius: 30% 70% 70% 30%; }
+
+        /* --- Header --- */
+        .header-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 { 
+            font-size: 34px; 
+            margin-bottom: 8px;
+            color: #6c5ce7;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-accent { color: var(--accent-eng); }
+
+        p.subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        /* --- Tìm kiếm --- */
+        .search-wrapper {
+            max-width: 500px;
+            margin: 0 auto 50px auto;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 15px 25px;
+            border-radius: 15px;
+            border: 2px solid transparent;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            font-family: 'Quicksand', sans-serif;
+            font-size: 16px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            box-sizing: border-box; 
+            transition: all 0.3s ease;
+        }
+
+        #searchInput:focus {
+            border-color: var(--primary-eng);
+            outline: none;
+            background: #fff;
+            box-shadow: 0 10px 25px rgba(162, 155, 254, 0.2);
+        }
+
+        /* --- Grid Container --- */
+        .container { 
+            max-width: 1000px; 
+            margin: auto; 
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding-bottom: 80px; /* Chừa chỗ cho nút liên hệ */
+        }
+
+        /* --- Card Unit Style Snap --- */
+        .unit-card { 
+            background: var(--glass-bg);
+            padding: 22px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+            position: relative;
+            animation: fadeIn 0.5s ease backwards;
+        }
+
+        .unit-card:hover {
+            transform: translateY(-5px);
+            background: #fff;
+            box-shadow: 0 12px 25px rgba(162, 155, 254, 0.15);
+            border-color: var(--primary-eng);
+        }
+
+        .status-badge {
+            width: 6px;
+            height: 45px;
+            border-radius: 10px;
+            background: var(--accent-eng); /* Đổi màu badge sang cam cho Dictation */
+            margin-right: 18px;
+            transition: 0.3s;
+        }
+
+        .unit-card:hover .status-badge {
+            background: var(--primary-eng);
+            transform: scaleY(1.1);
+        }
+
+        .unit-info { flex-grow: 1; }
+
+        .unit-tag {
+            font-size: 10px;
+            background: #ffe3d1; /* Màu nền tag cam nhạt */
+            color: #d35400;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: inline-block;
+        }
+
+        .unit-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0;
+            color: #333;
+        }
+
+        .arrow-btn {
+            color: var(--primary-eng);
+            font-size: 18px;
+            font-weight: bold;
+            opacity: 0.5;
+            transition: 0.3s;
+        }
+
+        .unit-card:hover .arrow-btn {
+            opacity: 1;
+            transform: translateX(3px);
+            color: var(--accent-eng);
+        }
+
+        /* --- Nút Liên hệ cố định --- */
+        .contact-floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--primary-eng); /* Đổi màu nút liên hệ để cân bằng thị giác */
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 15px;
+            box-shadow: 0 4px 15px rgba(162, 155, 254, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .contact-floating-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(162, 155, 254, 0.6);
+            background-color: #8c82fc;
+        }
+
+        .hidden { display: none !important; }
+
+        #noResults {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 50px;
+            color: #95a5a6;
+            font-style: italic;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .container { grid-template-columns: 1fr; }
+            .contact-floating-btn {
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+
+    <div class="header-section">
+        <h1>✍️ Snap<span class="brand-accent">Dictation</span></h1>
+        <p class="subtitle">Luyện chép chính tả TOEIC Listening Part 1, 2, 3, 4 (2018 - 2026)</p>
+    </div>
+    
+    <div class="search-wrapper">
+        <input type="text" id="searchInput" placeholder="Tìm năm, Part hoặc Test (VD: 2025, Part 1, Test 2)...">
+    </div>
+
+    <div class="container" id="unitContainer">
+        <div id="noResults" class="hidden">Không tìm thấy bài chép chính tả bạn cần... 🔍</div>
+    </div>
+
+    <a href="contact.html" class="contact-floating-btn">
+        💬 Nhận hỗ trợ
+    </a>
+
+   <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('unitContainer');
+        const noResultsMsg = document.getElementById('noResults');
+        const searchInput = document.getElementById('searchInput');
+
+        // Cấu hình dữ liệu sinh tự động từ 2018 tới 2026
+        const startYear = 2018;
+        const endYear = 2026;
+        const lessons = [];
+
+        // Tạo danh sách Dictation
+        for (let year = startYear; year <= endYear; year++) {
+            // Giả định 2018 có 5 test, các năm khác có 10 test (như bản TOEIC Listening)
+            const maxTest = (year === 2018) ? 5 : 10;
+            
+            for (let test = 1; test <= maxTest; test++) {
+                [1, 2, 3, 4].forEach(part => {
+                    lessons.push({
+                        year: year,
+                        part: part,
+                        test: test,
+                        title: `Dictation Part ${part} - Test ${test} - ${year}`,
+                        // Thay đổi URL để trỏ đúng về trang dictation
+                        url: `part-${part}-test-${test}-${year}-dictation.html`
+                    });
+                });
+            }
+        }
+
+        function renderLessons() {
+            // Sử dụng Fragment để tăng tốc độ render cho lượng DOM lớn
+            const fragment = document.createDocumentFragment();
+            
+            lessons.forEach((item, index) => {
+                const card = document.createElement('a');
+                card.className = 'unit-card';
+                card.href = item.url;
+                
+                // Từ khóa dùng để tìm kiếm
+                card.setAttribute('data-search', `${item.year} part ${item.part} test ${item.test} dictation chép chính tả`);
+                
+                card.style.animationDelay = `${(index % 20) * 0.02}s`;
+
+                card.innerHTML = `
+                    <div class="status-badge"></div>
+                    <div class="unit-info">
+                        <span class="unit-tag">DICTATION</span>
+                        <h3 class="unit-title">${item.title}</h3>
+                    </div>
+                    <div class="arrow-btn">✍️</div>
+                `;
+                fragment.appendChild(card);
+            });
+            
+            container.appendChild(fragment);
+        }
+
+        // Xử lý logic tìm kiếm trực tiếp
+        searchInput.addEventListener('input', function() {
+            const filter = this.value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.unit-card');
+            let count = 0;
+
+            // Loại bỏ khoảng trắng thừa để tìm kiếm mượt hơn
+            const filterWords = filter.split(/\s+/);
+
+            cards.forEach(card => {
+                const searchText = card.getAttribute('data-search');
+                
+                // Kiểm tra xem chuỗi tìm kiếm có chứa TẤT CẢ các từ khóa người dùng nhập không
+                const isMatch = filterWords.every(word => searchText.includes(word));
+                
+                if (isMatch) {
+                    card.classList.remove('hidden');
+                    count++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            // Hiển thị thông báo nếu không có kết quả
+            if (count === 0) {
+                noResultsMsg.classList.remove('hidden');
+            } else {
+                noResultsMsg.classList.add('hidden');
+            }
+        });
+
+        // Chạy hàm khởi tạo render
+        renderLessons();
+    });
+   </script>
+</body>
+</html>
