@@ -1481,6 +1481,50 @@ function startTestActual() {
 
 // --- INIT ---
 window.onload = function() {
+    // --- HÀM TÔ MÀU DẪN CHỨNG HIỆN SẴN ---
+function applyEvidenceColors() {
+    const pastelColors = [
+        { bg: '#ffadad', text: '#5a1c1c' }, // Đỏ pastel
+        { bg: '#ffd6a5', text: '#663d14' }, // Cam pastel
+        { bg: '#caffbf', text: '#1f4d1f' }, // Xanh lá pastel
+        { bg: '#9bf6ff', text: '#16565c' }, // Xanh dương pastel
+        { bg: '#a0c4ff', text: '#1c3666' }, // Xanh biển pastel
+        { bg: '#bdb2ff', text: '#352666' }, // Tím pastel
+        { bg: '#ffc6ff', text: '#661a66' }, // Hồng pastel
+        { bg: '#e2f0cb', text: '#3e5222' }  // Xanh rêu pastel
+    ];
+
+    let colorIndex = 0;
+    let usedColors = {}; // Lưu lại màu của từng câu hỏi
+
+    // Lấy tất cả các thẻ có class là ev-box
+    let evElements = document.querySelectorAll('.ev-box');
+
+    evElements.forEach(el => {
+        let idString = el.id;
+        if (!idString) return;
+
+        // Tách lấy số của câu hỏi (Ví dụ: từ "ev-191-2" lấy ra số "191")
+        let match = idString.match(/ev-(\d+)/);
+        if (match) {
+            let qId = match[1];
+
+            // Nếu câu này chưa được cấp màu, lấy màu mới trong mảng
+            if (!usedColors[qId]) {
+                usedColors[qId] = pastelColors[colorIndex % pastelColors.length];
+                colorIndex++;
+            }
+
+            // Áp dụng màu cho thẻ
+            el.style.backgroundColor = usedColors[qId].bg;
+            el.style.color = usedColors[qId].text;
+            el.style.padding = "2px 5px";
+            el.style.borderRadius = "6px";
+            el.style.fontWeight = "600";
+            el.style.transition = "all 0.3s ease";
+        }
+    });
+}
     renderDynamicContent();
     switchTab(1); // Thêm dòng này để tab Part 5 active hiển thị đúng tiêu đề
     document.getElementById('setupOverlay').style.display = 'flex';
@@ -1540,6 +1584,10 @@ function renderDynamicContent() {
         dot.onclick = () => scrollToQuestion(id);
         nav.appendChild(dot);
     });
+
+    // --- GỌI HÀM TÔ MÀU DẪN CHỨNG Ở ĐÂY ---
+    applyEvidenceColors(); 
+}
 }
 
 // Helper: Chuyển đáp án Text thành A, B, C, D
@@ -1683,22 +1731,26 @@ function startTimer() {
         }
     }, 1000);
 }
-// --- HÀM CUỘN VÀ NHẤP NHÁY DẪN CHỨNG ---
-function scrollToevIdence(evId) {
+// --- HÀM CUỘN VÀ TẠO HIỆU ỨNG NHẤN MẠNH ---
+function scrollToEvidence(evId) {
     const evElement = document.getElementById(evId);
     if(evElement) {
         // Cuộn đoạn văn chứa dẫn chứng vào giữa màn hình
         evElement.scrollIntoView({behavior: "smooth", block: "center"});
         
-        // Gỡ class cũ (nếu đang bấm liên tục) và trigger reflow để reset animation
-        evElement.classList.remove("focus-blink");
-        void evElement.offsetWidth; 
+        // Tạo hiệu ứng phát sáng viền để thu hút sự chú ý mà không đè mất màu pastel
+        let originalBoxShadow = evElement.style.boxShadow || "none";
         
-        // Thêm class phát sáng
-        evElement.classList.add("focus-blink");
+        // Làm nổi bật bằng shadow viền xám đậm
+        evElement.style.boxShadow = "0 0 0 3px rgba(0,0,0,0.4), 0 4px 10px rgba(0,0,0,0.2)";
+        evElement.style.transform = "scale(1.02)";
+        evElement.style.display = "inline-block";
         
-        // Tự động tắt phát sáng sau 2 giây
-        setTimeout(() => evElement.classList.remove("focus-blink"), 2000);
+        // Tắt nổi bật sau 1.5 giây
+        setTimeout(() => {
+            evElement.style.boxShadow = originalBoxShadow;
+            evElement.style.transform = "scale(1)";
+        }, 1500);
     } else {
         alert("Chưa được gắn ID dẫn chứng trong bài đọc!");
     }
