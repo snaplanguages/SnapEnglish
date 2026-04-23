@@ -1924,6 +1924,61 @@ Sole Assortment will serve women who work in the surrounding area.</span> Becaus
 
     window.onload = () => { renderPassage(0); };
 </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Lấy dữ liệu người dùng đã lưu
+        const savedAnswersJSON = localStorage.getItem('snapEnglish_userAnswers');
+        
+        if (savedAnswersJSON) {
+            const userAnswers = JSON.parse(savedAnswersJSON);
+            const answerCards = document.querySelectorAll('.answer-card');
+            
+            // Mảng đáp án đúng để đối chiếu
+            const correctAnswers = [
+                "recommendation", "appointment", "eligible", "required", "confirmation",
+                "us", "early", "returned", "automatically", "project",
+                "who", "proposed", "within", "leaves", "similar",
+                "promote", "easily", "beginning", "very", "before",
+                "participation", "factor", "regarding", "creatively", "submit",
+                "themselves", "clearly", "While", "as soon as", "compliance"
+            ];
 
+            answerCards.forEach((card, index) => {
+                const userAnswer = userAnswers[index];
+                const correctAnswer = correctAnswers[index];
+                
+                // Tạo thẻ hiển thị kết quả của người dùng
+                const resultDiv = document.createElement('div');
+                resultDiv.style.margin = "10px 0 20px 0";
+                resultDiv.style.fontWeight = "700";
+                resultDiv.style.padding = "12px 15px";
+                resultDiv.style.borderRadius = "8px";
+                resultDiv.style.fontSize = "16px";
+                resultDiv.style.display = "inline-block";
+
+                if (!userAnswer) {
+                    resultDiv.innerHTML = "Bạn chưa chọn đáp án ⚪";
+                    resultDiv.style.backgroundColor = "#f1f3f5";
+                    resultDiv.style.color = "#6c757d";
+                    resultDiv.style.border = "1px solid #dee2e6";
+                } else if (userAnswer === correctAnswer) {
+                    resultDiv.innerHTML = `Bạn đã chọn: <strong>${userAnswer}</strong> <span>✅ Đúng</span>`;
+                    resultDiv.style.backgroundColor = "#e8f5e9"; // Xanh pastel
+                    resultDiv.style.color = "#2e7d32";
+                    resultDiv.style.border = "1px solid #c8e6c9";
+                } else {
+                    resultDiv.innerHTML = `Bạn đã chọn: <strong>${userAnswer}</strong> <span>❌ Sai</span>`;
+                    resultDiv.style.backgroundColor = "#ffebee"; // Đỏ pastel
+                    resultDiv.style.color = "#c62828";
+                    resultDiv.style.border = "1px solid #ffcdd2";
+                }
+                
+                // Chèn kết quả vào ngay trước thẻ giải thích
+                const explanationBox = card.querySelector('.explanation-box');
+                card.insertBefore(resultDiv, explanationBox);
+            });
+        }
+    });
+</script>
 </body>
 </html>
