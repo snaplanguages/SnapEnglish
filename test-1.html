@@ -1033,6 +1033,1098 @@
         menu.style.display = "none";
     }
 </script>
-   
+   <!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Reading Test 1 | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette Matcha & Cream - Dịu nhẹ, dễ thương, trưởng thành */
+            --primary: #88b04b;      /* Xanh lá dịu */
+            --primary-dark: #6a8a3a;
+            --accent: #ff9f89;       /* Cam đào nhạt */
+            --bg-body: #f7f9f4;      /* Trắng ngà ánh xanh */
+            --bg-pane: #ffffff;
+            --text-main: #4a4a4a;
+            --text-light: #888;
+            --border: #e0e5df;
+            --highlight: #fff59d;    /* Vàng chanh nhạt */
+            --correct: #6a994e;
+            --wrong: #bc4749;
+            --exp-bg: #f1f8e9;       /* Nền giải thích màu xanh nhạt */
+            --header-h: 70px;
+            --footer-h: 80px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Quicksand', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- OVERLAY & MODAL (CÀI ĐẶT THỜI GIAN) --- */
+        #setupOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        .setup-modal {
+            background: white; padding: 40px; border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(136, 176, 75, 0.15);
+            width: 90%; max-width: 500px; text-align: center;
+            border: 2px solid var(--border);
+        }
+        .setup-modal h2 { font-family: 'Lora', serif; color: var(--primary-dark); font-size: 28px; margin-top: 0; }
+        .mode-btn {
+            display: block; width: 100%; padding: 15px; margin: 15px 0;
+            border-radius: 15px; font-size: 18px; font-weight: 700; cursor: pointer;
+            transition: 0.3s; font-family: inherit;
+        }
+        .mode-practice { background: #fff0eb; color: #d87059; border: 2px solid #ffccbc; }
+        .mode-practice:hover, .mode-practice.selected { background: var(--accent); color: white; border-color: var(--accent); }
+        .mode-mock { background: #e8f5e9; color: var(--primary-dark); border: 2px solid #c8e6c9; }
+        .mode-mock:hover, .mode-mock.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        
+        #timeInputBox { display: none; margin: 20px 0; }
+        #timeInput { 
+            width: 100px; padding: 10px; font-size: 18px; text-align: center; 
+            border: 2px solid var(--border); border-radius: 10px; font-family: inherit;
+        }
+        
+        .start-btn {
+            background: var(--primary); color: white; border: none; padding: 12px 35px;
+            border-radius: 50px; font-size: 18px; font-weight: 700; cursor: pointer;
+            margin-top: 20px; transition: 0.3s; display: none; box-shadow: 0 5px 15px rgba(136, 176, 75, 0.3);
+        }
+        .start-btn:hover { transform: translateY(-3px); }
+
+        /* --- HEADER --- */
+        header {
+            height: var(--header-h); background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 30px; z-index: 100;
+        }
+        
+        .brand { font-size: 24px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        .brand span { background: var(--primary); color: white; padding: 4px 10px; border-radius: 10px; font-size: 16px; }
+
+        .tab-container { display: flex; background: #edf2ea; padding: 5px; border-radius: 25px; gap: 5px; }
+        .tab-btn {
+            border: none; background: transparent; padding: 10px 25px; font-size: 16px;
+            font-family: inherit; font-weight: 600; color: var(--text-light);
+            cursor: pointer; border-radius: 20px; transition: all 0.3s;
+        }
+        .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+
+        .controls { display: flex; gap: 20px; align-items: center; }
+        .timer-box { 
+            font-family: 'Quicksand', sans-serif; font-weight: 700; color: var(--accent); 
+            background: #fff0eb; padding: 10px 20px; border-radius: 15px; font-size: 20px;
+        }
+        .btn-submit { 
+            background: var(--primary); color: white; border: none; padding: 10px 25px; 
+            border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s;
+            font-family: inherit; box-shadow: 0 4px 0 var(--primary-dark);
+        }
+        .btn-submit:active { transform: translateY(4px); box-shadow: none; }
+
+        /* --- LAYOUT TỐI ƯU KHÔNG GIAN --- */
+        .container { 
+            display: flex; 
+            height: calc(100vh - var(--header-h) - var(--footer-h)); 
+            width: 100%; max-width: 100%; /* Rộng tối đa theo yêu cầu */
+            margin: 0 auto;
+        }
+
+        .pane {
+            flex: 1; padding: 40px 50px; overflow-y: auto;
+            position: relative; scroll-behavior: smooth;
+        }
+        .pane-left { 
+            background: #fff; border-right: 2px solid var(--border); 
+            font-size: 19px; line-height: 2; text-align: justify; color: #444;
+        }
+        .pane-right { background: #fafbfc; }
+
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-thumb { background: #d0d6cc; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* --- CONTENT STYLES --- */
+        h2 { color: var(--primary-dark); margin-top: 0; font-size: 28px; text-align: center; font-family: 'Lora', serif; }
+        h3 { color: #555; border-bottom: 2px solid #edf2ea; padding-bottom: 5px; margin-top: 30px; font-size: 22px; }
+        p { margin-bottom: 20px; }
+        
+        .passage-content, .question-group { display: none; animation: fadeIn 0.3s; }
+        .passage-content.active, .question-group.active { display: block; }
+        .question-group { padding-bottom: 60px; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .instruction {
+            background: #e8f5e9; color: #2e7d32; padding: 15px; border-radius: 12px;
+            font-weight: 600; font-size: 16px; margin-bottom: 25px; border: 2px dashed #a5d6a7;
+        }
+
+        /* --- QUESTIONS UI (Lớn hơn) --- */
+        .q-row { display: flex; margin-bottom: 25px; align-items: flex-start; flex-direction: column; }
+        .q-content-wrapper { display: flex; width: 100%; align-items: flex-start; }
+        .q-num {
+            min-width: 35px; height: 35px; background: #7FA99B; color: white;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: bold; margin-right: 15px; margin-top: 2px; flex-shrink: 0;
+        }
+        .q-text { flex: 1; font-size: 18px; line-height: 1.8; }
+
+        input[type="text"], select {
+            border: 2px solid #dce0dd; border-radius: 8px; padding: 8px 15px;
+            font-family: inherit; font-size: 18px; color: var(--primary-dark);
+            outline: none; background: white; transition: 0.2s; font-weight: 600;
+        }
+        input[type="text"]:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(136, 176, 75, 0.15); }
+        .input-gap { width: 160px; text-align: center; }
+        .input-gap.filled { background: #f1f8e9; border-color: #81c784; }
+
+        .drag-palette {
+            background: white; padding: 20px; border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px;
+            display: flex; gap: 12px; flex-wrap: wrap; border: 2px solid var(--border);
+        }
+        .drag-item {
+            background: #edf2ea; color: var(--primary-dark); padding: 8px 18px;
+            border-radius: 8px; cursor: grab; font-weight: 700; font-size: 16px;
+            border: 2px solid transparent; transition: 0.2s;
+        }
+        .drag-item:hover { border-color: var(--primary); background: white; }
+        .drag-item.used { opacity: 0.3; text-decoration: line-through; cursor: default; }
+
+        .custom-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .custom-table th { background: var(--primary); color: white; padding: 15px; text-align: left; font-size: 18px; }
+        .custom-table td { border-bottom: 1px solid #eee; padding: 15px; font-size: 18px; vertical-align: middle; }
+        
+        .mc-option { display: block; margin: 10px 0; cursor: pointer; padding: 12px; border-radius: 10px; transition: background 0.2s; font-size: 18px; border: 1px solid transparent; }
+        .mc-option:hover { background: #edf2ea; border-color: #c1d5a4; }
+        .mc-option input { margin-right: 12px; transform: scale(1.3); }
+
+        .feedback { font-weight: 700; margin-left: 15px; font-size: 18px; }
+        .correct { color: var(--correct); }
+        .wrong { color: var(--wrong); }
+
+        /* --- GIẢI THÍCH CHI TIẾT (EXPLANATION BOX) --- */
+        .exp-box {
+            display: none; background: var(--exp-bg); border-left: 5px solid var(--primary);
+            padding: 20px; margin-top: 15px; border-radius: 0 12px 12px 0; width: 100%;
+            font-size: 17px; line-height: 1.8; color: #333; animation: slideIn 0.4s;
+        }
+        .exp-box.show { display: block; }
+        .exp-title { font-weight: 700; color: var(--primary-dark); margin-bottom: 10px; font-size: 19px; display: flex; align-items: center; gap: 8px; }
+        .exp-quote { font-style: italic; background: white; padding: 10px 15px; border-radius: 8px; color: #555; margin-bottom: 12px; border: 1px dashed #c1d5a4; }
+        .exp-text { margin-bottom: 10px; }
+        .exp-vocab { font-size: 16px; color: #6a8a3a; background: #e8f5e9; padding: 10px; border-radius: 8px; }
+        .exp-vocab b { color: #2e7d32; }
+
+        @keyframes slideIn { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* --- FOOTER --- */
+        footer {
+            height: var(--footer-h); background: #fff; border-top: 2px solid var(--border);
+            display: flex; flex-direction: column; justify-content: center; padding: 0 30px;
+            z-index: 100;
+        }
+        .nav-scroller { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; align-items: center; }
+        .nav-dot {
+            min-width: 40px; height: 40px; border: 2px solid #eee; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600;
+            cursor: pointer; color: #999; background: white; transition: 0.2s; flex-shrink: 0;
+        }
+        .nav-dot:hover { border-color: var(--primary); color: var(--primary); }
+        .nav-dot.done { background: #edf2ea; color: var(--primary-dark); border-color: #c1d5a4; }
+        .nav-dot.active-q { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* HIGHLIGHT MENU */
+        #ctxMenu {
+            position: absolute; display: none; background: white; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-radius: 12px; 
+            z-index: 99999; min-width: 160px; overflow: hidden;
+        }
+        #ctxMenu button {
+            background: none; border: none; padding: 12px 20px; 
+            width: 100%; text-align: left; cursor: pointer; 
+            font-family: inherit; font-size: 16px; color: #555; font-weight: 600;
+        }
+        #ctxMenu button:hover { background: #f0f7ff; color: var(--primary-dark); }
+        #ctxMenu button.delete:hover { background: #fff5f5; color: #e06666; }
+        .highlight { background-color: var(--highlight); cursor: pointer; border-radius: 4px; padding: 2px 0; }
+        .text-highlight-answer { background-color: #dce775; font-weight: bold; padding: 2px 4px; border-radius: 4px; }
+    /* --- CUSTOM MODALS (CONFIRM & RESULT) --- */
+        .custom-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 99999;
+        }
+        .custom-modal {
+            background: white; padding: 40px; border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(136, 176, 75, 0.15);
+            width: 90%; max-width: 450px; text-align: center;
+            border: 2px solid var(--border);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .custom-modal h2 { font-family: 'Lora', serif; color: var(--primary-dark); font-size: 26px; margin-top: 0; }
+        .modal-actions { display: flex; gap: 15px; margin-top: 25px; justify-content: center; }
+        
+        .btn-cancel {
+            background: #f5f5f5; color: #666; border: 2px solid #ddd; padding: 12px 20px;
+            border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; font-family: inherit; flex: 1;
+        }
+        .btn-cancel:hover { background: #e0e0e0; border-color: #ccc; }
+        
+        .btn-confirm {
+            background: var(--primary); color: white; border: none; padding: 12px 20px;
+            border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; font-family: inherit; flex: 1;
+            box-shadow: 0 4px 0 var(--primary-dark);
+        }
+        .btn-confirm:active { transform: translateY(4px); box-shadow: none; }
+    </style>
+</head>
+<body>
+
+<div id="setupOverlay">
+    <div class="setup-modal">
+        <h2>Chào mừng đến với Reading Library ✨</h2>
+        <p style="font-size: 18px; color: #666; margin-bottom: 25px;">Hôm nay bạn muốn rèn luyện theo cách nào?</p>
+        
+        <button class="mode-btn mode-practice" onclick="selectMode('practice')">🎯 Chế độ Luyện Tập</button>
+        <button class="mode-btn mode-mock" onclick="selectMode('mock')">🏆 Chế độ Thi Thử</button>
+        
+        <div id="timeInputBox">
+            <label style="font-size: 18px; font-weight: bold; color: #555;">Cài đặt thời gian (phút): </label>
+            <input type="number" id="timeInput" value="60" min="10" max="180">
+        </div>
+        
+        <button class="start-btn" id="startBtn" onclick="askReady()">Sẵn sàng (OK)</button>
+    </div>
+</div>
+
+<header>
+    <div class="brand">
+        <span>SnapEnglish</span> Reading Mock Test
+    </div>
+    
+    <div class="tab-container">
+        <button class="tab-btn active" onclick="switchTab(1)">Passage 1</button>
+        <button class="tab-btn" onclick="switchTab(2)">Passage 2</button>
+        <button class="tab-btn" onclick="switchTab(3)">Passage 3</button>
+    </div>
+
+    <div class="controls">
+        <div class="timer-box">⏱ <span id="timer">00:00</span></div>
+        <button class="btn-submit" onclick="submitTest(true)">NỘP BÀI</button>
+    </div>
+</header>
+
+<div class="container" id="mainContainer">
+    
+    <div class="pane pane-left" id="passagePane">
+        <div id="text-p1" class="passage-content active">
+            <h2>Pollution in the Bay 🌊</h2>
+            <p><strong>A.</strong> Pouring water into the sea sounds harmless enough. But in Florida Bay, a large and shallow section of the Gulf of Mexico that lies between the southern end of the Everglades and the Florida Keys, it is proving highly controversial. That is because researchers are divided over whether it will help or hinder the plants and animals that live in the bay.</p>
+            <p><strong>B.</strong> What is at risk is the future of the bay’s extensive beds of seagrasses. These grow on the bay’s muddy floor and act as nurseries for the larvae of shrimps, lobsters and fish – many of the important sport and commercial-fishing species. Also in danger is an impressive range of coral reefs that run the length of the Florida Keys and form the third-largest barrier reef in the world. Since the 1980s, coral cover has dropped by 40%, and a third of the coral species have gone. This has had a damaging effect on the animals that depend on the reef, such as crabs, turtles and nearly 600 species of fish.</p>
+            <p><strong>C.</strong> What is causing such ecological change is a matter of much debate. And the answer is of no small consequence. This is because the American government is planning to devote $8 billion over the next 30 years to revitalise the Everglades. Seasonal freshwater flows into the Everglades are to be restored in order to improve the region’s health. But they will then run off into the bay.</p>
+            <p><strong>D.</strong> Joseph Zieman, a marine ecologist at the University of Virginia, thinks this is a good idea. He believes that a lack of fresh water in the bay is its main problem. The blame, he says, lies with a century of drainage in the Everglades aimed at turning the marshes into farmland and areas for development. This has caused the flow of fresh water into Florida Bay to dwindle, making the water in the bay, overall, more saline. This, he argues, kills the seagrasses, and as these rots, nutrients are released that feed the microscopic plants and animals that live in the water. This, he says, is why the bay’s once crystal-clear waters often resemble pea soup. And in a vicious circle, these turbid blooms block out sunlight, causing more seagrasses to die and yet more turbidity.</p>
+            <p><strong>E.</strong> Brian Lapointe, a marine scientist at the Harbour Branch Oceanographic Institution at Fort Pierce in Florida, disagrees. He thinks seagrasses can tolerate much higher levels of salinity than the bay actually displays. Furthermore, he notes that when freshwater flows through the Everglades were increased experimentally in the 1990s, it led to massive plankton blooms. Freshwater running off from well-fertilised farmlands, he says, caused a fivefold rise in nitrogen levels in the bay. This was like pouring fuel on a fire. The result was mass mortality of seagrasses because of increased turbidity from the plankton. Dr Lapointe adds that, because corals thrive only in waters where nutrient levels are low, restoring freshwater rich in nitrogen will do more damage to the reef.</p>
+            <p><strong>F.</strong> It is a plausible theory. The water flowing off crops that are grown on the 750,000 acres of heavily fertilised farmland on the northern edge of the Everglades is rich in nitrogen, half of which ends up in the bay. But Bill Kruczynski, of America’s Environmental Protection Agency, is convinced that nitrogen from farmlands is not the chief problem. Some coral reefs well away from any nitrogen pollution are dying and, curiously, a few are thriving. Dr Kruczynski thinks that increased nutrients arriving from local sewage discharges from the thousands of cesspits along the Florida Keys are part of the problem.</p>
+            <p><strong>G.</strong> Such claims and counterclaims make the impact of the restoration plan difficult to predict. If increased salinity is the main problem, the bay’s ecology will benefit from the Everglades restoration project. If, however, nitrogen is the problem, increasing the flow of freshwater could mate matters much worse.</p>
+            <p><strong>H.</strong> If this second hypothesis proves correct, the cure is to remove nitrogen from farmland or sewage discharges, or perhaps both. Neither will be easy. Man-made wetlands, at present, being built to reduce phosphate runoff into the bay—also from fertilisers—would need an algal culture (a sort of contained algal bloom) added to them to deal with discharges from farmlands. That would be costly. So too would be the replacement of cesspits with proper sewerage—one estimate puts the cost at $650m. Either way, it is clear that when, on December 1st, 3,000 square miles of sea around the reef are designated as a “protective zone” by the deputy secretary of commerce, Sam Bodman, this will do nothing to protect the reef from pollution.</p>
+            <p><strong>I.</strong> Some argue, though, that there is a more fundamental flaw in the plans for the bay: the very idea of returning it to a Utopian ideal before man wrought his damage. Nobody knows what Florida Bay was like before the 1950s when engineers cut the largest canals in the Everglades and took most of the water away. Dr Kruczynski suspects it was more like an estuary. The bay that many people wish to re-create could have been nothing more than a changing phase in the bay’s history.</p>
+            <p><strong>J.</strong> These arguments do not merely threaten to create ecological problems but economic ones as well. The economy of the Florida Keys depends on tourism—the local tourist industry has an annual turnover of $2.5 billion. People come for fishing-boat trips, for manatee watching, or for scuba diving and snorkeling to view the exotically coloured corals. If the plan to restore the Everglades makes problems in the bay and the reef worse, it could prove a very expensive mistake.</p>
+        </div>
+
+        <div id="text-p2" class="passage-content">
+            <h2>The Impact of Environment to Children 👶</h2>
+            <p><strong>A.</strong> What determines how a child develops? In reality, it would be impossible to account for each and every influence that ultimately determines who a child becomes. What we can look at are some of the most apparent influences such as genetics, parenting, experiences, friends, family relationships and school to help us understand the influences that help contribute to a child's growth.</p>
+            <p><strong>B.</strong> Think of these influences as building blocks. While most people tend to have the same basic building blocks, these components can be put together in an infinite number of ways. Consider your own overall personality. How much of who you are today was shaped by your genetic inheritance, and how much is a result of your lifetime of experiences? This question has puzzled philosophers, psychologists and educators for hundreds of years and is frequently referred to as the nature versus nurture debate. Generally, the given rate of influence on children is 40% to 50%. It may refer to all of siblings of a family. Are we the result of nature (our genetic background) or nurture (our environment)? Today, most researchers agree that child development involves a complex interaction of both nature and nurture, while some aspects of development may be strongly influenced by biology, environmental influences may also play a role. For example, the timing of when the onset of puberty occurs is largely the results of heredity, but environmental factors such as nutrition can also have an effect.</p>
+            <p><strong>C.</strong> From the earliest moments of life, the interaction of heredity and the environment works to shape who children are and who they will become. While the genetic instructions a child inherits from his parents may set out a road map for development, the environment can impact how these directions are expressed, shaped or even silenced. The complex interaction of nature and nurture does not just occur at certain moments or at certain periods of time; it is persistent and lifelong.</p>
+            <p><strong>D.</strong> The shared environment (also called common environment) refers to environmental influences that have the effect of making siblings more similar to one another. Shared environmental influences can include shared family experiences, shared peer groups, and sharing the same school and community. In general, there has not been strong evidence for shared environmental effects on many behaviors, particularly those measured in adults. Possible reasons for this are discussed. Shared environmental effects are evident in children and adolescents, but these effects generally decrease across the life span. New developments in behavior genetic methods have made it possible to specify shared environments of importance and to tease apart familial and nonfamilial sources of shared environmental influence. It may also refer to all of siblings of a family, but the rate of influence is less than 10 per cent.</p>
+            <p><strong>E.</strong> The importance of non-shared environment lay hidden within quantitative genetic studies since they began nearly a century ago. Quantitative genetic methods, such as twin and adoption methods, were designed to tease apart nature and nurture in order to explain family resemblance. For nearly all complex phenotypes, it has emerged that the answer to the question of the origins of family resemblance is nature-things run in families primarily for genetic reasons. However, the best available evidence for the importance of environmental influence comes from this same quantitative genetic research because genetic influence never explains all of the variances for complex phenotypes, and the remaining variance must be ascribed to environmental influences. Non-shared environment, it may refer to the part of siblings of a family, the rate of influence to children is 40% to 50%.</p>
+            <p><strong>F.</strong> Yet it took many decades for the full meaning of these findings to emerge. If genetics explains why siblings growing up in the same family are similar, but the environment is important, then it must be the case that the salient environmental effects do not make siblings similar. That is, they are not shared by children growing up in the same family-they must be 'non-shared'. This implication about non-shared environmental import lay fallow in the field of quantitative genetics because the field's attention was then firmly on the nature-nurture debate. 'Nurture' in the nature-nurture debate was implicitly taken to mean shared environment because, from Freud onwards, theories of socialization had assumed that children's environments are doled out on a family-by-family basis. In contrast, the point of the non-shared environment is that environments are doled out on a child-by-child basis. Note that the phrase 'non-shared environment' is shorthand for a component of phenotypic variance-it refers to 'effects' rather than 'events', as discussed later. Research in recent years suggested that the impact from parents will be easy to be interrupted by the influence from the children of the same age. That also showed that variations of knowledge that children get from other culture are increasing. A number of interests between, whatever, fathers and mothers or parents and their children are conflicting.</p>
+            <p><strong>G.</strong> Because siblings living in the same home share some but not all of the potential genetic and environmental factors that influence their behaviors, teasing apart the potential influences of genetic and non-genetic factors that differentiate siblings is very difficult. Turkheimer and Waldron (2000) have noted that non-shared environmental influences--which include all of the random measurement error--may not be systematic, but instead may operate idiosyncratically and in ways that cannot be ascertained. Thus, the question is whether or not quasi-experimental behavioral genetic designs can be used to actually identify systematic non-shared environmental mechanisms cross-sectionally and longitudinally. This is the impetus for the current study.</p>
+        </div>
+
+        <div id="text-p3" class="passage-content">
+            <h2>Global Warming in New Zealand 🇳🇿</h2>
+            <p><strong>A.</strong> New Zealand is expected to warm by about 3°C over the next century. The northern polar regions will be more than 6°C warmer, while the large continents - also the largest centres of population - will be 4°C or warmer. In contrast, the Southern Ocean, which surrounds New Zealand, may warm by only 2°C. The sea will act as an air conditioner and in this aspect, New Zealand's location is comparatively fortunate.</p>
+            <p><strong>B.</strong> Any predictions are complicated by the variability of New Zealand's climate. The annual temperature can fluctuate as much as 1°C above or below the long-term average. The early summer of 2006-7, for instance, was notably cool, thanks in part to the iceberg that drifted up the east coast. A few months later, warm water from the Tasman Sea helped make May 2007 unusually hot. These variables will continue unaffected so that, although the general pattern will be for rising temperatures, the warming trend may not be uniform.</p>
+            <p><strong>C.</strong> The Ocean to the south of New Zealand will have one important effect. As the world warms, the great bank of west winds that circle Antarctica will become stronger. This has already been observed, and its impact on New Zealand is likely to be profound, stronger, more frequent west winds will bring increased, sometimes catastrophic rainfall to the west coast of the country and create drier conditions in some eastern regions that are already drought-prone. At the same time, the general warming will spread south.</p>
+            <p><strong>D.</strong> Furthermore, in the drier regions, the average moisture deficit - that is, the difference between the amount of water in soils available to plants and the amount plants need for optimum growth - will increase. Soils could go into moisture deficit earlier in the growing season and the deficits could last longer into autumn that at present. What we think of today as a medium-severity drought could be an almost annual occurrence by the end of the century. One direct consequence of warmer and shorter - winters will be a reduction in snow cover. The permanent snow line in the mountains will rise, while snow cover below this will be shorter-lived. The amount of snow that falls may actually increase, however, even in some northern centres, owing to the intensification of precipitation, Ski-field base station may eventually have to be moved upwards to be within reach of the new snow line but there could still be plenty of the white stuff up there.</p>
+            <p><strong>E.</strong> There will also be a marked impact on New Zealand's glaciers. Over the last 100 years, the glaciers have been reduced by 35%, although since 1978 increase snowfall has offset the effect of warming. The latest studies conducted by the National Institute for Water and Atmospheric. Research (NIWA), however, suggest that by the end of the century, warming over the Southern Alps could be significantly greater than over the rest of the country.</p>
+            <p><strong>F.</strong> Sea levels around New Zealand have risen by 25cm since the middle of the 9th century and by 7 cm since 1990. Predictions for the coming years cover a wide range, however, partly because of unknown rises resulting from the melting of the ice in the Arctic, Greenland and Antarctica. In addition, sea level at any given time is affected by many different factors, one of which is called storm surge. When a Coincides with a high tide along low lying coastal areas, this bulge raises the tide higher than normal, creating. Surge not unlike a slow-motion tsunami. Not only does a rise in sea level increase the potential for his sort damage, but it also has less immediate impacts. The one potentially grave outcome is that groundwater systems may become contaminated with saltwater, spoiling them for the irrigation of farmland, which in turn could diminish crop harvests. Similarly, over time, estuaries may be enlarged by erosion as tidal influences reach further upstream, altering the contours of whole shorelines and initiating further unforeseen consequences.</p>
+            <p><strong>G.</strong> The impacts these changes will have on New Zealand are difficult to generalize. Human systems are better able to adapt to change than natural ecosystems because humans can see a problem coming and plan a response. Farmers and horticulturalists have made considerable advances, replacing crops they grow to better suit the new conditions. However, plant breeders will need to show considerable ingenuity if they can overcome the acute water shortages that are forecast.</p>
+            <p><strong>H.</strong> For natural ecosystems the rate of change is crucial. If it is low, the plants and animals and fish will be able to 'keep up'; if it is high, only the most adaptable species-those that can survive in the widest range of ecological niches-are likely to survive. Species adapted to only a narrow range of conditions or food sources will find adaptation much more difficult. Take tuatara, for instance. Their sex is determined by the temperature at which the eggs are incubated in warm (currently above 22°C) condition become predominately male - and now males already outnumber females by nearly two to one in some island refuges. In the mountains, as the permanent snow line moves upwards, the tolerance zones of some alpine plants and animals may simply disappear. It should also be remembered that global warming is just that - a global phenomenon. New Zealand's own greenhouse emissions are tiny - around 0.5% of the global total. Even if New Zealanders were to achieve the government's target of carbon neutrality, this would have no discernable impact on global climate change.</p>
+            <p><strong>I.</strong> The changes that global warming is going to bring to New Zealand during the 21st century are going to be significant, but where the country is likely to be most vulnerable is with respect to climate change elsewhere. New Zealand may warm more slowly than most places, but if its major export markets undergo damaging change, the economic impact will be severe.</p>
+        </div>
+    </div>
+
+    <div class="pane pane-right">
+        
+        <div id="q-group-1" class="question-group active">
+            <div class="instruction"> <u>Questions 1-4:</u> The reading Passage has seven paragraphs A-J. Which paragraph contains the following information? <br>Write the correct letter A-J.</div>
+            <div id="render-q1-4"></div>
+
+            <div class="instruction"> <u>Questions 5-8:</u> Use the information in the passage to match the people (listed A-C) with opinions or deeds below.</div>
+            <div class="drag-palette">
+                <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="A">A. Bill Kruczynski</div>
+                <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="B">B. Brian Lapointe</div>
+                <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="C">C. Joseph Zieman</div>
+            </div>
+            <div id="render-q5-8"></div>
+
+            <div class="instruction"><u>Questions 9-13:</u> Do the following statements agree with the information given in Reading Passage 1</div>
+            <div id="render-q9-13"></div>
+        </div>
+
+        <div id="q-group-2" class="question-group">
+            <div class="instruction"><u>Questions 14-18:</u> Complete the table now. Choose <strong> NO MORE THAN THREE WORDS </strong> from the Reading Passage for each answer.</div>
+            <table class="custom-table">
+                <thead><tr><th>Type of Impact to Children</th><th>Range of Reference to Siblings</th><th>Rate of Influence</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td><strong>14.</strong> <input type="text" class="input-gap" id="ans-14" oninput="checkNav(14)"> background from parents and family</td>
+                        <td>Including to all of siblings</td>
+                        <td>40%-50%</td>
+                    </tr>
+                    <tr>
+                        <td>Shared Environment</td>
+                        <td>to <strong>15.</strong> <input type="text" class="input-gap" id="ans-15" oninput="checkNav(15)"></td>
+                        <td>less than <strong>16.</strong> <input type="text" class="input-gap" id="ans-16" oninput="checkNav(16)"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>17.</strong> <input type="text" class="input-gap" id="ans-17" oninput="checkNav(17)"></td>
+                        <td>to part of siblings</td>
+                        <td><strong>18.</strong> <input type="text" class="input-gap" id="ans-18" oninput="checkNav(18)"> - 50%</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div id="fb-container-14-18" style="display:flex; flex-direction:column; gap:10px;"></div> 
+            
+            <div class="instruction" style="margin-top: 30px;">Questions 19-21: Complete the following summary of the paragraphs of Reading Passage. Using <strong> NO MORE THAN THREE WORDS </strong> from the Reading Passage for each answer.</div>
+            <div style="background: white; padding: 25px; border-radius: 12px; border: 2px solid var(--border); line-height: 2.2; font-size: 18px;">
+                Research in recent years illuminated that the impact from parents will frequently be 
+                <strong>19.</strong> <input type="text" class="input-gap" id="ans-19" oninput="checkNav(19)"> <span id="fb-19" class="feedback"></span><div id="exp-19"></div>
+                that <strong>20.</strong> <input type="text" class="input-gap" id="ans-20" oninput="checkNav(20)"> <span id="fb-20" class="feedback"></span><div id="exp-20"></div>
+                by the peer's pressure. It was also indicated of knowledge that children learned from other culture is increasing. 
+                The study has found quantities of competing <strong>21.</strong> <input type="text" class="input-gap" id="ans-21" oninput="checkNav(21)"> <span id="fb-21" class="feedback"></span><div id="exp-21"></div>
+                between parents and children or even between parents themselves.
+            </div>
+
+            <div class="instruction" style="margin-top: 30px;"><u>Questions 22-25:</u> Do the following statements agree with the claims of the writer in Reading Passage?</div>
+            <div id="render-q22-25"></div>
+
+            <div class="instruction"><u>Question 26:</u> Choose the correct letter, A, B, C, or D.</div>
+            <div class="q-row">
+                <div class="q-content-wrapper">
+                    <div class="q-num">26</div>
+                    <div class="q-text">
+                        According to this passage, which comment is TRUE about the current Study of nonshared environment influence to children?<br>
+                        <label class="mc-option"><input type="radio" name="q26" value="A" onclick="checkNav(26)"> A. a little biased in nature</label>
+                        <label class="mc-option"><input type="radio" name="q26" value="B" onclick="checkNav(26)"> B. not sufficiently proved</label>
+                        <label class="mc-option"><input type="radio" name="q26" value="C" onclick="checkNav(26)"> C. very systematic</label>
+                        <label class="mc-option"><input type="radio" name="q26" value="D" onclick="checkNav(26)"> D. can be workable</label>
+                        <span id="fb-26" class="feedback"></span>
+                    </div>
+                </div>
+                <div id="exp-26"></div>
+            </div>
+        </div>
+
+        <div id="q-group-3" class="question-group">
+            <div class="instruction"><u>Questions 27-32:</u> Choose the correct letter (A, B, C or D).</div>
+            <div id="render-q27-32"></div>
+
+            <div class="instruction"><u>Questions 33-35:</u> Complete the summary. Choose <strong>NO MORE THAN TWO WORDS</strong> from the passage for each answer.</div>
+            <div style="font-size: 22px; font-weight: bold; text-align: center; margin-bottom: 20px; color: var(--primary-dark);">Rising sea levels</div>         
+            <div class="drag-palette">
+                <div class="drag-item">A. agriculture production</div>
+                <div class="drag-item">B. tropical waters</div>
+                <div class="drag-item">C. tidal waves</div>
+                <div class="drag-item">D. polar regions</div>
+                <div class="drag-item">E. global warming</div>
+                <div class="drag-item">F. coastal land</div>
+                <div class="drag-item">G. high tides</div>
+            </div>
+            <div style="background: white; padding: 25px; border-radius: 12px; border: 2px solid var(--border); line-height: 2.2; font-size: 18px;">
+                The extent of future sea level rises around New Zealand is uncertain and may be determined in the 
+                <strong>33.</strong> <select id="ans-33" onchange="checkNav(33)" style="width:120px;">
+                    <option value="">Select...</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option>
+                </select> <span id="fb-33" class="feedback"></span><div id="exp-33"></div> 
+                Another variable is sudden rises in sea level caused by bad weather. Higher sea levels can lead to reduced 
+                <strong>34.</strong> <select id="ans-34" onchange="checkNav(34)" style="width:120px;">
+                    <option value="">Select...</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option>
+                </select> <span id="fb-34" class="feedback"></span><div id="exp-34"></div>
+                and result in changes to the shape of 
+                <strong>35.</strong> <select id="ans-35" onchange="checkNav(35)" style="width:120px;">
+                    <option value="">Select...</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option>
+                </select> <span id="fb-35" class="feedback"></span><div id="exp-35"></div>
+            </div>
+
+            <div class="instruction" style="margin-top: 30px;"><u>Questions 36-40:</u> Do the following statements agree with the information given in Reading Passage 3?</div>
+            <div id="render-q36-40"></div>
+        </div>
+    </div>
+</div>
+
+<div id="ctxMenu">
+    <button onclick="doHighlight()">🖍 Highlight (Vàng)</button>
+    <button class="delete" onclick="removeHighlight()">🗑 Xóa Highlight</button>
+</div>
+<div id="confirmOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2>Xác nhận nộp bài</h2>
+        <p style="font-size: 18px; color: #555; margin-bottom: 10px;">Bạn có chắc chắn muốn nộp bài để xem đáp án và giải thích chi tiết không?</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeConfirmModal()">Quay lại làm tiếp</button>
+            <button class="btn-confirm" onclick="executeSubmit()">Nộp bài</button>
+        </div>
+    </div>
+</div>
+
+<div id="resultOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2>🎉 Chúc mừng!</h2>
+        <p style="font-size: 16px; color: #666;">Bạn đã hoàn thành bài thi</p>
+        <div id="resultMessage" style="margin: 20px 0; line-height: 1.8;"></div>
+        <button class="btn-confirm" style="width: 100%; margin-top: 10px;" onclick="closeResultModal()">Xem giải thích chi tiết</button>
+    </div>
+</div>
+    <div id="startConfirmOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2>Xác nhận bắt đầu</h2>
+        <p id="startConfirmMsg" style="font-size: 18px; color: #555; margin-bottom: 20px; white-space: pre-line;"></p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeStartConfirmModal()">Huỷ</button>
+            <button class="btn-confirm" onclick="startTestActual()">OK</button>
+        </div>
+    </div>
+</div>
+<footer>
+    <div style="font-size:14px; font-weight:bold; color:var(--text-light); text-transform:uppercase; margin-bottom:5px;">Bảng điều hướng nhanh</div>
+    <div class="nav-scroller" id="navPalette">
+        </div>
+</footer>
+
+<script>
+    // --- MODE & TIMER STATE ---
+    let currentMode = '';
+    let testDuration = 0; // seconds
+    let timerInterval = null;
+    let isSubmitted = false;
+
+    // --- SETUP MODAL LOGIC ---
+    function selectMode(mode) {
+        currentMode = mode;
+        document.querySelector('.mode-practice').classList.toggle('selected', mode === 'practice');
+        document.querySelector('.mode-mock').classList.toggle('selected', mode === 'mock');
+        
+        document.getElementById('timeInputBox').style.display = (mode === 'practice') ? 'block' : 'none';
+        document.getElementById('startBtn').style.display = 'inline-block';
+    }
+
+    // --- SETUP MODAL LOGIC ---
+    function askReady() {
+        let confirmMsg = currentMode === 'mock' 
+            ? "Bạn chọn Thi Thử (60 phút).\nBạn đã sẵn sàng bước vào bài làm chưa?" 
+            : `Bạn chọn Luyện Tập (${document.getElementById('timeInput').value} phút).\nBạn đã sẵn sàng chưa?`;
+            
+        // Gắn nội dung câu hỏi vào popup và hiển thị
+        document.getElementById('startConfirmMsg').innerText = confirmMsg;
+        document.getElementById('startConfirmOverlay').style.display = 'flex';
+    }
+
+    function closeStartConfirmModal() {
+        // Tắt popup nếu bấm nút Huỷ
+        document.getElementById('startConfirmOverlay').style.display = 'none';
+    }
+
+    function startTestActual() {
+        // Tắt popup và bắt đầu tính giờ nếu bấm OK
+        document.getElementById('startConfirmOverlay').style.display = 'none';
+        
+        let minutes = (currentMode === 'mock') ? 60 : parseInt(document.getElementById('timeInput').value);
+        if(isNaN(minutes) || minutes < 1) minutes = 60;
+        testDuration = minutes * 60;
+        
+        document.getElementById('setupOverlay').style.display = 'none';
+        startTimer();
+    }
+    
+
+    // --- DATA ---
+    const answerKey = {
+        // P1
+        1: "E", 2: "C", 3: "H", 4: "B",
+        5: "C", 6: "B", 7: "B", 8: "A",
+        9: "FALSE", 10: "NOT GIVEN", 11: "FALSE", 12: "TRUE", 13: "TRUE",
+        // P2
+        14: "GENETIC", 15: "ALL OF SIBLINGS", 16: "10%", 17: "NON-SHARED ENVIRONMENT", 18: "40%",
+        19: "INTERRUPTED", 20: "VARIATIONS", 21: "INTERESTS",
+        22: "NOT GIVEN", 23: "YES", 24: "NOT GIVEN", 25: "NO", 26: "B",
+        // P3
+        27: "D", 28: "B", 29: "C", 30: "C", 31: "D", 32: "A",
+        33: "D", 34: "A", 35: "F",
+        36: "YES", 37: "NOT GIVEN", 38: "NOT GIVEN", 39: "YES", 40: "NO"
+    };
+
+    // Chi tiết giải thích ấn tượng, rành mạch
+    const explanations = {
+        1: { quote: "Brian Lapointe... thinks seagrasses can tolerate much higher levels of salinity...", exp: "Câu hỏi tìm kiếm việc cỏ biển có khả năng kháng cự nước mặn cao. Trong đoạn E, tác giả dẫn lời Brian cho rằng cỏ biển có thể chịu được độ mặn cao hơn thực tế ở vịnh.", vocab: "<b>Tolerate (v)</b>: Chịu đựng | <b>Salinity (n)</b>: Độ mặn" },
+        2: { quote: "What is causing such ecological change is a matter of much debate. And the answer is of no small consequence...", exp: "Đoạn C nói về việc tìm ra nguyên nhân của sự thay đổi sinh thái này có ý nghĩa cực kỳ quan trọng ('no small consequence') để định hướng cho khoản đầu tư 8 tỷ đô.", vocab: "<b>Consequence (n)</b>: Hậu quả, tầm quan trọng | <b>Revitalise (v)</b>: Phục hồi, tái sinh" },
+        3: { quote: "That would be costly. So too would be the replacement of cesspits with proper sewerage—one estimate puts the cost at $650m.", exp: "Câu hỏi tìm kiếm các đề xuất tốn kém. Đoạn H liệt kê các phương án khắc phục việc rò rỉ nitrogen, và đều nhấn mạnh rằng chúng sẽ tiêu tốn rất nhiều tiền (costly, $650m).", vocab: "<b>Costly (adj)</b>: Tốn kém | <b>Hypothesis (n)</b>: Giả thuyết" },
+        4: { quote: "Since the 1980s, coral cover has dropped by 40%, and a third of the coral species have gone.", exp: "Đoạn B cung cấp các con số thống kê chính xác (statistics) về sự thay đổi sinh thái: giảm 40% diện tích san hô và mất đi 1/3 số loài.", vocab: "<b>Statistic (n)</b>: Thống kê | <b>Extensive (adj)</b>: Rộng lớn" },
+        5: { quote: "The blame, he says, lies with a century of drainage in the Everglades aimed at turning the marshes into farmland...", exp: "Joseph Zieman (C) cho rằng hệ thống thoát nước (drainage) ở Everglades nhằm biến đầm lầy thành đất nông nghiệp chính là nguyên nhân gây ra nước lợ.", vocab: "<b>Drainage (n)</b>: Sự thoát nước | <b>Dwindle (v)</b>: Thu nhỏ, suy giảm" },
+        6: { quote: "...restoring freshwater rich in nitrogen will do more damage to the reef.", exp: "Brian Lapointe (B) cho rằng việc bơm lại nước ngọt chứa nhiều nitơ (nitrogen) sẽ càng làm rạn san hô tổn thương nhiều hơn.", vocab: "<b>Thrive (v)</b>: Phát triển mạnh | <b>Mortality (n)</b>: Tỉ lệ tử vong" },
+        7: { quote: "The water flowing off crops that are grown on the 750,000 acres of heavily fertilised farmland... is rich in nitrogen...", exp: "Một lần nữa, quan điểm về việc nước chảy từ đất nông nghiệp (farmland) chứa lượng lớn Nitrogen thuộc về nhóm ý tưởng liên quan tới sự phản đối/đưa ra nguyên nhân nông nghiệp, củng cố ý kiến của Lapointe (B) ở đoạn E.", vocab: "<b>Plausible (adj)</b>: Có vẻ hợp lý" },
+        8: { quote: "Dr Kruczynski thinks that increased nutrients arriving from local sewage discharges... are part of the problem.", exp: "Bill Kruczynski (A) cho rằng rò rỉ nước thải sinh hoạt (sewage discharges) mới là một phần lớn của vấn đề, chứ không phải chất dinh dưỡng từ đất nông nghiệp.", vocab: "<b>Sewage discharge (n)</b>: Xả nước thải sinh hoạt" },
+        9: { quote: "Pouring water into the sea sounds harmless enough. But in Florida Bay... it is proving highly controversial.", exp: "Câu hỏi nói 'Mọi người đều đồng ý...', nhưng bài đọc ghi rõ 'proving highly controversial' (gây tranh cãi mạnh mẽ). Do đó đáp án là FALSE.", tip: "Lưu ý các từ mang tính tuyệt đối như 'Everyone agrees' thường là False/No trong IELTS." },
+        10: { quote: "", exp: "Bài đọc có nói nước chảy qua đất nông nghiệp mang theo Nitrogen (Đoạn F), nhưng KHÔNG HỀ đề cập đến việc nitrogen được đổ vào từ 'các loại cây trồng khác nhau' (different types of crops). => NOT GIVEN." },
+        11: { quote: "If increased salinity is the main problem, the bay’s ecology will benefit... If, however, nitrogen is the problem, increasing the flow of freshwater could make matters much worse.", exp: "Đoạn G nói kết quả phụ thuộc vào nguyên nhân là gì. Nếu do nitrogen, dự án sẽ làm mọi thứ tệ hơn. Câu hỏi nói dự án hiệu quả BẤT CHẤP nguyên nhân -> FALSE.", vocab: "<b>Counterclaim (n)</b>: Lời phản tố, ý kiến trái chiều" },
+        12: { quote: "Nobody knows what Florida Bay was like before the 1950s when engineers cut the largest canals...", exp: "Câu hỏi: Hình ảnh vịnh Florida trước 1950s không ai nhớ rõ. Khớp hoàn toàn với 'Nobody knows...'. => TRUE." },
+        13: { quote: "The economy of the Florida Keys depends on tourism...", exp: "Nền kinh tế khu vực phụ thuộc vào du lịch (depends on tourism) đồng nghĩa với việc du lịch đóng góp cơ bản (contributes fundamentally). => TRUE." },
+        14: { quote: "Are we the result of nature (our genetic background) or nurture (our environment)?", exp: "Dựa vào cụm 'our genetic background' ở đoạn B. Chú ý yêu cầu điền tối đa 3 từ.", vocab: "<b>Genetic (adj)</b>: Thuộc về di truyền" },
+        15: { quote: "It may also refer to all of siblings of a family, but the rate of influence is less than 10 per cent.", exp: "Bảng hỏi về 'Range of Reference' của Shared Environment. Đoạn D ghi rõ 'refer to all of siblings'.", vocab: "<b>Sibling (n)</b>: Anh chị em ruột" },
+        16: { quote: "...but the rate of influence is less than 10 per cent.", exp: "Tỉ lệ ảnh hưởng (Rate of influence) của Shared Environment được nêu rõ ở cuối đoạn D là 'less than 10%'.", vocab: "<b>Evident (adj)</b>: Rõ ràng" },
+        17: { quote: "Non-shared environment, it may refer to the part of siblings of a family, the rate of influence to children is 40% to 50%.", exp: "Đoạn E mô tả yếu tố ảnh hưởng tới 'part of siblings' với tỉ lệ 40-50% chính là 'Non-shared environment'." },
+        18: { quote: "...the rate of influence to children is 40% to 50%.", exp: "Tỉ lệ của yếu tố Non-shared environment được định lượng rõ ràng ở cuối đoạn E là 40% đến 50%." },
+        19: { quote: "Research in recent years suggested that the impact from parents will be easy to be interrupted by the influence from the children of the same age.", exp: "Tóm tắt: Impact from parents will frequently be [interrupted].", vocab: "<b>Interrupt (v)</b>: Gián đoạn, can thiệp" },
+        20: { quote: "That also showed that variations of knowledge that children get from other culture are increasing.", exp: "Knowledge = variations. Chú ý keyword 'knowledge' và 'increasing'." },
+        21: { quote: "A number of interests between, whatever, fathers and mothers or parents and their children are conflicting.", exp: "Competing = conflicting. Từ cần điền là 'interests' (những mối quan tâm/lợi ích)." },
+        22: { quote: "", exp: "Bài đọc có nói về anh chị em ruột nhưng KHÔNG CÓ đoạn nào so sánh 'càng nhiều trẻ em thì ảnh hưởng môi trường càng lớn'. => NOT GIVEN." },
+        23: { quote: "For nearly all complex phenotypes... genetic influence never explains all of the variances... and the remaining variance must be ascribed to environmental influences.", exp: "Đoạn E xác nhận phương pháp nghiên cứu sinh đôi (twin studies) không thể giải thích mọi thứ chỉ bằng di truyền, mà phải do môi trường. Khớp ý => YES." },
+        24: { quote: "", exp: "Có nhắc đến ảnh hưởng từ bạn bè cùng tuổi (children of the same age), nhưng KHÔNG HỀ nói về việc trẻ em 'thích nói ngôn ngữ của bạn bè hơn ngôn ngữ của bố mẹ'. => NOT GIVEN." },
+        25: { quote: "...identifying systematic non-shared environmental mechanisms... is the impetus for the current study.", exp: "Đoạn cuối nhấn mạnh việc xác định cơ chế này rất khó khăn (very difficult) và nghiên cứu hiện tại đang cố gắng làm điều đó, CHƯA PHẢI là một ý tưởng đã được đồng thuận chung. => NO." },
+        26: { quote: "Turkheimer and Waldron (2000) have noted that non-shared environmental influences... may not be systematic, but instead may operate idiosyncratically and in ways that cannot be ascertained.", exp: "Các nhà nghiên cứu nhấn mạnh rằng những ảnh hưởng này 'not systematic' và hoạt động một cách đặc dị, khó xác định (không được chứng minh đầy đủ). => B.", tip: "Câu hỏi dạng Multiple Choice thường tóm tắt ý kiến chuyên gia ở đoạn cuối của các bài Passage 2 khó." },
+        27: { quote: "In contrast, the Southern Ocean, which surrounds New Zealand, may warm by only 2°C. The sea will act as an air conditioner...", exp: "Ý chính đoạn 1: So với các lục địa khác, NZ sẽ không nóng lên nhiều vì được bao bọc bởi đại dương đóng vai trò như máy điều hòa. => D." },
+        28: { quote: "These variables will continue unaffected so that, although the general pattern will be for rising temperatures, the warming trend may not be uniform.", exp: "Đoạn B nói sự biến động thời tiết sẽ tiếp tục diễn ra, do đó xu hướng nóng lên sẽ không đồng đều. Nghĩa là thời tiết biến động sẽ tiếp diễn mà không bị thay đổi hoàn toàn bởi global warming. => B." },
+        29: { quote: "As the world warms, the great bank of west winds that circle Antarctica will become stronger... bring increased, sometimes catastrophic rainfall to the west coast... and create drier conditions in some eastern regions...", exp: "Đoạn C nói gió tây mạnh lên sẽ gây mưa lớn ở phía tây và hạn hán ở phía đông. Tức là NZ sẽ bị ảnh hưởng nặng hơn bởi lụt và hạn hán. => C." },
+        30: { quote: "What we think of today as a medium-severity drought could be an almost annual occurrence by the end of the century.", exp: "Đoạn D đề cập 'moisture deficit' để dẫn tới việc tình trạng hạn hán (drought) sẽ trở nên thường xuyên và tồi tệ hơn. => C." },
+        31: { quote: "Ski-field base station may eventually have to be moved upwards to be within reach of the new snow line...", exp: "Đoạn D chỉ ra tuyết sẽ rơi ở vị trí cao hơn, do đó các khu trượt tuyết có thể sẽ phải dời lên độ cao lớn hơn (move upwards = higher altitude). => D." },
+        32: { quote: "...warming over the Southern Alps could be significantly greater than over the rest of the country.", exp: "Đoạn E dẫn nghiên cứu của NIWA để chứng minh một địa điểm cụ thể (Southern Alps) có thể chịu ảnh hưởng nóng lên nghiêm trọng hơn. => A." },
+        33: { quote: "Predictions for the coming years cover a wide range, however, partly because of unknown rises resulting from the melting of the ice in the Arctic, Greenland and Antarctica.", exp: "Băng tan ở Arctic, Greenland, Antarctica (các vùng địa cực - Polar regions) quyết định mực nước biển dâng. => D.", vocab: "<b>Polar regions (n)</b>: Vùng địa cực" },
+        34: { quote: "...groundwater systems may become contaminated with saltwater... which in turn could diminish crop harvests.", exp: "Nước biển dâng làm nhiễm mặn nước ngầm, làm giảm sản lượng thu hoạch cây trồng (diminish crop harvests) -> ảnh hưởng sản xuất nông nghiệp (agriculture production). => A.", vocab: "<b>Diminish (v)</b>: Làm giảm bớt" },
+        35: { quote: "...estuaries may be enlarged by erosion... altering the contours of whole shorelines...", exp: "Xói mòn làm thay đổi đường bờ biển (shorelines) -> coastal land. => F.", vocab: "<b>Contour (n)</b>: Đường viền, đường đồng mức" },
+        36: { quote: "Human systems are better able to adapt to change than natural ecosystems because humans can see a problem coming and plan a response.", exp: "Hệ thống con người thích nghi tốt hơn hệ sinh thái tự nhiên. Tức là thế giới tự nhiên phản ứng kém hơn (less responsive) so với con người. => YES." },
+        37: { quote: "Farmers and horticulturalists have made considerable advances...", exp: "Bài đọc nói nông dân đã tạo ra những bước tiến đáng kể, chứ KHÔNG HỀ nói họ bảo thủ (conservative) hay chống lại sự đổi mới. Do thông tin đưa ra trái ngược nhưng câu khẳng định tính cách bảo thủ không hề được nhắc đến trực tiếp là phủ định hay khẳng định, thực tế bài đọc nói họ 'có tiến bộ', nên việc đánh giá họ 'too conservative' là Not Given hoặc False. Tuy nhiên, sát nghĩa 'chống đổi mới' không có trong bài -> NOT GIVEN/FALSE tùy góc nhìn, nhưng bài hoàn toàn không xét nét độ bảo thủ. => NOT GIVEN (Hoặc NO, ở đây đáp án chuẩn IELTS là NOT GIVEN)." },
+        38: { quote: "", exp: "Bài đọc nói NZ nóng chậm hơn, nhưng KHÔNG CÓ thông tin nào nói quá trình nóng lên toàn cầu là 'chậm' và tác động từng vùng theo cách khác nhau một cách chung chung như khẳng định. Thực ra bài tập trung vào NZ. => NOT GIVEN." },
+        39: { quote: "Their sex is determined by the temperature... males already outnumber females... tolerance zones... may simply disappear.", exp: "Tuatara bị mất cân bằng giới tính do nhiệt độ tăng, cho thấy chúng cực kỳ dễ bị tổn thương (vulnerable) trước thay đổi khí hậu. => YES." },
+        40: { quote: "Even if New Zealanders were to achieve the government's target of carbon neutrality, this would have no discernable impact on global climate change.", exp: "Câu hỏi nói NZ 'bắt buộc phải giảm (must reduce) lượng khí thải nếu muốn làm chậm global warming'. Nhưng bài đọc khẳng định dù NZ có đạt target thì cũng KHÔNG CÓ TÁC ĐỘNG NHẬN THẤY ĐƯỢC (no discernable impact) tới biến đổi khí hậu toàn cầu vì lượng thải của NZ quá nhỏ. => NO." }
+    };
+
+    const mcQuestions = [
+        {id: 27, text: "What is the main idea of the first paragraph?", opts: ["The air condition in New Zealand will maintain a high quality because of the ocean", "The Southern Ocean will remain at a constant strength", "The continents will warm more than the point", "New Zealand will not warm as much as other countries in the next century because it is surrounded by sea."]},
+        {id: 28, text: "What does the writer say about New Zealand’s variable weather?", opts: ["Temperature changes of 1°C will not be seem important in future", "Variable weather will continue, unchanged by global warming", "There was an unusually small amount of variation in 2006-2007", "Summer temperatures will vary but winter ones will be consistent"]},
+        {id: 29, text: "What is the predicted impact of conditions in the ocean to the south of New Zealand?", opts: ["New Zealand will be more affected by floods and droughts", "Antarctica will not be adversely affected by warming", "The band of west winds will move further to the south.", "The usual west wind will no longer be reliable"]},
+        {id: 30, text: "The writer mentions ‘moisture deficit’ to show?", opts: ["The droughts will be shorter but more severe", "How the growing season will become longer.", "How growing conditions will deteriorate", "That farmers should alter the make-up of soils"]},
+        {id: 31, text: "What are the implications of global warming for New Zealand’s", opts: ["Skiing may move to lower the altitude in future.", "The ski season will be later in the year than at present.", "The northern ski field will have to move to the south", "Warming may provide more snow for some ski locations"]},
+        {id: 32, text: "The writer refers to NIWA’s latest studies in the 3rd paragraph to show", opts: ["how a particular place could be affected by warming", "that the warming trend has been intensifying since 1978", "that freezing levels will rise throughout the century", "how the growth of glaciers is likely to cause damage"]}
+    ];
+
+    // --- INIT ---
+    window.onload = function() {
+        renderDynamicContent();
+        document.getElementById('setupOverlay').style.display = 'flex'; // Hiện popup cài đặt
+    }
+
+    // --- RENDER FUNCTIONS ---
+    function renderDynamicContent() {
+        // P1 Questions 1-4
+        let html1 = '';
+        const q1text = [
+            "Seagrass turned to be more resistant to the saline water level in the Bay.",
+            "Significance of finding a specific reason in controversy.",
+            "Expensive proposals raised to solve the nitrogen dilemma.",
+            "A statistic of ecological changes in both the coral area and species."
+        ];
+        q1text.forEach((txt, idx) => {
+            let id = idx + 1;
+            html1 += createGapQuestion(id, txt);
+        });
+        document.getElementById('render-q1-4').innerHTML = html1;
+
+        // P1 Questions 5-8
+        let html2 = '';
+        const q2text = [
+            "Drainage system in Everglades actually results in high salty water in the bay.",
+            "Restoring water high in nitrogen level will make more ecological side effect.",
+            "High nitrogen levels may be caused by the nearby farmland.",
+            "Released sewage rather than nutrients from agricultural area increase the level of Nitrogen."
+        ];
+        q2text.forEach((txt, idx) => {
+            let id = idx + 5;
+            html2 += createGapQuestion(id, txt, true); // true for droppable
+        });
+        document.getElementById('render-q5-8').innerHTML = html2;
+
+        // P1 Questions 9-13
+        let html3 = '';
+        const q3text = [
+            "Everyone agrees with 'pouring water into the sea is harmless enough'.",
+            "Nitrogen was poured in from different types of crops as water flows through.",
+            "Everglades restoration project can be effective regardless of the cause of the pollution.",
+            "Human has changed Florida Bay where old image before 1950s is unrecalled.",
+            "Tourism contributes fundamentally to the Florida Bay area."
+        ];
+        q3text.forEach((txt, idx) => {
+            let id = idx + 9;
+            html3 += createSelectQuestion(id, txt, ["TRUE", "FALSE", "NOT GIVEN"]);
+        });
+        document.getElementById('render-q9-13').innerHTML = html3;
+
+        // P2 Questions 22-25
+        let html4 = '';
+        const q4text = [
+            "The more children there are in a family, the more impacts of environment it is.",
+            "Methods based on twin studies still meet unexpected differences that cannot be ascribed to be a purely genetic explanation.",
+            "Children prefer to speak the language from the children of the same age to the language spoken by their parents.",
+            "The Study of non-shared environment influence can be a generally agreed idea among researchers in the field."
+        ];
+        q4text.forEach((txt, idx) => {
+            let id = idx + 22;
+            html4 += createSelectQuestion(id, txt, ["YES", "NO", "NOT GIVEN"]);
+        });
+        document.getElementById('render-q22-25').innerHTML = html4;
+
+        // P3 Questions 27-32 (MC)
+        let html5 = '';
+        mcQuestions.forEach(q => {
+            let optsHTML = q.opts.map((opt, i) => {
+                let char = String.fromCharCode(65 + i); // A, B, C, D
+                return `<label class="mc-option"><input type="radio" name="q${q.id}" value="${char}" onclick="checkNav(${q.id})"> <b>${char}.</b> ${opt}</label>`;
+            }).join("");
+            html5 += `<div class="q-row" id="q-row-${q.id}">
+                        <div class="q-content-wrapper">
+                            <div class="q-num">${q.id}</div>
+                            <div class="q-text"><b>${q.text}</b><br>${optsHTML}<span id="fb-${q.id}" class="feedback"></span></div>
+                        </div>
+                        <div id="exp-${q.id}"></div>
+                      </div>`;
+        });
+        document.getElementById('render-q27-32').innerHTML = html5;
+
+        // P3 Questions 36-40
+        let html6 = '';
+        const q6text = [
+            "The natural world is less responsive to challenges than humans.",
+            "The agricultural sector is being too conservative and resistant to innovation.",
+            "The global warming is slow; it will affect different regions in different ways.",
+            "The tuatara is vulnerable to changes in climate conditions.",
+            "New Zealand must reduce carbon emission if global warming is to be slowed."
+        ];
+        q6text.forEach((txt, idx) => {
+            let id = idx + 36;
+            html6 += createSelectQuestion(id, txt, ["YES", "NO", "NOT GIVEN"]);
+        });
+        document.getElementById('render-q36-40').innerHTML = html6;
+
+        // Generate Footer Navigation
+        const nav = document.getElementById("navPalette");
+        for (let i = 1; i <= 40; i++) {
+            let dot = document.createElement("div");
+            dot.className = "nav-dot"; dot.id = `nav-${i}`; dot.innerText = i;
+            dot.onclick = () => scrollToQuestion(i);
+            nav.appendChild(dot);
+        }
+    }
+
+    // Helper: Create HTML for Gap Question
+    function createGapQuestion(id, text, isDroppable = false) {
+        let events = isDroppable ? `ondrop="drop(event)" ondragover="allowDrop(event)"` : "";
+        return `<div class="q-row" id="q-row-${id}">
+            <div class="q-content-wrapper">
+                <div class="q-num">${id}</div>
+                <div class="q-text">${text} <br> 
+                    <input type="text" class="input-gap" id="ans-${id}" ${events} oninput="checkNav(${id})" autocomplete="off">
+                    <span id="fb-${id}" class="feedback"></span>
+                </div>
+            </div>
+            <div id="exp-${id}"></div>
+        </div>`;
+    }
+
+    // Helper: Create HTML for Select Question
+    function createSelectQuestion(id, text, options) {
+        let opts = options.map(o => `<option value="${o}">${o}</option>`).join("");
+        return `<div class="q-row" id="q-row-${id}">
+            <div class="q-content-wrapper">
+                <div class="q-num">${id}</div>
+                <div class="q-text">${text} <br>
+                    <select id="ans-${id}" onchange="checkNav(${id})">
+                        <option value="">Select...</option>
+                        ${opts}
+                    </select>
+                    <span id="fb-${id}" class="feedback"></span>
+                </div>
+            </div>
+            <div id="exp-${id}"></div>
+        </div>`;
+    }
+
+    // --- LOGIC ---
+    function switchTab(n) {
+        // Active Buttons
+        document.querySelectorAll('.tab-btn').forEach((b, i) => {
+            b.classList.toggle('active', i + 1 === n);
+        });
+        // Show Pane Content
+        document.querySelectorAll('.passage-content').forEach((p, i) => {
+            p.classList.toggle('active', i + 1 === n);
+        });
+        // Show Questions
+        document.querySelectorAll('.question-group').forEach((q, i) => {
+            q.classList.toggle('active', i + 1 === n);
+        });
+        
+        // Scroll to top
+        document.querySelector('.pane-left').scrollTop = 0;
+        document.querySelector('.pane-right').scrollTop = 0;
+    }
+
+    function checkNav(id) {
+        if(isSubmitted) return; // Khóa sau khi nộp
+        let val = "";
+        let el = document.getElementById(`ans-${id}`);
+        
+        if (el) {
+            val = el.value;
+        } else {
+            // Radio buttons logic
+            let radios = document.getElementsByName(`q${id}`);
+            for (let r of radios) if (r.checked) val = r.value;
+        }
+
+        let nav = document.getElementById(`nav-${id}`);
+        if (val && val.trim() !== "") nav.classList.add("done");
+        else nav.classList.remove("done");
+    }
+
+    function scrollToQuestion(id) {
+        let group = 1;
+        if (id >= 14 && id <= 26) group = 2;
+        if (id >= 27) group = 3;
+        
+        switchTab(group);
+        setTimeout(() => {
+            let el = document.getElementById(id >= 27 && id <=32 ? `q-row-${id}` : (document.getElementById(`ans-${id}`) || document.getElementsByName(`q${id}`)[0]));
+            if (el) {
+                if(!el.id) el = el.closest('.q-row') || el.closest('tr') || el.parentNode;
+                el.scrollIntoView({behavior: "smooth", block: "center"});
+                // Blink effect
+                el.style.transition = "background 0.5s";
+                el.style.background = "#fff9c4";
+                setTimeout(() => el.style.background = "", 1000);
+            }
+        }, 100);
+    }
+
+    // --- DRAG DROP ---
+    function allowDrop(ev) { if(!isSubmitted) ev.preventDefault(); }
+    function drag(ev) { if(!isSubmitted) ev.dataTransfer.setData("text", ev.target.getAttribute("data-val")); }
+    function drop(ev) {
+        if(isSubmitted) return;
+        ev.preventDefault();
+        let val = ev.dataTransfer.getData("text");
+        if (ev.target.tagName === 'INPUT') {
+            ev.target.value = val;
+            checkNav(ev.target.id.split('-')[1]);
+        }
+    }
+
+    // --- TIMER ---
+    function startTimer() {
+        let display = document.getElementById("timer");
+        timerInterval = setInterval(function () {
+            let m = Math.floor(testDuration / 60);
+            let s = testDuration % 60;
+            display.textContent = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+            if (--testDuration < 0) { 
+                clearInterval(timerInterval); 
+                submitTest(false); 
+            }
+        }, 1000);
+    }
+
+    // --- GRADING & EXPLANATIONS ---
+    // --- GRADING & EXPLANATIONS ---
+    function submitTest(manual) {
+        if (isSubmitted) return;
+        if (manual) {
+            // Hiển thị Popup xác nhận nộp bài thay vì dùng confirm()
+            document.getElementById('confirmOverlay').style.display = 'flex';
+            return;
+        } else {
+            // Hết giờ -> Nộp luôn không cần hỏi
+            executeSubmit();
+        }
+    }
+
+    function closeConfirmModal() {
+        document.getElementById('confirmOverlay').style.display = 'none';
+    }
+
+    function closeResultModal() {
+        document.getElementById('resultOverlay').style.display = 'none';
+    }
+
+    function executeSubmit() {
+        // Đóng popup xác nhận nếu nó đang mở
+        document.getElementById('confirmOverlay').style.display = 'none';
+        
+        isSubmitted = true;
+        clearInterval(timerInterval);
+        
+        // Khóa toàn bộ input
+        document.querySelectorAll('input, select').forEach(el => el.disabled = true);
+        
+        let score = 0;
+
+        for (let i = 1; i <= 40; i++) {
+            let userAns = "";
+            let el = document.getElementById(`ans-${i}`);
+            let feedbackEl = document.getElementById(`fb-${i}`);
+            let expContainer = document.getElementById(`exp-${i}`);
+            
+            // Fix for table items
+            if (!feedbackEl && i >= 14 && i <= 18) {
+                let container = document.getElementById('fb-container-14-18');
+                let rowInfo = document.createElement('div');
+                rowInfo.style.display = "flex"; rowInfo.style.alignItems = "center"; rowInfo.style.flexWrap = "wrap";
+                
+                let span = document.createElement('span'); span.id = `fb-${i}`;
+                let expBox = document.createElement('div'); expBox.id = `exp-${i}`; expBox.style.width = "100%";
+                
+                let label = document.createElement('b'); label.innerText = `Câu ${i}: `; label.style.marginRight = "10px";
+                
+                rowInfo.appendChild(label);
+                rowInfo.appendChild(span);
+                rowInfo.appendChild(expBox);
+                container.appendChild(rowInfo);
+                
+                feedbackEl = span;
+                expContainer = expBox;
+            }
+
+            if (el) {
+                userAns = el.value.trim().toUpperCase();
+            } else {
+                let radios = document.getElementsByName(`q${i}`);
+                for (let r of radios) if (r.checked) userAns = r.value;
+            }
+
+            let correctAns = answerKey[i];
+            let cleanUser = userAns.replace(/[^A-Z0-9%]/g, "");
+            let cleanKey = correctAns.replace(/[^A-Z0-9%]/g, "");
+            
+            let isCorrect = (cleanUser === cleanKey);
+            if (isCorrect) score++;
+
+            // Render Feedback mark
+            if(feedbackEl) {
+                if(isCorrect) {
+                    feedbackEl.innerHTML = `✓ Đúng`;
+                    feedbackEl.className = "feedback correct";
+                } else {
+                    feedbackEl.innerHTML = `✗ Sai (Đáp án: <span class="text-highlight-answer">${correctAns}</span>)`;
+                    feedbackEl.className = "feedback wrong";
+                }
+            }
+            
+            // Render Detailed Explanation
+            if(expContainer && explanations[i]) {
+                let expData = explanations[i];
+                let quoteHtml = expData.quote ? `<div class="exp-quote">"${expData.quote}"</div>` : '';
+                let vocabHtml = expData.vocab ? `<div class="exp-vocab">${expData.vocab}</div>` : '';
+                let tipHtml = expData.tip ? `<div style="margin-top:8px; color:#d87059; font-weight:600;">📌 Mẹo: ${expData.tip}</div>` : '';
+                
+                expContainer.innerHTML = `
+                    <div class="exp-box show">
+                        <div class="exp-title">💡 Giải thích chi tiết Câu ${i}</div>
+                        ${quoteHtml}
+                        <div class="exp-text">${expData.exp}</div>
+                        ${vocabHtml}
+                        ${tipHtml}
+                    </div>
+                `;
+            }
+            
+            // Update Navigator dots
+            let nav = document.getElementById(`nav-${i}`);
+            nav.style.background = isCorrect ? "#c8e6c9" : "#ffcdd2";
+            nav.style.color = isCorrect ? "#2e7d32" : "#c62828";
+            nav.style.borderColor = isCorrect ? "#81c784" : "#ef9a9a";
+        }
+
+        // Show highlight feature for reading text
+        document.getElementById('passagePane').style.backgroundColor = "#fff";
+        
+        // Final UI Alert (thay vì dùng alert mặc định)
+        document.getElementById('resultMessage').innerHTML = `
+            <strong style="font-size: 26px; color: var(--accent); display: block; margin-bottom: 10px;">Số câu đúng: ${score}/40</strong>
+            <strong style="font-size: 26px; color: var(--primary);">Band Score: ${getBand(score)}</strong>
+        `;
+        
+        // Đẩy điểm lên hệ thống
+        if(window.luuDiemIELTSFullTest) {
+            window.luuDiemIELTSFullTest(score, getBand(score), "IELTS Reading Test 1");
+        }
+
+        setTimeout(() => {
+            document.getElementById('resultOverlay').style.display = 'flex';
+        }, 500);
+    }
+
+    function calculateBand(raw) {
+        if (raw >= 39) return "9.0";
+        if (raw >= 37) return "8.5";
+        if (raw >= 35) return "8.0";
+        if (raw >= 33) return "7.5";
+        if (raw >= 30) return "7.0";
+        if (raw >= 27) return "6.5";
+        if (raw >= 23) return "6.0";
+        if (raw >= 19) return "5.5";
+        if (raw >= 15) return "5.0";
+        return "< 5.0";
+    }
+
+    // --- HIGHLIGHT SYSTEM ---
+    const mainContainer = document.getElementById("mainContainer");
+    const menu = document.getElementById("ctxMenu");
+    let targetElement = null;
+    let selectedRange = null;
+
+    mainContainer.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        targetElement = null; selectedRange = null;
+        if (e.target.classList.contains("highlight")) {
+            targetElement = e.target;
+            showMenu(e.pageX, e.pageY, "remove");
+            return;
+        }
+        let sel = window.getSelection();
+        if (sel.toString().trim().length > 0 && mainContainer.contains(sel.anchorNode)) {
+            selectedRange = sel.getRangeAt(0);
+            showMenu(e.pageX, e.pageY, "add");
+        } else {
+            menu.style.display = "none";
+        }
+    });
+
+    document.addEventListener("click", (e) => { if (!menu.contains(e.target)) menu.style.display = "none"; });
+
+    function showMenu(x, y, mode) {
+        menu.style.display = "block";
+        
+        // Prevent menu from overflowing window
+        let mw = menu.offsetWidth;
+        let mh = menu.offsetHeight;
+        let left = x + mw > window.innerWidth ? window.innerWidth - mw - 10 : x;
+        let top = y + mh > window.innerHeight ? window.innerHeight - mh - 10 : y;
+        
+        menu.style.left = left + "px";
+        menu.style.top = top + "px";
+        menu.children[0].style.display = (mode === "add") ? "block" : "none";
+        menu.children[1].style.display = (mode === "remove") ? "block" : "none";
+    }
+
+    function doHighlight() {
+        if (selectedRange) {
+            let span = document.createElement("span");
+            span.className = "highlight";
+            try { selectedRange.surroundContents(span); } catch(e) {}
+            window.getSelection().removeAllRanges();
+        }
+        menu.style.display = "none";
+    }
+
+    function removeHighlight() {
+        if (targetElement) {
+            let text = document.createTextNode(targetElement.textContent);
+            targetElement.parentNode.replaceChild(text, targetElement);
+            mainContainer.normalize();
+        }
+        menu.style.display = "none";
+    }
+</script>
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+        authDomain: "snapenglish-cb6e2.firebaseapp.com",
+        projectId: "snapenglish-cb6e2",
+        storageBucket: "snapenglish-cb6e2.firebasestorage.app",
+        messagingSenderId: "373152038413",
+        appId: "1:373152038413:web:19284622571390f8585f44"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Thông báo Toast trượt góc chuẩn SnapEnglish
+    function showSyncToast(msg) {
+        let toast = document.createElement("div");
+        toast.innerText = msg;
+        toast.style.cssText = "position:fixed; bottom:20px; right:20px; background:#ff477e; color:white; padding:12px 25px; border-radius:50px; font-weight:bold; font-family:'Quicksand',sans-serif; z-index:99999; box-shadow:0 8px 20px rgba(0,0,0,0.15); transform:translateY(100px); opacity:0; transition:all 0.5s ease;";
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.style.transform = "translateY(0)"; toast.style.opacity = "1"; }, 100);
+        setTimeout(() => { toast.style.transform = "translateY(100px)"; toast.style.opacity = "0"; }, 3500);
+    }
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            window.currentUserUid = user.uid;
+            window.currentUserEmail = user.email;
+        }
+    });
+
+    window.luuDiemIELTSFullTest = async function(diemSo, bandScore, tenBai) {
+        if (!window.currentUserUid) return;
+        let phanTram = Math.round((diemSo / 40) * 100);
+        let timestamp = Date.now();
+        let docId = window.currentUserUid + "_" + timestamp;
+
+        await setDoc(doc(db, "user_scores", docId), {
+            email: window.currentUserEmail,
+            baiThi: tenBai,
+            kyNang: "Reading",
+            dangBai: "Full Test",
+            diemSo: diemSo,
+            tongSoCau: 40,
+            phanTram: phanTram,
+            band: bandScore,
+            ngayThi: new Date().toLocaleString("vi-VN"),
+            timestamp: timestamp
+        });
+        showSyncToast("☁️ Đã đồng bộ Band " + bandScore + " lên Tracker!");
+    }
+</script>
+</body>
+</html>
 </body>
 </html>
