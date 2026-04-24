@@ -896,22 +896,36 @@ if(window.luuDiemLenFirebase) window.luuDiemLenFirebase(score);
         }
     });
 
-    // 2. TÍNH NĂNG LƯU ĐIỂM LÊN KHO
+   // 2. TÍNH NĂNG LƯU ĐIỂM LÊN KHO CHUYÊN NGHIỆP
     window.luuDiemLenFirebase = async function(diemSo) {
-        if (!window.currentUserUid) return; // Không có tài khoản thì thôi, không lưu
+        if (!window.currentUserUid) return;
 
-        // Tạo một hồ sơ tên là: IDnguoidung_quiz1 (Ví dụ: abc123_quiz1)
-        const hoSoRef = doc(db, "user_scores", window.currentUserUid + "_quiz2");
+        // Tính các thông số nâng cao
+        let tongSoCau = 13; // Sửa số 13 này tùy theo từng Quiz
+        let phanTram = Math.round((diemSo / tongSoCau) * 100);
+
+        // Lấy thời gian làm bài (Tính từ lúc timer chạy đến lúc nộp)
+        let thoiGianHienTai = document.getElementById("timer").innerText; 
         
-        // Viết dữ liệu vào hồ sơ
+        // Tạo ID duy nhất cho mỗi lần làm bài để tạo thành "Lịch sử"
+        let idLuotThi = window.currentUserUid + "_" + Date.now();
+        const hoSoRef = doc(db, "user_scores", idLuotThi);
+        
+        // Đẩy toàn bộ dữ liệu chi tiết lên
         await setDoc(hoSoRef, {
             email: window.currentUserEmail,
-            baiThi: "Reading Quiz 2",
-            diem: diemSo + "/13",
-            ngayThi: new Date().toLocaleString("vi-VN")
+            baiThi: "Reading Quiz 1", // NHỚ SỬA TÊN BÀI Ở ĐÂY CHO TỪNG FILE
+            kyNang: "Reading",        // Reading hoặc Listening
+            dangBai: "Practice",      // Practice hoặc Full Test
+            diemSo: diemSo,
+            tongSoCau: tongSoCau,
+            phanTram: phanTram,
+            thoiGianConLai: thoiGianHienTai, 
+            ngayThi: new Date().toLocaleString("vi-VN"),
+            timestamp: Date.now()     // Dùng để sắp xếp trên Tracker
         });
         
-        console.log("Đã đẩy điểm lên mây thành công!");
+        console.log("Đã đồng bộ điểm số lên Hồ sơ học tập!");
     }
 </script>
 </body>
