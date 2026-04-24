@@ -22,7 +22,26 @@
             --incorrect: #f44336;
             --modal-bg: rgba(255,255,255,0.9);
         }
-
+/* --- BỘ LỌC DỮ LIỆU --- */
+        .filter-container { 
+            display: flex; 
+            gap: 10px; 
+            flex-wrap: wrap; 
+        }
+        .filter-input {
+            padding: 8px 12px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 8px;
+            font-family: 'Quicksand', sans-serif; 
+            font-size: 13px; 
+            outline: none; 
+            transition: 0.3s;
+            color: var(--text-main);
+        }
+        .filter-input:focus { 
+            border-color: var(--secondary); 
+            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2); 
+        }
         body {
             font-family: 'Quicksand', sans-serif;
             background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
@@ -260,8 +279,18 @@
                 </div>
 
                 <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
                         <h3 style="margin: 0;">Lịch Sử Luyện Tập</h3>
+                        <div class="filter-container">
+                            <select id="filterSkill" class="filter-input" onchange="applyFilters()">
+                                <option value="all">Tất cả kỹ năng</option>
+                                <option value="Listening">Listening</option>
+                                <option value="Reading">Reading</option>
+                                <option value="Speaking">Speaking</option>
+                                <option value="Writing">Writing</option>
+                            </select>
+                            <input type="text" id="filterText" class="filter-input" placeholder="Tìm Tên đề, Part, Full..." onkeyup="applyFilters()">
+                        </div>
                     </div>
 
                     <div class="table-container">
@@ -341,7 +370,47 @@
         window.closeModal = function() {
             document.getElementById('customModal').style.display = 'none';
         }
+window.renderTable = function(data) {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+            
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: #999; padding: 20px;">Không tìm thấy dữ liệu phù hợp. 🕵️‍♂️</td></tr>`;
+            } else {
+                data.forEach(record => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${record.date}</td>
+                        <td><span class="badge badge-${record.skill.toLowerCase()}">${record.skill}</span></td>
+                        <td><strong>${record.testName}</strong></td>
+                        <td>${record.partName}</td>
+                        <td>${record.timeTaken}'</td>
+                        <td><span style="color: var(--correct); font-weight: bold;">${record.correctQ}</span>/${record.totalQ}</td>
+                        <td><strong style="color: var(--primary);">${record.score}</strong></td>
+                        <td><button class="btn-delete" onclick="deleteRecord('${record.id}')">Xóa</button></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        };
 
+        window.applyFilters = function() {
+            const skillFilter = document.getElementById('filterSkill').value;
+            const textFilter = document.getElementById('filterText').value.toLowerCase().trim();
+
+            const filteredData = records.filter(record => {
+                // Kiểm tra điều kiện Kỹ năng
+                const matchSkill = (skillFilter === 'all') || (record.skill === skillFilter);
+                
+                // Kiểm tra điều kiện Text (tìm trong Tên đề hoặc Tên Part)
+                const matchText = record.testName.toLowerCase().includes(textFilter) || 
+                                  record.partName.toLowerCase().includes(textFilter);
+
+                return matchSkill && matchText;
+            });
+
+            window.renderTable(filteredData);
+        };
         // Logic
         window.updateDefaultQuestions = function() {
             const skill = document.getElementById('skill').value;
@@ -463,28 +532,9 @@
             document.getElementById('totalLR').innerText = avgL + avgR;
             document.getElementById('totalSW').innerText = avgS + avgW;
 
-            // Render Table
-            const tbody = document.getElementById('historyTableBody');
-            tbody.innerHTML = '';
-            
-            if (records.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: #999; padding: 20px;">Chưa có dữ liệu nào. Làm bài ngay thôi! 🕵️‍♂️</td></tr>`;
-            } else {
-                records.forEach(record => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${record.date}</td>
-                        <td><span class="badge badge-${record.skill.toLowerCase()}">${record.skill}</span></td>
-                        <td><strong>${record.testName}</strong></td>
-                        <td>${record.partName}</td>
-                        <td>${record.timeTaken}'</td>
-                        <td><span style="color: var(--correct); font-weight: bold;">${record.correctQ}</span>/${record.totalQ}</td>
-                        <td><strong style="color: var(--primary);">${record.score}</strong></td>
-                        <td><button class="btn-delete" onclick="deleteRecord('${record.id}')">Xóa</button></td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
+            document.getElementById('filterSkill').value = 'all'; // Reset filter khi load mới
+            document.getElementById('filterText').value = '';
+            window.renderTable(records);
 
             // Render Chart
             const ctx = document.getElementById('progressChart').getContext('2d');
