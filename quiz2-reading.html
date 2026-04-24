@@ -861,52 +861,6 @@ if(window.luuDiemLenFirebase) window.luuDiemLenFirebase(score);
         }, 1000);
     }
 </script>
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
-        authDomain: "snapenglish-cb6e2.firebaseapp.com",
-        projectId: "snapenglish-cb6e2",
-        storageBucket: "snapenglish-cb6e2.firebasestorage.app",
-        messagingSenderId: "373152038413",
-        appId: "1:373152038413:web:19284622571390f8585f44"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            window.currentUserUid = user.uid;
-            window.currentUserEmail = user.email;
-            // Đổi lời chào ở Header
-            let name = user.email.split('@')[0];
-            document.querySelector('.brand span').innerText = "Chào " + name;
-        }
-    });
-
-    window.luuDiemLenFirebase = async function(diemSo) {
-        if (!window.currentUserUid) return;
-        let tongSoCau = 13; 
-        let phanTram = Math.round((diemSo / tongSoCau) * 100);
-        let idLuotThi = window.currentUserUid + "_" + Date.now();
-
-        await setDoc(doc(db, "user_scores", idLuotThi), {
-            email: window.currentUserEmail,
-            baiThi: "Reading Quiz 2", // Nhớ đổi tên bài tương ứng
-            kyNang: "Reading",
-            dangBai: "Practice",
-            diemSo: diemSo,
-            tongSoCau: tongSoCau,
-            phanTram: phanTram,
-            ngayThi: new Date().toLocaleString("vi-VN"),
-            timestamp: Date.now()
-        });
-    }
-</script>
 </body>
 </html>
