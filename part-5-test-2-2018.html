@@ -457,33 +457,39 @@ let testDuration = 0;
     }
 
     function submitQuiz() {
-        document.getElementById('confirmOverlay').style.display = 'none';
-        isSubmitted = true;
-        clearInterval(timerInterval);
-      
-        // LƯU ĐÁP ÁN VÀO LOCALSTORAGE TẠI ĐÂY
-        localStorage.setItem('snapEnglish_userAnswers', JSON.stringify(userAnswers));
-        
-        let correctCount = 0;
-        for (let i = 0; i < questions.length; i++) {
-            if (userAnswers[i] === questions[i].a) {
-                correctCount++;
-            }
-        }
-
-        document.getElementById("question-container").style.display = "none";
-        document.getElementById("result-container").style.display = "block";
-        document.getElementById("score-display").textContent = `${correctCount}/${questions.length}`;
-        
-        let message = "Tuyệt vời! Bạn đã làm rất tốt.";
-        if (correctCount < 15) message = "Hãy cố gắng ôn tập thêm nhé!";
-        else if (correctCount < 25) message = "Khá lắm, tiếp tục phát huy nha!";
-        document.getElementById("result-message").textContent = message;
-        if(window.luuDiemTOEIC) {
-    window.luuDiemTOEIC(score, totalQuestions, "Test 2 - 2018", "Reading", "Part 5", false);
-}
+    document.getElementById('confirmOverlay').style.display = 'none';
+    isSubmitted = true;
+    clearInterval(timerInterval);
+  
+    // Lưu đáp án vào LocalStorage
+    localStorage.setItem('snapEnglish_userAnswers', JSON.stringify(userAnswers));
+    
+    let correctCount = 0;
+    for (let i = 0; i < questions.length; i++) {
+        if (userAnswers[i] === questions[i].a) {
+            correctCount++;
         }
     }
+
+    document.getElementById("question-container").style.display = "none";
+    document.getElementById("result-container").style.display = "block";
+    document.getElementById("score-display").textContent = `${correctCount}/${questions.length}`;
+    
+    let message = "Tuyệt vời! Bạn đã làm rất tốt.";
+    if (correctCount < 15) {
+        message = "Hãy cố gắng ôn tập thêm nhé!";
+    } else if (correctCount < 25) {
+        message = "Khá lắm, tiếp tục phát huy nha!"; // Đã bỏ dấu \ gây lỗi
+    }
+    
+    document.getElementById("result-message").textContent = message;
+
+    // Đồng bộ điểm lên Tracker
+    if (window.luuDiemTOEIC) {
+        // Sử dụng correctCount thay cho score và questions.length thay cho totalQuestions
+        window.luuDiemTOEIC(correctCount, questions.length, "Test 2 - 2018", "Reading", "Part 5", false);
+    }
+}
     loadQuestion();
 </script>
 <script type="module" src="firebase-core.js"></script>
