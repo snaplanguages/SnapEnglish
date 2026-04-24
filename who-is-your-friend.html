@@ -450,6 +450,50 @@
         synth.speak(utterThis);
     }
 </script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
+    // Cấu hình Firebase SnapEnglish của riêng bạn
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+        authDomain: "snapenglish-cb6e2.firebaseapp.com",
+        projectId: "snapenglish-cb6e2",
+        storageBucket: "snapenglish-cb6e2.firebasestorage.app",
+        messagingSenderId: "373152038413",
+        appId: "1:373152038413:web:19284622571390f8585f44"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Hàm hiển thị thông báo tài khoản (Toast Popup)
+    function showAccountToast(msg, isWelcome = true) {
+        let toast = document.createElement("div");
+        toast.innerText = msg;
+        // Style pastel, bo góc chuẩn SnapEnglish
+        toast.style.cssText = `
+            position: fixed; bottom: 20px; left: 20px; 
+            background: ${isWelcome ? '#a3b492' : '#ff477e'}; 
+            color: white; padding: 12px 25px; border-radius: 50px; 
+            font-weight: bold; font-family: 'Quicksand', sans-serif; 
+            z-index: 9999; box-shadow: 0 8px 25px rgba(0,0,0,0.1); 
+            transform: translateY(100px); opacity: 0; transition: all 0.5s ease;
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.style.transform = "translateY(0)"; toast.style.opacity = "1"; }, 100);
+        setTimeout(() => { toast.style.transform = "translateY(100px)"; toast.style.opacity = "0"; }, 4000);
+    }
+
+    // Lắng nghe trạng thái đăng nhập
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            let name = user.email.split('@')[0]; // Lấy tên từ Email
+            showAccountToast("✨ Chào " + name + "! Bạn đang học cùng SnapEnglish.");
+        } else {
+            showAccountToast("⚠️ Bạn chưa đăng nhập! Hãy đăng nhập để đồng bộ tài khoản nhé.", false);
+        }
+    });
+</script>
 </body>
 </html>
