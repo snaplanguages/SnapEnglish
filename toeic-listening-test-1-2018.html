@@ -2289,25 +2289,37 @@ let totalTimeInSeconds = parseInt(document.getElementById('inputTime').value) * 
         }
     });
 
-    window.luuDiemTOEICFull = async function(correct, total, testTitle) {
+    window.luuDiemTOEICFull = async function(correct, total, testTitle, timeSpent) {
         if (!window.currentUserUid) return;
         let scoreConverted = Math.round(((correct / total) * 495) / 5) * 5;
         let timestamp = Date.now();
         let docId = window.currentUserUid + "_toeic_" + timestamp;
 
-        await setDoc(doc(db, "user_toeic_scores", docId), {
-            email: window.currentUserEmail,
-            skill: "Listening",
-            testName: testTitle,
-            partName: "Full Listening",
-            correctQ: correct,
-            totalQ: total,
-            score: scoreConverted,
-            date: new Date().toLocaleDateString('vi-VN'),
-            timestamp: timestamp
-        });
-        // Hiện thông báo xinh xắn (tự tạo UI toast nếu muốn)
-        console.log("Đã đồng bộ điểm TOEIC!");
+        try {
+            await setDoc(doc(db, "user_toeic_scores", docId), {
+                email: window.currentUserEmail,
+                skill: "Listening",
+                testName: testTitle,
+                partName: "Full",
+                correctQ: correct,
+                totalQ: total,
+                score: scoreConverted,
+                timeSpent: timeSpent || "0 phút 0 giây", // Thêm dòng này để đẩy lên tracker
+                date: new Date().toLocaleDateString('vi-VN'),
+                timestamp: timestamp
+            });
+            
+            // Kích hoạt giao diện Toast notification
+            const toast = document.getElementById('toastNotification');
+            if (toast) {
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 4000); // Tự động ẩn sau 4 giây
+            }
+        } catch (error) {
+            console.error("Lỗi khi lưu điểm: ", error);
+        }
     }
 </script>
     <div id="toastNotification">
