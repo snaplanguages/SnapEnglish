@@ -468,7 +468,7 @@
         }
     ];
 
-    let currentIndex = 0;
+    window.currentIndex = 0;
     let currentPlayCount = 0;
     let playTimeout;
     const synth = window.speechSynthesis;
@@ -497,7 +497,7 @@
         
         let savedIndex = parseInt(localStorage.getItem('part1_test4_progress'));
         if (!isNaN(savedIndex) && savedIndex < lessonData.length) {
-            currentIndex = savedIndex;
+            window.currentIndex = savedIndex;
         }
 
         updateUI();
@@ -505,9 +505,9 @@
 
     function updateUI() {
         updateProgress();
-        document.getElementById('current-sentence-num').innerText = currentIndex + 1;
+        document.getElementById('current-sentence-num').innerText = window.currentIndex + 1;
         
-        const data = lessonData[currentIndex];
+        const data = lessonData[window.currentIndex];
         imageDisplay.src = data.image;
     }
 
@@ -541,7 +541,7 @@
     function triggerAudioLoop() {
         if (synth.speaking) synth.cancel();
         
-        const data = lessonData[currentIndex];
+        const data = lessonData[window.currentIndex];
         const utterThis = new SpeechSynthesisUtterance(data.en);
         utterThis.lang = 'en-US';
         utterThis.rate = parseFloat(document.getElementById('speed-setting').value);
@@ -565,7 +565,7 @@
     function checkAnswer() {
         const rawUserInput = inputField.value;
         const userInput = normalizeText(rawUserInput);
-        const targetText = normalizeText(lessonData[currentIndex].en);
+        const targetText = normalizeText(lessonData[window.currentIndex].en);
         
         if (userInput === targetText) {
             msgBox.innerText = "";
@@ -626,9 +626,9 @@
 
         const rawUserInput = inputField.value;
         const userInput = normalizeText(rawUserInput);
-        const targetText = normalizeText(lessonData[currentIndex].en);
+        const targetText = normalizeText(lessonData[window.currentIndex].en);
         
-        const targetWordsRaw = lessonData[currentIndex].en.split(' ');
+        const targetWordsRaw = lessonData[window.currentIndex].en.split(' ');
         const targetWordsNorm = targetText.split(' ');
         const userWords = userInput.split(' ').filter(w => w !== "");
 
@@ -649,7 +649,7 @@
 
     function showModal() {
         inputField.blur();
-        const data = lessonData[currentIndex];
+        const data = lessonData[window.currentIndex];
         
         document.getElementById("trans-en").innerText = data.en;
         document.getElementById("trans-vi").innerText = data.vi;
@@ -678,15 +678,15 @@
     }
 
     function prevSentenceManual() {
-        if (currentIndex > 0) {
-            currentIndex--;
+        if (window.currentIndex > 0) {
+            window.currentIndex--;
             resetForNewSentence();
         }
     }
 
     function nextSentenceManual() {
-        if (currentIndex < lessonData.length - 1) {
-            currentIndex++;
+        if (window.currentIndex < lessonData.length - 1) {
+            window.currentIndex++;
             resetForNewSentence();
         } else {
             finishLesson();
@@ -694,31 +694,40 @@
     }
     
     function resetForNewSentence() {
-        modalOverlay.style.display = "none";
-        inputField.value = "";
-        msgBox.innerHTML = "";
-        localStorage.setItem('part1_test4_progress', currentIndex);
-        updateUI();
-        playAudio();
-    }
+    modalOverlay.style.display = "none";
+    inputField.value = "";
+    msgBox.innerHTML = "";
+    
+    // Lưu Local dự phòng
+    localStorage.setItem('part1_test3_progress', window.currentIndex); 
+    // LƯU LÊN CLOUD
+    if(window.saveProgressToCloud) window.saveProgressToCloud(window.currentIndex); 
+    
+    updateUI();
+    playAudio();
+}
 
     function nextSentence() {
-        modalOverlay.style.display = "none";
-        currentIndex++;
-        inputField.value = "";
-        msgBox.innerHTML = "";
-        
-        if (currentIndex < lessonData.length) {
-            localStorage.setItem('part1_test4_progress', currentIndex);
-            updateUI();
-            playAudio();
-        } else {
-            finishLesson();
-        }
+    modalOverlay.style.display = "none";
+    window.currentIndex++;
+    inputField.value = "";
+    msgBox.innerHTML = "";
+    
+    if (window.currentIndex < lessonData.length) {
+        // Lưu Local dự phòng
+        localStorage.setItem('part1_test3_progress', window.currentIndex);
+        // LƯU LÊN CLOUD
+        if(window.saveProgressToCloud) window.saveProgressToCloud(window.currentIndex);
+
+        updateUI();
+        playAudio();
+    } else {
+        finishLesson();
     }
+}
 
     function updateProgress() {
-        const percent = Math.round((currentIndex / lessonData.length) * 100);
+        const percent = Math.round((window.currentIndex / lessonData.length) * 100);
         document.getElementById("progress-percent").innerText = percent;
         document.getElementById("progress-ring").style.background = `conic-gradient(var(--primary) ${percent}%, #eee 0)`;
     }
@@ -762,8 +771,9 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    // IMPORT THÊM FIRESTORE
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-    // Cấu hình Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
         authDomain: "snapenglish-cb6e2.firebaseapp.com",
@@ -775,16 +785,48 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app); // KHỞI TẠO FIRESTORE
 
-    // KIỂM TRA & ĐỒNG BỘ TÀI KHOẢN (Chạy ngầm)
-    onAuthStateChanged(auth, (user) => {
+    // Khai báo hàm để lưu tiến độ lên Cloud có thể gọi từ bên ngoài module
+    window.saveProgressToCloud = async (progressIndex) => {
+        if (window.currentUserUid) {
+            try {
+                await setDoc(doc(db, "userProgress", window.currentUserUid), {
+                    part1_test3_progress: progressIndex
+                }, { merge: true });
+            } catch (e) {
+                console.error("Lỗi khi lưu tiến độ:", e);
+            }
+        }
+    };
+
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
-            // Lưu thông tin user vào window để hệ thống biết người dùng đã đăng nhập
             window.currentUserUid = user.uid;
             window.currentUserEmail = user.email;
-            
-            // Console log ẩn để bạn dễ debug, người dùng bình thường không thấy
             console.log("Đã đồng bộ ngầm tài khoản:", user.email);
+
+            // KHI ĐĂNG NHẬP, KÉO DỮ LIỆU TỪ CLOUD VỀ
+            try {
+                const docRef = doc(db, "userProgress", user.uid);
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    let cloudProgress = docSnap.data().part1_test3_progress;
+                    if (cloudProgress !== undefined) {
+                        // Gắn tiến độ mới và cập nhật giao diện
+                        window.currentIndex = cloudProgress; 
+                        window.updateUI();
+                    }
+                }
+            } catch (error) {
+                console.error("Lỗi khi tải tiến độ:", error);
+            }
+           
+        } else {
+            window.currentUserUid = null;
+            window.currentUserEmail = null;
+            console.log("Trạng thái: Khách vãng lai");
         }
     });
 </script>
