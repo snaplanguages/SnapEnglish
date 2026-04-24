@@ -8,8 +8,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
   
   <style>
+    /* --- Cài đặt chung & Biến màu (Branding) --- */
     :root {
-      --primary-color: #ff477e;
+      --primary-color: #ff477e; /* Hồng san hô đậm chất SnapEnglish */
       --primary-light: #ff709b;
       --bg-gradient: linear-gradient(135deg, #fff0f5 0%, #ffe6ee 100%);
       --text-main: #2d3436;
@@ -17,7 +18,10 @@
       --card-bg: rgba(255, 255, 255, 0.9);
       --card-shadow: 0 8px 32px rgba(255, 71, 126, 0.08);
     }
-
+    ::selection {
+      background: #ffb6c1; /* Màu hồng nhạt */
+      color: #fff;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -27,53 +31,155 @@
       line-height: 1.6;
       min-height: 100vh;
       padding: 40px 0; 
+      overflow-x: hidden;
     }
 
+    /* Phóng to hết ra màn hình, không bị giới hạn chiều ngang */
     .container {
-      width: 95%;
-      max-width: 1400px; 
+      width: 100%;
+      padding: 0 30px;
       margin: 0 auto;
     }
 
-    /* --- Header --- */
-    .header-section { text-align: center; margin-bottom: 50px; }
+    /* --- Header & Typography --- */
+    .header-section {
+      text-align: center;
+      margin-bottom: 50px;
+      animation: fadeInDown 0.8s ease;
+    }
     .snap-logo {
-      font-size: 3rem;
+      font-family: 'Poppins', sans-serif;
       font-weight: 700;
+      font-size: 2.8rem;
       background: linear-gradient(45deg, #ff477e, #ff8a00);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+      letter-spacing: -1px;
     }
 
-    /* --- Auth Button --- */
+    .header-section p {
+      font-family: 'Quicksand', sans-serif;
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* --- Nút Đăng nhập góc phải --- */
     .btn-login-top {
       position: fixed; top: 20px; right: 20px;
       background: var(--primary-color); color: white;
       border: none; padding: 12px 25px; border-radius: 30px;
-      font-weight: 700; cursor: pointer; z-index: 100;
-      box-shadow: 0 4px 15px rgba(255, 71, 126, 0.3);
+      font-family: 'Quicksand', sans-serif; font-weight: 700; cursor: pointer; z-index: 100;
+      box-shadow: 0 4px 15px rgba(255, 71, 126, 0.3); transition: all 0.3s ease;
+    }
+    .btn-login-top:hover { background-color: var(--primary-light); transform: translateY(-2px); }
+
+    /* --- Phân mục (Categories) --- */
+    .category-section {
+      margin-bottom: 40px;
+      animation: fadeInUp 0.8s ease backwards;
+    }
+    .category-section:nth-child(2) { animation-delay: 0.1s; }
+    .category-section:nth-child(3) { animation-delay: 0.2s; }
+    .category-section:nth-child(4) { animation-delay: 0.3s; }
+    .category-section:nth-child(5) { animation-delay: 0.4s; }
+
+    .category-title {
+      font-size: 1.4rem;
+      color: var(--primary-color);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px dashed #ffb6c1;
+      display: inline-block;
     }
 
-    /* --- Category & Cards --- */
-    .category-section { margin-bottom: 50px; }
-    .category-title {
-      font-size: 1.6rem; color: var(--primary-color);
-      border-bottom: 2px dashed #ffb6c1; margin-bottom: 25px;
-      display: inline-block; padding-bottom: 5px;
-    }
+    /* --- Grid Layout --- */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 25px;
+      gap: 20px;
     }
-    .card-link { text-decoration: none; color: inherit; }
+
+    /* --- Card Style --- */
+    a.card-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      outline: none;
+    }
+
     .card {
-      background: var(--card-bg); padding: 30px; border-radius: 20px;
-      text-align: center; transition: 0.3s; height: 100%;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      padding: 25px 20px;
+      border-radius: 20px;
+      box-shadow: var(--card-shadow);
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
       border: 1px solid rgba(255, 255, 255, 0.5);
+      height: 100%;
+      position: relative;
+      overflow: hidden;
     }
-    .card:hover { transform: translateY(-10px); box-shadow: var(--card-shadow); }
-    .card-icon { font-size: 40px; margin-bottom: 15px; }
+
+    .card::after {
+      content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+      background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
+      transform: skewX(-25deg); transition: all 0.7s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 15px 35px rgba(255, 71, 126, 0.2);
+      border-color: var(--primary-light);
+    }
+    .card:hover::after { left: 200%; }
+
+    .card-icon {
+      font-size: 32px; display: flex; align-items: center; justify-content: center;
+      width: 65px; height: 65px; background-color: #fff0f5; border-radius: 18px;
+      margin-bottom: 15px; transition: all 0.3s ease; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .card:hover .card-icon { background-color: var(--primary-color); transform: rotate(-10deg) scale(1.1); }
+    .card h3 { margin: 0; font-size: 1.05rem; color: var(--text-main); font-weight: 600; }
+
+    /* --- News Ticker --- */
+    .news-ticker {
+      background-color: var(--primary-light); color: #ffffff; padding: 10px 0;
+      overflow: hidden; white-space: nowrap; box-shadow: 0 4px 15px rgba(255, 71, 126, 0.2);
+      margin-bottom: 30px; position: relative; font-family: 'Quicksand', sans-serif; font-weight: 600; font-size: 1rem;
+    }
+    .ticker-content { display: inline-block; padding-left: 100%; animation: ticker 25s linear infinite; }
+    @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+    .news-ticker:hover .ticker-content { animation-play-state: paused; }
+
+    /* --- Watermark Style --- */
+    .watermark {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: -1; pointer-events: none; display: flex; flex-wrap: wrap;
+      justify-content: space-around; align-content: space-around; opacity: 0.04; 
+      font-family: 'Poppins', sans-serif; font-size: 5rem; font-weight: 700;
+      color: var(--primary-color); transform: rotate(-30deg); user-select: none;
+      overflow: hidden; white-space: nowrap;
+    }
+    .watermark::before { content: "SnapEnglish  SnapEnglish  SnapEnglish  SnapEnglish  SnapEnglish"; line-height: 200px; }
+
+    /* --- Footer --- */
+    footer {
+      margin-top: 60px; padding: 20px; font-size: 0.9rem; color: var(--text-muted);
+      text-align: center; animation: fadeInUp 1s ease backwards; animation-delay: 0.5s;
+    }
+
+    /* --- Keyframes --- */
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
 
     /* --- Modal Auth System --- */
     .modal-overlay {
@@ -92,12 +198,12 @@
     }
     .tab.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); }
     
-    input {
+    .auth-box input {
       width: 100%; padding: 15px; margin: 10px 0;
       border: 2px solid #f0f0f0; border-radius: 12px; outline: none;
       font-family: 'Quicksand', sans-serif;
     }
-    input:focus { border-color: var(--primary-color); }
+    .auth-box input:focus { border-color: var(--primary-color); }
     
     .btn-submit {
       width: 100%; padding: 15px; background: var(--primary-color);
@@ -112,62 +218,109 @@
 
     /* --- GIAO DIỆN THÔNG BÁO POPUP (TOAST) --- */
     .toast-notification {
-      position: fixed;
-      top: -100px; /* Ẩn tít trên cao */
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 15px 30px;
-      border-radius: 50px;
-      color: white;
-      font-family: 'Quicksand', sans-serif;
-      font-weight: 700;
-      font-size: 15px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-      z-index: 9999;
-      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Hiệu ứng nảy */
-      pointer-events: none;
-      text-align: center;
+      position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+      padding: 15px 30px; border-radius: 50px; color: white;
+      font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 9999;
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); pointer-events: none; text-align: center;
     }
-    .toast-notification.show {
-      top: 30px; /* Trượt xuống giữa màn hình */
+    .toast-notification.show { top: 30px; }
+    .toast-success { background-color: #a3b18a; } 
+    .toast-error { background-color: #ff477e; } 
+    .toast-warning { background-color: #ff8a00; } 
+
+    @media (max-width: 600px) {
+      .snap-logo { font-size: 2.2rem; }
+      .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+      .card { padding: 20px 15px; }
+      .card-icon { width: 50px; height: 50px; font-size: 24px; }
+      .btn-login-top { top: 10px; right: 10px; padding: 10px 15px; font-size: 14px; }
     }
-    .toast-success { background-color: #a3b18a; } /* Xanh rêu pastel */
-    .toast-error { background-color: #ff477e; } /* Hồng SnapEnglish */
-    .toast-warning { background-color: #ff8a00; } /* Cam */
   </style>
 </head>
+
 <body>
 
   <div id="toastMessage" class="toast-notification"></div>
 
+  <div class="watermark">SnapEnglish</div>
+
   <button class="btn-login-top" id="authBtn" onclick="openAuth()">Đăng nhập / Đăng ký</button>
 
   <div class="container">
+    
+    <div class="news-ticker">
+      <div class="ticker-content">
+        ✨ Chào mừng bạn đến với SnapEnglish! | 🚀 Hãy cố gắng chinh phục mục tiêu của mình nhé! | 💡 Chúc bạn một ngày học tập thật hiệu quả!
+      </div>
+    </div>
+
     <div class="header-section">
       <h1 class="snap-logo">SnapEnglish ✨</h1>
-      <p>Nền tảng học tiếng Anh cá nhân hóa cho mục tiêu của riêng bạn.</p>
+      <p>Chọn mục tiêu và kỹ năng bạn muốn chinh phục hôm nay. Khám phá kho tài liệu được cá nhân hóa dành riêng cho bạn!</p>
     </div>
 
     <div class="category-section">
       <h2 class="category-title">🎯 IELTS Mastery</h2>
       <div class="grid">
-        <a href="reading-quiz.html" class="card-link"><div class="card"><div class="card-icon">📖</div><h3>Reading Quiz</h3></div></a>
-        <a href="listening-quiz.html" class="card-link"><div class="card"><div class="card-icon">🎵</div><h3>Listening Quiz</h3></div></a>
-        <a href="vocabulary-task-2.html" class="card-link"><div class="card"><div class="card-icon">🏷️</div><h3>Vocabulary Task 2</h3></div></a>
-        <a href="writing-task-1.html" class="card-link"><div class="card"><div class="card-icon">📊</div><h3>Writing Task 1</h3></div></a>
-        <a href="writing-task-2.html" class="card-link"><div class="card"><div class="card-icon">✍️</div><h3>Writing Task 2</h3></div></a>
+        <a href="reading-quiz.html" class="card-link"><div class="card"><div class="card-icon">📖</div><h3> Reading Quiz</h3></div></a>
+        <a href="listening-quiz.html" class="card-link"><div class="card"><div class="card-icon">🎵</div><h3> Listening Quiz</h3></div></a>
+        <a href="vocabulary-task-2.html" class="card-link"><div class="card"><div class="card-icon">🏷️</div><h3> Vocabulary Task 2</h3></div></a>
+        <a href="writing-task-1.html" class="card-link"><div class="card"><div class="card-icon">📊</div><h3> Writing Task 1</h3></div></a>
+        <a href="writing-task-2.html" class="card-link"><div class="card"><div class="card-icon">✍️</div><h3> Writing Task 2</h3></div></a>
+        <a href="reading-mock-test.html" class="card-link"><div class="card"><div class="card-icon">📚</div><h3>Reading Mock Test</h3></div></a>
+        <a href="listening-mock-test.html" class="card-link"><div class="card"><div class="card-icon">🎧</div><h3>Listening Mock Test</h3></div></a>
+        <a href="blog-task-1.html" class="card-link"><div class="card"><div class="card-icon">📰</div><h3>Blog Task 1</h3></div></a>
+        <a href="blog-task-2.html" class="card-link"><div class="card"><div class="card-icon">📝</div><h3>Blog Task 2</h3></div></a>
       </div>
     </div>
 
     <div class="category-section">
       <h2 class="category-title">🚀 TOEIC Target</h2>
       <div class="grid">
-        <a href="toeic-listening.html" class="card-link"><div class="card"><div class="card-icon">🔊</div><h3>TOEIC Listening</h3></div></a>
-        <a href="toeic-reading.html" class="card-link"><div class="card"><div class="card-icon">⏱️</div><h3>TOEIC Reading</h3></div></a>
+        <a href="toeic-listening.html" class="card-link"><div class="card"><div class="card-icon">🔊</div><h3>TOEIC Listening Part</h3></div></a>
+        <a href="toeic-reading.html" class="card-link"><div class="card"><div class="card-icon">⏱️</div><h3>TOEIC Reading Part</h3></div></a>
         <a href="toeic-grammar.html" class="card-link"><div class="card"><div class="card-icon">🧩</div><h3>TOEIC Grammar</h3></div></a>
+        <a href="toeic-reading-test.html" class="card-link"><div class="card"><div class="card-icon">📚</div><h3>TOEIC Reading Test</h3></div></a>
+        <a href="toeic-listening-test.html" class="card-link"><div class="card"><div class="card-icon">🎧</div><h3>TOEIC Listening Test</h3></div></a>
+        <a href="daily-dictation-toeic.html" class="card-link"><div class="card"><div class="card-icon">🎙️</div><h3>TOEIC Dictation</h3></div></a>
       </div>
     </div>
+    
+    <div class="category-section">
+      <h2 class="category-title">🌱 General English</h2>
+      <div class="grid">
+        <a href="pronunciation.html" class="card-link"><div class="card"><div class="card-icon">👄</div><h3>Pronunciation</h3></div></a>
+        <a href="grammar.html" class="card-link"><div class="card"><div class="card-icon">🧩</div><h3>Grammar</h3></div></a>
+        <a href="vocabulary.html" class="card-link"><div class="card"><div class="card-icon">🔡</div><h3>Vocabulary</h3></div></a>
+        <a href="daily-dictation.html" class="card-link"><div class="card"><div class="card-icon">🎙️</div><h3>Daily Dictation</h3></div></a>
+        <a href="phrasal-verb.html" class="card-link"><div class="card"><div class="card-icon">🧠</div><h3>Phrasal Verb</h3></div></a>
+        <a href="idioms-and-collocations.html" class="card-link"><div class="card"><div class="card-icon">💬</div><h3>Idioms & Collocations</h3></div></a>
+        <a href="listening.html" class="card-link"><div class="card"><div class="card-icon">👂</div><h3>Listening</h3></div></a>
+        <a href="reading.html" class="card-link"><div class="card"><div class="card-icon">👀</div><h3>Reading</h3></div></a>
+        <a href="writing.html" class="card-link"><div class="card"><div class="card-icon">✏️</div><h3>Writing</h3></div></a>
+        <a href="speaking.html" class="card-link"><div class="card"><div class="card-icon">🗣️</div><h3>Speaking</h3></div></a>
+      </div>
+    </div>
+
+    <div class="category-section">
+      <h2 class="category-title">✨ Others</h2>
+      <div class="grid">
+        <a href="IELTS-tracker.html" class="card-link"><div class="card"><div class="card-icon">📈</div><h3>IELTS Tracker</h3></div></a>
+        <a href="TOEIC-tracker.html" class="card-link"><div class="card"><div class="card-icon">📋</div><h3>TOEIC Tracker</h3></div></a>
+        <a href="toeic-planner.html" class="card-link"><div class="card"><div class="card-icon">📋</div><h3>TOEIC Planner</h3></div></a>
+        <a href="TOEIC-plan.html" class="card-link"><div class="card"><div class="card-icon">📅</div><h3>My TOEIC Plan</h3></div></a>
+        <a href="hsk-index.html" class="card-link"><div class="card"><div class="card-icon">🐼</div><h3>HSK</h3></div></a>
+        <a href="contact.html" class="card-link"><div class="card"><div class="card-icon">📬</div><h3>Contact Us</h3></div></a>
+      </div>
+    </div>
+
   </div>
+  
+  <footer>
+    <p>&copy; 2026 SnapEnglish. Crafted with ❤️ for language learners.</p>
+    <p> All rights reserved. Do not copy or distribute without permission.</p>
+  </footer>
 
   <div class="modal-overlay" id="authModal">
     <div class="auth-box">
