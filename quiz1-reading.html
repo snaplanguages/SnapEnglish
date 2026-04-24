@@ -904,7 +904,6 @@
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
     import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-    // Chìa khóa dự án của bạn
     const firebaseConfig = {
         apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
         authDomain: "snapenglish-cb6e2.firebaseapp.com",
@@ -918,51 +917,33 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // 1. KIỂM TRA TÀI KHOẢN (Ông bảo vệ)
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            // Nếu có thẻ VIP: Đổi chữ "SnapEnglish" góc trái thành Tên người dùng
-            let tenNguoiDung = user.email.split('@')[0]; // Lấy phần trước chữ @
-            document.querySelector('.brand span').innerText = "Chào " + tenNguoiDung;
-            
-            // Lưu thông tin user vào window để lát nộp bài còn biết mà ghi điểm
             window.currentUserUid = user.uid;
             window.currentUserEmail = user.email;
-        } else {
-            // Nếu là Khách vãng lai: Hiện thông báo nhỏ
-            alert("Lưu ý: Bạn chưa đăng nhập! Hãy làm bài thoải mái, nhưng điểm số sẽ không được lưu lại đâu nhé.");
+            // Đổi lời chào ở Header
+            let name = user.email.split('@')[0];
+            document.querySelector('.brand span').innerText = "Chào " + name;
         }
     });
-// 2. TÍNH NĂNG LƯU ĐIỂM LÊN KHO CHUYÊN NGHIỆP
+
     window.luuDiemLenFirebase = async function(diemSo) {
         if (!window.currentUserUid) return;
-
-        // Tính các thông số nâng cao
-        let tongSoCau = 13; // Sửa số 13 này tùy theo từng Quiz
+        let tongSoCau = 13; 
         let phanTram = Math.round((diemSo / tongSoCau) * 100);
-
-        // Lấy thời gian làm bài (Tính từ lúc timer chạy đến lúc nộp)
-        let thoiGianHienTai = document.getElementById("timer").innerText; 
-        
-        // Tạo ID duy nhất cho mỗi lần làm bài để tạo thành "Lịch sử"
         let idLuotThi = window.currentUserUid + "_" + Date.now();
-        const hoSoRef = doc(db, "user_scores", idLuotThi);
-        
-        // Đẩy toàn bộ dữ liệu chi tiết lên
-        await setDoc(hoSoRef, {
+
+        await setDoc(doc(db, "user_scores", idLuotThi), {
             email: window.currentUserEmail,
-            baiThi: "Reading Quiz 1", // NHỚ SỬA TÊN BÀI Ở ĐÂY CHO TỪNG FILE
-            kyNang: "Reading",        // Reading hoặc Listening
-            dangBai: "Practice",      // Practice hoặc Full Test
+            baiThi: "Reading Quiz 1", // Nhớ đổi tên bài tương ứng
+            kyNang: "Reading",
+            dangBai: "Practice",
             diemSo: diemSo,
             tongSoCau: tongSoCau,
             phanTram: phanTram,
-            thoiGianConLai: thoiGianHienTai, 
             ngayThi: new Date().toLocaleString("vi-VN"),
-            timestamp: Date.now()     // Dùng để sắp xếp trên Tracker
+            timestamp: Date.now()
         });
-        
-        console.log("Đã đồng bộ điểm số lên Hồ sơ học tập!");
     }
 </script>
 </body>
