@@ -819,7 +819,7 @@
             <strong style="font-size: 26px; color: var(--primary-dark); display: block; margin-bottom: 10px;">Số câu đúng: ${score}/13</strong>
             <p style="font-size: 16px; color: #666;">Bạn đã hoàn thành bài luyện tập xuất sắc!</p>
         `;
-
+if(window.luuDiemLenFirebase) window.luuDiemLenFirebase(score);
         // Đổ màu dẫn chứng trong bài đọc (nếu bạn đã thêm Bước 2 của câu hỏi trước)
         const pastelColors = ['#ffadad','#ffd6a5','#caffbf','#9bf6ff','#a0c4ff','#bdb2ff','#ffc6ff','#e2f0cb','#fdede8','#dfd8f5','#cbe3f0','#fce1e4','#e5f6e5'];
         document.querySelectorAll('.ev-box').forEach((el, index) => {
@@ -861,6 +861,58 @@
         }, 1000);
     }
 </script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
+    // Chìa khóa dự án của bạn
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+        authDomain: "snapenglish-cb6e2.firebaseapp.com",
+        projectId: "snapenglish-cb6e2",
+        storageBucket: "snapenglish-cb6e2.firebasestorage.app",
+        messagingSenderId: "373152038413",
+        appId: "1:373152038413:web:19284622571390f8585f44"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // 1. KIỂM TRA TÀI KHOẢN (Ông bảo vệ)
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // Nếu có thẻ VIP: Đổi chữ "SnapEnglish" góc trái thành Tên người dùng
+            let tenNguoiDung = user.email.split('@')[0]; // Lấy phần trước chữ @
+            document.querySelector('.brand span').innerText = "Chào " + tenNguoiDung;
+            
+            // Lưu thông tin user vào window để lát nộp bài còn biết mà ghi điểm
+            window.currentUserUid = user.uid;
+            window.currentUserEmail = user.email;
+        } else {
+            // Nếu là Khách vãng lai: Hiện thông báo nhỏ
+            alert("Lưu ý: Bạn chưa đăng nhập! Hãy làm bài thoải mái, nhưng điểm số sẽ không được lưu lại đâu nhé.");
+        }
+    });
+
+    // 2. TÍNH NĂNG LƯU ĐIỂM LÊN KHO
+    window.luuDiemLenFirebase = async function(diemSo) {
+        if (!window.currentUserUid) return; // Không có tài khoản thì thôi, không lưu
+
+        // Tạo một hồ sơ tên là: IDnguoidung_quiz1 (Ví dụ: abc123_quiz1)
+        const hoSoRef = doc(db, "user_scores", window.currentUserUid + "_quiz1");
+        
+        // Viết dữ liệu vào hồ sơ
+        await setDoc(hoSoRef, {
+            email: window.currentUserEmail,
+            baiThi: "Reading Quiz 1",
+            diem: diemSo + "/13",
+            ngayThi: new Date().toLocaleString("vi-VN")
+        });
+        
+        console.log("Đã đẩy điểm lên mây thành công!");
+    }
+</script>
 </body>
 </html>
