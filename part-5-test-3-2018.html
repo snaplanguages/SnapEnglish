@@ -36,7 +36,7 @@
             color: var(--text-main);
             height: 100vh;
             display: flex; flex-direction: column;
-            overflow: hidden; /* Cố định màn hình, chỉ scroll phần nội dung */
+            overflow: hidden; 
             user-select: none; /* Chống bôi đen text */
         }
 
@@ -73,10 +73,10 @@
             padding: 40px;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
             scroll-behavior: smooth;
         }
         
-        /* Chỉnh thanh cuộn */
         ::-webkit-scrollbar { width: 10px; }
         ::-webkit-scrollbar-thumb { background: #e2c2c8; border-radius: 5px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
@@ -84,17 +84,17 @@
         .question-card {
             background: var(--bg-card);
             width: 100%;
-            max-width: 1400px; /* Phóng to hết cỡ nhưng giữ 1 limit vừa phải để chữ không dài ngoằng */
+            max-width: 1400px;
             border-radius: 25px;
             padding: 50px;
             box-shadow: 0 15px 40px rgba(0,0,0,0.03);
             border: 2px solid var(--border);
             display: none;
-            animation: fadeIn 0.4s ease;
+            animation: fadeIn 0.3s ease;
         }
         .question-card.active { display: block; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
         .q-header { display: flex; justify-content: space-between; margin-bottom: 30px; align-items: center; border-bottom: 2px dashed var(--border); padding-bottom: 20px;}
         .q-num { font-size: 24px; font-weight: 800; color: var(--secondary-dark); }
@@ -111,9 +111,25 @@
         .option.selected { background: #f0fdfa; border-color: var(--secondary); color: var(--secondary-dark); box-shadow: 0 4px 15px rgba(156, 180, 148, 0.2); }
         .option.disabled { cursor: default; }
         
-        /* Review Colors */
         .option.correct { background: var(--correct-bg); border-color: #81c784; color: var(--correct-text); box-shadow: 0 4px 15px rgba(46, 125, 50, 0.15);}
         .option.wrong { background: var(--wrong-bg); border-color: #e57373; color: var(--wrong-text); }
+
+        /* --- NAVIGATION BUTTONS (INSIDE CARD) --- */
+        .q-nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 35px;
+            padding-top: 25px;
+            border-top: 2px dashed var(--border);
+        }
+        .btn-nav {
+            padding: 12px 30px; border-radius: 15px; font-size: 18px; font-weight: 700; cursor: pointer;
+            border: none; transition: 0.3s; font-family: inherit; background: #f1f5f9; color: #64748b;
+        }
+        .btn-nav:hover:not(:disabled) { background: #e2e8f0; color: #334155; transform: translateY(-2px); }
+        .btn-nav.next { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(216, 140, 154, 0.3); }
+        .btn-nav.next:hover:not(:disabled) { background: var(--primary-dark); }
+        .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
 
         /* --- PHẦN GIẢI THÍCH CHI TIẾT --- */
         .explanation-box {
@@ -148,6 +164,7 @@
         .nav-dot.done { background: #fff0f3; color: var(--primary-dark); border-color: var(--primary); }
         .nav-dot.correct { background: var(--correct-bg); color: var(--correct-text); border-color: #81c784; }
         .nav-dot.wrong { background: var(--wrong-bg); color: var(--wrong-text); border-color: #e57373; }
+        .nav-dot.active { border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(156, 180, 148, 0.3); }
 
         /* --- MODALS --- */
         .custom-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(253, 246, 246, 0.9); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 99999; }
@@ -166,19 +183,14 @@
 <body>
 
 <script>
-    // Vô hiệu hóa chuột phải
     document.addEventListener('contextmenu', event => event.preventDefault());
-    
-    // Vô hiệu hóa các phím tắt F12, Ctrl+Shift+I, Ctrl+U, v.v.
     document.onkeydown = function(e) {
-        if(e.keyCode == 123) return false; // F12
+        if(e.keyCode == 123) return false; 
         if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
         if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
         if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
         if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
     }
-    
-    // Bẫy Debugger liên tục chống mở DevTools
     setInterval(function() {
         var before = new Date().getTime();
         debugger;
@@ -236,7 +248,6 @@
 </div>
 
 <script>
-    // Dữ liệu 30 câu hỏi và giải thích siêu chi tiết
     const questionsData = [
         {
             id: 101, q: "All shelves in the holiday merchandise section need to remain ----- stocked.",
@@ -428,17 +439,7 @@
                 trans: "Việc mua lại tờ The New Lagos Reporter sẽ không dẫn đến sự thay đổi TRONG đội ngũ biên tập."
             }
         },
-        {
-            id: 120, q: "Professor Reginald Layke's proposal for an additional course in business management was approved in a ------ short time.",
-            options: ["surprised", "surprise", "surprisingly", "surprising"], a: "surprisingly",
-            exp: {
-                correct: "Chỗ trống đứng trước tính từ `short`. Ta cần **Trạng từ** bổ nghĩa cho tính từ đó. `surprisingly short` = ngắn một cách đáng ngạc nhiên.",
-                wrong: "<ul><li>**surprised (adj):** Cảm thấy ngạc nhiên (dành cho người).</li><li>**surprise (n):** Danh từ.</li><li>**surprising (adj):** Tính từ.</li></ul>",
-                vocab: "<b>proposal (n):</b> bản đề xuất<br><b>approve (v):</b> phê duyệt",
-                trans: "Đề xuất của Giáo sư Reginald Layke về một khóa học bổ sung trong quản lý kinh doanh đã được phê duyệt trong một thời gian ngắn ĐÁNG NGẠC NHIÊN."
-            }
-        },
-        // Chèn các câu giải thích ngắn hơn từ 121 đến 130 để đảm bảo hiệu suất
+        { id: 120, q: "Professor Reginald Layke's proposal for an additional course in business management was approved in a ------ short time.", options: ["surprised", "surprise", "surprisingly", "surprising"], a: "surprisingly", exp: { correct: "Chỗ trống đứng trước tính từ `short`. Ta cần **Trạng từ** bổ nghĩa cho tính từ đó. `surprisingly short` = ngắn một cách đáng ngạc nhiên.", wrong: "surprised (cảm thấy ngạc nhiên - dành cho người), surprise (danh từ), surprising (tính từ).", vocab: "<b>proposal (n):</b> bản đề xuất<br><b>approve (v):</b> phê duyệt", trans: "Đề xuất của Giáo sư Reginald Layke về một khóa học bổ sung trong quản lý kinh doanh đã được phê duyệt trong một thời gian ngắn ĐÁNG NGẠC NHIÊN." } },
         { id: 121, q: "Candell Science Museum trustees are expected to be ------ of all the museum's operations.", options: ["aware", "current", "serious", "alert"], a: "aware", exp: { correct: "Cụm tính từ **be aware of** (nhận thức được, nắm rõ về).", wrong: "Các từ khác không đi với giới từ 'of' trong ngữ cảnh này.", vocab: "<b>trustee (n):</b> ủy viên quản trị", trans: "Các ủy viên của Bảo tàng Khoa học Candell được kỳ vọng sẽ NẮM RÕ mọi hoạt động của bảo tàng." } },
         { id: 122, q: "With the completion of its airport, Honokai Island's tourism ------ has improved dramatically.", options: ["economical", "economic", "economize", "economy"], a: "economy", exp: { correct: "Tạo cụm danh từ ghép **tourism economy** (nền kinh tế du lịch) đóng vai trò chủ ngữ.", wrong: "Không thể dùng tính từ (economic) hay động từ (economize) đứng làm danh từ chính.", vocab: "<b>dramatically (adv):</b> một cách đáng kể", trans: "Với việc hoàn thành sân bay, NỀN KINH TẾ du lịch của Đảo Honokai đã cải thiện đáng kể." } },
         { id: 123, q: "Brock's Bistro has requested that we ------ the number of dinner guests by Monday.", options: ["personify", "magnify", "specify", "testify"], a: "specify", exp: { correct: "**specify** (v) nghĩa là chỉ định, nói rõ. Đây là câu giả định với 'requested that S + V(nguyên thể)'.", wrong: "magnify: phóng đại, testify: làm chứng.", vocab: "<b>specify (v):</b> nêu rõ", trans: "Brock's Bistro đã yêu cầu chúng ta NÊU RÕ số lượng khách ăn tối trước thứ Hai." } },
@@ -457,13 +458,11 @@
     let testDuration = 0;
     let timerInterval = null;
 
-    // Khởi tạo giao diện khi chạy
     const mainArea = document.getElementById('mainArea');
     const navPalette = document.getElementById('navPalette');
 
     function initQuiz() {
         questionsData.forEach((q, index) => {
-            // Tạo Navigation Dot
             let dot = document.createElement('div');
             dot.className = 'nav-dot';
             dot.id = `nav-${index}`;
@@ -471,7 +470,6 @@
             dot.onclick = () => jumpToQuestion(index);
             navPalette.appendChild(dot);
 
-            // Tạo Question Card
             let card = document.createElement('div');
             card.className = 'question-card';
             card.id = `card-${index}`;
@@ -491,6 +489,12 @@
                 <div class="options">
                     ${optionsHtml}
                 </div>
+                
+                <div class="q-nav-buttons">
+                    <button class="btn-nav btn-prev" onclick="jumpToQuestion(${index - 1})" ${index === 0 ? 'disabled' : ''}>Quay lại</button>
+                    <button class="btn-nav btn-next next" onclick="jumpToQuestion(${index + 1})" ${index === questionsData.length - 1 ? 'disabled' : ''}>Tiếp theo</button>
+                </div>
+
                 <div class="explanation-box" id="exp-${index}">
                     <div class="exp-title">💡 Giải Thích Chi Tiết</div>
                     <div class="exp-content">
@@ -511,7 +515,6 @@
         });
     }
 
-    // --- LOGIC HOẠT ĐỘNG ---
     function startTest() {
         document.getElementById('setupOverlay').style.display = 'none';
         let minutes = parseInt(document.getElementById('timeInput').value) || 20;
@@ -519,48 +522,48 @@
         initQuiz();
         jumpToQuestion(0);
         
-        // Bắt đầu tính giờ
         timerInterval = setInterval(() => {
             let m = Math.floor(testDuration / 60);
             let s = testDuration % 60;
             document.getElementById("timer").textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
             if (--testDuration < 0) { 
                 clearInterval(timerInterval); 
-                executeSubmit(); // Hết giờ tự nộp
+                executeSubmit(); 
             }
         }, 1000);
     }
 
     function jumpToQuestion(index) {
-        // Ẩn thẻ cũ
+        if (index < 0 || index >= questionsData.length) return;
+        
+        // Ẩn thẻ cũ & cập nhật viền nav-dot
         let oldCard = document.getElementById(`card-${currentQIndex}`);
+        let oldDot = document.getElementById(`nav-${currentQIndex}`);
         if(oldCard) oldCard.classList.remove('active');
+        if(oldDot) oldDot.classList.remove('active');
         
         // Hiện thẻ mới
         currentQIndex = index;
         let newCard = document.getElementById(`card-${currentQIndex}`);
+        let newDot = document.getElementById(`nav-${currentQIndex}`);
         if(newCard) newCard.classList.add('active');
+        if(newDot) newDot.classList.add('active');
         
-        // Scroll mượt lên đầu
+        // Luôn cuộn lên trên cùng của mainArea để người dùng không phải kéo tay lên
         mainArea.scrollTo(0, 0);
     }
 
     function selectOption(qIndex, answer, optIndex) {
-        if(isSubmitted) return; // Nếu nộp bài rồi thì khóa
+        if(isSubmitted) return; 
         
         userAnswers[qIndex] = answer;
-        
-        // Xóa class selected của các option khác
         for(let i=0; i<4; i++) {
             document.getElementById(`opt-${qIndex}-${i}`).classList.remove('selected');
         }
-        // Thêm selected cho ô vừa click
         document.getElementById(`opt-${qIndex}-${optIndex}`).classList.add('selected');
-        
-        // Cập nhật nav dot
         document.getElementById(`nav-${qIndex}`).classList.add('done');
         
-        // Tự động chuyển câu tiếp theo sau 0.4s nếu chưa phải câu cuối
+        // Chuyển tự động sang câu kế tiếp sau 0.4s nếu chưa hết
         if(qIndex < questionsData.length - 1) {
             setTimeout(() => jumpToQuestion(qIndex + 1), 400);
         }
@@ -577,8 +580,7 @@
     
     function closeResultModal() {
         document.getElementById('resultOverlay').style.display = 'none';
-        // Hiển thị toàn bộ câu hỏi dọc xuống thay vì ẩn hiện
-        document.querySelectorAll('.question-card').forEach(card => card.classList.add('active'));
+        // Chỉ cần trở về câu số 1, các thẻ khác vẫn ẩn (vì 1 lúc chỉ hiện 1 câu)
         jumpToQuestion(0);
     }
 
@@ -600,35 +602,29 @@
             let isCorrect = uAns === q.a;
             if(isCorrect) score++;
 
-            // Render style cho các option
             for(let i=0; i<4; i++) {
                 let optEl = document.getElementById(`opt-${index}-${i}`);
                 optEl.classList.add('disabled');
                 
-                // Text của option hiện tại
                 let optText = q.options[i];
-                
                 if (optText === q.a) {
-                    optEl.classList.add('correct'); // Bôi xanh đáp án đúng
+                    optEl.classList.add('correct'); 
                 } else if (optText === uAns) {
-                    optEl.classList.add('wrong'); // Bôi đỏ nếu người dùng chọn sai
+                    optEl.classList.add('wrong'); 
                 }
             }
 
-            // Mở bảng giải thích
             document.getElementById(`exp-${index}`).classList.add('show');
 
-            // Cập nhật Nav Board màu xanh/đỏ
             let dot = document.getElementById(`nav-${index}`);
             dot.classList.remove('done');
             if (isCorrect) dot.classList.add('correct');
             else dot.classList.add('wrong');
         });
 
-        // Hiển thị kết quả
         document.getElementById('resultMessage').innerHTML = `
             <strong style="font-size: 40px; color: var(--primary); display: block; margin-bottom: 15px;">${score} / ${questionsData.length}</strong>
-            <p style="font-size: 18px; color: #64748b; font-weight: 600;">Bạn đã hoàn thành xuất sắc bài kiểm tra!<br>Bây giờ hãy kéo xuống để xem giải thích chi tiết nhé.</p>
+            <p style="font-size: 18px; color: #64748b; font-weight: 600;">Bạn đã hoàn thành bài kiểm tra!<br>Hãy bấm vào các câu ở bảng điều hướng bên dưới hoặc dùng nút "Tiếp theo" để xem giải thích chi tiết nhé.</p>
         `;
         document.getElementById('resultOverlay').style.display = 'flex';
     }
