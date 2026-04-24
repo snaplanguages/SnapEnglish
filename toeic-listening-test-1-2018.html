@@ -2219,6 +2219,51 @@ part4: [
         });
     }
 </script>
-    
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+        authDomain: "snapenglish-cb6e2.firebaseapp.com",
+        projectId: "snapenglish-cb6e2",
+        storageBucket: "snapenglish-cb6e2.firebasestorage.app",
+        messagingSenderId: "373152038413",
+        appId: "1:373152038413:web:19284622571390f8585f44"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            window.currentUserUid = user.uid;
+            window.currentUserEmail = user.email;
+        }
+    });
+
+    window.luuDiemTOEICFull = async function(correct, total, testTitle) {
+        if (!window.currentUserUid) return;
+        let scoreConverted = Math.round(((correct / total) * 495) / 5) * 5;
+        let timestamp = Date.now();
+        let docId = window.currentUserUid + "_toeic_" + timestamp;
+
+        await setDoc(doc(db, "user_toeic_scores", docId), {
+            email: window.currentUserEmail,
+            skill: "Listening",
+            testName: testTitle,
+            partName: "Full Listening",
+            correctQ: correct,
+            totalQ: total,
+            score: scoreConverted,
+            date: new Date().toLocaleDateString('vi-VN'),
+            timestamp: timestamp
+        });
+        // Hiện thông báo xinh xắn (tự tạo UI toast nếu muốn)
+        console.log("Đã đồng bộ điểm TOEIC!");
+    }
+</script>
 </body>
 </html>
