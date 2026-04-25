@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 5 - Test 1 - 2019 | SnapEnglish</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        
+    <style>
+        :root {
+            /* Tông màu Mới: Indigo & Teal chuyên nghiệp, hiện đại */
+            --primary: #4f46e5;       
+            --primary-dark: #3730a3;
+            --secondary: #0d9488;     
+            --secondary-dark: #0f766e;
+            --bg-body: #f8fafc;       
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --correct-bg: #f0fdf4;
+            --correct-text: #166534;
+            --correct-border: #bbf7d0;
+            --wrong-bg: #fef2f2;
+            --wrong-text: #991b1b;
+            --wrong-border: #fecaca;
+            --grammar-bg: #eff6ff;
+            --grammar-border: #bfdbfe;
+            --vocab-bg: #fffbeb;
+            --vocab-border: #fde68a;
+            --header-h: 75px;
+        }
+        ::selection { background: #c7d2fe; color: #1e293b; }
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex; flex-direction: column;
+            overflow: hidden; 
+        }
+
+        /* --- HEADER --- */
+        header {
+            height: var(--header-h); background: #fff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 40px; z-index: 1000; flex-shrink: 0;
+            position: relative;
+        }
+        
+        .brand { font-size: 22px; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 12px; }
+        .brand span { background: var(--primary); color: white; padding: 4px 12px; border-radius: 8px; font-size: 16px; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);}
+
+        .controls { display: flex; gap: 15px; align-items: center; }
+        
+        .timer-box { 
+            font-weight: 700; color: var(--primary-dark); 
+            background: #e0e7ff; padding: 8px 18px; border-radius: 8px; font-size: 18px;
+        }
+
+        .btn-nav-toggle {
+            background: #f1f5f9; color: var(--text-main); border: 2px solid var(--border);
+            padding: 8px 20px; border-radius: 8px; font-weight: 700; font-size: 16px; 
+            cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px;
+            font-family: inherit;
+        }
+        .btn-nav-toggle:hover { background: #e2e8f0; border-color: #cbd5e1; }
+
+        .btn-submit { 
+            background: var(--secondary); color: white; border: none; padding: 10px 25px; 
+            border-radius: 8px; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(13, 148, 136, 0.3); font-family: inherit;
+        }
+        .btn-submit:hover { transform: translateY(-2px); background: var(--secondary-dark); box-shadow: 0 6px 20px rgba(13, 148, 136, 0.4); }
+
+        /* --- VERTICAL DROPDOWN NAVIGATION --- */
+        .nav-dropdown {
+            position: absolute; top: calc(var(--header-h) + 10px); right: 40px;
+            background: #fff; border-radius: 12px; border: 1px solid var(--border);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1); width: 320px;
+            max-height: 400px; overflow-y: auto; z-index: 999;
+            padding: 20px; display: none; grid-template-columns: repeat(5, 1fr); gap: 10px;
+            opacity: 0; transform: translateY(-10px); transition: 0.3s ease;
+        }
+        .nav-dropdown.show {
+            display: grid; opacity: 1; transform: translateY(0);
+        }
+        .nav-dropdown::-webkit-scrollbar { width: 6px; }
+        .nav-dropdown::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+        .nav-dot {
+            height: 45px; border: 2px solid var(--border); border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;
+            cursor: pointer; color: var(--text-light); background: #f8fafc; transition: 0.2s;
+        }
+        .nav-dot:hover { border-color: var(--primary); color: var(--primary); }
+        .nav-dot.done { background: #e0e7ff; color: var(--primary-dark); border-color: var(--primary); }
+        .nav-dot.correct { background: var(--correct-bg); color: var(--correct-text); border-color: var(--correct-border); }
+        .nav-dot.wrong { background: var(--wrong-bg); color: var(--wrong-text); border-color: var(--wrong-border); }
+        .nav-dot.active { box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3); border-color: var(--primary); }
+
+        /* --- MAIN CONTAINER (FULL SCREEN WIDTH) --- */
+        .main-area {
+            flex: 1; width: 100%; overflow-y: auto; padding: 40px;
+            display: flex; justify-content: center; align-items: flex-start; scroll-behavior: smooth;
+        }
+        
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        .question-card {
+            background: var(--bg-card);
+            width: 100%; /* Tràn viền màn hình theo yêu cầu */
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border);
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .question-card.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .q-header { display: flex; justify-content: space-between; margin-bottom: 25px; align-items: center; border-bottom: 2px dashed var(--border); padding-bottom: 15px;}
+        .q-num { font-size: 22px; font-weight: 800; color: var(--primary); }
+        .q-text { font-size: 19px; line-height: 1.6; font-weight: 600; margin-bottom: 30px; color: var(--text-main); background: #f8fafc; padding: 25px; border-radius: 12px; border-left: 6px solid var(--primary);}
+
+        /* Options */
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #ffffff; border: 2px solid var(--border); border-radius: 10px;
+            padding: 16px 20px; font-size: 17px; font-weight: 500; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center;
+        }
+        .option:hover:not(.disabled) { background: #f1f5f9; border-color: #94a3b8; }
+        .option.selected { background: #e0e7ff; border-color: var(--primary); color: var(--primary-dark); font-weight: 700; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.15); }
+        .option.disabled { cursor: default; }
+        
+        .option.correct { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-text); font-weight: 700; }
+        .option.wrong { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-text); text-decoration: line-through; opacity: 0.8;}
+
+        /* --- NAVIGATION BUTTONS (INSIDE CARD) --- */
+        .q-nav-buttons {
+            display: flex; justify-content: space-between; margin-top: 35px; padding-top: 25px; border-top: 2px dashed var(--border);
+        }
+        .btn-nav {
+            padding: 12px 30px; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer;
+            border: none; transition: 0.2s; font-family: inherit; background: #e2e8f0; color: #475569;
+        }
+        .btn-nav:hover:not(:disabled) { background: #cbd5e1; color: #1e293b; }
+        .btn-nav.next { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2); }
+        .btn-nav.next:hover:not(:disabled) { background: var(--primary-dark); }
+        .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
+        /* --- PHẦN GIẢI THÍCH CHI TIẾT (UI ĐẸP MẮT) --- */
+        .explanation-box {
+            display: none; margin-top: 40px; animation: fadeIn 0.5s ease;
+        }
+        .explanation-box.show { display: block; }
+        
+        .exp-main-title { font-size: 20px; font-weight: 800; color: var(--text-main); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
+        
+        .exp-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; }
+        
+        /* Box Styles */
+        .box { padding: 20px; border-radius: 12px; border: 1px solid; font-size: 16px; line-height: 1.6; }
+        .box-title { font-weight: 800; font-size: 17px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;}
+        
+        .box-correct { background: var(--correct-bg); border-color: var(--correct-border); color: #064e3b; }
+        .box-correct .box-title { color: var(--correct-text); }
+        
+        .box-wrong { background: var(--wrong-bg); border-color: var(--wrong-border); color: #7f1d1d; }
+        .box-wrong .box-title { color: var(--wrong-text); }
+        .box-wrong ul { margin: 0; padding-left: 20px; }
+        .box-wrong li { margin-bottom: 6px; }
+        
+        .box-grammar { background: var(--grammar-bg); border-color: var(--grammar-border); color: #1e3a8a; }
+        .box-grammar .box-title { color: #1d4ed8; }
+        
+        .box-vocab { background: var(--vocab-bg); border-color: var(--vocab-border); color: #78350f; }
+        .box-vocab .box-title { color: #b45309; }
+        
+        .box-trans { background: #f8fafc; border-color: #e2e8f0; color: #334155; font-style: italic; border-left: 5px solid var(--text-light);}
+        .box-trans .box-title { color: var(--text-light); font-style: normal;}
+
+        /* --- MODALS --- */
+        .custom-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 99999; }
+        .custom-modal { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); width: 90%; max-width: 480px; text-align: center; border: 1px solid var(--border); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .custom-modal h2 { color: var(--text-main); font-size: 26px; margin-top: 0; font-weight: 800; }
+        .modal-actions { display: flex; gap: 15px; margin-top: 30px; }
+        .btn-modal { flex: 1; padding: 14px; border-radius: 8px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; font-family: inherit; border: none; }
+        .btn-cancel { background: #f1f5f9; color: #475569; }
+        .btn-cancel:hover { background: #e2e8f0; color: #1e293b;}
+        .btn-confirm-start { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3); }
+        .btn-confirm-start:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        #timeInput { width: 100px; padding: 12px; font-size: 18px; text-align: center; border: 2px solid var(--border); border-radius: 8px; outline: none; font-weight: 800; color: var(--primary-dark); font-family: inherit;}
+        #timeInput:focus { border-color: var(--primary); }
+    </style>
+</head>
+<body>
+
+<script>
+    // Script hạn chế F12, Ctrl+U để bảo vệ mã nguồn
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    document.onkeydown = function(e) {
+        if(e.keyCode == 123) return false; 
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+        if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+    }
+    setInterval(function() {
+        var before = new Date().getTime();
+        debugger;
+        var after = new Date().getTime();
+        if (after - before > 100) {
+            document.body.innerHTML = "<h1 style='text-align:center; margin-top: 20%; color: #4f46e5; font-family: sans-serif;'>SnapEnglish - Security Alert!</h1><p style='text-align:center; font-family: sans-serif;'>Vui lòng không can thiệp vào mã nguồn của hệ thống.</p>";
+        }
+    }, 1000);
+</script>
+
+<div id="setupOverlay" class="custom-overlay" style="display: flex;">
+    <div class="custom-modal">
+        <h2>Sẵn sàng chưa? 🚀</h2>
+        <p style="font-size: 17px; color: #64748b; margin-bottom: 25px; line-height: 1.5;">Cài đặt thời gian làm bài Part 5<br>(Gợi ý: 15-20 phút)</p>
+        <div style="margin-bottom: 30px; display: flex; justify-content: center; align-items: center; gap: 10px;">
+            <input type="number" id="timeInput" value="20" min="1"> 
+            <span style="font-size: 18px; font-weight: 700; color: #475569;">phút</span>
+        </div>
+        <button class="btn-modal btn-confirm-start" style="width: 100%;" onclick="startTest()">BẮT ĐẦU NGAY</button>
+    </div>
+</div>
+
+<header>
+    <div class="brand"><span>SnapEnglish</span> Part 5 - Test 1 (2019)</div>
+    <div class="controls">
+        <div class="timer-box">⏱ <span id="timer">00:00</span></div>
+        <button class="btn-nav-toggle" onclick="toggleNavDropdown()">📑 Danh sách câu</button>
+        <button class="btn-submit" id="mainSubmitBtn" onclick="askSubmit()">NỘP BÀI</button>
+    </div>
+    <div class="nav-dropdown" id="navDropdown"></div>
+</header>
+
+<div class="main-area" id="mainArea">
+    </div>
+
+<div id="confirmOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2>Xác nhận nộp bài</h2>
+        <p style="font-size: 17px; color: #475569; margin-top: 15px;">Bạn có chắc chắn muốn nộp bài để xem giải thích chi tiết không?</p>
+        <div class="modal-actions">
+            <button class="btn-modal btn-cancel" onclick="closeConfirmModal()">Quay lại</button>
+            <button class="btn-modal btn-confirm-start" onclick="submitTest()">Nộp bài</button>
+        </div>
+    </div>
+</div>
+
+<div id="resultOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2>🎉 Tuyệt vời!</h2>
+        <div id="resultMessage" style="margin: 25px 0; line-height: 1.6;"></div>
+        <button class="btn-modal btn-confirm-start" style="width: 100%;" onclick="closeResultModal()">Xem Giải Thích Chi Tiết</button>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu câu hỏi với Giải thích đa chiều, bóc tách kỹ ngữ pháp và từ vựng
+    const questionsData = [
+        {
+            id: 101, q: "Ms. Durkin asked for volunteers to help ------- with the employee fitness program.",
+            options: ["she", "her", "hers", "herself"], a: "her",
+            exp: {
+                correct: "Chỗ trống đứng sau động từ <b>help</b>, cần một Đại từ nhân xưng đóng vai trò làm <b>Tân ngữ</b> để bổ nghĩa cho động từ này. Do đó, chọn <b>her</b>.",
+                wrong: "<ul><li><b>(A) she</b>: Đại từ nhân xưng làm Chủ ngữ (đứng đầu câu hoặc trước V).</li><li><b>(C) hers</b>: Đại từ sở hữu (= her + Noun), không phù hợp ngữ cảnh.</li><li><b>(D) herself</b>: Đại từ phản thân (dùng khi chủ ngữ và tân ngữ là cùng một người). Ở đây chủ ngữ là volunteers, tân ngữ là Ms. Durkin nên không dùng herself.</li></ul>",
+                grammar: "Cấu trúc: <b>Help + O + with + Noun</b>: Giúp đỡ ai đó với việc gì/về việc gì.",
+                vocab: "<b>volunteer (n)</b>: tình nguyện viên<br><b>fitness program (n)</b>: chương trình thể dục",
+                trans: "Cô Durkin yêu cầu các tình nguyện viên giúp đỡ cô ấy với chương trình thể dục cho nhân viên."
+            }
+        },
+        {
+            id: 102, q: "Lasner Electronics' staff have extensive ------- of current hardware systems.",
+            options: ["know", "known", "knowledge", "knowledgeable"], a: "knowledge",
+            exp: {
+                correct: "Chỗ trống đứng sau tính từ <b>extensive</b> (sâu rộng), do đó ta cần một <b>Danh từ</b> để tạo thành cụm danh từ làm tân ngữ cho động từ <i>have</i>. <b>knowledge</b> (sự hiểu biết/kiến thức) là đáp án chính xác.",
+                wrong: "<ul><li><b>(A) know</b>: Động từ nguyên thể.</li><li><b>(B) known</b>: Động từ dạng phân từ 2 (V3/ed).</li><li><b>(D) knowledgeable</b>: Tính từ. Tính từ không thể đứng sau bổ nghĩa cho một tính từ khác trong trường hợp này.</li></ul>",
+                grammar: "Cụm danh từ: <b>Adjective + Noun</b>. 'extensive knowledge' = kiến thức sâu rộng.",
+                vocab: "<b>extensive (adj)</b>: sâu rộng, bao quát<br><b>hardware system (n)</b>: hệ thống phần cứng",
+                trans: "Nhân viên của Lasner Electronic có kiến thức sâu rộng về hệ thống phần cứng hiện tại."
+            }
+        },
+        {
+            id: 103, q: "____ a year, Tarrin Industrial Supply audits the accounts of all of its factory.",
+            options: ["Once", "Immediately", "Directly", "Yet"], a: "Once",
+            exp: {
+                correct: "Dựa vào cụm từ chỉ thời gian 'a year' (một năm) phía sau, ta cần một trạng từ chỉ tần suất/mức độ phù hợp. <b>Once</b> ghép với 'a year' tạo thành cụm <b>once a year</b> (mỗi năm một lần).",
+                wrong: "<ul><li><b>(B) Immediately</b>: Ngay lập tức.</li><li><b>(C) Directly</b>: Trực tiếp.</li><li><b>(D) Yet</b>: Chưa, còn.</li>Các từ này không ghép được với 'a year' để tạo ra cụm trạng ngữ chỉ thời gian có nghĩa.</ul>",
+                grammar: "Cụm trạng ngữ chỉ tần suất: <b>Once / Twice / Three times + a + khoảng thời gian (day/week/month/year)</b>.",
+                vocab: "<b>audit (v)</b>: kiểm toán<br><b>account (n)</b>: tài khoản, sổ sách kế toán",
+                trans: "Một lần mỗi năm, công ty cung cấp vật liệu công nghiệp Tarrin kiểm toán tất cả tài khoản của tất cả nhà máy của họ."
+            }
+        },
+        {
+            id: 104, q: "Ms. Pham requested a refund _____ the coffeemaker she received was damaged.",
+            options: ["despite", "why", "concerning", "because"], a: "because",
+            exp: {
+                correct: "Câu có 2 mệnh đề hoàn chỉnh diễn tả mối quan hệ Nguyên nhân - Kết quả. Vế sau 'the coffeemaker she received was damaged' là mệnh đề chỉ nguyên nhân. Ta cần liên từ <b>because</b> (bởi vì).",
+                wrong: "<ul><li><b>(A) despite</b>: Mặc dù (Cấu trúc: Despite + Noun/V-ing). Ở đây là một mệnh đề (S+V) nên sai ngữ pháp.</li><li><b>(B) why</b>: Tại sao.</li><li><b>(C) concerning</b>: Liên quan đến (= about). Theo sau phải là Noun/V-ing.</li></ul>",
+                grammar: "Liên từ: <b>Because + S + V</b>. Phân biệt với <b>Because of + N/V-ing</b>.",
+                vocab: "<b>request a refund (v-phrase)</b>: yêu cầu hoàn tiền<br><b>damaged (adj)</b>: bị hư hỏng",
+                trans: "Cô Pham yêu cầu hoàn tiền bởi vì máy pha cà phê mà cô ấy nhận được đã bị hư."
+            }
+        },
+        {
+            id: 105, q: "Information ____ the artwork in the lobby is available at the reception desk.",
+            options: ["across", "about", "upon", "except"], a: "about",
+            exp: {
+                correct: "Chỗ trống cần một giới từ bổ nghĩa cho danh từ <b>Information</b> phía trước. Cụm từ cố định: <b>Information about something</b> (Thông tin về cái gì đó).",
+                wrong: "<ul><li><b>(A) across</b>: Ngang qua / Đối diện (thường dùng: across from).</li><li><b>(C) upon</b>: Ở trên (= on).</li><li><b>(D) except</b>: Ngoại trừ.</li></ul>",
+                grammar: "Giới từ đi kèm danh từ. Các danh từ thường đi với giới từ 'about': <i>information, knowledge, details, facts...</i>",
+                vocab: "<b>artwork (n)</b>: tác phẩm nghệ thuật, hình ảnh minh họa<br><b>lobby (n)</b>: sảnh chờ<br><b>reception desk (n)</b>: quầy lễ tân",
+                trans: "Thông tin về các tác phẩm nghệ thuật ở sảnh có sẵn ở quầy lễ tân."
+            }
+        },
+        {
+            id: 106, q: "With the Gema XTI binoculars, users can ____ see objects that are more than 100 meters away.",
+            options: ["ease", "easy", "easily", "easier"], a: "easily",
+            exp: {
+                correct: "Chỗ trống nằm giữa trợ động từ <i>can</i> và động từ chính <i>see</i>. Ta cần một <b>Trạng từ</b> để bổ nghĩa cho động từ thường phía sau. <b>easily</b> (một cách dễ dàng) là lựa chọn duy nhất đúng.",
+                wrong: "<ul><li><b>(A) ease</b>: Danh từ (sự dễ dàng) hoặc Động từ (làm dịu).</li><li><b>(B) easy</b>: Tính từ.</li><li><b>(D) easier</b>: Tính từ so sánh hơn.</li></ul>",
+                grammar: "Vị trí của trạng từ: <b>Trợ động từ (can/will/must...) + Trạng từ (Adv) + Động từ thường (V)</b>.",
+                vocab: "<b>binoculars (n)</b>: ống nhòm<br><b>object (n)</b>: vật thể, mục tiêu",
+                trans: "Với ống nhòm của Gema XTI, người dùng có thể dễ dàng nhìn thấy các vật thể cách xa hơn 100 mét."
+            }
+        },
+        {
+            id: 107, q: "The Physical Therapy Association is committed to keeping cost ____ for its certification programs.",
+            options: ["affordable", "permitted", "cutting", "necessary"], a: "affordable",
+            exp: {
+                correct: "Dựa vào cấu trúc 'keep + O + Adj' (giữ cho cái gì như thế nào) và ngữ nghĩa của câu, ta cần một tính từ phù hợp đi với <i>cost</i> (chi phí). <b>affordable</b> (vừa túi tiền, phải chăng) tạo thành cụm <i>affordable cost</i> cực kỳ phổ biến trong TOEIC.",
+                wrong: "<ul><li><b>(B) permitted</b>: Được cho phép.</li><li><b>(C) cutting</b>: Cắt giảm (thường dùng cost-cutting).</li><li><b>(D) necessary</b>: Cần thiết. Không hợp nghĩa bằng 'affordable'.</li></ul>",
+                grammar: "Cấu trúc: <b>Keep + O (Tân ngữ) + Adj (Tính từ)</b>.",
+                vocab: "<b>commit to V-ing/N (v)</b>: cam kết làm gì<br><b>certification program (n)</b>: chương trình cấp chứng chỉ",
+                trans: "Hiệp hội Vật lý trị liệu cam kết sẽ giữ chi phí vừa túi tiền cho các chương trình cấp chứng chỉ của mình."
+            }
+        },
+        {
+            id: 108, q: "Mr. Brennel _____ positions in various areas of the company before he became president.",
+            options: ["occupation", "occupational", "occupying", "occupied"], a: "occupied",
+            exp: {
+                correct: "Câu thiếu <b>Động từ chính</b> cho chủ ngữ <i>Mr. Brennel</i>. Mệnh đề phía sau (before he became president) chia thì Quá khứ đơn, diễn tả một hành động đã xảy ra và kết thúc trong quá khứ. Do đó động từ chính ở vế trước cũng phải chia thì quá khứ: <b>occupied</b> (đã giữ, đảm nhiệm).",
+                wrong: "<ul><li><b>(A) occupation</b>: Danh từ.</li><li><b>(B) occupational</b>: Tính từ.</li><li><b>(C) occupying</b>: V-ing không thể đứng một mình làm động từ chính của câu (cần to be).</li></ul>",
+                grammar: "Hòa hợp thì: Hành động xảy ra trước một mốc thời gian trong quá khứ (before he became...) thường dùng Quá khứ đơn hoặc Quá khứ hoàn thành.",
+                vocab: "<b>occupy a position (v)</b>: giữ / đảm nhiệm một vị trí<br><b>various (adj)</b>: đa dạng, nhiều",
+                trans: "Ông Brennel đã giữ các vị trí khác nhau trong công ty trước khi ông ấy trở thành chủ tịch."
+            }
+        },
+        {
+            id: 109, q: "To remain on schedule, editors must submit all ____ to the book to the authors by Friday.",
+            options: ["ideas", "essays", "revision", "suggestions"], a: "revision",
+            exp: {
+                correct: "Chỗ trống cần một Danh từ ghép với giới từ <b>'to'</b> phía sau. Cấu trúc <b>revision to something</b> (sự sửa đổi/chỉnh sửa đối với cái gì) là cấu trúc chuẩn xác nhất trong văn cảnh biên tập sách.",
+                wrong: "<ul><li><b>(A) ideas</b>: Ý tưởng (thường đi với about/for).</li><li><b>(B) essays</b>: Bài luận (không đi với to).</li><li><b>(D) suggestions</b>: Đề xuất (đi với for).</li></ul>",
+                grammar: "Giới từ đi với danh từ: <i>make a revision <b>to</b> something</i>.",
+                vocab: "<b>remain on schedule</b>: duy trì đúng tiến độ<br><b>submit (v)</b>: nộp, đệ trình",
+                trans: "Để duy trì tiến độ, các biên tập viên phải nộp tất cả các sửa đổi cho quyển sách đến các tác giả trước thứ 6."
+            }
+        },
+        {
+            id: 110, q: "_____ industry professionals are allowed to purchase tickets to the Kuo Photography Fair.",
+            options: ["Only", "Until", "Unless", "Quite"], a: "Only",
+            exp: {
+                correct: "Chỗ trống đứng đầu câu bổ nghĩa cho cụm danh từ 'industry professionals' (các chuyên gia trong ngành). Trạng từ <b>Only</b> (Chỉ) dùng để giới hạn đối tượng, mang nghĩa 'Chỉ riêng ai đó mới được...'.",
+                wrong: "<ul><li><b>(B) Until</b>: Cho đến khi (Đi kèm Mệnh đề hoặc Mốc thời gian).</li><li><b>(C) Unless</b>: Trừ khi, Nếu không (Đi kèm Mệnh đề S+V).</li><li><b>(D) Quite</b>: Khá (Đứng trước Tính từ hoặc Trạng từ).</li></ul>",
+                grammar: "Trạng từ <b>Only</b> có thể đứng trước Danh từ/Cụm danh từ để nhấn mạnh sự giới hạn.",
+                vocab: "<b>professional (n)</b>: chuyên gia<br><b>be allowed to V (v)</b>: được phép làm gì",
+                trans: "Chỉ các chuyên gia trong ngành mới được phép mua vé tham dự Hội chợ Nhiếp ảnh Kuo."
+            }
+        }
+    ];
+
+    let currentQIndex = 0;
+    let userAnswers = new Array(questionsData.length).fill(null);
+    let isSubmitted = false;
+    let testDuration = 0;
+    let timerInterval = null;
+
+    const mainArea = document.getElementById('mainArea');
+    const navDropdown = document.getElementById('navDropdown');
+
+    // Mở/Đóng Menu dọc
+    function toggleNavDropdown() {
+        navDropdown.classList.toggle('show');
+    }
+
+    // Đóng dropdown khi click ra ngoài
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.controls') && !event.target.closest('.nav-dropdown')) {
+            navDropdown.classList.remove('show');
+        }
+    });
+
+    function initQuiz() {
+        questionsData.forEach((q, index) => {
+            // Tạo nút trong Dropdown Menu
+            let dot = document.createElement('div');
+            dot.className = 'nav-dot';
+            dot.id = `nav-${index}`;
+            dot.innerText = index + 1;
+            dot.onclick = () => {
+                jumpToQuestion(index);
+                navDropdown.classList.remove('show'); // Tự đóng khi chọn câu
+            };
+            navDropdown.appendChild(dot);
+
+            // Tạo thẻ nội dung
+            let card = document.createElement('div');
+            card.className = 'question-card';
+            card.id = `card-${index}`;
+            
+            let optionsHtml = q.options.map((opt, optIndex) => `
+                <div class="option" id="opt-${index}-${optIndex}" onclick="selectOption(${index}, '${opt}', ${optIndex})">
+                    <strong style="margin-right:15px; color: var(--primary); font-size: 19px; width: 25px; display:inline-block;">${String.fromCharCode(65 + optIndex)}.</strong> 
+                    <span>${opt}</span>
+                </div>
+            `).join('');
+
+            card.innerHTML = `
+                <div class="q-header">
+                    <div class="q-num">Question ${index + 1}</div>
+                    <div style="font-weight: 700; color: var(--text-light); font-size: 16px; background: #f1f5f9; padding: 4px 12px; border-radius: 20px;">
+                        ${index + 1} / ${questionsData.length}
+                    </div>
+                </div>
+                <div class="q-text">${q.q}</div>
+                <div class="options">
+                    ${optionsHtml}
+                </div>
+                
+                <div class="q-nav-buttons">
+                    <button class="btn-nav btn-prev" onclick="jumpToQuestion(${index - 1})" ${index === 0 ? 'disabled' : ''}>← Câu trước</button>
+                    <button class="btn-nav btn-next next" onclick="jumpToQuestion(${index + 1})" ${index === questionsData.length - 1 ? 'disabled' : ''}>Câu tiếp →</button>
+                </div>
+
+                <div class="explanation-box" id="exp-${index}">
+                    <div class="exp-main-title">💡 Giải Thích Chi Tiết</div>
+                    
+                    <div class="exp-grid">
+                        <div class="box box-correct">
+                            <div class="box-title">✅ Phân Tích Đáp Án Đúng</div>
+                            ${q.exp.correct}
+                        </div>
+                        
+                        <div class="box box-wrong">
+                            <div class="box-title">❌ Vì Sao Các Đáp Án Kia Sai?</div>
+                            ${q.exp.wrong}
+                        </div>
+                        
+                        <div class="box box-grammar">
+                            <div class="box-title">📖 Cấu Trúc / Ngữ Pháp</div>
+                            ${q.exp.grammar}
+                        </div>
+
+                        <div class="box box-vocab">
+                            <div class="box-title">📚 Từ Vựng Cốt Lõi</div>
+                            ${q.exp.vocab}
+                        </div>
+                    </div>
+                    
+                    <div class="box box-trans">
+                        <div class="box-title">🌐 Dịch Nghĩa Toàn Câu:</div>
+                        "${q.exp.trans}"
+                    </div>
+                </div>
+            `;
+            mainArea.appendChild(card);
+        });
+    }
+
+    function startTest() {
+        document.getElementById('setupOverlay').style.display = 'none';
+        let minutes = parseInt(document.getElementById('timeInput').value) || 20;
+        testDuration = minutes * 60;
+        initQuiz();
+        jumpToQuestion(0);
+        
+        timerInterval = setInterval(() => {
+            let m = Math.floor(testDuration / 60);
+            let s = testDuration % 60;
+            document.getElementById("timer").textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            if (--testDuration < 0) { 
+                clearInterval(timerInterval); 
+                executeSubmit(); 
+            }
+        }, 1000);
+    }
+
+    function jumpToQuestion(index) {
+        if (index < 0 || index >= questionsData.length) return;
+        
+        let oldCard = document.getElementById(`card-${currentQIndex}`);
+        let oldDot = document.getElementById(`nav-${currentQIndex}`);
+        if(oldCard) oldCard.classList.remove('active');
+        if(oldDot) oldDot.classList.remove('active');
+        
+        currentQIndex = index;
+        let newCard = document.getElementById(`card-${currentQIndex}`);
+        let newDot = document.getElementById(`nav-${currentQIndex}`);
+        if(newCard) newCard.classList.add('active');
+        if(newDot) newDot.classList.add('active');
+        
+        mainArea.scrollTo(0, 0);
+    }
+
+    function selectOption(qIndex, answer, optIndex) {
+        if(isSubmitted) return; 
+        
+        userAnswers[qIndex] = answer;
+        for(let i=0; i<4; i++) {
+            document.getElementById(`opt-${qIndex}-${i}`).classList.remove('selected');
+        }
+        document.getElementById(`opt-${qIndex}-${optIndex}`).classList.add('selected');
+        document.getElementById(`nav-${qIndex}`).classList.add('done');
+        
+        if(qIndex < questionsData.length - 1) {
+            setTimeout(() => jumpToQuestion(qIndex + 1), 350);
+        }
+    }
+
+    function askSubmit() {
+        if(isSubmitted) return;
+        document.getElementById('confirmOverlay').style.display = 'flex';
+    }
+
+    function closeConfirmModal() {
+        document.getElementById('confirmOverlay').style.display = 'none';
+    }
+    
+    function closeResultModal() {
+        document.getElementById('resultOverlay').style.display = 'none';
+        jumpToQuestion(0);
+        navDropdown.classList.add('show'); // Hiển thị list cho dễ xem
+    }
+
+    function submitTest() {
+        document.getElementById('confirmOverlay').style.display = 'none';
+        executeSubmit();
+    }
+
+    function executeSubmit() {
+        if(isSubmitted) return;
+        isSubmitted = true;
+        clearInterval(timerInterval);
+        document.getElementById("mainSubmitBtn").style.display = 'none';
+
+        let score = 0;
+        
+        questionsData.forEach((q, index) => {
+            let uAns = userAnswers[index];
+            let isCorrect = uAns === q.a;
+            if(isCorrect) score++;
+
+            for(let i=0; i<4; i++) {
+                let optEl = document.getElementById(`opt-${index}-${i}`);
+                optEl.classList.add('disabled');
+                
+                let optText = q.options[i];
+                if (optText === q.a) {
+                    optEl.classList.add('correct'); 
+                } else if (optText === uAns) {
+                    optEl.classList.add('wrong'); 
+                }
+            }
+
+            document.getElementById(`exp-${index}`).classList.add('show');
+
+            let dot = document.getElementById(`nav-${index}`);
+            dot.classList.remove('done', 'active');
+            if (isCorrect) dot.classList.add('correct');
+            else dot.classList.add('wrong');
+        });
+
+        document.getElementById('resultMessage').innerHTML = `
+            <strong style="font-size: 38px; color: var(--primary); display: block; margin-bottom: 15px;">${score} / ${questionsData.length}</strong>
+            <p style="font-size: 16px; color: #64748b; font-weight: 500;">Bạn đã hoàn thành bài kiểm tra!<br>Hãy xem danh sách câu hỏi để đọc phần Giải Thích siêu chi tiết nhé.</p>
+        `;
+        document.getElementById('resultOverlay').style.display = 'flex';
+
+        if (window.luuDiemTOEICLenFirebase) {
+            window.luuDiemTOEICLenFirebase(questionsData.length, score, "ETS 2019 - Test 1", "Reading", "Part 5");
+        }
+    }
+</script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+        authDomain: "snapenglish-cb6e2.firebaseapp.com",
+        projectId: "snapenglish-cb6e2",
+        storageBucket: "snapenglish-cb6e2.firebasestorage.app",
+        messagingSenderId: "373152038413",
+        appId: "1:373152038413:web:19284622571390f8585f44"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    function showInGameToast(msg) {
+        let toast = document.createElement("div");
+        toast.innerText = msg;
+        toast.style.cssText = "position:fixed; bottom:20px; right:20px; background:#4f46e5; color:white; padding:15px 20px; border-radius:8px; font-weight:600; font-family:'Be Vietnam Pro',sans-serif; z-index:99999; box-shadow:0 10px 30px rgba(79, 70, 229, 0.3); transform:translateY(100px); opacity:0; transition:all 0.4s ease;";
+        document.body.appendChild(toast);
+        
+        setTimeout(() => { toast.style.transform = "translateY(0)"; toast.style.opacity = "1"; }, 100);
+        setTimeout(() => { toast.style.transform = "translateY(100px)"; toast.style.opacity = "0"; }, 3500);
+        setTimeout(() => { toast.remove(); }, 4000);
+    }
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            window.currentUserUid = user.uid;
+            window.currentUserEmail = user.email;
+        } else {
+            showInGameToast("⚠️ Bạn đang chơi dưới dạng Khách, điểm sẽ không lưu lên kho!");
+        }
+    });
+
+    function calculateToeicScore(skill, correct, total) {
+        let percentage = correct / total;
+        let maxScore = (skill === 'Listening' || skill === 'Reading') ? 495 : 200;
+        let step = (skill === 'Listening' || skill === 'Reading') ? 5 : 10;
+        let estimated = Math.round((percentage * maxScore) / step) * step;
+        if (estimated > maxScore) return maxScore;
+        if (estimated < 5 && (skill === 'Listening' || skill === 'Reading')) return 5;
+        if (estimated < 0) return 0;
+        return estimated;
+    }
+
+    window.luuDiemTOEICLenFirebase = async function(tongSoCau, soCauDung, tenBai, kyNang, tenPart) {
+        if (!window.currentUserUid) return; 
+
+        let diemQuyDoi = calculateToeicScore(kyNang, soCauDung, tongSoCau);
+        let thoiGianHienTai = document.getElementById("timer") ? document.getElementById("timer").innerText : "--"; 
+
+        let timestamp = Date.now();
+        let docId = window.currentUserUid + "_toeic_" + timestamp;
+        
+        try {
+            await setDoc(doc(db, "user_toeic_scores", docId), {
+                email: window.currentUserEmail,
+                skill: kyNang,
+                testName: tenBai,
+                partName: tenPart,
+                timeTaken: thoiGianHienTai,
+                totalQ: tongSoCau,
+                correctQ: soCauDung,
+                score: diemQuyDoi,
+                date: new Date().toLocaleDateString('vi-VN'),
+                timestamp: timestamp
+            });
+            showInGameToast("☁️ Đã đồng bộ điểm số lên Máy Chủ!");
+        } catch (error) {
+            console.error(error);
+        }
+    }
+</script>
+</body>
+</html>
