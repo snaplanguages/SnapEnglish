@@ -66,7 +66,6 @@
             letter-spacing: -0.5px;
         }
 
-        /* Giao diện mở rộng toàn màn hình */
         .layout-container {
             display: flex;
             gap: 25px;
@@ -164,11 +163,13 @@
         .modal-content h3 { color: #38A169; font-size: 22px; margin-bottom: 15px; text-align: center; }
         .modal-script { font-size: 20px; font-weight: 700; color: var(--primary); margin-bottom: 10px; text-align: center; padding-bottom: 15px; border-bottom: 2px dashed #eee;}
         .modal-content p { margin-bottom: 10px; line-height: 1.6; font-size: 16px; }
+        .vocab-list { list-style-type: none; padding-left: 0; margin-top: 10px;}
+        .vocab-list li { margin-bottom: 8px; background: #f8fafc; padding: 8px 15px; border-radius: 8px;}
+        .vocab-list li strong { color: var(--accent); font-size: 16px;}
         
         .btn-next-modal { width: 100%; background: var(--primary); color: white; margin-top: 20px; padding: 15px; font-size: 18px; }
         .btn-next-modal:hover { background: var(--primary-hover); }
 
-        /* END SCREEN */
         .end-screen { display: none; text-align: center; padding-top: 20px;}
         .transcript-box { text-align: left; background: #F7FAFC; padding: 25px; border-radius: 15px; height: 400px; overflow-y: auto; margin: 25px 0; border: 1px solid #E2E8F0; line-height: 1.8; font-size: 16px;}
 
@@ -262,12 +263,13 @@
         <h3>🎉 Chính xác!</h3>
         <div class="modal-script" id="trans-en"></div>
         <p><strong>🇻🇳 Nghĩa:</strong> <span id="trans-vi"></span></p>
+        <p id="grammar-container" style="display: none;"><strong>📖 Ngữ pháp/Ghi chú:</strong> <span id="trans-grammar"></span></p>
+        <ul class="vocab-list" id="trans-vocab"></ul>
         <button class="btn btn-next-modal" onclick="nextSentence()">Qua câu tiếp theo (Enter) ➔</button>
     </div>
 </div>
 
 <script>
-    // TOÀN BỘ DỮ LIỆU ĐƯỢC TRÍCH XUẤT TỪ PART 4 TEST 1 (Câu 71 đến 100)
     const lessonData = [
         // Talk 1 (71-73)
         { en: "Hi Ms. Xiao. This is Franklin Moore calling from Franklin Auto Express.", vi: "Xin chào cô Xiao. Tôi là Franklin Moore gọi từ Franklin Auto Express.", speaker: "Franklin Moore", gender: "male" },
@@ -353,7 +355,7 @@
         { en: "We've positioned a live camera on one tree there, and we don't want anything to disturb the birds for the duration of the study.", vi: "Chúng tôi đã đặt một camera trực tiếp trên một cái cây ở đó, và chúng tôi không muốn bất cứ thứ gì làm phiền những con chim trong suốt thời gian nghiên cứu.", speaker: "Speaker", gender: "male" }
     ];
 
-    let currentIndex = 0;
+    window.currentIndex = 0;
     let currentPlayCount = 0;
     let playTimeout;
     const synth = window.speechSynthesis;
@@ -384,7 +386,7 @@
         
         let savedIndex = parseInt(localStorage.getItem('part4_test1_progress'));
         if (!isNaN(savedIndex) && savedIndex < lessonData.length) {
-            currentIndex = savedIndex;
+            window.currentIndex = savedIndex;
         }
 
         updateUI();
@@ -392,9 +394,9 @@
 
     function updateUI() {
         updateProgress();
-        document.getElementById('current-sentence-num').innerText = currentIndex + 1;
+        document.getElementById('current-sentence-num').innerText = window.currentIndex + 1;
         
-        const data = lessonData[currentIndex];
+        const data = lessonData[window.currentIndex];
         
         if (data.gender === "male") {
             labelDisplay.innerText = "👨 " + data.speaker;
@@ -435,7 +437,7 @@
     function triggerAudioLoop() {
         if (synth.speaking) synth.cancel();
         
-        const data = lessonData[currentIndex];
+        const data = lessonData[window.currentIndex];
         const utterThis = new SpeechSynthesisUtterance(data.en);
         utterThis.lang = 'en-US';
         utterThis.rate = parseFloat(document.getElementById('speed-setting').value);
@@ -454,6 +456,7 @@
         synth.speak(utterThis);
         if (modalOverlay.style.display !== "flex") inputField.focus();
     }
+
 // 1. Hàm xóa dấu câu và ĐỒNG BỘ DẤU NHÁY từ mọi thiết bị
     function normalizeText(text) { 
         // Gom tất cả nháy cong, nháy ngược về nháy thẳng (')
@@ -485,19 +488,15 @@
     // 3. Hàm chuẩn hóa chính tả Anh-Anh sang Anh-Mỹ để bao dung lỗi
     function normalizeSpelling(text) {
         return text
-            // Xử lý đuôi s/z (VD: realise -> realize, organise -> organize, organisation -> organization)
             .replace(/ise\b/g, 'ize')
             .replace(/ised\b/g, 'ized')
             .replace(/ising\b/g, 'izing')
             .replace(/ises\b/g, 'izes')
             .replace(/isation/g, 'ization')
-            // Xử lý our/or (VD: colour -> color, favour -> favor)
             .replace(/our\b/g, 'or')
             .replace(/ours\b/g, 'ors')
-            // Xử lý tre/ter (VD: centre -> center)
             .replace(/tre\b/g, 'ter')
             .replace(/tres\b/g, 'ters')
-            // Xử lý phụ âm kép l/ll (VD: travelling -> traveling)
             .replace(/lling\b/g, 'ling')
             .replace(/lled\b/g, 'led');
     }
@@ -505,25 +504,20 @@
         const rawUserInput = inputField.value;
         const rawTargetText = lessonData[window.currentIndex].en;
         
-        // Mở rộng viết tắt, xóa nháy phẩy, VÀ đồng bộ chính tả s/z, our/or
         const userInputExpanded = normalizeSpelling(expandContractions(rawUserInput).replace(/'/g, ''));
         const targetTextExpanded = normalizeSpelling(expandContractions(rawTargetText).replace(/'/g, ''));
         
-        // KIỂM TRA 1: Nếu đáp án đúng hoàn toàn (Full câu)
         if (userInputExpanded === targetTextExpanded) {
             msgBox.innerText = "";
             showModal();
             return;
         }
 
-        // KIỂM TRA 2 (NÂNG CẤP): Đang gõ dở nhưng vẫn đúng hướng
-        // (Bao dung cả trường hợp đang gõ They are thay vì They're)
         if (targetTextExpanded.startsWith(userInputExpanded) && userInputExpanded.length > 0) {
             msgBox.innerText = "Chưa hết câu, hãy nghe thêm và gõ tiếp nhé!";
             return; 
         }
 
-        // KIỂM TRA 3: NẾU SAI THẬT SỰ: Chạy logic cũ để tìm và bôi đỏ từ sai
         const userInput = normalizeText(rawUserInput);
         const targetText = normalizeText(rawTargetText);
         
@@ -546,21 +540,18 @@
             }
 
             if (wrongIndex !== -1) {
-                // Tính vị trí cần select (bôi đen)
                 let startPos = 0;
                 for (let k = 0; k < wrongIndex; k++) {
-                    startPos += rawWords[k].length + 1; // +1 là dấu khoảng trắng
+                    startPos += rawWords[k].length + 1;
                 }
                 
                 const leadingSpaces = inputField.value.length - inputField.value.trimStart().length;
                 startPos += leadingSpaces;
                 let endPos = startPos + rawWords[wrongIndex].length;
 
-                // Tự động bôi đen chữ sai
                 inputField.focus();
                 inputField.setSelectionRange(startPos, endPos);
 
-                // Hiển thị đoạn text nhấp nháy đỏ
                 let displayHTML = rawWords.map((w, idx) => {
                     if (idx === wrongIndex) {
                         return `<span class="glow-error">${w}</span>`;
@@ -585,9 +576,9 @@
 
         const rawUserInput = inputField.value;
         const userInput = normalizeText(rawUserInput);
-        const targetText = normalizeText(lessonData[currentIndex].en);
+        const targetText = normalizeText(lessonData[window.currentIndex].en);
         
-        const targetWordsRaw = lessonData[currentIndex].en.split(' ');
+        const targetWordsRaw = lessonData[window.currentIndex].en.split(' ');
         const targetWordsNorm = targetText.split(' ');
         const userWords = userInput.split(' ').filter(w => w !== "");
 
@@ -608,25 +599,44 @@
 
     function showModal() {
         inputField.blur();
-        const data = lessonData[currentIndex];
+        const data = lessonData[window.currentIndex];
         
         document.getElementById("trans-en").innerText = data.en;
         document.getElementById("trans-vi").innerText = data.vi;
         
+        const grammarContainer = document.getElementById("grammar-container");
+        if(data.grammar) {
+            grammarContainer.style.display = "block";
+            document.getElementById("trans-grammar").innerText = data.grammar;
+        } else {
+            grammarContainer.style.display = "none";
+        }
+        
+        const vocabList = document.getElementById("trans-vocab");
+        vocabList.innerHTML = "";
+        if(data.vocab && data.vocab.length > 0) {
+            data.vocab.forEach(v => {
+                let li = document.createElement("li");
+                let parts = v.split(" (");
+                li.innerHTML = `<strong>${parts[0]}</strong> (${parts[1]}`;
+                vocabList.appendChild(li);
+            });
+        }
+
         modalOverlay.style.display = "flex";
         document.querySelector('.btn-next-modal').focus();
     }
 
     function prevSentenceManual() {
-        if (currentIndex > 0) {
-            currentIndex--;
+        if (window.currentIndex > 0) {
+            window.currentIndex--;
             resetForNewSentence();
         }
     }
 
     function nextSentenceManual() {
-        if (currentIndex < lessonData.length - 1) {
-            currentIndex++;
+        if (window.currentIndex < lessonData.length - 1) {
+            window.currentIndex++;
             resetForNewSentence();
         } else {
             finishLesson();
@@ -637,19 +647,21 @@
         modalOverlay.style.display = "none";
         inputField.value = "";
         msgBox.innerHTML = "";
-        localStorage.setItem('part4_test1_progress', currentIndex);
+        localStorage.setItem('part4_test1_progress', window.currentIndex);
+        if(window.saveProgressToCloud) window.saveProgressToCloud(window.currentIndex);
         updateUI();
         playAudio();
     }
 
     function nextSentence() {
         modalOverlay.style.display = "none";
-        currentIndex++;
+        window.currentIndex++;
         inputField.value = "";
         msgBox.innerHTML = "";
         
-        if (currentIndex < lessonData.length) {
-            localStorage.setItem('part4_test1_progress', currentIndex);
+        if (window.currentIndex < lessonData.length) {
+            localStorage.setItem('part4_test1_progress', window.currentIndex);
+            if(window.saveProgressToCloud) window.saveProgressToCloud(window.currentIndex);
             updateUI();
             playAudio();
         } else {
@@ -658,10 +670,20 @@
     }
 
     function updateProgress() {
-        const percent = Math.round((currentIndex / lessonData.length) * 100);
+        const percent = Math.round((window.currentIndex / lessonData.length) * 100);
         document.getElementById("progress-percent").innerText = percent;
         document.getElementById("progress-ring").style.background = `conic-gradient(var(--primary) ${percent}%, #eee 0)`;
     }
+
+    window.playEndScreenAudio = function(text, gender) {
+        if (synth.speaking) synth.cancel();
+        const utterThis = new SpeechSynthesisUtterance(text);
+        utterThis.lang = 'en-US';
+        utterThis.rate = parseFloat(document.getElementById('speed-setting').value) || 1.0; 
+        if (gender === 'female' && femaleVoice) utterThis.voice = femaleVoice;
+        else if (gender === 'male' && maleVoice) utterThis.voice = maleVoice;
+        synth.speak(utterThis);
+    };
 
     function finishLesson() {
         document.getElementById("learning-screen").style.display = "none";
@@ -673,6 +695,7 @@
         document.getElementById('study-count').innerText = count;
 
         localStorage.removeItem('part4_test1_progress');
+        if(window.saveProgressToCloud) window.saveProgressToCloud(0);
 
         const transcriptBox = document.getElementById("full-transcript");
         let htmlContent = "";
@@ -680,7 +703,8 @@
         lessonData.forEach(d => {
             const color = d.gender === 'male' ? '#3182CE' : '#E53E3E';
             htmlContent += `<p style="margin-bottom:12px; padding-left: 10px;">
-                <strong style="color:${color}">${d.speaker}:</strong> <span style="font-weight: 500;">${d.en}</span><br>
+                <strong style="color:${color}">${d.speaker}:</strong> <span style="font-weight: 500;">${d.en}</span>
+                <button onclick="playEndScreenAudio(\`${d.en.replace(/`/g, "'")}\`, '${d.gender}')" style="background:none; border:none; cursor:pointer; font-size:18px; margin-left: 5px; transition: 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" title="Nghe lại câu này">🔊</button><br>
                 <span style="color:var(--text-light); font-size: 14px;">${d.vi}</span>
             </p>`;
         });
@@ -695,7 +719,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    // Đã xóa import Firestore vì bài dictation không cần lưu điểm
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     // Cấu hình Firebase
     const firebaseConfig = {
@@ -709,28 +733,44 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    // KIỂM TRA & ĐỒNG BỘ TÀI KHOẢN (Chạy ngầm)
-    onAuthStateChanged(auth, (user) => {
+    window.saveProgressToCloud = async (progressIndex) => {
+        if (window.currentUserUid) {
+            try {
+                await setDoc(doc(db, "userProgress", window.currentUserUid), {
+                    part4_test1_progress: progressIndex
+                }, { merge: true });
+            } catch (e) {
+                console.error("Lỗi khi lưu tiến độ:", e);
+            }
+        }
+    };
+
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
-            // Lưu thông tin user vào window để hệ thống biết người dùng đã đăng nhập
             window.currentUserUid = user.uid;
             window.currentUserEmail = user.email;
             
-            // Console log ẩn để bạn dễ debug, người dùng bình thường không thấy
-            console.log("Đã đồng bộ ngầm tài khoản:", user.email);
-            
-            // Note: Cố ý không đổi logo SnapEnglish và không bật alert
+            try {
+                const docRef = doc(db, "userProgress", user.uid);
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    let cloudProgress = docSnap.data().part4_test1_progress;
+                    if (cloudProgress !== undefined) {
+                        window.currentIndex = cloudProgress; 
+                        window.updateUI();
+                    }
+                }
+            } catch (error) {
+                console.error("Lỗi khi tải tiến độ:", error);
+            }
         } else {
-            // Dọn dẹp thông tin khi là khách vãng lai hoặc đăng xuất
             window.currentUserUid = null;
             window.currentUserEmail = null;
-            
-            console.log("Trạng thái: Khách vãng lai");
         }
     });
-
-    // Đã xóa bỏ hàm luuDiemLenFirebase()
 </script>
 </body>
 </html>
