@@ -665,9 +665,9 @@
 
         const rawUserInput = inputField.value;
         const userInput = normalizeText(rawUserInput);
-        const targetText = normalizeText(lessonData[currentIndex].en);
+        const targetText = normalizeText(lessonData[window.currentIndex].en);
         
-        const targetWordsRaw = lessonData[currentIndex].en.split(' ');
+        const targetWordsRaw = lessonData[window.currentIndex].en.split(' ');
         const targetWordsNorm = targetText.split(' ');
         const userWords = userInput.split(' ').filter(w => w !== "");
 
@@ -733,42 +733,53 @@
     }
     
     function resetForNewSentence() {
-    modalOverlay.style.display = "none";
-    inputField.value = "";
-    msgBox.innerHTML = "";
-    
-    // Lưu Local dự phòng
-    localStorage.setItem('part2_test1_progress', window.currentIndex); 
-    // LƯU LÊN CLOUD
-    if(window.saveProgressToCloud) window.saveProgressToCloud(window.currentIndex); 
-    
-    updateUI();
-    playAudio();
-}
-
-    function nextSentence() {
-    modalOverlay.style.display = "none";
-    window.currentIndex++;
-    inputField.value = "";
-    msgBox.innerHTML = "";
-    
-    if (window.currentIndex < lessonData.length) {
+        modalOverlay.style.display = "none";
+        inputField.value = "";
+        msgBox.innerHTML = "";
+        
         // Lưu Local dự phòng
-        localStorage.setItem('part2_test1_progress', window.currentIndex);
+        localStorage.setItem('part2_test1_progress', window.currentIndex); 
         // LƯU LÊN CLOUD
-        if(window.saveProgressToCloud) window.saveProgressToCloud(window.currentIndex);
-
+        if(window.saveProgressToCloud) window.saveProgressToCloud(window.currentIndex); 
+        
         updateUI();
         playAudio();
-    } else {
-        finishLesson();
     }
-}
+
+    function nextSentence() {
+        modalOverlay.style.display = "none";
+        window.currentIndex++;
+        inputField.value = "";
+        msgBox.innerHTML = "";
+        
+        if (window.currentIndex < lessonData.length) {
+            // Lưu Local dự phòng
+            localStorage.setItem('part2_test1_progress', window.currentIndex);
+            // LƯU LÊN CLOUD
+            if(window.saveProgressToCloud) window.saveProgressToCloud(window.currentIndex);
+
+            updateUI();
+            playAudio();
+        } else {
+            finishLesson();
+        }
+    }
+
     function updateProgress() {
         const percent = Math.round((window.currentIndex / lessonData.length) * 100);
         document.getElementById("progress-percent").innerText = percent;
         document.getElementById("progress-ring").style.background = `conic-gradient(var(--primary) ${percent}%, #eee 0)`;
     }
+
+    // THÊM HÀM PLAY AUDIO RIÊNG Ở END SCREEN
+    window.playEndScreenAudio = function(text) {
+        if (synth.speaking) synth.cancel();
+        const utterThis = new SpeechSynthesisUtterance(text);
+        utterThis.lang = 'en-US';
+        utterThis.rate = parseFloat(document.getElementById('speed-setting').value) || 1.0; 
+        if (window.mainVoice) utterThis.voice = window.mainVoice; 
+        synth.speak(utterThis);
+    };
 
     function finishLesson() {
         document.getElementById("learning-screen").style.display = "none";
@@ -789,8 +800,11 @@
             const color = isQuestion ? 'var(--badge-q-text)' : (d.type === 'correct' ? 'var(--badge-corr-text)' : 'var(--badge-opt-text)');
             const padding = isQuestion ? '0' : '25px';
             
+            // CHÈN THÊM NÚT NGHE LẠI AUDIO VÀO TRANSCRIPT
+            const playBtnHtml = `<button onclick="playEndScreenAudio(\`${d.en.replace(/`/g, "'")}\`)" style="background:none; border:none; cursor:pointer; font-size:18px; margin-left: 5px; transition: 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" title="Nghe lại câu này">🔊</button>`;
+            
             htmlContent += `<p style="margin-bottom:10px; padding-left: ${padding};">
-                <strong style="color:${color}">${d.label}:</strong> <span style="font-weight: 500;">${d.en}</span><br>
+                <strong style="color:${color}">${d.label}:</strong> <span style="font-weight: 500;">${d.en}</span> ${playBtnHtml}<br>
                 <span style="color:var(--text-light); font-size: 14px;">${d.vi}</span>
             </p>`;
             
