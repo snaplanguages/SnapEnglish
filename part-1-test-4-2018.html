@@ -236,7 +236,55 @@
 
         .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary-hover); }
         .btn-outline:hover { background: var(--primary-light); }
+/* Style cho Popup Xác nhận */
+.confirm-box {
+    background: white;
+    border-radius: 25px;
+    padding: 40px;
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+    animation: scaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
 
+@keyframes scaleUp {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.confirm-title { font-size: 24px; color: var(--primary-hover); margin-bottom: 15px; font-weight: 800; }
+.confirm-desc { color: var(--text-muted); margin-bottom: 30px; font-size: 16px; }
+.confirm-actions { display: flex; justify-content: center; gap: 15px; }
+
+/* Style cho trạng thái Mock Test (Nhấp nháy) */
+.mock-status {
+    display: none;
+    padding: 15px;
+    background: var(--danger-light);
+    border-radius: 15px;
+    color: var(--danger);
+    font-weight: 800;
+    font-size: 16px;
+    text-align: center;
+    margin-bottom: 25px;
+    border: 1px dashed var(--danger);
+}
+
+.mock-status span.pulse {
+    display: inline-block;
+    width: 10px; height: 10px;
+    background-color: var(--danger);
+    border-radius: 50%;
+    margin-right: 8px;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 118, 117, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 118, 117, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 118, 117, 0); }
+}
         .btn-navigation {
             display: flex;
             justify-content: space-between;
@@ -397,6 +445,8 @@
         <div class="brand-logo">🎓</div>
         <div class="brand-name">SnapEnglish</div>
     </a>
+    <div style="display: flex; gap: 15px; align-items: center;">
+        <div id="timer-container" style="display: none;"><span id="timer">00:00</span></div>
     <div id="test-progress" style="font-weight: 700; color: var(--text-muted); display: none;">Question 1 / 6</div>
 </header>
 
@@ -493,6 +543,48 @@
 </div>
 
 <script>
+    // 1. HÀM TÍNH ĐIỂM TOEIC
+    function calculateToeicScore(skill, correct, total) {
+        let percentage = correct / total;
+        let estimated = Math.round(percentage * 495);
+        if (estimated < 5 && (skill === 'Listening' || skill === 'Reading')) return 5;
+        if (estimated < 0) return 0;
+        return estimated;
+    }
+
+    // 2. HÀM ĐỒNG BỘ LÊN FIREBASE
+    window.luuDiemTOEICLenFirebase = async function(tongSoCau, soCauDung, tenBai, kyNang, tenPart) {
+        // Đảm bảo user đã đăng nhập (biến này lấy từ file firebase tổng của bạn)
+        if (!window.currentUserUid) {
+            console.log("Cảnh báo: Chưa đăng nhập, không thể lưu điểm.");
+            return; 
+        }
+
+        let diemQuyDoi = calculateToeicScore(kyNang, soCauDung, tongSoCau);
+        // Lấy thời gian làm bài nếu có thẻ id="timer", không thì để "--:--"
+        let thoiGianHienTai = document.getElementById("timer") ? document.getElementById("timer").innerText : "--:--"; 
+
+        let timestamp = Date.now();
+        let docId = window.currentUserUid + "_toeic_" + timestamp;
+        
+        try {
+            await window.setDoc(window.doc(window.db, "user_toeic_scores", docId), {
+                email: window.currentUserEmail || "unknown",
+                skill: kyNang,           
+                testName: tenBai,        
+                partName: tenPart,       
+                timeTaken: thoiGianHienTai,
+                totalQ: tongSoCau,
+                correctQ: soCauDung,
+                score: diemQuyDoi,       
+                date: new Date().toLocaleDateString('vi-VN'),
+                timestamp: timestamp
+            });
+            console.log("Thành công: Đã đồng bộ điểm TOEIC lên Firebase SnapEnglish!");
+        } catch (e) {
+            console.error("Lỗi khi lưu điểm lên Firebase: ", e);
+        }
+    }
     const questions = [
         {
             id: 1,
@@ -650,16 +742,29 @@
     let userAnswers = new Array(questions.length).fill(null);
     let mode = 'practice';
 
-    function startTest(selectedMode) {
-        mode = selectedMode;
-        document.getElementById('screen-welcome').classList.remove('active');
-        document.getElementById('screen-test').classList.add('active');
-        document.getElementById('test-progress').style.display = 'block';
-        loadQuestion();
-    }
+    function promptStart(selectedMode) {
+    pendingMode = selectedMode;
+    document.getElementById('modal-start-confirm').style.display = 'flex';
+}
+
+function cancelStart() {
+    document.getElementById('modal-start-confirm').style.display = 'none';
+}
+
+function confirmStart() {
+    document.getElementById('modal-start-confirm').style.display = 'none';
+    isMockMode = (pendingMode === 'mock'); // Kích hoạt biến Thi thử
+    
+    document.getElementById('screen-welcome').classList.remove('active');
+    document.getElementById('screen-test').classList.add('active');
+    
+    loadQuestion(); // Tải câu hỏi đầu tiên
+}
 
     function loadQuestion() {
         const q = questions[currentIdx];
+        const audioEl = document.getElementById('q-audio');
+    audioEl.src = q.audio;
         document.getElementById('q-image').src = q.img;
         document.getElementById('q-audio').src = q.audio;
         document.getElementById('test-progress').innerText = `Question ${currentIdx + 1} / ${questions.length}`;
@@ -733,6 +838,15 @@
         });
 
         document.getElementById('final-score').innerText = `${correctCount}/${questions.length}`;
+    if (typeof window.luuDiemTOEICLenFirebase === "function") {
+            window.luuDiemTOEICLenFirebase(
+                questions.length, 
+                correctCount, 
+                "ETS 2018 - Test 4",  // Tên bài Test
+                "Listening",      // Kỹ năng
+                "Part 1"          // Tên Part
+            );
+        }
     }
 
     function openDetail(idx) {
@@ -764,12 +878,38 @@
 
         document.getElementById('modal-detail').style.display = 'flex';
     }
-
+let pendingMode = 'practice';
+let isMockMode = false;
+let autoNextTimeout;
     function closeModal() {
         document.getElementById('modal-detail').style.display = 'none';
         document.getElementById('modal-audio').pause();
     }
 </script>
+<div class="mock-status" id="mock-status-view">
+    <span class="pulse"></span> 🎙️ Đang phát Audio... Tự động chuyển câu.
+</div>
 
+<div id="modal-start-confirm" class="modal" style="display: none; z-index: 2000;">
+    <div class="confirm-box">
+        <div class="confirm-title">Bắt đầu làm bài? 🚀</div>
+        <div class="confirm-desc">Chế độ thi thử sẽ ẩn nút điều khiển Audio và tự động chuyển câu. Bạn đã sẵn sàng chưa?</div>
+        <div class="confirm-actions">
+            <button class="btn btn-outline" onclick="cancelStart()">Chưa, từ từ đã</button>
+            <button class="btn btn-primary" onclick="confirmStart()">Chiến luôn!</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-submit-confirm" class="modal" style="display: none; z-index: 2000;">
+    <div class="confirm-box">
+        <div class="confirm-title">Nộp bài ngay? ✨</div>
+        <div class="confirm-desc">Bạn có chắc chắn muốn nộp bài? Kết quả sẽ được ghi nhận.</div>
+        <div class="confirm-actions">
+            <button class="btn btn-outline" onclick="cancelSubmit()">Kiểm tra lại</button>
+            <button class="btn btn-success" onclick="confirmSubmit()">Nộp luôn!</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
