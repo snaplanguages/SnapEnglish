@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8"> 
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Part 1 - Test 3 - 2018 | SnapEnglish</title>
     <link rel="icon" type="image/png" href="ảnh.png">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Cute Pastel Palette */
+            /* Cute Pastel Violet Palette for Test 3 */
             --primary: #A084E8;        /* Soft Violet */
             --primary-hover: #8F71D8;
             --primary-light: #F3EFFF;
@@ -43,7 +43,7 @@
             justify-content: space-between;
             align-items: center;
             background: var(--bg-card);
-            box-shadow: 0 2px 15px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.03);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -76,15 +76,24 @@
             letter-spacing: -0.5px;
         }
 
+        /* Timer cho Firebase */
+        #timer-container {
+            font-weight: 700;
+            color: var(--primary-hover);
+            background: var(--primary-light);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
         .container {
             width: 100%;
-            max-width: 100%; /* Expand full screen */
-            padding: 40px;
+            max-width: 1200px;
+            padding: 40px 20px;
             margin: 0 auto;
         }
 
         /* Screen transitions */
-        .screen { display: none; animation: fadeIn 0.5s ease; }
+        .screen { display: none; animation: fadeIn 0.4s ease; }
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -100,7 +109,7 @@
             border: 2px solid var(--primary-light);
         }
 
-        .welcome-card h1 { font-size: 32px; margin-bottom: 20px; color: var(--primary); }
+        .welcome-card h1 { font-size: 32px; margin-bottom: 20px; color: var(--primary-hover); }
         .welcome-card p { color: var(--text-muted); margin-bottom: 40px; font-size: 18px; }
 
         /* Test Layout */
@@ -108,7 +117,14 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 40px;
-            align-items: start;
+            align-items: stretch;
+        }
+
+        /* FIX LỖI NHẢY TRANG: Khóa chiều cao của box ảnh */
+        .image-side {
+            position: sticky;
+            top: 100px;
+            align-self: start;
         }
 
         .image-container {
@@ -117,31 +133,70 @@
             border-radius: 25px;
             box-shadow: var(--shadow-soft);
             border: 2px solid var(--primary-light);
-            position: sticky;
-            top: 120px;
+            height: 500px; /* Khóa cứng chiều cao */
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .image-container img {
-            width: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; 
             border-radius: 15px;
-            display: block;
+        }
+
+        /* KHUNG CONTENT BÊN PHẢI */
+        .content-side {
+            display: flex;
+            flex-direction: column;
+            min-height: 500px;
         }
 
         .audio-player-wrapper {
             background: var(--primary-light);
             padding: 20px;
             border-radius: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             text-align: center;
         }
 
         .audio-player-wrapper p {
             font-weight: 700;
-            color: var(--primary);
+            color: var(--primary-hover);
             margin-bottom: 10px;
         }
 
-        audio { width: 100%; height: 40px; }
+        audio { width: 100%; height: 40px; outline: none; }
+
+        /* Mock Status Animation */
+        .mock-status {
+            display: none;
+            padding: 15px;
+            background: var(--danger-light);
+            border-radius: 15px;
+            color: var(--danger);
+            font-weight: 800;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 25px;
+            border: 1px dashed var(--danger);
+        }
+
+        .mock-status span.pulse {
+            display: inline-block;
+            width: 10px; height: 10px;
+            background-color: var(--danger);
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 107, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 107, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 107, 129, 0); }
+        }
 
         /* Question Controls */
         .options-container {
@@ -152,8 +207,8 @@
 
         .option-item {
             background: var(--bg-card);
-            border: 2px solid #F1F2F6;
-            padding: 20px 25px;
+            border: 2px solid #EAEAEA;
+            padding: 18px 25px;
             border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -173,16 +228,17 @@
         .option-item.selected {
             border-color: var(--primary);
             background: var(--primary-light);
-            color: var(--primary);
+            color: var(--primary-hover);
         }
 
         .radio-circle {
             width: 24px;
             height: 24px;
-            border: 2px solid #DFE6E9;
+            border: 2px solid #B2BEC3;
             border-radius: 50%;
             position: relative;
             flex-shrink: 0;
+            transition: 0.2s;
         }
 
         .option-item.selected .radio-circle {
@@ -202,9 +258,16 @@
             transform: translate(-50%, -50%);
         }
 
-        /* Buttons */
+        /* Navigation Buttons */
+        .btn-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto; /* Đẩy nút xuống đáy content */
+            padding-top: 30px;
+        }
+
         .btn {
-            padding: 15px 35px;
+            padding: 14px 30px;
             border-radius: 18px;
             border: none;
             cursor: pointer;
@@ -216,14 +279,11 @@
         .btn-primary { background: var(--primary); color: white; }
         .btn-primary:hover { background: var(--primary-hover); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(160, 132, 232, 0.3); }
 
-        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
-        .btn-outline:hover { background: var(--primary-light); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #27ae60; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(46, 213, 115, 0.3); }
 
-        .btn-navigation {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 40px;
-        }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary-hover); }
+        .btn-outline:hover { background: var(--primary-light); }
 
         /* Result Screen */
         .result-container {
@@ -265,16 +325,16 @@
             background: white;
             padding: 25px;
             border-radius: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
             transition: 0.3s;
-            border: 1px solid #F1F2F6;
+            border: 2px solid transparent;
         }
 
-        .result-item:hover { transform: scale(1.03); border-color: var(--primary); }
+        .result-item:hover { transform: scale(1.03); border-color: var(--primary-light); box-shadow: var(--shadow-soft); }
 
         .status-badge {
             padding: 6px 12px;
@@ -286,12 +346,12 @@
         .status-correct { background: var(--success-light); color: var(--success); }
         .status-wrong { background: var(--danger-light); color: var(--danger); }
 
-        /* Modal Details */
+        /* General Modal Styling */
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(47, 53, 66, 0.6);
+            background: rgba(45, 52, 54, 0.7);
             backdrop-filter: blur(5px);
             z-index: 1000;
             justify-content: center;
@@ -299,12 +359,13 @@
             padding: 20px;
         }
 
+        /* Detail Modal */
         .modal-content {
             background: var(--bg-body);
             width: 100%;
             max-width: 900px;
             max-height: 90vh;
-            border-radius: 35px;
+            border-radius: 30px;
             overflow-y: auto;
             position: relative;
             padding: 40px;
@@ -329,38 +390,65 @@
 
         .close-modal:hover { transform: rotate(90deg); background: var(--danger); color: white; }
 
+        /* Confirmation Modals */
+        .confirm-box {
+            background: var(--bg-card);
+            border-radius: 25px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            animation: scaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes scaleUp {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .confirm-title { font-size: 24px; color: var(--primary-hover); margin-bottom: 15px; font-weight: 800; }
+        .confirm-desc { color: var(--text-muted); margin-bottom: 30px; font-size: 16px; }
+        .confirm-actions { display: flex; justify-content: center; gap: 15px; }
+
+        /* Details Modal Sections */
         .script-row {
-            margin-bottom: 25px;
-            padding: 15px;
-            border-radius: 15px;
+            margin-bottom: 20px;
+            padding: 18px;
+            border-radius: 18px;
             background: white;
             border-left: 5px solid var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         }
 
         .script-en { font-weight: 700; color: var(--text-main); margin-bottom: 5px; font-size: 17px; }
         .script-vi { color: var(--text-muted); font-style: italic; }
 
         .vocab-section {
-            background: #FFF9E6;
+            background: #FFFBF0;
             padding: 25px;
             border-radius: 20px;
             margin: 30px 0;
-            border: 2px dashed #FFEAA7;
+            border: 2px dashed #FDCB6E;
         }
 
-        .vocab-section h4 { color: #D35400; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .vocab-section h4 { color: #E17055; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-size: 18px;}
 
         .explain-item {
             margin-top: 15px;
-            padding: 15px;
-            border-radius: 15px;
+            padding: 20px;
+            border-radius: 18px;
+            font-size: 15px;
         }
 
-        .explain-correct { background: var(--success-light); color: var(--success); border: 1px solid var(--success); }
-        .explain-wrong { background: var(--danger-light); color: var(--danger); border: 1px solid var(--danger); }
+        .explain-correct { background: var(--success-light); color: #008966; border: 1px solid var(--success); }
+        .explain-wrong { background: var(--danger-light); color: #D63031; border: 1px solid var(--danger); }
 
         @media (max-width: 900px) {
             .test-layout { grid-template-columns: 1fr; }
+            .image-side { position: relative; top: 0; }
+            .image-container { height: 350px; }
+            .content-side { min-height: auto; }
             .container { padding: 20px; }
             header { padding: 15px 20px; }
         }
@@ -373,17 +461,20 @@
         <div class="brand-logo">🎓</div>
         <div class="brand-name">SnapEnglish</div>
     </a>
-    <div id="test-progress" style="font-weight: 700; color: var(--text-muted); display: none;">Question 1 / 6</div>
+    <div style="display: flex; gap: 15px; align-items: center;">
+        <div id="timer-container" style="display: none;"><span id="timer">00:00</span></div>
+        <div id="test-progress" style="font-weight: 700; color: var(--text-muted); display: none;">Question 1 / 6</div>
+    </div>
 </header>
 
 <div class="container">
     <div id="screen-welcome" class="screen active">
         <div class="welcome-card">
             <h1>Chào mừng bạn đến với SnapEnglish! 🎓</h1>
-            <p>Hôm nay chúng ta sẽ luyện tập TOEIC Part 1 - Test 3.<br>Hãy chọn chế độ bạn muốn bắt đầu nhé!</p>
-            <div style="display: flex; justify-content: center; gap: 20px;">
-                <button class="btn btn-outline" onclick="startTest('practice')">Chế độ Luyện tập</button>
-                <button class="btn btn-primary" onclick="startTest('mock')">Chế độ Thi thử</button>
+            <p>Hôm nay chúng ta sẽ luyện tập <b>TOEIC Part 1 - Test 3</b>.<br>Hệ thống tự động chuyển câu trong chế độ thi thử và đồng bộ điểm lên cơ sở dữ liệu.</p>
+            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                <button class="btn btn-outline" onclick="promptStart('practice')">Chế độ Luyện tập</button>
+                <button class="btn btn-primary" onclick="promptStart('mock')">Chế độ Thi thử</button>
             </div>
         </div>
     </div>
@@ -396,9 +487,14 @@
                 </div>
             </div>
             <div class="content-side">
-                <div class="audio-player-wrapper">
+                
+                <div class="audio-player-wrapper" id="normal-audio-view">
                     <p>🔈 Listen to the audio</p>
                     <audio id="q-audio" controls controlsList="nodownload"></audio>
+                </div>
+                
+                <div class="mock-status" id="mock-status-view">
+                    <span class="pulse"></span> 🎙️ Đang phát Audio... Tự động chuyển câu.
                 </div>
                 
                 <div class="options-container">
@@ -420,9 +516,9 @@
                     </div>
                 </div>
 
-                <div class="btn-navigation">
+                <div class="btn-navigation" id="nav-buttons">
                     <button class="btn btn-outline" id="btn-prev" onclick="prevQuestion()" style="visibility: hidden;">Quay lại</button>
-                    <button class="btn btn-primary" id="btn-next" onclick="nextQuestion()">Câu tiếp theo</button>
+                    <button class="btn btn-primary" id="btn-next" onclick="nextQuestion()">Câu tiếp theo ➜</button>
                 </div>
             </div>
         </div>
@@ -433,7 +529,7 @@
             <div class="score-box">
                 <h2>Kết quả của bạn 🎉</h2>
                 <div class="score-circle" id="final-score">0/6</div>
-                <p id="score-msg">Làm tốt lắm! Hãy xem lại các câu sai để cải thiện nhé.</p>
+                <p id="score-msg">Làm tốt lắm! Dữ liệu của bạn đã được đồng bộ lên hệ thống.<br>Nhấp vào từng câu bên dưới để xem phân tích chi tiết nhé.</p>
             </div>
             
             <div class="result-list" id="result-list-ui">
@@ -446,13 +542,35 @@
     </div>
 </div>
 
+<div id="modal-start-confirm" class="modal" style="display: none; z-index: 2000;">
+    <div class="confirm-box">
+        <div class="confirm-title">Bắt đầu làm bài? 🚀</div>
+        <div class="confirm-desc">Chế độ thi thử sẽ ẩn nút điều khiển Audio và tự động chuyển câu. Bạn đã chuẩn bị sẵn sàng chưa?</div>
+        <div class="confirm-actions">
+            <button class="btn btn-outline" onclick="cancelStart()">Chưa, từ từ đã</button>
+            <button class="btn btn-primary" onclick="confirmStart()">Chiến luôn!</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-submit-confirm" class="modal" style="display: none; z-index: 2000;">
+    <div class="confirm-box">
+        <div class="confirm-title">Nộp bài ngay? ✨</div>
+        <div class="confirm-desc">Bạn có chắc chắn muốn nộp bài? Kết quả của bạn sẽ được lưu lên hệ thống.</div>
+        <div class="confirm-actions">
+            <button class="btn btn-outline" onclick="cancelSubmit()">Kiểm tra lại</button>
+            <button class="btn btn-success" onclick="confirmSubmit()">Nộp luôn!</button>
+        </div>
+    </div>
+</div>
+
 <div id="modal-detail" class="modal">
     <div class="modal-content">
         <div class="close-modal" onclick="closeModal()">×</div>
-        <h2 id="modal-title" style="margin-bottom: 30px; color: var(--primary);">Phân tích chi tiết</h2>
+        <h2 id="modal-title" style="margin-bottom: 30px; color: var(--primary-hover);">Phân tích chi tiết</h2>
         
-        <div id="modal-audio-container" style="margin-bottom: 30px;">
-            <audio id="modal-audio" controls></audio>
+        <div id="modal-audio-container" style="margin-bottom: 30px; text-align: center;">
+            <audio id="modal-audio" controls style="width: 80%;"></audio>
         </div>
 
         <div id="modal-script-combined">
@@ -460,7 +578,7 @@
 
         <div class="vocab-section" id="modal-vocab-section">
             <h4>📚 Từ vựng quan trọng</h4>
-            <div id="modal-vocab" style="white-space: pre-line;"></div>
+            <div id="modal-vocab" style="white-space: pre-line; line-height: 1.8;"></div>
         </div>
 
         <div id="modal-explains">
@@ -469,6 +587,43 @@
 </div>
 
 <script>
+    // Hàm đồng bộ Firebase
+    function calculateToeicScore(skill, correct, total) {
+        let percentage = correct / total;
+        let estimated = Math.round(percentage * 495);
+        if (estimated < 5 && (skill === 'Listening' || skill === 'Reading')) return 5;
+        if (estimated < 0) return 0;
+        return estimated;
+    }
+
+    window.luuDiemTOEICLenFirebase = async function(tongSoCau, soCauDung, tenBai, kyNang, tenPart) {
+        if (!window.currentUserUid) return; 
+        let diemQuyDoi = calculateToeicScore(kyNang, soCauDung, tongSoCau);
+        let thoiGianHienTai = document.getElementById("timer") ? document.getElementById("timer").innerText : "--:--"; 
+        
+        let timestamp = Date.now();
+        let docId = window.currentUserUid + "_toeic_" + timestamp;
+        
+        try {
+            await window.setDoc(window.doc(window.db, "user_toeic_scores", docId), {
+                email: window.currentUserEmail || "unknown",
+                skill: kyNang,           
+                testName: tenBai,        
+                partName: tenPart,       
+                timeTaken: thoiGianHienTai,
+                totalQ: tongSoCau,
+                correctQ: soCauDung,
+                score: diemQuyDoi,       
+                date: new Date().toLocaleDateString('vi-VN'),
+                timestamp: timestamp
+            });
+            console.log("Thành công: Đã đồng bộ điểm TOEIC lên Firebase SnapEnglish!");
+        } catch (e) {
+            console.error("Lỗi khi lưu điểm lên Firebase: ", e);
+        }
+    }
+
+    // Data Test 3
     const questions = [
         {
             id: 1,
@@ -564,23 +719,37 @@
 
     let currentIdx = 0;
     let userAnswers = new Array(questions.length).fill(null);
-    let mode = 'practice';
+    let pendingMode = 'practice';
+    let isMockMode = false;
+    let autoNextTimeout;
 
-    function startTest(selectedMode) {
-        mode = selectedMode;
+    function promptStart(selectedMode) {
+        pendingMode = selectedMode;
+        document.getElementById('modal-start-confirm').style.display = 'flex';
+    }
+
+    function cancelStart() {
+        document.getElementById('modal-start-confirm').style.display = 'none';
+    }
+
+    function confirmStart() {
+        document.getElementById('modal-start-confirm').style.display = 'none';
+        isMockMode = (pendingMode === 'mock');
+        
         document.getElementById('screen-welcome').classList.remove('active');
         document.getElementById('screen-test').classList.add('active');
         document.getElementById('test-progress').style.display = 'block';
+        
         loadQuestion();
     }
 
     function loadQuestion() {
         const q = questions[currentIdx];
         document.getElementById('q-image').src = q.img;
-        document.getElementById('q-audio').src = q.audio;
+        const audioEl = document.getElementById('q-audio');
+        audioEl.src = q.audio;
         document.getElementById('test-progress').innerText = `Question ${currentIdx + 1} / ${questions.length}`;
         
-        // Reset options
         document.querySelectorAll('.option-item').forEach((item, idx) => {
             item.classList.remove('selected');
             const label = ['A', 'B', 'C', 'D'][idx];
@@ -589,9 +758,40 @@
             }
         });
 
-        // Navigation visibility
-        document.getElementById('btn-prev').style.visibility = currentIdx === 0 ? 'hidden' : 'visible';
-        document.getElementById('btn-next').innerText = currentIdx === questions.length - 1 ? 'Nộp bài' : 'Câu tiếp theo';
+        clearTimeout(autoNextTimeout);
+
+        // MOCK MODE LOGIC
+        if (isMockMode) {
+            document.getElementById('normal-audio-view').style.display = 'none';
+            document.getElementById('nav-buttons').style.display = 'none';
+            document.getElementById('mock-status-view').style.display = 'block';
+            
+            let playPromise = audioEl.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => console.log("Trình duyệt chặn Autoplay. Cần tương tác người dùng."));
+            }
+
+            audioEl.onended = () => {
+                autoNextTimeout = setTimeout(() => {
+                    if (currentIdx < questions.length - 1) {
+                        currentIdx++;
+                        loadQuestion();
+                    } else {
+                        promptSubmit();
+                    }
+                }, 3000); 
+            };
+        } 
+        // PRACTICE MODE LOGIC
+        else {
+            document.getElementById('normal-audio-view').style.display = 'block';
+            document.getElementById('nav-buttons').style.display = 'flex';
+            document.getElementById('mock-status-view').style.display = 'none';
+            
+            document.getElementById('btn-prev').style.visibility = currentIdx === 0 ? 'hidden' : 'visible';
+            document.getElementById('btn-next').innerText = currentIdx === questions.length - 1 ? 'Nộp bài ✨' : 'Câu tiếp theo ➜';
+            audioEl.onended = null; 
+        }
         
         window.scrollTo(0, 0);
     }
@@ -609,7 +809,7 @@
             currentIdx++;
             loadQuestion();
         } else {
-            showResult();
+            promptSubmit();
         }
     }
 
@@ -620,7 +820,23 @@
         }
     }
 
+    function promptSubmit() {
+        document.getElementById('modal-submit-confirm').style.display = 'flex';
+    }
+
+    function cancelSubmit() {
+        document.getElementById('modal-submit-confirm').style.display = 'none';
+    }
+
+    function confirmSubmit() {
+        document.getElementById('modal-submit-confirm').style.display = 'none';
+        showResult();
+    }
+
     function showResult() {
+        document.getElementById('q-audio').pause();
+        clearTimeout(autoNextTimeout);
+
         document.getElementById('screen-test').classList.remove('active');
         document.getElementById('screen-result').classList.add('active');
         document.getElementById('test-progress').style.display = 'none';
@@ -638,20 +854,22 @@
             item.onclick = () => openDetail(idx);
             item.innerHTML = `
                 <div>
-                    <strong style="color: var(--primary);">Câu ${q.id}</strong>
-                    <div style="font-size: 14px; color: var(--text-muted);">Bạn chọn: ${userAnswers[idx] || 'Trống'} - Đáp án: ${q.answer}</div>
+                    <strong style="color: var(--primary-hover); font-size: 18px;">Câu ${q.id}</strong>
+                    <div style="font-size: 15px; color: var(--text-muted); margin-top: 5px;">Bạn chọn: <b style="color:var(--text-main)">${userAnswers[idx] || 'Trống'}</b> &nbsp;|&nbsp; Đáp án đúng: <b style="color:var(--success)">${q.answer}</b></div>
                 </div>
                 <span class="status-badge ${isCorrect ? 'status-correct' : 'status-wrong'}">
-                    ${isCorrect ? 'Đúng' : 'Sai'}
+                    ${isCorrect ? 'Đúng ✔' : 'Sai ✘'}
                 </span>
             `;
             listUI.appendChild(item);
         });
 
         document.getElementById('final-score').innerText = `${correctCount}/${questions.length}`;
-    if(window.luuDiemTOEICLenFirebase) {
-    window.luuDiemTOEICLenFirebase(questions.length, correctCount, "ETS 2018 - Test 3", "Listening", "Part 1");
-}
+
+        // ĐỒNG BỘ ĐIỂM SỐ LÊN FIREBASE
+        if (typeof window.luuDiemTOEICLenFirebase === "function") {
+            window.luuDiemTOEICLenFirebase(questions.length, correctCount, "Test 3 - 2018", "Listening", "Part 1");
+        }
     }
 
     function openDetail(idx) {
@@ -673,7 +891,7 @@
         document.getElementById('modal-vocab').innerText = q.vocab;
 
         const explainDiv = document.getElementById('modal-explains');
-        explainDiv.innerHTML = '<h4>🕵️ Giải thích chi tiết:</h4>';
+        explainDiv.innerHTML = '<h4 style="color: var(--primary-hover); margin-bottom: 15px; font-size: 18px;">🕵️ Giải thích đáp án chi tiết:</h4>';
         q.explains.forEach(ex => {
             const div = document.createElement('div');
             div.className = `explain-item ${ex.type === 'correct' ? 'explain-correct' : 'explain-wrong'}`;
@@ -689,85 +907,6 @@
         document.getElementById('modal-audio').pause();
     }
 </script>
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
-        authDomain: "snapenglish-cb6e2.firebaseapp.com",
-        projectId: "snapenglish-cb6e2",
-        storageBucket: "snapenglish-cb6e2.firebasestorage.app",
-        messagingSenderId: "373152038413",
-        appId: "1:373152038413:web:19284622571390f8585f44"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // Giao diện Toast nhanh (không cần CSS)
-    function showInGameToast(msg) {
-        let toast = document.createElement("div");
-        toast.innerText = msg;
-        toast.style.cssText = "position:fixed; bottom:20px; right:20px; background:#4ECDC4; color:white; padding:15px 20px; border-radius:12px; font-weight:bold; font-family:'Quicksand',sans-serif; z-index:99999; box-shadow:0 10px 30px rgba(0,0,0,0.2); transform:translateY(100px); opacity:0; transition:all 0.4s ease;";
-        document.body.appendChild(toast);
-        
-        setTimeout(() => { toast.style.transform = "translateY(0)"; toast.style.opacity = "1"; }, 100);
-        setTimeout(() => { toast.style.transform = "translateY(100px)"; toast.style.opacity = "0"; }, 3500);
-        setTimeout(() => { toast.remove(); }, 4000);
-    }
-
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            window.currentUserUid = user.uid;
-            window.currentUserEmail = user.email;
-        } else {
-            showInGameToast("⚠️ Bạn đang chơi dưới dạng Khách, điểm sẽ không lưu lên kho!");
-        }
-    });
-
-    // Hàm tính điểm theo chuẩn TOEIC
-    function calculateToeicScore(skill, correct, total) {
-        let percentage = correct / total;
-        let maxScore = (skill === 'Listening' || skill === 'Reading') ? 495 : 200;
-        let step = (skill === 'Listening' || skill === 'Reading') ? 5 : 10;
-        let estimated = Math.round((percentage * maxScore) / step) * step;
-        if (estimated > maxScore) return maxScore;
-        if (estimated < 5 && (skill === 'Listening' || skill === 'Reading')) return 5;
-        if (estimated < 0) return 0;
-        return estimated;
-    }
-
-    // Gắn hàm này vào lúc nộp bài (Ví dụ trong hàm finishTest() hoặc submitQuiz())
-    window.luuDiemTOEICLenFirebase = async function(tongSoCau, soCauDung, tenBai, kyNang, tenPart) {
-        if (!window.currentUserUid) return; 
-        // Tính điểm quy đổi
-        let diemQuyDoi = calculateToeicScore(kyNang, soCauDung, tongSoCau);
-        let thoiGianHienTai = document.getElementById("timer") ? document.getElementById("timer").innerText : "--"; 
-
-        let timestamp = Date.now();
-        let docId = window.currentUserUid + "_toeic_" + timestamp;
-        
-        try {
-            await setDoc(doc(db, "user_toeic_scores", docId), {
-                email: window.currentUserEmail,
-                skill: kyNang,           // VD: "Reading" hoặc "Listening"
-                testName: tenBai,        // VD: "Test 1 - 2018"
-                partName: tenPart,       // VD: "Part 5"
-                timeTaken: thoiGianHienTai,
-                totalQ: tongSoCau,
-                correctQ: soCauDung,
-                score: diemQuyDoi,       // Lưu thẳng điểm đã nhân hệ số (VD: 150 điểm)
-                date: new Date().toLocaleDateString('vi-VN'),
-                timestamp: timestamp
-            });
-            showInGameToast("☁️ Đã đồng bộ điểm số lên Máy Chủ!");
-        } catch (error) {
-            console.error(error);
-        }
-    }
-</script>
 </body>
 </html>
