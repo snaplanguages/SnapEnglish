@@ -461,29 +461,90 @@
         if (modalOverlay.style.display !== "flex") inputField.focus();
     }
 
-    function normalizeText(text) { return text.toLowerCase().replace(/[.,?!–\-:;"]/g, '').trim(); }
+// 1. Hàm xóa dấu câu và ĐỒNG BỘ DẤU NHÁY từ mọi thiết bị
+    function normalizeText(text) { 
+        // Gom tất cả nháy cong, nháy ngược về nháy thẳng (')
+        let standardText = text.replace(/[’‘`´]/g, "'"); 
+        return standardText.toLowerCase().replace(/[.,?!–\-:"]/g, '').trim(); 
+    }
 
+    // 2. Hàm hỗ trợ quy đổi từ viết tắt sang dạng đầy đủ
+    function expandContractions(text) {
+        // Đồng bộ dấu nháy trước khi tra từ điển
+        let lower = text.toLowerCase().replace(/[’‘`´]/g, "'");
+        const dict = {
+            "they're": "they are", "we're": "we are", "you're": "you are",
+            "he's": "he is", "she's": "she is", "it's": "it is", "that's": "that is", "there's": "there is", "who's": "who is", "what's": "what is",
+            "i'm": "i am",
+            "they'd": "they would", "we'd": "we would", "you'd": "you would", "he'd": "he would", "she'd": "she would", "i'd": "i would",
+            "they've": "they have", "we've": "we have", "you've": "you have", "i've": "i have",
+            "they'll": "they will", "we'll": "we will", "you'll": "you will", "he'll": "he will", "she'll": "she will", "it'll": "it will", "i'll": "i will",
+            "don't": "do not", "doesn't": "does not", "didn't": "did not",
+            "isn't": "is not", "aren't": "are not", "wasn't": "was not", "weren't": "were not",
+            "haven't": "have not", "hasn't": "has not", "hadn't": "had not",
+            "can't": "can not", "cannot": "can not", "won't": "will not", "wouldn't": "would not",
+            "shouldn't": "should not", "couldn't": "could not", "mustn't": "must not"
+        };
+        
+        lower = lower.replace(/[.,?!–\-:"]/g, '');
+        return lower.split(/\s+/).map(w => dict[w] || w).join(' ').trim();
+    }
+    // 3. Hàm chuẩn hóa chính tả Anh-Anh sang Anh-Mỹ để bao dung lỗi
+    function normalizeSpelling(text) {
+        return text
+            // Xử lý đuôi s/z (VD: realise -> realize, organise -> organize, organisation -> organization)
+            .replace(/ise\b/g, 'ize')
+            .replace(/ised\b/g, 'ized')
+            .replace(/ising\b/g, 'izing')
+            .replace(/ises\b/g, 'izes')
+            .replace(/isation/g, 'ization')
+            // Xử lý our/or (VD: colour -> color, favour -> favor)
+            .replace(/our\b/g, 'or')
+            .replace(/ours\b/g, 'ors')
+            // Xử lý tre/ter (VD: centre -> center)
+            .replace(/tre\b/g, 'ter')
+            .replace(/tres\b/g, 'ters')
+            // Xử lý phụ âm kép l/ll (VD: travelling -> traveling)
+            .replace(/lling\b/g, 'ling')
+            .replace(/lled\b/g, 'led');
+    }
     function checkAnswer() {
         const rawUserInput = inputField.value;
-        const userInput = normalizeText(rawUserInput);
-        const targetText = normalizeText(lessonData[currentIndex].en);
+        const rawTargetText = lessonData[window.currentIndex].en;
         
-        if (userInput === targetText) {
+        // Mở rộng viết tắt, xóa nháy phẩy, VÀ đồng bộ chính tả s/z, our/or
+        const userInputExpanded = normalizeSpelling(expandContractions(rawUserInput).replace(/'/g, ''));
+        const targetTextExpanded = normalizeSpelling(expandContractions(rawTargetText).replace(/'/g, ''));
+        
+        // KIỂM TRA 1: Nếu đáp án đúng hoàn toàn (Full câu)
+        if (userInputExpanded === targetTextExpanded) {
             msgBox.innerText = "";
             showModal();
-        } else {
-            const userWordsNorm = userInput.split(' ').filter(w => w !== "");
-            const targetWordsNorm = targetText.split(' ');
-            
-            // Tách từ thô để highlight chính xác vị trí đang nhập
-            const rawWords = rawUserInput.trim().split(/\s+/);
+            return;
+        }
 
-            if (userWordsNorm.length === 0) {
-                msgBox.innerText = "Bạn chưa gõ gì cả. Nhấn Ctrl để nghe nhé!";
-                return;
-            }
+        // KIỂM TRA 2 (NÂNG CẤP): Đang gõ dở nhưng vẫn đúng hướng
+        // (Bao dung cả trường hợp đang gõ They are thay vì They're)
+        if (targetTextExpanded.startsWith(userInputExpanded) && userInputExpanded.length > 0) {
+            msgBox.innerText = "Chưa hết câu, hãy nghe thêm và gõ tiếp nhé!";
+            return; 
+        }
 
-            let wrongIndex = -1;
+        // KIỂM TRA 3: NẾU SAI THẬT SỰ: Chạy logic cũ để tìm và bôi đỏ từ sai
+        const userInput = normalizeText(rawUserInput);
+        const targetText = normalizeText(rawTargetText);
+        
+        const userWordsNorm = userInput.split(' ').filter(w => w !== "");
+        const targetWordsNorm = targetText.split(' ');
+        
+        const rawWords = rawUserInput.trim().split(/\s+/);
+
+        if (userWordsNorm.length === 0) {
+            msgBox.innerText = "Bạn chưa gõ gì cả. Nhấn Ctrl để nghe nhé!";
+            return;
+        }
+
+        let wrongIndex = -1;
             for (let i = 0; i < userWordsNorm.length; i++) {
                 if (userWordsNorm[i] !== targetWordsNorm[i]) {
                     wrongIndex = i;
@@ -492,7 +553,7 @@
             }
 
             if (wrongIndex !== -1) {
-                // Tính vị trí cần select (bôi đen) để hỗ trợ gõ lại nhanh
+                // Tính vị trí cần select (bôi đen)
                 let startPos = 0;
                 for (let k = 0; k < wrongIndex; k++) {
                     startPos += rawWords[k].length + 1; // +1 là dấu khoảng trắng
@@ -506,7 +567,7 @@
                 inputField.focus();
                 inputField.setSelectionRange(startPos, endPos);
 
-                // Hiển thị đoạn text nhấp nháy đỏ dưới thông báo
+                // Hiển thị đoạn text nhấp nháy đỏ
                 let displayHTML = rawWords.map((w, idx) => {
                     if (idx === wrongIndex) {
                         return `<span class="glow-error">${w}</span>`;
@@ -523,7 +584,7 @@
             } else {
                 msgBox.innerText = "Có lỗi sai chính tả nhỏ, hãy kiểm tra lại.";
             }
-        }
+        
     }
 
     function giveHint() {
