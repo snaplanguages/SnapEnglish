@@ -560,7 +560,7 @@
         if (modalOverlay.style.display !== "flex") inputField.focus();
     }
 
-    // 1. Hàm xóa dấu câu và ĐỒNG BỘ DẤU NHÁY từ mọi thiết bị
+   // 1. Hàm xóa dấu câu và ĐỒNG BỘ DẤU NHÁY từ mọi thiết bị
     function normalizeText(text) { 
         // Gom tất cả nháy cong, nháy ngược về nháy thẳng (')
         let standardText = text.replace(/[’‘`´]/g, "'"); 
@@ -588,13 +588,32 @@
         lower = lower.replace(/[.,?!–\-:"]/g, '');
         return lower.split(/\s+/).map(w => dict[w] || w).join(' ').trim();
     }
-   function checkAnswer() {
+    // 3. Hàm chuẩn hóa chính tả Anh-Anh sang Anh-Mỹ để bao dung lỗi
+    function normalizeSpelling(text) {
+        return text
+            // Xử lý đuôi s/z (VD: realise -> realize, organise -> organize, organisation -> organization)
+            .replace(/ise\b/g, 'ize')
+            .replace(/ised\b/g, 'ized')
+            .replace(/ising\b/g, 'izing')
+            .replace(/ises\b/g, 'izes')
+            .replace(/isation/g, 'ization')
+            // Xử lý our/or (VD: colour -> color, favour -> favor)
+            .replace(/our\b/g, 'or')
+            .replace(/ours\b/g, 'ors')
+            // Xử lý tre/ter (VD: centre -> center)
+            .replace(/tre\b/g, 'ter')
+            .replace(/tres\b/g, 'ters')
+            // Xử lý phụ âm kép l/ll (VD: travelling -> traveling)
+            .replace(/lling\b/g, 'ling')
+            .replace(/lled\b/g, 'led');
+    }
+    function checkAnswer() {
         const rawUserInput = inputField.value;
         const rawTargetText = lessonData[window.currentIndex].en;
         
-        // Mở rộng toàn bộ viết tắt và xóa nốt dấu phẩy trên (') để so sánh nghĩa tuyệt đối
-        const userInputExpanded = expandContractions(rawUserInput).replace(/'/g, '');
-        const targetTextExpanded = expandContractions(rawTargetText).replace(/'/g, '');
+        // Mở rộng viết tắt, xóa nháy phẩy, VÀ đồng bộ chính tả s/z, our/or
+        const userInputExpanded = normalizeSpelling(expandContractions(rawUserInput).replace(/'/g, ''));
+        const targetTextExpanded = normalizeSpelling(expandContractions(rawTargetText).replace(/'/g, ''));
         
         // KIỂM TRA 1: Nếu đáp án đúng hoàn toàn (Full câu)
         if (userInputExpanded === targetTextExpanded) {
@@ -633,22 +652,21 @@
             }
 
             if (wrongIndex !== -1) {
-                // Tính toán vị trí Select (bôi đen) bên trong Textarea để dễ gõ lại
+                // Tính vị trí cần select (bôi đen)
                 let startPos = 0;
                 for (let k = 0; k < wrongIndex; k++) {
-                    startPos += rawWords[k].length + 1; // +1 là dấu cách
+                    startPos += rawWords[k].length + 1; // +1 là dấu khoảng trắng
                 }
                 
-                // Tính luôn các khoảng trắng thừa ở đầu nếu có
                 const leadingSpaces = inputField.value.length - inputField.value.trimStart().length;
                 startPos += leadingSpaces;
                 let endPos = startPos + rawWords[wrongIndex].length;
 
-                // Tự động focus và bôi đen vùng sai
+                // Tự động bôi đen chữ sai
                 inputField.focus();
                 inputField.setSelectionRange(startPos, endPos);
 
-                // Hiển thị đoạn text với hiệu ứng Phát sáng tại đúng vị trí sai bên dưới
+                // Hiển thị đoạn text nhấp nháy đỏ
                 let displayHTML = rawWords.map((w, idx) => {
                     if (idx === wrongIndex) {
                         return `<span class="glow-error">${w}</span>`;
@@ -664,8 +682,8 @@
                 inputField.setSelectionRange(inputField.value.length, inputField.value.length);
             } else {
                 msgBox.innerText = "Có lỗi sai chính tả nhỏ, hãy kiểm tra lại.";
-            
-        }
+            }
+        
     }
 
     function giveHint() {
@@ -673,9 +691,9 @@
 
         const rawUserInput = inputField.value;
         const userInput = normalizeText(rawUserInput);
-        const targetText = normalizeText(lessonData[window.currentIndex].en);
+        const targetText = normalizeText(lessonData[currentIndex].en);
         
-        const targetWordsRaw = lessonData[window.currentIndex].en.split(' ');
+        const targetWordsRaw = lessonData[currentIndex].en.split(' ');
         const targetWordsNorm = targetText.split(' ');
         const userWords = userInput.split(' ').filter(w => w !== "");
 
