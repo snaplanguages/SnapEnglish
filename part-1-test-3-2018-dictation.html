@@ -467,7 +467,7 @@
         }
     ];
 
-    window.currentIndex = 0;
+   window.currentIndex = 0;
     let currentPlayCount = 0;
     let playTimeout;
     const synth = window.speechSynthesis;
@@ -487,7 +487,7 @@
     if (speechSynthesis.onvoiceschanged !== undefined) {
         speechSynthesis.onvoiceschanged = loadVoices;
     }
- 
+
     window.onload = () => {
         loadVoices();
         let count = localStorage.getItem('part1_test3_count') || 0;
@@ -503,6 +503,18 @@
     };
 
     function updateUI() {
+        if (window.currentIndex >= lessonData.length) {
+            document.getElementById("progress-percent").innerText = "100";
+            document.getElementById("progress-ring").style.background = `conic-gradient(var(--primary) 100%, #eee 0)`;
+            msgBox.innerHTML = "<span style='color: var(--primary); font-size: 18px; font-weight: 700;'>🎉 100% Hoàn thành! Nhấn 'Enter' hoặc 'Next ➡️' để xem lại toàn bộ.</span>";
+            inputField.value = "";
+            inputField.disabled = true; // Khóa bàn phím
+            document.getElementById('current-sentence-num').innerText = lessonData.length;
+            return;
+        }
+
+        // Trạng thái học bình thường
+        inputField.disabled = false;
         updateProgress();
         document.getElementById('current-sentence-num').innerText = window.currentIndex + 1;
         
@@ -527,6 +539,8 @@
     function handleEnterAction() {
         if (modalOverlay.style.display === "flex") {
             nextSentence();
+        } else if (window.currentIndex >= lessonData.length) {
+            finishLesson(); // Chuyển sang màn hình kết quả nếu đã 100%
         } else {
             checkAnswer();
         }
@@ -540,6 +554,7 @@
 
     function triggerAudioLoop() {
         if (synth.speaking) synth.cancel();
+        if (window.currentIndex >= lessonData.length) return; // Chặn lỗi nếu đang ở mốc 100%
         
         const data = lessonData[window.currentIndex];
         const utterThis = new SpeechSynthesisUtterance(data.en);
@@ -559,8 +574,10 @@
         synth.speak(utterThis);
         if (modalOverlay.style.display !== "flex") inputField.focus();
     }
+        
+       
 
-   // 1. Hàm xóa dấu câu và ĐỒNG BỘ DẤU NHÁY từ mọi thiết bị
+  // 1. Hàm xóa dấu câu và ĐỒNG BỘ DẤU NHÁY từ mọi thiết bị
     function normalizeText(text) { 
         // Gom tất cả nháy cong, nháy ngược về nháy thẳng (')
         let standardText = text.replace(/[’‘`´]/g, "'"); 
@@ -750,11 +767,15 @@
     }
 
     function nextSentenceManual() {
-        if (window.currentIndex < lessonData.length - 1) {
+        if (window.currentIndex < lessonData.length) {
             window.currentIndex++;
-            resetForNewSentence();
+            if (window.currentIndex === lessonData.length) {
+                updateUI(); // Dừng lại ở mốc 100%
+            } else {
+                resetForNewSentence();
+            }
         } else {
-            finishLesson();
+            finishLesson(); // Đã 100% mà bấm Next nữa thì show bảng kết quả
         }
     }
     
@@ -763,9 +784,8 @@
     inputField.value = "";
     msgBox.innerHTML = "";
     
-    // Lưu Local dự phòng
+ 
     localStorage.setItem('part1_test3_progress', window.currentIndex); 
-    // LƯU LÊN CLOUD
     if(window.saveProgressToCloud) window.saveProgressToCloud(window.currentIndex); 
     
     updateUI();
@@ -773,23 +793,25 @@
 }
 
     function nextSentence() {
-    modalOverlay.style.display = "none";
-    window.currentIndex++;
-    inputField.value = "";
-    msgBox.innerHTML = "";
-    
-    if (window.currentIndex < lessonData.length) {
-        // Lưu Local dự phòng
-        localStorage.setItem('part1_test3_progress', window.currentIndex);
-        // LƯU LÊN CLOUD
-        if(window.saveProgressToCloud) window.saveProgressToCloud(window.currentIndex);
-
-        updateUI();
-        playAudio();
-    } else {
-        finishLesson();
+        modalOverlay.style.display = "none";
+        window.currentIndex++;
+        inputField.value = "";
+        msgBox.innerHTML = "";
+        
+        if (window.currentIndex === lessonData.length) {
+            // Lưu Local và Cloud cho câu cuối cùng
+            localStorage.setItem('part1_test3_progress', window.currentIndex);
+            if(window.saveProgressToCloud) window.saveProgressToCloud(window.currentIndex);
+            updateUI(); // Dừng lại show 100%
+        } else if (window.currentIndex < lessonData.length) {
+            localStorage.setItem('part1_test3_progress', window.currentIndex);
+            if(window.saveProgressToCloud) window.saveProgressToCloud(window.currentIndex);
+            updateUI();
+            playAudio();
+        } else {
+            finishLesson();
+        }
     }
-}
 
     function updateProgress() {
         const percent = Math.round((window.currentIndex / lessonData.length) * 100);
@@ -797,34 +819,49 @@
         document.getElementById("progress-ring").style.background = `conic-gradient(var(--primary) ${percent}%, #eee 0)`;
     }
 
-    function finishLesson() {
+   function finishLesson() {
         document.getElementById("learning-screen").style.display = "none";
         document.getElementById("end-screen").style.display = "block";
         
+        // CỘNG VÀ LƯU SỐ LẦN ĐÃ HỌC (Tiến trình lần 1, 2...)
         let count = parseInt(localStorage.getItem('part1_test3_count')) || 0;
         count++;
         localStorage.setItem('part1_test3_count', count);
         document.getElementById('study-count').innerText = count;
 
+        // Reset lại tiến trình câu hỏi về 0 để chuẩn bị cho lần học sau
         localStorage.removeItem('part1_test3_progress');
+        if(window.saveProgressToCloud) window.saveProgressToCloud(0); 
 
         const transcriptBox = document.getElementById("full-transcript");
         let lastImage = "";
         let htmlContent = "";
 
         lessonData.forEach((d, idx) => {
-            
-if(d.image !== lastImage) {
-    htmlContent += `<div style="text-align:center; margin: 20px 0 10px;"><img src="${d.image}" style="max-height: 150px; max-width: 100%; height: auto; object-fit: contain; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.1);"></div>`;
-    lastImage = d.image;
-}
+            if(d.image !== lastImage) {
+                htmlContent += `<div style="text-align:center; margin: 20px 0 10px;"><img src="${d.image}" style="max-height: 150px; max-width: 100%; height: auto; object-fit: contain; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.1);"></div>`;
+                lastImage = d.image;
+            }
+            // Thêm nút 🔊 để phát Audio riêng rẽ cho từng câu
             htmlContent += `<p style="margin-bottom:12px; padding-left: 10px;">
-                <strong>${(idx % 4) + 1}.</strong> <span style="color:var(--primary); font-weight:600;">${d.en}</span><br>
+                <strong>${(idx % 4) + 1}.</strong> <span style="color:var(--primary); font-weight:600;">${d.en}</span> 
+                <button onclick="playEndScreenAudio(\`${d.en.replace(/`/g, "'")}\`)" style="background:none; border:none; cursor:pointer; font-size:18px; margin-left: 5px; transition: 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" title="Nghe lại câu này">🔊</button><br>
                 <span style="color:var(--text-light); font-size: 14px; padding-left: 18px;">${d.vi}</span>
             </p>`;
         });
         transcriptBox.innerHTML = htmlContent;
     }
+
+    // Hàm bổ trợ giúp đọc Audio ở màn hình End Screen
+    window.playEndScreenAudio = function(text) {
+        if (synth.speaking) synth.cancel();
+        const utterThis = new SpeechSynthesisUtterance(text);
+        utterThis.lang = 'en-US';
+        // Có thể áp dụng tốc độ đọc mà người dùng đã chọn trước đó
+        utterThis.rate = parseFloat(document.getElementById('speed-setting').value) || 1.0; 
+        if (mainVoice) utterThis.voice = mainVoice;
+        synth.speak(utterThis);
+    };
 
     function restartLesson() {
         localStorage.setItem('part1_test3_progress', 0);
@@ -834,7 +871,6 @@ if(d.image !== lastImage) {
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    // IMPORT THÊM FIRESTORE
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -850,7 +886,6 @@ if(d.image !== lastImage) {
     const auth = getAuth(app);
     const db = getFirestore(app); // KHỞI TẠO FIRESTORE
 
-    // Khai báo hàm để lưu tiến độ lên Cloud có thể gọi từ bên ngoài module
     window.saveProgressToCloud = async (progressIndex) => {
         if (window.currentUserUid) {
             try {
@@ -869,7 +904,6 @@ if(d.image !== lastImage) {
             window.currentUserEmail = user.email;
             console.log("Đã đồng bộ ngầm tài khoản:", user.email);
 
-            // KHI ĐĂNG NHẬP, KÉO DỮ LIỆU TỪ CLOUD VỀ
             try {
                 const docRef = doc(db, "userProgress", user.uid);
                 const docSnap = await getDoc(docRef);
