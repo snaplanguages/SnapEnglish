@@ -562,28 +562,60 @@
 
     // Xóa dấu câu để hỗ trợ kiểm tra mượt mà hơn
     function normalizeText(text) { return text.toLowerCase().replace(/[.,?!–\-:"]/g, '').trim(); }
+// Hàm hỗ trợ quy đổi từ viết tắt sang dạng đầy đủ
+    function expandContractions(text) {
+        let lower = text.toLowerCase();
+        const dict = {
+            "they're": "they are", "we're": "we are", "you're": "you are",
+            "he's": "he is", "she's": "she is", "it's": "it is", "that's": "that is", "there's": "there is", "who's": "who is", "what's": "what is",
+            "i'm": "i am",
+            "they'd": "they would", "we'd": "we would", "you'd": "you would", "he'd": "he would", "she'd": "she would", "i'd": "i would",
+            "they've": "they have", "we've": "we have", "you've": "you have", "i've": "i have",
+            "they'll": "they will", "we'll": "we will", "you'll": "you will", "he'll": "he will", "she'll": "she will", "it'll": "it will", "i'll": "i will",
+            "don't": "do not", "doesn't": "does not", "didn't": "did not",
+            "isn't": "is not", "aren't": "are not", "wasn't": "was not", "weren't": "were not",
+            "haven't": "have not", "hasn't": "has not", "hadn't": "had not",
+            "can't": "can not", "cannot": "can not", "won't": "will not", "wouldn't": "would not",
+            "shouldn't": "should not", "couldn't": "could not", "mustn't": "must not"
+        };
+        
+        // Bỏ các dấu câu trừ dấu nháy đơn (') để giữ nguyên cấu trúc từ viết tắt
+        lower = lower.replace(/[.,?!–\-:"]/g, '');
 
+        // Tách từ, quét qua từ điển và ghép lại
+        return lower.split(/\s+/).map(w => dict[w] || w).join(' ').trim();
+    }
     function checkAnswer() {
         const rawUserInput = inputField.value;
-        const userInput = normalizeText(rawUserInput);
-        const targetText = normalizeText(lessonData[window.currentIndex].en);
+        const rawTargetText = lessonData[window.currentIndex].en;
         
-        if (userInput === targetText) {
+        // 1. TÍNH NĂNG MỚI: Kiểm tra bao dung (chấp nhận cả viết tắt và viết đầy đủ)
+        // Mở rộng toàn bộ viết tắt và xóa nốt dấu phẩy trên (') để so sánh nghĩa tuyệt đối
+        const userInputExpanded = expandContractions(rawUserInput).replace(/'/g, '');
+        const targetTextExpanded = expandContractions(rawTargetText).replace(/'/g, '');
+        
+        if (userInputExpanded === targetTextExpanded) {
             msgBox.innerText = "";
             showModal();
-        } else {
-            const userWordsNorm = userInput.split(' ').filter(w => w !== "");
-            const targetWordsNorm = targetText.split(' ');
-            
-            // Lấy từ thô (raw) để highlight chính xác vị trí trong khung nhập
-            const rawWords = rawUserInput.trim().split(/\s+/);
+            return; // Đáp án đúng! Kết thúc hàm sớm.
+        }
 
-            if (userWordsNorm.length === 0) {
-                msgBox.innerText = "Bạn chưa gõ gì cả. Nhấn Ctrl để nghe nhé!";
-                return;
-            }
+        // 2. NẾU SAI: Vẫn chạy logic cũ bên dưới để tìm và bôi đỏ chính xác từ bị gõ sai
+        const userInput = normalizeText(rawUserInput);
+        const targetText = normalizeText(rawTargetText);
+        
+        const userWordsNorm = userInput.split(' ').filter(w => w !== "");
+        const targetWordsNorm = targetText.split(' ');
+        
+        // Lấy từ thô để highlight chính xác vị trí đang nhập
+        const rawWords = rawUserInput.trim().split(/\s+/);
 
-            let wrongIndex = -1;
+        if (userWordsNorm.length === 0) {
+            msgBox.innerText = "Bạn chưa gõ gì cả. Nhấn Ctrl để nghe nhé!";
+            return;
+        }
+
+        let wrongIndex = -1;
             for (let i = 0; i < userWordsNorm.length; i++) {
                 if (userWordsNorm[i] !== targetWordsNorm[i]) {
                     wrongIndex = i;
