@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nghe Chép: Bạn có biết họ không? | SnapChinese</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&family=Nunito:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        /* TÔNG MÀU MỚI SNAPCHINESE: Ruby Red & Cream Pastel */
+        :root {
+            --primary: #e63946;         /* Ruby Red */
+            --primary-hover: #d90429;   /* Deep Red */
+            --secondary: #ffe6e6;       /* Pastel Pink/Cream */
+            --pinyin-color: #d97706;    /* Golden Amber cho Pinyin */
+            --blue-pastel: #fff0f0;     
+            --blue-dark: #831843;       /* Dark Red/Plum */
+            --text-dark: #1E293B;       
+            --text-light: #64748B;      
+            --bg-main: #fcfcfc;         
+            --white: #FFFFFF;
+            --brand-pink: #ff4d6d;      
+            --brand-text: #4a0404;
+            --error-glow: #E11D48;      
+            
+            --badge-q-bg: #fff0f0; --badge-q-border: #ffb3c1; --badge-q-text: #e63946;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Quicksand', sans-serif; }
+
+        body {
+            background: linear-gradient(135deg, #fff0f0 0%, #ffe6e6 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .layout-wrapper {
+            display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 1200px;
+        }
+
+        .header-brand {
+            display: flex; align-items: center; gap: 12px; margin-bottom: 25px; width: 100%;
+        }
+        .brand-badge {
+            background: linear-gradient(45deg, var(--primary), #ff8a00);
+            color: var(--white); font-weight: 800; font-size: 26px; padding: 8px 20px; border-radius: 15px; letter-spacing: -0.5px; box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);
+        }
+        .brand-title {
+            color: var(--brand-text); font-weight: 800; font-size: 26px; letter-spacing: -0.5px; font-family: 'Nunito', sans-serif;
+        }
+
+        .layout-container {
+            display: flex; gap: 25px; width: 100%; height: 85vh; min-height: 600px;
+        }
+
+        /* SIDEBAR TIẾN ĐỘ */
+        .sidebar {
+            flex: 1; background: var(--white); border-radius: 20px; padding: 30px;
+            box-shadow: 0 10px 30px rgba(230, 57, 70, 0.08); display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.6);
+        }
+
+        .progress-section { text-align: center; }
+        .progress-circle {
+            width: 150px; height: 150px; border-radius: 50%;
+            background: conic-gradient(var(--primary) 0%, #eee 0);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px; position: relative; transition: background 0.5s;
+        }
+        .progress-circle::after { content: ""; position: absolute; width: 120px; height: 120px; background: var(--white); border-radius: 50%; }
+        .progress-text { position: relative; z-index: 1; font-size: 28px; font-weight: 700; color: var(--primary); }
+
+        .instructions { background: var(--blue-pastel); padding: 20px; border-radius: 15px; color: var(--blue-dark); border: 1px dashed #ffb3c1;}
+        .instructions h3 { margin-bottom: 15px; font-size: 18px; }
+        .instructions ul { list-style: none; }
+        .instructions li { margin-bottom: 12px; font-size: 14.5px; line-height: 1.5; font-weight: 600;}
+        kbd { background: var(--white); border: 1px solid #ffb3c1; border-radius: 4px; padding: 3px 8px; font-family: monospace; font-size: 13px; font-weight: bold; box-shadow: 0 2px 0 #ffb3c1; color: var(--primary);}
+
+        /* KHUNG CHÍNH (MAIN CONTENT) */
+        .main-content {
+            flex: 3; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; padding: 35px;
+            box-shadow: 0 10px 30px rgba(230, 57, 70, 0.08); display: flex; flex-direction: column; position: relative; border: 1px solid rgba(255,255,255,0.6);
+        }
+
+        .settings-bar { display: flex; justify-content: flex-end; gap: 15px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px dashed #ffe6e6; }
+        .setting-group { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text-light); }
+        select { padding: 6px 12px; border-radius: 8px; border: 1px solid #ffb3c1; outline: none; cursor: pointer; font-family: 'Quicksand', sans-serif; font-weight: 600; color: var(--primary); background: white;}
+
+        .audio-section { text-align: center; margin-bottom: 30px; display: flex; flex-direction: column; align-items: center; gap: 15px;}
+        
+        .speaker-badge { display: inline-block; padding: 8px 25px; border-radius: 20px; font-weight: bold; font-size: 16px; background: var(--badge-q-bg); color: var(--badge-q-text); border: 1px solid var(--badge-q-border);}
+
+        .btn-play { background: var(--primary); color: white; border: none; padding: 15px 35px; border-radius: 50px; font-size: 18px; cursor: pointer; transition: 0.3s; font-weight: 700; box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);}
+        .btn-play:hover { background: var(--primary-hover); transform: translateY(-2px); }
+
+        .input-section { flex-grow: 1; display: flex; flex-direction: column; }
+        
+        .message { text-align: center; margin-bottom: 10px; min-height: 45px; color: var(--primary); font-weight: 600;}
+        .glow-error {
+            color: var(--error-glow); text-shadow: 0 0 12px rgba(225, 29, 72, 0.6);
+            font-weight: 800; background: #FFF1F2; padding: 2px 6px; border-radius: 6px; border: 2px dashed var(--error-glow);
+            display: inline-block; transform: scale(1.1); font-size: 22px;
+        }
+        
+        textarea { width: 100%; height: 120px; padding: 20px; border: 2px solid #ffb3c1; border-radius: 15px; font-size: 24px; outline: none; transition: 0.3s; resize: none; color: var(--text-dark); line-height: 1.6; font-family: 'Nunito', sans-serif;}
+        textarea:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(230, 57, 70, 0.15); }
+
+        .actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+        .btn { padding: 12px 25px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; font-weight: 700; transition: 0.3s; display: flex; align-items: center; gap: 8px;}
+        .btn-enter { background: var(--primary); color: var(--white); box-shadow: 0 4px 10px rgba(230, 57, 70, 0.2);}
+        .btn-enter:hover { background: var(--primary-hover); transform: translateY(-2px);}
+        .btn-hint { background: var(--secondary); color: var(--primary-hover); border: 1px solid #ffb3c1;}
+        .btn-hint:hover { background: #ffd6d6; transform: translateY(-2px);}
+        .btn-nav { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0;}
+        .btn-nav:hover { background: #e2e8f0; }
+
+        /* MODAL POPUP (GIẢI NGHĨA KHOA HỌC) */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: white; width: 90%; max-width: 550px; padding: 35px;
+            border-radius: 20px; box-shadow: 0 15px 40px rgba(230, 57, 70, 0.15);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: left; position: relative; max-height: 90vh; overflow-y: auto;
+        }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .modal-content h3 { color: #10b981; font-size: 24px; margin-bottom: 10px; text-align: center; }
+        .modal-pinyin { font-size: 18px; color: var(--pinyin-color); text-align: center; font-weight: 700; margin-bottom: 5px;}
+        .modal-script { font-size: 24px; font-weight: 800; color: var(--text-dark); text-align: center; padding-bottom: 15px; border-bottom: 2px dashed #ffe6e6; font-family: 'Nunito', sans-serif;}
+        
+        .modal-content p { margin-top: 15px; line-height: 1.6; font-size: 16px; color: #334155;}
+        .vocab-list { list-style-type: none; padding-left: 0; margin-top: 10px;}
+        .vocab-list li { margin-bottom: 8px; background: var(--blue-pastel); padding: 10px 15px; border-radius: 10px; border-left: 4px solid var(--primary); font-size: 15px;}
+        .vocab-list li strong { color: var(--primary); font-size: 18px;}
+        
+        .btn-next-modal { width: 100%; background: var(--primary); color: white; margin-top: 20px; padding: 15px; font-size: 18px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer;}
+        .btn-next-modal:hover { background: var(--primary-hover); }
+
+        /* END SCREEN */
+        .end-screen { display: none; text-align: center; padding-top: 20px;}
+        .transcript-box { text-align: left; background: white; padding: 25px; border-radius: 15px; height: 380px; overflow-y: auto; margin: 25px 0; border: 1px solid #ffb3c1; line-height: 1.8; box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);}
+        
+        /* Floating Home Button */
+        .back-home { position: fixed; bottom: 30px; left: 30px; width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 20px; box-shadow: 0 4px 15px rgba(230, 57, 70, 0.2); z-index: 100; transition: 0.3s; border: 2px solid var(--primary);}
+        .back-home:hover { transform: rotate(-10deg) scale(1.1); }
+
+        @media (max-width: 850px) {
+            .layout-container { flex-direction: column; height: auto; }
+            .sidebar { flex: none; width: 100%; order: 2; }
+            .main-content { flex: none; width: 100%; order: 1; min-height: 500px;}
+        }
+    </style>
+</head>
+<body>
+
+<a href="hsk-index.html" class="back-home">🏮</a>
+
+<div class="layout-wrapper">
+    <div class="header-brand">
+        <div class="brand-badge">SnapChinese</div>
+        <div class="brand-title">Dictation: Bạn Có Biết Họ Không?</div>
+    </div>
+
+    <div class="layout-container" id="app">
+        <div class="sidebar">
+            <div class="progress-section">
+                <h2 style="color: var(--text-dark); margin-bottom: 25px; font-size: 22px;">Tiến độ chép chính tả</h2>
+                <div class="progress-circle" id="progress-ring"><div class="progress-text"><span id="progress-percent">0</span>%</div></div>
+                <p style="color: var(--text-light); font-weight: 600; margin-top: 15px;">Câu: <span id="current-sentence-num">1</span> / <span id="total-sentences"></span></p>
+                <p style="font-size: 14px; color: #888; margin-top: 5px;">Số lần luyện tập: <span id="study-count">0</span></p>
+            </div>
+            <div class="instructions">
+                <h3>⌨️ Hướng dẫn phím tắt</h3>
+                <ul>
+                    <li><kbd>Ctrl</kbd> Lặp lại Audio.</li>
+                    <li><kbd>Tab</kbd> Gợi ý Hán Tự tiếp theo.</li>
+                    <li><kbd>Enter</kbd> Kiểm tra đáp án.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div id="learning-screen" style="display: flex; flex-direction: column; height: 100%;">
+                <div class="settings-bar">
+                    <div class="setting-group">
+                        <label>Tốc độ đọc:</label>
+                        <select id="speed-setting">
+                            <option value="0.6">Rất chậm (0.6x)</option>
+                            <option value="0.8" selected>Chậm (0.8x)</option>
+                            <option value="1.0">Bình thường (1.0x)</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label>Lặp tự động:</label>
+                        <select id="repeat-setting">
+                            <option value="1">1 lần</option>
+                            <option value="2" selected>2 lần</option>
+                            <option value="3">3 lần</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="audio-section">
+                    <div id="sentence-label" class="speaker-badge">Câu 1</div>
+                    <button class="btn-play" onclick="playAudio()">🔊 Nghe Audio (Ctrl)</button>
+                </div>
+                
+                <div class="message" id="system-message">Lắng nghe và gõ Pinyin để ra Hán Tự nhé!</div>
+
+                <div class="input-section">
+                    <textarea id="user-input" placeholder="Ví dụ gõ 'ni' sẽ ra '你'..." autofocus></textarea>
+                    
+                    <div class="actions">
+                        <button class="btn btn-nav" onclick="prevSentenceManual()">⬅️ Back</button>
+                        <button class="btn btn-enter" onclick="handleEnterAction()">✨ Kiểm tra (Enter)</button>
+                        <button class="btn btn-hint" onclick="giveHint()">💡 Gợi ý (Tab)</button>
+                        <button class="btn btn-nav" onclick="nextSentenceManual()">Next ➡️</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="end-screen" class="end-screen">
+                <h2 style="color: var(--primary); font-size: 28px;">Tuyệt vời! Hoàn thành bài chép 🏆</h2>
+                <div class="transcript-box" id="full-transcript"></div>
+                <div class="actions">
+                    <button class="btn btn-enter" onclick="restartLesson()">🔄 Luyện tập lại</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="feedback-modal">
+    <div class="modal-content">
+        <h3>🎉 Chính xác!</h3>
+        <div class="modal-pinyin" id="trans-pinyin"></div>
+        <div class="modal-script" id="trans-zh"></div>
+        <p><strong>🇻🇳 Nghĩa:</strong> <span id="trans-vi"></span></p>
+        <p id="grammar-container"><strong>📖 Ngữ pháp:</strong> <span id="trans-grammar"></span></p>
+        <ul class="vocab-list" id="trans-vocab"></ul>
+        <button class="btn btn-next-modal" onclick="nextSentence()">Qua câu tiếp theo (Enter) ➔</button>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu trích xuất từ file Bạn có biết họ không?
+    const lessonData = [
+        {
+            zh: "你认识这两个人吗？",
+            pinyin: "Nǐ rènshi zhè liǎng gè rén ma?",
+            vi: "Bạn có quen biết hai người này không?",
+            grammar: "认识 (rènshi): Quen biết, nhận biết một người hoặc mặt chữ. Khác với 知道 (zhīdào) là biết một thông tin.",
+            vocab: ["认识 (rènshi) - Quen biết", "两 (liǎng) - Hai (dùng với lượng từ 个)"]
+        },
+        {
+            zh: "她是我的中文老师，姓王；",
+            pinyin: "Tā shì wǒ de zhōngwén lǎoshī, xìng Wáng;",
+            vi: "Cô ấy là giáo viên tiếng Trung của tôi, họ Vương;",
+            vocab: ["中文 (zhōngwén) - Tiếng Trung", "老师 (lǎoshī) - Giáo viên", "姓 (xìng) - Họ"]
+        },
+        {
+            zh: "他是我弟弟的英文老师，姓李。",
+            pinyin: "Tā shì wǒ dìdi de yīngwén lǎoshī, xìng Lǐ.",
+            vi: "Thầy ấy là giáo viên tiếng Anh của em trai tôi, họ Lý.",
+            vocab: ["英文 (yīngwén) - Tiếng Anh", "弟弟 (dìdi) - Em trai"]
+        },
+        {
+            zh: "王老师很漂亮，她今年二十八岁，喜欢旅游和跑步。",
+            pinyin: "Wáng lǎoshī hěn piàoliang, tā jīnnián èrshíbā suì, xǐhuān lǚyóu hé pǎobù.",
+            vi: "Cô Vương rất xinh đẹp, cô ấy năm nay 28 tuổi, thích đi du lịch và chạy bộ.",
+            grammar: "Mẹo nhớ từ 旅游 (Du lịch): Cả hai chữ đều có bộ 方 (Phương), thể hiện việc đi lại khắp bốn phương.",
+            vocab: ["漂亮 (piàoliang) - Xinh đẹp", "旅游 (lǚyóu) - Du lịch", "跑步 (pǎobù) - Chạy bộ"]
+        },
+        {
+            zh: "李老师很高，今年三十二岁，在大学工作。",
+            pinyin: "Lǐ lǎoshī hěn gāo, jīnnián sānshí'èr suì, zài dàxué gōngzuò.",
+            vi: "Thầy Lý rất cao, năm nay 32 tuổi, làm việc tại trường đại học.",
+            vocab: ["高 (gāo) - Cao", "大学 (dàxué) - Đại học", "工作 (gōngzuò) - Làm việc"]
+        },
+        {
+            zh: "他们两个人认识五年了，有一个女儿和一个儿子。",
+            pinyin: "Tāmen liǎng gè rén rènshi wǔ nián le, yǒu yī gè nǚ'ér hé yī gè érzi.",
+            vi: "Hai người họ quen biết nhau 5 năm rồi, có một người con gái và một người con trai.",
+            grammar: "Phân biệt 男 (Nam) và 女 (Nữ): 男 gồm Điền (ruộng) và Lực (sức) -> Đàn ông cày ruộng. 女 mang hình dáng mềm mại.",
+            vocab: ["女儿 (nǚ'ér) - Con gái", "儿子 (érzi) - Con trai"]
+        },
+        {
+            zh: "女儿一岁，儿子三岁，他们会说中文，也会说英文。",
+            pinyin: "Nǚ'ér yī suì, érzi sān suì, tāmen huì shuō zhōngwén, yě huì shuō yīngwén.",
+            vi: "Con gái 1 tuổi, con trai 3 tuổi, chúng biết nói tiếng Trung, cũng biết nói tiếng Anh.",
+            grammar: "会 + Động từ (huì...): Biết làm gì đó thông qua quá trình học tập, rèn luyện.",
+            vocab: ["会 (huì) - Biết (thông qua học tập)", "说 (shuō) - Nói"]
+        },
+        {
+            zh: "王老师和李老师都是很好的人，我和弟弟都很喜欢他们。",
+            pinyin: "Wáng lǎoshī hé Lǐ lǎoshī dōu shì hěn hǎo de rén, wǒ hé dìdi dōu hěn xǐhuān tāmen.",
+            vi: "Cô Vương và thầy Lý đều là những người rất tốt, tôi và em trai đều rất thích họ.",
+            grammar: "都 + Động từ/Tính từ (dōu): Phó từ mang nghĩa 'Đều'. Lưu ý: 'Đều là' -> 都是, 'Đều rất' -> 都很.",
+            vocab: ["都 (dōu) - Đều", "喜欢 (xǐhuān) - Thích"]
+        }
+    ];
+
+    window.currentIndex = 0;
+    let currentPlayCount = 0;
+    let playTimeout;
+    const synth = window.speechSynthesis;
+    let zhVoice = null;
+
+    const msgBox = document.getElementById("system-message");
+    const inputField = document.getElementById("user-input");
+    const modalOverlay = document.getElementById("feedback-modal");
+
+    // Lọc giọng đọc Tiếng Trung (Ưu tiên giọng AI tự nhiên)
+    function loadVoices() {
+        let voices = synth.getVoices();
+        const zhVoices = voices.filter(v => v.lang.includes('zh'));
+        if (zhVoices.length > 0) {
+            zhVoice = zhVoices.find(v => v.name.includes('Xiaoxiao') || v.name.includes('Yunjian') || v.name.includes('Ting-Ting') || v.name.includes('Google')) || zhVoices[0];
+        }
+    }
+
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    window.onload = () => {
+        loadVoices();
+        let count = localStorage.getItem('hsk_dictation_1_count') || 0;
+        document.getElementById('study-count').innerText = count;
+        document.getElementById('total-sentences').innerText = lessonData.length;
+        
+        let savedIndex = parseInt(localStorage.getItem('hsk_dictation_1_progress'));
+        if (!isNaN(savedIndex) && savedIndex < lessonData.length) {
+            window.currentIndex = savedIndex;
+        }
+        updateUI();
+    };
+
+    function updateUI() {
+        updateProgress();
+        document.getElementById('current-sentence-num').innerText = window.currentIndex + 1;
+        document.getElementById('sentence-label').innerText = `Câu ${window.currentIndex + 1}`;
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Control') {
+            e.preventDefault(); playAudio();
+        } else if (e.key === 'Tab') {
+            e.preventDefault(); giveHint();
+        } else if (e.key === 'Enter' && modalOverlay.style.display !== "flex") {
+            e.preventDefault(); handleEnterAction();
+        }
+    });
+
+    function handleEnterAction() {
+        if (modalOverlay.style.display === "flex") { nextSentence(); } 
+        else { checkAnswer(); }
+    }
+
+    function playAudio() {
+        currentPlayCount = 0;
+        clearTimeout(playTimeout);
+        triggerAudioLoop();
+    }
+
+    function triggerAudioLoop() {
+        if (synth.speaking) synth.cancel();
+        
+        const utterThis = new SpeechSynthesisUtterance(lessonData[window.currentIndex].zh);
+        utterThis.lang = 'zh-CN';
+        utterThis.rate = parseFloat(document.getElementById('speed-setting').value);
+        if (zhVoice) utterThis.voice = zhVoice;
+        
+        utterThis.onend = () => {
+            currentPlayCount++;
+            const maxRepeat = parseInt(document.getElementById('repeat-setting').value);
+            if (currentPlayCount < maxRepeat) {
+                playTimeout = setTimeout(triggerAudioLoop, 800);
+            }
+        };
+        
+        synth.speak(utterThis);
+        if (modalOverlay.style.display !== "flex") inputField.focus();
+    }
+
+    // THUẬT TOÁN SO SÁNH TIẾNG TRUNG (Bỏ qua dấu câu)
+    function normalizeChinese(text) {
+        return text.replace(/[，。！？；：、,.\?!;:\s]/g, '');
+    }
+
+    function checkAnswer() {
+        const rawUserInput = inputField.value;
+        const rawTargetText = lessonData[window.currentIndex].zh;
+        
+        const userInputNorm = normalizeChinese(rawUserInput);
+        const targetTextNorm = normalizeChinese(rawTargetText);
+        
+        if (userInputNorm === targetTextNorm) {
+            msgBox.innerText = "";
+            showModal();
+            return;
+        }
+
+        if (userInputNorm.length === 0) {
+            msgBox.innerText = "Bạn chưa gõ gì cả. Nhấn Ctrl để nghe nhé!";
+            return;
+        }
+
+        if (targetTextNorm.startsWith(userInputNorm)) {
+            msgBox.innerText = "Chính xác đến hiện tại. Hãy nghe thêm và gõ tiếp nhé!";
+            return; 
+        }
+
+        // Tìm ký tự sai đầu tiên
+        let wrongIndex = -1;
+        for (let i = 0; i < userInputNorm.length; i++) {
+            if (userInputNorm[i] !== targetTextNorm[i]) {
+                wrongIndex = i; break;
+            }
+        }
+
+        if (wrongIndex !== -1) {
+            let wrongChar = userInputNorm[wrongIndex];
+            msgBox.innerHTML = `Lỗi sai ở chữ: <span class="glow-error">${wrongChar}</span><br><span style="font-size:15px; color:#64748b; font-weight:500;">(Hãy xóa chữ sai và gõ lại nhé)</span>`;
+        }
+    }
+
+    // THUẬT TOÁN GỢI Ý (Thông minh tự động bỏ qua dấu câu)
+    function giveHint() {
+        if (modalOverlay.style.display === "flex") return;
+
+        const targetRaw = lessonData[window.currentIndex].zh;
+        const userInputNorm = normalizeChinese(inputField.value);
+        const targetNorm = normalizeChinese(targetRaw);
+
+        let correctLen = 0;
+        for(let i=0; i < userInputNorm.length; i++){
+            if(userInputNorm[i] === targetNorm[i]) correctLen++;
+            else break;
+        }
+
+        // Tìm số lượng ký tự gốc (bao gồm dấu câu) tương ứng với correctLen + 1
+        let rawIndex = 0;
+        let normCount = 0;
+        while(normCount < correctLen + 1 && rawIndex < targetRaw.length) {
+            if(!/[，。！？；：、,.\?!;:\s]/.test(targetRaw[rawIndex])) {
+                normCount++;
+            }
+            rawIndex++;
+        }
+
+        inputField.value = targetRaw.substring(0, rawIndex);
+        msgBox.innerText = "💡 Đã gợi ý thêm 1 chữ!";
+    }
+
+    function showModal() {
+        inputField.blur();
+        const data = lessonData[window.currentIndex];
+        
+        document.getElementById("trans-zh").innerText = data.zh;
+        document.getElementById("trans-pinyin").innerText = data.pinyin;
+        document.getElementById("trans-vi").innerText = data.vi;
+        
+        const grammarContainer = document.getElementById("grammar-container");
+        if(data.grammar) {
+            grammarContainer.style.display = "block";
+            document.getElementById("trans-grammar").innerText = data.grammar;
+        } else {
+            grammarContainer.style.display = "none";
+        }
+        
+        const vocabList = document.getElementById("trans-vocab");
+        vocabList.innerHTML = "";
+        if(data.vocab && data.vocab.length > 0) {
+            data.vocab.forEach(v => {
+                let li = document.createElement("li");
+                let parts = v.split(" - ");
+                li.innerHTML = `<strong>${parts[0]}</strong> <span style="color:var(--text-light); font-size:15px;">- ${parts[1]}</span>`;
+                vocabList.appendChild(li);
+            });
+        }
+        
+        modalOverlay.style.display = "flex";
+        document.querySelector('.btn-next-modal').focus();
+    }
+
+    function prevSentenceManual() {
+        if (window.currentIndex > 0) { window.currentIndex--; resetForNewSentence(); }
+    }
+
+    function nextSentenceManual() {
+        if (window.currentIndex < lessonData.length - 1) { window.currentIndex++; resetForNewSentence(); } 
+        else { finishLesson(); }
+    }
+    
+    function resetForNewSentence() {
+        modalOverlay.style.display = "none"; inputField.value = ""; msgBox.innerHTML = "Lắng nghe và gõ Pinyin nhé!";
+        localStorage.setItem('hsk_dictation_1_progress', window.currentIndex); 
+        updateUI(); playAudio();
+    }
+
+    function nextSentence() {
+        modalOverlay.style.display = "none"; window.currentIndex++; inputField.value = ""; msgBox.innerHTML = "Lắng nghe và gõ Pinyin nhé!";
+        if (window.currentIndex < lessonData.length) {
+            localStorage.setItem('hsk_dictation_1_progress', window.currentIndex);
+            updateUI(); playAudio();
+        } else { finishLesson(); }
+    }
+
+    function updateProgress() {
+        const percent = Math.round((window.currentIndex / lessonData.length) * 100);
+        document.getElementById("progress-percent").innerText = percent;
+        document.getElementById("progress-ring").style.background = `conic-gradient(var(--primary) ${percent}%, #eee 0)`;
+    }
+
+    window.playEndScreenAudio = function(text) {
+        if (synth.speaking) synth.cancel();
+        const utterThis = new SpeechSynthesisUtterance(text);
+        utterThis.lang = 'zh-CN';
+        utterThis.rate = 0.9; 
+        if (zhVoice) utterThis.voice = zhVoice; 
+        synth.speak(utterThis);
+    };
+
+    function finishLesson() {
+        document.getElementById("learning-screen").style.display = "none";
+        document.getElementById("end-screen").style.display = "block";
+        
+        let count = parseInt(localStorage.getItem('hsk_dictation_1_count')) || 0;
+        count++;
+        localStorage.setItem('hsk_dictation_1_count', count);
+        document.getElementById('study-count').innerText = count;
+        localStorage.removeItem('hsk_dictation_1_progress');
+
+        const transcriptBox = document.getElementById("full-transcript");
+        let htmlContent = "";
+
+        lessonData.forEach((d, idx) => {
+            const playBtnHtml = `<button onclick="playEndScreenAudio(\`${d.zh}\`)" style="background:none; border:none; cursor:pointer; font-size:20px; margin-left: 10px; transition: 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" title="Nghe lại câu này">🔊</button>`;
+
+            htmlContent += `<div style="margin-bottom:20px; padding-bottom: 15px; border-bottom: 1px dashed #ffe6e6;">
+                <div style="color:var(--pinyin-color); font-weight: 700; font-size: 16px; margin-bottom: 3px;">${d.pinyin}</div>
+                <div style="font-size: 22px; font-weight: 800; color: var(--text-dark); margin-bottom: 5px;">
+                    <span style="color:var(--primary); margin-right:5px;">${idx + 1}.</span>${d.zh} ${playBtnHtml}
+                </div>
+                <div style="color:var(--text-light); font-size: 15px;">${d.vi}</div>
+            </div>`;
+        });
+        transcriptBox.innerHTML = htmlContent;
+    }
+
+    function restartLesson() {
+        localStorage.setItem('hsk_dictation_1_progress', 0);
+        location.reload();
+    }
+</script>
+</body>
+</html>
