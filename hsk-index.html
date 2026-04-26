@@ -3,259 +3,384 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SnapChinese</title>
-   <link rel="icon" type="image/png" href="ảnh.png">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  <title>Trang Chủ | SnapChinese</title>
+  <link rel="icon" type="image/png" href="ảnh.png">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   
   <style>
-    /* --- Cài đặt chung --- */
+    /* --- Cài đặt chung & Biến màu (Branding SnapChinese) --- */
     :root {
-      /* Đổi màu chủ đạo sang Xanh Mint */
-      --primary-color: #48c9b0; 
-      --primary-hover: #1abc9c;
-      --bg-color: #f0fbf9; /* Nền xanh mint rất nhạt */
-      --text-color: #333;
-      --card-bg: #ffffff;
+      /* Tone màu Đỏ/Ruby mang phong cách Trung Hoa nhưng mềm mại, hiện đại */
+      --primary-color: #e63946; 
+      --primary-light: #ff4d6d;
+      --bg-gradient: linear-gradient(135deg, #fff0f0 0%, #ffe6e6 100%);
+      --text-main: #2d3436;
+      --text-muted: #636e72;
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --card-shadow: 0 8px 32px rgba(230, 57, 70, 0.08);
     }
-
-    * { box-sizing: border-box; }
+    ::selection {
+      background: #ffb3c1; 
+      color: #fff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Poppins', 'Quicksand', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      margin: 0;
-      padding: 0;
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
       line-height: 1.6;
-      overflow-x: hidden; 
+      min-height: 100vh;
+      padding: 40px 0; 
+      overflow-x: hidden;
     }
 
-    /* --- Phần nội dung chính --- */
-    .container {
-      max-width: 1000px;
-      margin: 20px auto;
-      padding: 0 20px;
-      text-align: center;
+    .container { width: 100%; padding: 0 30px; margin: 0 auto; max-width: 1400px; }
+
+    /* --- NÚT BÓNG ĐÈN CỐ ĐỊNH CHUYỂN VỀ SNAPENGLISH --- */
+    .floating-back {
+      position: fixed;
+      bottom: 40px; right: 40px; z-index: 100;
+      width: 65px; height: 65px;
+      background: white; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; text-decoration: none;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      border: 3px solid #ffb6c1; /* Màu của SnapEnglish để gợi nhớ */
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .floating-back:hover {
+      transform: translateY(-10px) scale(1.1);
+      box-shadow: 0 15px 35px rgba(255, 71, 126, 0.3);
+      border-color: #ff477e;
+    }
+    /* Tooltip cho bóng đèn */
+    .floating-back::after {
+      content: "Sang SnapEnglish";
+      position: absolute; right: 80px;
+      background: #ff477e; color: white;
+      padding: 5px 15px; border-radius: 20px;
+      font-size: 14px; font-weight: 700; white-space: nowrap;
+      opacity: 0; pointer-events: none; transition: 0.3s;
+      transform: translateX(10px);
+    }
+    .floating-back:hover::after { opacity: 1; transform: translateX(0); }
+
+    /* --- Header & Typography --- */
+    .header-section { text-align: center; margin-bottom: 50px; animation: fadeInDown 0.8s ease; }
+    .snap-logo {
+      font-weight: 800;
+      font-size: 2.8rem;
+      background: linear-gradient(45deg, var(--primary-color), #ff8a00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+      letter-spacing: -1px;
+    }
+    .header-section p { font-size: 1.1rem; color: var(--text-muted); max-width: 600px; margin: 0 auto; font-weight: 600; }
+
+    /* --- CỤM NÚT ĐĂNG NHẬP / ĐĂNG XUẤT --- */
+    .top-actions {
+      position: fixed; top: 20px; right: 20px; z-index: 100; display: flex; gap: 10px;
+    }
+    .btn-top {
+      border: none; padding: 10px 22px; border-radius: 30px;
+      font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 15px;
+      cursor: pointer; transition: all 0.3s ease;
+    }
+    .btn-login-top {
+      background: var(--primary-color); color: white;
+      box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);
+    }
+    .btn-login-top:hover { background-color: var(--primary-light); transform: translateY(-2px); }
+    .btn-logout-top { background: #e2e8f0; color: #64748b; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
+    .btn-logout-top:hover { background: #cbd5e1; color: #475569; transform: translateY(-2px); }
+
+    /* --- Phân mục (Categories) --- */
+    .category-section { margin-bottom: 40px; animation: fadeInUp 0.8s ease backwards; }
+    .category-section:nth-child(2) { animation-delay: 0.1s; }
+    .category-section:nth-child(3) { animation-delay: 0.2s; }
+    .category-section:nth-child(4) { animation-delay: 0.3s; }
+    .category-title {
+      font-size: 1.4rem; color: var(--primary-color); margin-bottom: 20px;
+      padding-bottom: 10px; border-bottom: 2px dashed #ffb3c1; display: inline-block; font-weight: 800;
     }
 
-    .welcome-text h2 {
-      font-size: 1.8rem;
-      color: #444;
-      margin-bottom: 5px;
-    }
-
-    .welcome-text p {
-      font-family: 'Quicksand', sans-serif;
-      font-size: 1rem;
-      color: #666;
-      max-width: 700px;
-      margin: 0 auto 30px auto;
-    }
-
-    /* --- Grid Layout --- */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 20px;
-    }
-
-    /* --- Card Link Style --- */
-    a.card-link {
-        text-decoration: none;
-        color: inherit;
-        display: block;
-    }
-
-    /* --- Card Style --- */
+    /* --- Grid & Cards --- */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    a.card-link { text-decoration: none; color: inherit; display: block; outline: none; }
     .card {
-      background: var(--card-bg);
-      padding: 25px 15px;
-      border-radius: 16px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid transparent;
-      position: relative;
-      height: 100%;
+      background: var(--card-bg); backdrop-filter: blur(10px); padding: 25px 20px;
+      border-radius: 20px; box-shadow: var(--card-shadow); cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; border: 1px solid rgba(255, 255, 255, 0.5); height: 100%; position: relative; overflow: hidden;
     }
-
-    .card:hover {
-      transform: translateY(-5px);
-      /* Đổi màu bóng đổ khi hover sang tone mint */
-      box-shadow: 0 10px 25px rgba(72, 201, 176, 0.2); 
-      border-color: var(--primary-color);
+    .card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 15px 35px rgba(230, 57, 70, 0.2); border-color: var(--primary-light); }
+    .card-icon {
+      font-size: 32px; display: flex; align-items: center; justify-content: center;
+      width: 65px; height: 65px; background-color: #fff0f0; border-radius: 18px;
+      margin-bottom: 15px; transition: all 0.3s ease; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
     }
+    .card:hover .card-icon { background-color: var(--primary-color); color: white; transform: rotate(-10deg) scale(1.1); }
+    .card h3 { margin: 0; font-size: 1.05rem; color: var(--text-main); font-weight: 700; }
 
-    .card::before {
-      font-size: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 60px;
-      height: 60px;
-      /* Nền icon màu mint nhạt */
-      background-color: #e8f8f5; 
-      border-radius: 50%;
-      margin-bottom: 12px;
-      transition: background-color 0.3s;
+    /* --- News Ticker & Watermark --- */
+    .news-ticker {
+      background-color: var(--primary-light); color: #ffffff; padding: 10px 0;
+      overflow: hidden; white-space: nowrap; box-shadow: 0 4px 15px rgba(230, 57, 70, 0.2);
+      margin-bottom: 30px; position: relative; font-weight: 700; font-size: 1rem; border-radius: 8px;
     }
-
-    .card:hover::before {
-      background-color: var(--primary-color);
+    .ticker-content { display: inline-block; padding-left: 100%; animation: ticker 25s linear infinite; }
+    @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+    
+    .watermark {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
+      display: flex; flex-wrap: wrap; justify-content: space-around; align-content: space-around;
+      opacity: 0.03; font-size: 5rem; font-weight: 800; color: var(--primary-color); transform: rotate(-30deg); user-select: none;
     }
+    .watermark::before { content: "SnapChinese  SnapChinese  SnapChinese  SnapChinese  SnapChinese"; line-height: 200px; }
 
-    .card h3 {
-      margin: 0;
-      font-size: 16px;
-      color: #444;
-      font-weight: 700;
-    }
+    /* --- Animations --- */
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Icons tương ứng với các mục mới */
-    a.card-link:nth-child(1) .card::before { content: "📚"; } /* Từ vựng */
-    a.card-link:nth-child(2) .card::before { content: "🧩"; } /* Ngữ pháp */
-    a.card-link:nth-child(3) .card::before { content: "🗣️"; } /* Phát âm */
-    a.card-link:nth-child(4) .card::before { content: "🎧"; } /* Nghe */
-    a.card-link:nth-child(5) .card::before { content: "🎙️"; } /* Nói */
-    a.card-link:nth-child(6) .card::before { content: "📖"; } /* Đọc */
-    a.card-link:nth-child(7) .card::before { content: "✍️"; } /* Viết */
+    /* --- Modal Auth System (Giữ nguyên từ index) --- */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); z-index: 1000; justify-content: center; align-items: center; }
+    .auth-box { background: white; padding: 40px; border-radius: 25px; width: 90%; max-width: 450px; text-align: center; position: relative; animation: fadeInUp 0.3s ease; }
+    .auth-tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 25px; }
+    .tab { flex: 1; padding: 10px; cursor: pointer; font-weight: 800; color: #ccc; transition: 0.3s; }
+    .tab.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); }
+    .auth-box input { width: 100%; padding: 14px; margin: 10px 0; border: 2px solid #f0f0f0; border-radius: 12px; outline: none; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 600; }
+    .auth-box input:focus { border-color: var(--primary-color); }
+    .btn-submit { width: 100%; padding: 14px; background: var(--primary-color); color: white; border: none; border-radius: 12px; font-weight: 800; font-family: 'Nunito', sans-serif; font-size: 16px; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+    .btn-submit:hover { opacity: 0.9; transform: translateY(-2px); }
+    .close-modal { position: absolute; top: 15px; right: 20px; font-size: 25px; cursor: pointer; color: #b2bec3; }
+    .hidden { display: none !important; }
 
-    /* Footer */
-    footer {
-      margin-top: 30px;
-      padding: 10px;
-      font-size: 12px;
-      color: #888;
-      text-align: center;
-    }
-    /* --- Watermark Style --- */
-.watermark {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1; /* Nằm dưới cùng để không che mất bài học */
-  pointer-events: none; /* Không cho người dùng tương tác, click xuyên qua được */
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  align-content: space-around;
-  opacity: 0.04; /* Độ mờ cực thấp (4%), đủ để thấy khi nhìn kỹ nhưng không gây chói */
-  font-family: 'Poppins', sans-serif;
-  font-size: 5rem;
-  font-weight: 700;
-  color: var(--primary-color);
-  transform: rotate(-30deg); /* Nghiêng nhẹ cho nghệ thuật */
-  user-select: none;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-/* Nhân bản chữ để lấp đầy màn hình (dùng kỹ thuật pseudo-element) */
-.watermark::before {
-  content: "SnapChinese  SnapChinese  SnapChinese  SnapChinese  SnapChinese";
-  line-height: 200px;
-}
-    /* --- News Ticker --- */
-.news-ticker {
-  background-color: var(--primary-light);
-  color: #800000;
-  padding: 10px 0;
-  overflow: hidden;
-  white-space: nowrap;
-  box-shadow: 0 4px 15px rgba(255, 71, 126, 0.2);
-  margin-bottom: 30px;
-  position: relative;
-  font-family: 'Quicksand', sans-serif;
-  font-weight: 600;
-  font-size: 1rem;
-}
-
-.ticker-content {
-  display: inline-block;
-  padding-left: 100%;
-  animation: ticker 25s linear infinite;
-}
-
-@keyframes ticker {
-  0% { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(-100%, 0, 0); }
-}
-
-.news-ticker:hover .ticker-content {
-  animation-play-state: paused; /* Dừng lại khi di chuột vào để người dùng dễ đọc */
-}
+    /* --- TOAST NOTIFICATION --- */
+    .toast-notification { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); padding: 15px 30px; border-radius: 50px; color: white; font-weight: 800; font-size: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 9999; transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); pointer-events: none; text-align: center; }
+    .toast-notification.show { top: 30px; }
+    .toast-success { background-color: #a3b18a; } 
+    .toast-error { background-color: var(--primary-color); } 
+    .toast-warning { background-color: #ff8a00; } 
   </style>
 </head>
 
 <body>
-<div class="watermark">SnapChinese</div>
+
+  <a href="index.html" class="floating-back">💡</a>
+
+  <div id="toastMessage" class="toast-notification"></div>
+  <div class="watermark">SnapChinese</div>
+
+  <div class="top-actions">
+    <button class="btn-top btn-login-top" id="authBtn" onclick="openAuth()">Đăng nhập / Đăng ký</button>
+    <button class="btn-top btn-logout-top hidden" id="logoutBtn" onclick="handleLogout()">👋 Đăng xuất</button>
+  </div>
+
   <div class="container">
     <div class="news-ticker">
-  <div class="ticker-content">
-    ✨ Chào mừng bạn đến với SnapChinese! | 🚀 Hãy cố gắng chinh phục mục tiêu của mình nhé! | 💡 Chúc bạn một ngày học tập thật hiệu quả!
-  </div>
-</div>
-    <div class="welcome-text">
-      <h2> SnapChinese! ✨</h2>
-      <p>Chọn kỹ năng bạn muốn luyện tập hôm nay.</p>
+      <div class="ticker-content">
+        🏮 Chào mừng bạn đến với SnapChinese! | 🐉 Hãy cố gắng chinh phục HSK cùng chúng mình nhé! | 🍵 Chúc bạn một ngày học tập thật hiệu quả!
+      </div>
+    </div>
+
+    <div class="header-section">
+      <h1 class="snap-logo">SnapChinese 🏮</h1>
+      <p>Hệ thống ôn luyện HSK toàn diện. Khám phá kho tài liệu và bài thi được thiết kế khoa học dành riêng cho bạn!</p>
+    </div>
+
+    <div class="category-section">
+      <h2 class="category-title">🏆 HSK Mock Tests</h2>
+      <div class="grid">
+        <a href="hsk1.html" class="card-link"><div class="card"><div class="card-icon">❶</div><h3>Đề thi HSK 1</h3></div></a>
+        <a href="hsk2.html" class="card-link"><div class="card"><div class="card-icon">❷</div><h3>Đề thi HSK 2</h3></div></a>
+        <a href="hsk3.html" class="card-link"><div class="card"><div class="card-icon">❸</div><h3>Đề thi HSK 3</h3></div></a>
+        <a href="hsk4.html" class="card-link"><div class="card"><div class="card-icon">❹</div><h3>Đề thi HSK 4</h3></div></a>
+        <a href="hsk5.html" class="card-link"><div class="card"><div class="card-icon">❺</div><h3>Đề thi HSK 5</h3></div></a>
+        <a href="hsk6.html" class="card-link"><div class="card"><div class="card-icon">❻</div><h3>Đề thi HSK 6</h3></div></a>
+      </div>
+    </div>
+
+    <div class="category-section">
+      <h2 class="category-title">📚 Core Skills</h2>
+      <div class="grid">
+        <a href="tu-vung-hsk.html" class="card-link"><div class="card"><div class="card-icon">🏷️</div><h3>Từ vựng</h3></div></a>
+        <a href="ngu-phap-hsk.html" class="card-link"><div class="card"><div class="card-icon">🧩</div><h3>Ngữ pháp</h3></div></a>
+        <a href="phat-am-hsk.html" class="card-link"><div class="card"><div class="card-icon">👄</div><h3>Phát âm (Pinyin)</h3></div></a>
+        <a href="nghe-hsk.html" class="card-link"><div class="card"><div class="card-icon">🎧</div><h3>Luyện Nghe</h3></div></a>
+        <a href="noi-hsk.html" class="card-link"><div class="card"><div class="card-icon">🗣️</div><h3>Luyện Nói</h3></div></a>
+        <a href="doc-hsk.html" class="card-link"><div class="card"><div class="card-icon">📖</div><h3>Luyện Đọc</h3></div></a>
+        <a href="viet-hsk.html" class="card-link"><div class="card"><div class="card-icon">✍️</div><h3>Luyện Viết</h3></div></a>
+      </div>
     </div>
     
-    <div class="grid">
-      
-      <a href="tu-vung-hsk.html" class="card-link">
-        <div class="card">
-          <h3>Từ vựng</h3>
-        </div>
-      </a>
+    <div class="category-section">
+      <h2 class="category-title">🚀 Advanced Practice</h2>
+      <div class="grid">
+        <a href="dictation-hsk.html" class="card-link"><div class="card"><div class="card-icon">🎙️</div><h3>Dictation (Nghe chép)</h3></div></a>
+        <a href="shadowing-hsk.html" class="card-link"><div class="card"><div class="card-icon">🎭</div><h3>Shadowing (Nhại âm)</h3></div></a>
+        <a href="hanzi.html" class="card-link"><div class="card"><div class="card-icon">🖌️</div><h3>Luyện viết Hán Tự</h3></div></a>
+      </div>
+    </div>
 
-      <a href="ngu-phap-hsk.html" class="card-link">
-        <div class="card">
-          <h3>Ngữ pháp</h3>
-        </div>
-      </a>
-
-      <a href="phat-am-hsk.html" class="card-link">
-        <div class="card">
-          <h3>Phát âm</h3>
-        </div>
-      </a>
-
-      <a href="nghe-hsk.html" class="card-link">
-        <div class="card">
-          <h3>Nghe</h3>
-        </div>
-      </a>
-
-      <a href="noi-hsk.html" class="card-link">
-        <div class="card">
-          <h3>Nói</h3>
-        </div>
-      </a>
-
-      <a href="doc-hsk.html" class="card-link">
-        <div class="card">
-          <h3>Đọc</h3>
-        </div>
-      </a>
-
-      <a href="viet-hsk.html" class="card-link">
-        <div class="card">
-          <h3>Viết</h3>
-        </div>
-      </a>
-
+    <div class="category-section">
+      <h2 class="category-title">✨ Others</h2>
+      <div class="grid">
+        <a href="hsk-tracker.html" class="card-link"><div class="card"><div class="card-icon">📈</div><h3>HSK Tracker</h3></div></a>
+        <a href="hsk-plan.html" class="card-link"><div class="card"><div class="card-icon">📅</div><h3>My HSK Plan</h3></div></a>
+        <a href="contact.html" class="card-link"><div class="card"><div class="card-icon">📬</div><h3>Contact Us</h3></div></a>
+      </div>
     </div>
   </div>
-  
-  <footer>
-    <p>&copy; 2026 SnapChinese. All rights reserved by SnapEnglish. 🌿</p>
-  </footer>
 
+  <div class="modal-overlay" id="authModal">
+    <div class="auth-box">
+      <span class="close-modal" onclick="closeAuth()">&times;</span>
+      <div class="auth-tabs">
+        <div class="tab active" id="loginTab" onclick="toggleAuth('login')">Đăng nhập</div>
+        <div class="tab" id="signupTab" onclick="toggleAuth('signup')">Đăng ký</div>
+      </div>
+
+      <div id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Email...">
+        <input type="password" id="loginPass" placeholder="Mật mã...">
+        <button class="btn-submit" onclick="handleLogin()">Vào học ngay</button>
+        <p style="margin-top:15px; font-size:14px; font-weight:700; color:#ff8a00; cursor:pointer;" onclick="showRecovery()">Quên mật mã?</p>
+      </div>
+
+      <div id="signupForm" class="hidden">
+        <input type="email" id="signupEmail" placeholder="Email...">
+        <input type="password" id="signupPass" placeholder="Mật mã...">
+        <div style="background:#fff0f0; padding:15px; border-radius:12px; margin-top:10px; text-align:left;">
+          <p style="font-size:13px; font-weight:800; color:var(--primary-color);">Câu hỏi bảo mật:</p>
+          <p style="font-size:13px; font-weight:600; margin-bottom:5px;">Số điện thoại của bạn là:</p>
+          <input type="text" id="signupAnswer" placeholder="Câu trả lời bí mật..." style="margin:0; padding:10px;">
+        </div>
+        <button class="btn-submit" onclick="handleSignup()">Tạo tài khoản</button>
+      </div>
+
+      <div id="recoveryForm" class="hidden">
+        <h3 style="color:var(--primary-color); font-weight:800;">Khôi phục mật mã</h3>
+        <p style="font-size:13px; margin:10px 0; font-weight:600;">Câu hỏi: <b>Món ăn yêu thích nhất của bạn?</b></p>
+        <input type="text" id="recoveryAnswer" placeholder="Câu trả lời của bạn...">
+        <button class="btn-submit" style="background:#ff8a00" onclick="handleRecovery()">Xác nhận</button>
+      </div>
+      <p style="margin-top: 25px; font-size: 14px; font-weight: 700; color: #b2bec3; cursor: pointer; text-decoration: underline;" onclick="closeAuth()">Bỏ qua</p>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="logoutConfirmModal">
+    <div class="auth-box">
+      <span class="close-modal" onclick="closeLogoutConfirm()">&times;</span>
+      <h3 style="color:var(--primary-color); font-weight:800; font-size: 1.4rem; margin-bottom: 10px;">Xác nhận đăng xuất</h3>
+      <p style="margin-bottom: 25px; font-weight: 600; color: var(--text-muted); font-size: 15px;">
+        Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?
+      </p>
+      <div style="display: flex; gap: 15px; justify-content: center;">
+        <button class="btn-submit" style="background: #e2e8f0; color: #475569; margin-top: 0;" onclick="closeLogoutConfirm()">Hủy</button>
+        <button class="btn-submit" style="margin-top: 0;" onclick="executeLogout()">Đăng xuất</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+      authDomain: "snapenglish-cb6e2.firebaseapp.com",
+      projectId: "snapenglish-cb6e2",
+      storageBucket: "snapenglish-cb6e2.firebasestorage.app",
+      messagingSenderId: "373152038413",
+      appId: "1:373152038413:web:19284622571390f8585f44"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.hienThongBao = function(message, type = 'success') {
+      const toast = document.getElementById('toastMessage');
+      toast.innerText = message;
+      toast.className = `toast-notification show toast-${type}`;
+      setTimeout(() => { toast.classList.remove('show'); }, 3500);
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      const authBtn = document.getElementById('authBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+      if (user) {
+        authBtn.classList.add('hidden');
+        logoutBtn.classList.remove('hidden');
+      } else {
+        authBtn.classList.remove('hidden');
+        logoutBtn.classList.add('hidden');
+      }
+    });
+
+    window.openAuth = () => document.getElementById('authModal').style.display = 'flex';
+    window.closeAuth = () => document.getElementById('authModal').style.display = 'none';
+    
+    window.toggleAuth = (type) => {
+      document.getElementById('loginForm').classList.toggle('hidden', type === 'signup');
+      document.getElementById('signupForm').classList.toggle('hidden', type === 'login');
+      document.getElementById('recoveryForm').classList.add('hidden');
+      document.getElementById('loginTab').classList.toggle('active', type === 'login');
+      document.getElementById('signupTab').classList.toggle('active', type === 'signup');
+    };
+
+    window.showRecovery = () => {
+      document.getElementById('loginForm').classList.add('hidden');
+      document.getElementById('recoveryForm').classList.remove('hidden');
+    };
+
+    window.handleSignup = async () => {
+      const email = document.getElementById('signupEmail').value;
+      const pass = document.getElementById('signupPass').value;
+      const ans = document.getElementById('signupAnswer').value;
+      if(!email || !pass || !ans) return hienThongBao("Vui lòng nhập đủ thông tin nhé!", "error");
+      try {
+        const res = await createUserWithEmailAndPassword(auth, email, pass);
+        await setDoc(doc(db, "users", res.user.uid), { securityAnswer: ans.toLowerCase().trim() });
+        hienThongBao("🎉 Đăng ký thành công!", "success");
+        setTimeout(() => { closeAuth(); }, 1500);
+      } catch (e) { hienThongBao("Đã có lỗi xảy ra hoặc Email đã tồn tại!", "error"); }
+    };
+
+    window.handleLogin = async () => {
+      const email = document.getElementById('loginEmail').value;
+      const pass = document.getElementById('loginPass').value;
+      if(!email || !pass) return hienThongBao("Bạn chưa nhập Email hoặc Mật mã kìa!", "error");
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        hienThongBao("✨ Đăng nhập thành công! Chào mừng quay lại.", "success");
+        setTimeout(() => { closeAuth(); }, 1000);
+      } catch (e) { hienThongBao("❌ Sai thông tin đăng nhập mất rồi!", "error"); }
+    };
+
+    window.handleLogout = () => { document.getElementById('logoutConfirmModal').style.display = 'flex'; };
+    window.closeLogoutConfirm = () => { document.getElementById('logoutConfirmModal').style.display = 'none'; };
+
+    window.executeLogout = async () => {
+      try {
+        await signOut(auth);
+        closeLogoutConfirm();
+        hienThongBao("Đã đăng xuất an toàn!", "success");
+      } catch (e) { hienThongBao("Lỗi đăng xuất: " + e.message, "error"); }
+    };
+
+    window.handleRecovery = async () => {
+      const email = prompt("Nhập Email của bạn để hệ thống tìm kiếm:");
+      if(!email) return;
+      hienThongBao("Đang gửi yêu cầu thiết lập lại vào Email của bạn...", "warning");
+      sendPasswordResetEmail(auth, email)
+        .then(() => { hienThongBao("Thành công! Hãy kiểm tra hộp thư Email nhé.", "success"); })
+        .catch((e) => { hienThongBao("Không tìm thấy Email này trong hệ thống!", "error"); });
+    };
+  </script>
 </body>
 </html>
