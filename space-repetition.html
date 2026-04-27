@@ -110,7 +110,6 @@
         /* STUDY LAYOUT */
         .study-layout { display: flex; gap: 40px; width: 100%; }
         
-        /* CẬP NHẬT GIAO DIỆN SIDEBAR: Cấm cuộn ngang, giao diện dọc */
         .sidebar { 
             flex: 1; 
             min-width: 320px; 
@@ -121,12 +120,12 @@
             gap: 20px; 
             max-height: calc(100vh - 120px); 
             overflow-y: auto;
-            overflow-x: hidden; /* Cấm cuộn ngang tuyệt đối */
+            overflow-x: hidden; 
         }
         
         .main-card { flex: 3; padding: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 600px; text-align: center; position: relative;}
 
-        /* GIAO DIỆN DANH SÁCH DỌC THỐNG KÊ (Thay cho vòng tròn ngang) */
+        /* VERTICAL STATS LIST */
         .stats-list {
             display: flex;
             flex-direction: column;
@@ -445,7 +444,6 @@
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-        // Cấu hình Database chính chủ của SnapEnglish
         const firebaseConfig = {
             apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
             authDomain: "snapenglish-cb6e2.firebaseapp.com",
@@ -454,6 +452,7 @@
             messagingSenderId: "373152038413",
             appId: "1:373152038413:web:19284622571390f8585f44"
         };
+        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -673,11 +672,11 @@
 
         window.showWordDetail = (card) => {
             window.wordToDelete = card.id;
-            document.getElementById("detail-word").innerText = card.word;
-            document.getElementById("detail-pron").innerText = card.pronunciation;
-            document.getElementById("detail-pos").innerText = card.pos;
-            document.getElementById("detail-def").innerText = card.definition;
-            document.getElementById("detail-ex").innerText = card.example;
+            document.getElementById("detail-word").innerText = card.word || "N/A";
+            document.getElementById("detail-pron").innerText = card.pronunciation || "N/A";
+            document.getElementById("detail-pos").innerText = card.pos || "N/A";
+            document.getElementById("detail-def").innerText = card.definition || "N/A";
+            document.getElementById("detail-ex").innerText = card.example || "N/A";
             document.getElementById("word-detail-modal").style.display = "flex";
             document.getElementById("search-results").style.display = "none";
             document.getElementById("search-bar").value = "";
@@ -775,9 +774,9 @@
             document.getElementById("audio-btn").classList.remove("hidden");
             
             document.getElementById("ui-flashcard").classList.remove("hidden");
-            document.getElementById("fc-word").innerText = window.currentCard.word;
-            document.getElementById("fc-pron").innerText = window.currentCard.pronunciation;
-            document.getElementById("fc-def").innerText = window.currentCard.definition;
+            document.getElementById("fc-word").innerText = window.currentCard.word || "Word";
+            document.getElementById("fc-pron").innerText = window.currentCard.pronunciation || "";
+            document.getElementById("fc-def").innerText = window.currentCard.definition || "";
 
             setTimeout(playCurrentWordAudio, 300);
         };
@@ -810,7 +809,7 @@
 
         const renderTypeDef = () => {
             document.getElementById("exercise-badge").innerText = "Step 2: Recall";
-            document.getElementById("prompt-main").innerText = window.currentCard.definition;
+            document.getElementById("prompt-main").innerText = window.currentCard.definition || "No definition found";
             document.getElementById("prompt-sub").innerText = "Type the word for this definition";
             document.getElementById("audio-btn").classList.add("hidden");
 
@@ -836,6 +835,7 @@
             
             let base = word;
             let suffix = '([a-zA-Z]{0,4})?';
+            
             if (word.match(/[eE]$/)) {
                 base = word.slice(0, -1);
                 suffix = '(e|ed|es|ing|ings|er|est|ly)?';
@@ -845,10 +845,15 @@
             }
             
             const regex = new RegExp(`\\b${base}${suffix}\\b`, 'gi');
-            let blanked = window.currentCard.example ? window.currentCard.example.replace(regex, "_________") : "I want to _________ this word.";
+            let exampleText = window.currentCard.example || "I want to _________ this word.";
+            let blanked = exampleText.replace(regex, "_________");
             
-            if (window.currentCard.example && blanked === window.currentCard.example) {
-                 blanked = window.currentCard.example.replace(new RegExp(word, 'gi'), "_________");
+            // Backup thay thế trực tiếp chữ gốc nếu Regex nâng cao bỏ sót
+            if (blanked === exampleText && window.currentCard.example) {
+                 blanked = exampleText.replace(new RegExp(`\\b${word}\\b`, 'gi'), "_________");
+                 if (blanked === exampleText) {
+                     blanked = exampleText.replace(new RegExp(word, 'gi'), "_________");
+                 }
             }
 
             document.getElementById("prompt-main").innerHTML = blanked;
@@ -886,6 +891,7 @@
             if(!window.currentTfCorrect && distractors.length > 0) {
                 showDef = distractors[Math.floor(Math.random() * distractors.length)].definition;
             } else {
+                // FIX: Nếu không có từ làm mồi nhử -> ÉP BUỘC câu này phải là TRUE
                 window.currentTfCorrect = true;
                 showDef = window.currentCard.definition;
             }
@@ -969,11 +975,12 @@
             }
         });
 
+        // ĐÃ CHỮA LỖI KEY DATA CHO HÀM TEST MẪU
         window.triggerDummyImport = () => {
             const dummy = [
-                {id:"1", word:"abandon", pron:"/əˈbændən/", pos:"verb", def:"to leave a place, thing, or person forever", ex:"As a baby he was abandoned by his mother.", level:0, currentStep:0, nextReview:Date.now()},
-                {id:"2", word:"crucial", pron:"/ˈkruː.ʃəl/", pos:"adj", def:"extremely important or necessary", ex:"Her work has been crucially important to the project's success.", level:0, currentStep:0, nextReview:Date.now()},
-                {id:"3", word:"dilemma", pron:"/daɪˈlem.ə/", pos:"noun", def:"a situation in which a difficult choice has to be made", ex:"The president is clearly in a dilemma about how to tackle the crisis.", level:0, currentStep:0, nextReview:Date.now()}
+                {id:"1", word:"abandon", pronunciation:"/əˈbændən/", pos:"verb", definition:"to leave a place, thing, or person forever", example:"As a baby he was abandoned by his mother.", level:0, currentStep:0, nextReview:Date.now()},
+                {id:"2", word:"crucial", pronunciation:"/ˈkruː.ʃəl/", pos:"adj", definition:"extremely important or necessary", example:"Her work has been crucially important to the project's success.", level:0, currentStep:0, nextReview:Date.now()},
+                {id:"3", word:"dilemma", pronunciation:"/daɪˈlem.ə/", pos:"noun", definition:"a situation in which a difficult choice has to be made", example:"The president is clearly in a dilemma about how to tackle the crisis.", level:0, currentStep:0, nextReview:Date.now()}
             ];
             dummy.forEach(d => {
                 if(!window.deck.find(c => c.word === d.word)) window.deck.push(d);
