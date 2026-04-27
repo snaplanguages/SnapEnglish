@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnapEnglish | Spaced Repetition Flashcards</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563EB;
+            --primary-hover: #1D4ED8;
+            --accent: #F59E0B;
+            --bg-gradient: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            --glass-bg: rgba(255, 255, 255, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --text-dark: #1E293B;
+            --text-light: #475569;
+            --white: #FFFFFF;
+            --success: #10B981;
+            --error: #EF4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-dark);
+            min-height: 100vh;
+            width: 100vw;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            border-radius: 24px;
+        }
+
+        .header-brand {
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-logo {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .sync-status {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            background: var(--glass-bg);
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sync-dot {
+            width: 10px;
+            height: 10px;
+            background-color: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .container {
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        /* View Switching */
+        .view-section {
+            width: 100%;
+            max-width: 1200px; /* Expanded for full width experience */
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .view-section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Import Section & Tabs */
+        .import-box {
+            width: 100%;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .import-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255, 255, 255, 0.4);
+            font-weight: 700;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+        }
+
+        .import-content {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .import-content.active {
+            display: flex;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 20px;
+            border-radius: 16px;
+            border: 2px solid var(--white);
+            background: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            resize: none;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Manual Input UI */
+        .manual-row-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 50vh;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .manual-row {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 2fr 2fr auto;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 12px;
+            border-radius: 12px;
+            align-items: center;
+            border: 1px solid var(--glass-border);
+        }
+
+        .manual-input {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            outline: none;
+            font-size: 14px;
+            font-weight: 500;
+            background: var(--white);
+            transition: 0.3s;
+        }
+
+        .manual-input:focus {
+            border-color: var(--primary);
+        }
+
+        .btn-remove-row {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-remove-row:hover {
+            background: var(--error);
+            color: white;
+        }
+
+        .instructions {
+            font-size: 15px;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* Study Section */
+        .study-layout {
+            display: flex;
+            gap: 30px;
+            width: 100%;
+        }
+
+        .sidebar {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .stats-box {
+            text-align: center;
+        }
+
+        .stats-number {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .main-card {
+            flex: 3;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            text-align: center;
+        }
+
+        .card-type-badge {
+            background: var(--primary);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .prompt-text {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        /* Inputs and Options */
+        .answer-input {
+            width: 80%;
+            padding: 15px 25px;
+            border-radius: 50px;
+            border: 2px solid transparent;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 20px;
+            text-align: center;
+            outline: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: 0.3s;
+        }
+
+        .answer-input:focus {
+            border-color: var(--primary);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid transparent;
+            padding: 15px 20px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .option-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        /* General Buttons */
+        .btn {
+            padding: 14px 32px;
+            border-radius: 50px;
+            border: none;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .feedback-message {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: 700;
+            min-height: 27px;
+        }
+
+        .correct { color: var(--success); }
+        .wrong { color: var(--error); }
+        
+        .hidden { display: none !important; }
+
+        @media (max-width: 900px) {
+            .study-layout { flex-direction: column; }
+            .options-grid { grid-template-columns: 1fr; }
+            .container { padding: 10px 20px; }
+            .header-brand { padding: 15px 20px; }
+            .manual-row {
+                grid-template-columns: 1fr;
+                position: relative;
+            }
+            .btn-remove-row {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                width: 30px;
+                height: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header-brand glass-panel" style="border-radius: 0; border-top: none; border-left: none; border-right: none;">
+        <div class="brand-logo">SnapEnglish</div>
+        <div class="sync-status">
+            <div class="sync-dot" id="sync-dot"></div>
+            <span id="sync-text">Connecting...</span>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div id="import-view" class="view-section active">
+            <div class="import-box glass-panel">
+                <h2 style="color: var(--primary); font-size: 24px;">Import Deck Data</h2>
+                
+                <div class="import-tabs">
+                    <button class="tab-btn active" onclick="switchImportTab('paste', this)">Paste from Excel</button>
+                    <button class="tab-btn" onclick="switchImportTab('manual', this)">Manual Input</button>
+                </div>
+
+                <div id="tab-paste" class="import-content active">
+                    <div class="instructions">
+                        <strong>Format required (Tab-separated):</strong><br>
+                        <code>Word | Pronunciation | Part of Speech | English Definition | Example Sentence</code><br>
+                        <em>Note: To maximize immersion, please use English definitions only.</em>
+                    </div>
+                    <textarea id="data-input" placeholder="abandon   /əˈbændən/   verb   to leave a place forever   We had to abandon the car."></textarea>
+                    <button class="btn btn-primary" onclick="processPasteImport()" style="align-self: flex-start;">Generate Flashcards</button>
+                </div>
+
+                <div id="tab-manual" class="import-content">
+                    <div class="instructions">
+                        <strong>Type your words directly into the table below:</strong>
+                    </div>
+                    <div class="manual-row-container" id="manual-rows">
+                        <div class="manual-row">
+                            <input type="text" class="manual-input col-word" placeholder="Word (e.g. abandon)">
+                            <input type="text" class="manual-input col-pron" placeholder="Pronunciation">
+                            <input type="text" class="manual-input col-pos" placeholder="POS (verb, noun...)">
+                            <input type="text" class="manual-input col-def" placeholder="English Definition">
+                            <input type="text" class="manual-input col-ex" placeholder="Example Sentence">
+                            <button class="btn-remove-row" onclick="this.parentElement.remove()" title="Remove Row">✖</button>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button class="btn" style="background: var(--white); color: var(--primary);" onclick="addManualRow()">➕ Add Row</button>
+                        <button class="btn btn-primary" onclick="processManualImport()">Generate Flashcards</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="study-view" class="view-section">
+            <div class="study-layout">
+                <div class="sidebar glass-panel">
+                    <h3 style="color: var(--text-dark); margin-bottom: 10px;">Study Progress</h3>
+                    <div class="stats-box">
+                        <p class="text-light">Cards Due Now</p>
+                        <div class="stats-number" id="cards-due">0</div>
+                    </div>
+                    <hr style="border: 1px dashed var(--glass-border); margin: 10px 0;">
+                    <div class="stats-box">
+                        <p class="text-light">Total Cards Learned</p>
+                        <div class="stats-number" id="cards-total" style="color: var(--text-dark); font-size: 28px;">0</div>
+                    </div>
+                    <button class="btn" style="background: var(--white); color: var(--primary); margin-top: 20px;" onclick="switchView('import-view')">➕ Add More Words</button>
+                </div>
+
+                <div class="main-card glass-panel" id="card-container">
+                    <div id="completion-message" class="hidden">
+                        <h2 style="color: var(--success); font-size: 32px; margin-bottom: 15px;">🎉 All Caught Up!</h2>
+                        <p style="font-size: 18px; color: var(--text-light);">You have reviewed all due cards. Check back later.</p>
+                    </div>
+
+                    <div id="active-card">
+                        <div class="card-type-badge" id="question-type">Definition Mode</div>
+                        
+                        <div class="prompt-text" id="prompt-display">Loading...</div>
+                        <div style="color: var(--text-light); font-weight: 600; margin-bottom: 25px; font-size: 16px;" id="pos-display"></div>
+
+                        <div id="typing-interface" class="hidden">
+                            <input type="text" class="answer-input" id="type-answer" placeholder="Type the English word and press Enter" autocomplete="off">
+                        </div>
+
+                        <div id="mc-interface" class="hidden">
+                            <div class="options-grid" id="options-container">
+                                </div>
+                        </div>
+
+                        <div class="feedback-message" id="feedback-msg"></div>
+                        <button class="btn btn-primary hidden" id="next-btn" style="margin-top: 20px;" onclick="loadNextCard()">Next Card ➔</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+            authDomain: "snapenglish-cb6e2.firebaseapp.com",
+            projectId: "snapenglish-cb6e2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // SRS Intervals in milliseconds (1h, 12h, 1d, 3d, 1w, 1m, 1y)
+        const INTERVALS = [
+            0, 
+            60 * 60 * 1000, 
+            12 * 60 * 60 * 1000, 
+            24 * 60 * 60 * 1000, 
+            3 * 24 * 60 * 60 * 1000, 
+            7 * 24 * 60 * 60 * 1000, 
+            30 * 24 * 60 * 60 * 1000, 
+            365 * 24 * 60 * 60 * 1000
+        ];
+
+        window.deck = [];
+        window.currentCard = null;
+        window.dueQueue = [];
+        window.currentMode = 1;
+
+        // Firebase Real-time Sync
+        onAuthStateChanged(auth, (user) => {
+            const syncText = document.getElementById("sync-text");
+            const syncDot = document.getElementById("sync-dot");
+            
+            if (user) {
+                window.currentUserUid = user.uid;
+                syncText.innerText = "Synced Real-time";
+                syncDot.style.backgroundColor = "var(--success)";
+                
+                onSnapshot(doc(db, "userProgress", user.uid), (docSnap) => {
+                    if (docSnap.exists() && docSnap.data().srsDeck) {
+                        window.deck = docSnap.data().srsDeck;
+                        refreshDueQueue();
+                        if(window.deck.length > 0 && document.getElementById('import-view').classList.contains('active')) {
+                            switchView('study-view');
+                        }
+                    }
+                });
+            } else {
+                syncText.innerText = "Local Mode";
+                syncDot.style.backgroundColor = "var(--accent)";
+                loadLocalDeck();
+            }
+        });
+
+        window.saveData = async () => {
+            if (window.currentUserUid) {
+                try {
+                    await setDoc(doc(db, "userProgress", window.currentUserUid), {
+                        srsDeck: window.deck
+                    }, { merge: true });
+                } catch (e) {
+                    console.error("Sync Error:", e);
+                }
+            } else {
+                localStorage.setItem("snap_srs_deck", JSON.stringify(window.deck));
+            }
+        };
+
+        window.loadLocalDeck = () => {
+            const localData = localStorage.getItem("snap_srs_deck");
+            if (localData) {
+                window.deck = JSON.parse(localData);
+                if (window.deck.length > 0) switchView('study-view');
+                refreshDueQueue();
+            }
+        };
+
+        /* UI logic for Import Tabs */
+        window.switchImportTab = (tabId, btnElement) => {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.import-content').forEach(content => content.classList.remove('active'));
+            
+            btnElement.classList.add('active');
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+        };
+
+        window.addManualRow = () => {
+            const container = document.getElementById('manual-rows');
+            const rowHTML = `
+                <div class="manual-row">
+                    <input type="text" class="manual-input col-word" placeholder="Word (e.g. abandon)">
+                    <input type="text" class="manual-input col-pron" placeholder="Pronunciation">
+                    <input type="text" class="manual-input col-pos" placeholder="POS (verb, noun...)">
+                    <input type="text" class="manual-input col-def" placeholder="English Definition">
+                    <input type="text" class="manual-input col-ex" placeholder="Example Sentence">
+                    <button class="btn-remove-row" onclick="this.parentElement.remove()" title="Remove Row">✖</button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', rowHTML);
+            // Scroll to bottom of container
+            container.scrollTop = container.scrollHeight;
+        };
+
+        // Logic to push validated card to deck
+        const addCardToDeck = (word, pron, pos, def, ex) => {
+            if (!word || !def) return false; // Basic validation
+            if (!window.deck.find(c => c.word.toLowerCase() === word.toLowerCase())) {
+                window.deck.push({
+                    id: Date.now() + Math.random().toString(36).substr(2, 9),
+                    word: word,
+                    pronunciation: pron || '',
+                    pos: pos || '',
+                    definition: def,
+                    example: ex || '',
+                    level: 0,
+                    nextReview: Date.now()
+                });
+                return true;
+            }
+            return false;
+        };
+
+        window.processPasteImport = () => {
+            const raw = document.getElementById("data-input").value.trim();
+            if(!raw) return alert("Please paste your data first.");
+
+            const rows = raw.split('\n');
+            let addedCount = 0;
+
+            rows.forEach(row => {
+                const cols = row.split('\t').map(c => c.trim());
+                if(cols.length >= 4) {
+                    if (addCardToDeck(cols[0], cols[1], cols[2], cols[3], cols[4])) addedCount++;
+                }
+            });
+
+            handlePostImport(addedCount);
+        };
+
+        window.processManualImport = () => {
+            const rows = document.querySelectorAll('.manual-row');
+            let addedCount = 0;
+
+            rows.forEach(row => {
+                const word = row.querySelector('.col-word').value.trim();
+                const pron = row.querySelector('.col-pron').value.trim();
+                const pos = row.querySelector('.col-pos').value.trim();
+                const def = row.querySelector('.col-def').value.trim();
+                const ex = row.querySelector('.col-ex').value.trim();
+
+                if (addCardToDeck(word, pron, pos, def, ex)) addedCount++;
+            });
+
+            handlePostImport(addedCount);
+            
+            // Optionally clear inputs after successful import
+            if (addedCount > 0) {
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('input');
+                    inputs.forEach(input => input.value = '');
+                });
+            }
+        };
+
+        const handlePostImport = (addedCount) => {
+            if (addedCount > 0) {
+                saveData();
+                document.getElementById("data-input").value = "";
+                switchView('study-view');
+                refreshDueQueue();
+            } else {
+                alert("No new valid cards found. Ensure 'Word' and 'Definition' are filled, and check for duplicates.");
+            }
+        };
+
+        /* Study Logic */
+        window.refreshDueQueue = () => {
+            const now = Date.now();
+            window.dueQueue = window.deck.filter(card => card.nextReview <= now);
+            window.dueQueue.sort(() => Math.random() - 0.5);
+
+            document.getElementById("cards-due").innerText = window.dueQueue.length;
+            document.getElementById("cards-total").innerText = window.deck.length;
+
+            if (window.dueQueue.length === 0) {
+                document.getElementById("active-card").classList.add("hidden");
+                document.getElementById("completion-message").classList.remove("hidden");
+            } else {
+                document.getElementById("active-card").classList.remove("hidden");
+                document.getElementById("completion-message").classList.add("hidden");
+                if(!window.currentCard || window.dueQueue.indexOf(window.currentCard) === -1) {
+                    loadNextCard();
+                }
+            }
+        };
+
+        window.loadNextCard = () => {
+            if (window.dueQueue.length === 0) return refreshDueQueue();
+
+            window.currentCard = window.dueQueue[0];
+            window.currentMode = window.currentCard.example ? (Math.random() > 0.5 ? 1 : 2) : 1;
+
+            const promptDisplay = document.getElementById("prompt-display");
+            const posDisplay = document.getElementById("pos-display");
+            const badge = document.getElementById("question-type");
+            const typeUI = document.getElementById("typing-interface");
+            const mcUI = document.getElementById("mc-interface");
+            const typeInput = document.getElementById("type-answer");
+            
+            document.getElementById("feedback-msg").innerHTML = "";
+            document.getElementById("next-btn").classList.add("hidden");
+            
+            posDisplay.innerText = `[${window.currentCard.pos}] ${window.currentCard.pronunciation}`;
+
+            if (window.currentMode === 1) {
+                badge.innerText = "Definition Mode";
+                promptDisplay.innerText = window.currentCard.definition;
+                typeUI.classList.remove("hidden");
+                mcUI.classList.add("hidden");
+                typeInput.value = "";
+                typeInput.disabled = false;
+                setTimeout(() => typeInput.focus(), 100);
+            } else {
+                badge.innerText = "Context Mode";
+                const regex = new RegExp(`\\b${window.currentCard.word}\\b`, 'gi');
+                promptDisplay.innerHTML = window.currentCard.example.replace(regex, "_________");
+                typeUI.classList.add("hidden");
+                mcUI.classList.remove("hidden");
+                generateOptions();
+            }
+        };
+
+        window.generateOptions = () => {
+            const container = document.getElementById("options-container");
+            container.innerHTML = "";
+            
+            let options = [window.currentCard.word];
+            const distractors = window.deck.filter(c => c.word !== window.currentCard.word);
+            distractors.sort(() => Math.random() - 0.5);
+            
+            for(let i=0; i<Math.min(3, distractors.length); i++) {
+                options.push(distractors[i].word);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            options.forEach(opt => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.innerText = opt;
+                btn.onclick = () => handleAnswer(opt === window.currentCard.word, opt);
+                container.appendChild(btn);
+            });
+        };
+
+        window.handleAnswer = (isCorrect, userInput = "") => {
+            const msg = document.getElementById("feedback-msg");
+            document.getElementById("next-btn").classList.remove("hidden");
+
+            if (window.currentMode === 1) {
+                document.getElementById("type-answer").disabled = true;
+            } else {
+                const btns = document.querySelectorAll(".option-btn");
+                btns.forEach(b => {
+                    b.disabled = true;
+                    if(b.innerText === window.currentCard.word) b.style.borderColor = "var(--success)";
+                    else if(b.innerText === userInput && !isCorrect) b.style.borderColor = "var(--error)";
+                });
+            }
+
+            if (isCorrect) {
+                msg.innerHTML = `<span class="correct">Correct!</span> The word is <strong>${window.currentCard.word}</strong>.`;
+                window.currentCard.level = Math.min(window.currentCard.level + 1, INTERVALS.length - 1);
+            } else {
+                msg.innerHTML = `<span class="wrong">Incorrect.</span> The correct answer was <strong>${window.currentCard.word}</strong>.`;
+                window.currentCard.level = 0; 
+            }
+
+            window.currentCard.nextReview = Date.now() + INTERVALS[window.currentCard.level];
+            window.dueQueue.shift();
+            saveData();
+        };
+
+        document.getElementById("type-answer").addEventListener("keypress", function(event) {
+            if (event.key === "Enter" && !this.disabled) {
+                event.preventDefault();
+                const isCorrect = this.value.trim().toLowerCase() === window.currentCard.word.toLowerCase();
+                handleAnswer(isCorrect, this.value.trim());
+            }
+        });
+
+        document.addEventListener("keydown", (e) => {
+            const nextBtn = document.getElementById("next-btn");
+            if (e.key === "Enter" && !nextBtn.classList.contains("hidden")) {
+                loadNextCard();
+            }
+        });
+
+        window.switchView = (viewId) => {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+        };
+    </script>
+</body>
+</html>
