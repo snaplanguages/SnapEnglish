@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passage 3 Test 1 | SnapEnglish</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #d63384; 
+            --primary-dark: #a82463; 
+            --accent: #f8bbd0;
+            --bg-body: #f4f6f8;
+            --border-color: #dfe3e8;
+            --text-color: #212b36;
+            --highlight-color: #FFF59D;
+            --correct: #2e7d32;
+            --wrong: #c62828;
+            --exp-bg: #fce4ec;
+            --header-h: 65px;
+            --footer-h: 70px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- OVERLAY & MODAL (CÀI ĐẶT CHẾ ĐỘ) --- */
+        .custom-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 99999;
+        }
+        
+        .setup-modal {
+            background: white; padding: 40px 40px; border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(214, 51, 132, 0.2);
+            width: 90%; max-width: 450px; text-align: center;
+            border: 2px solid var(--accent);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .setup-modal h2 { font-family: 'Lora', serif; color: var(--primary-dark); font-size: 28px; margin-top: 0; }
+        
+        #timeInputBox { display: block; margin: 25px 0; }
+        #timeInput { 
+            width: 100px; padding: 10px; font-size: 18px; text-align: center; 
+            border: 2px solid var(--border-color); border-radius: 10px; font-family: inherit;
+            color: var(--primary-dark); font-weight: bold; outline: none;
+        }
+        #timeInput:focus { border-color: var(--primary); }
+        
+        .start-btn {
+            background: var(--primary); color: white; border: none; padding: 12px 35px;
+            border-radius: 50px; font-size: 16px; font-weight: 700; cursor: pointer;
+            transition: 0.3s; display: inline-block; box-shadow: 0 4px 15px rgba(214, 51, 132, 0.4);
+        }
+        .start-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(214, 51, 132, 0.5); }
+
+        .modal-actions { display: flex; gap: 15px; margin-top: 25px; justify-content: center; }
+        .btn-cancel {
+            background: #f5f5f5; color: #666; border: 2px solid #ddd; padding: 12px 20px;
+            border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s; flex: 1;
+        }
+        .btn-cancel:hover { background: #e0e0e0; border-color: #ccc; }
+        .btn-confirm {
+            background: var(--primary); color: white; border: none; padding: 12px 20px;
+            border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s; flex: 1;
+            box-shadow: 0 4px 0 var(--primary-dark);
+        }
+        .btn-confirm:active { transform: translateY(4px); box-shadow: none; }
+
+        /* HEADER */
+        header {
+            height: var(--header-h); background: #fff;
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 25px; z-index: 100;
+        }
+        .brand { font-size: 20px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        .brand span { background: var(--primary); color: white; padding: 4px 10px; border-radius: 8px; font-size: 14px; }
+        
+        .timer-box { font-family: monospace; font-size: 18px; font-weight: 700; color: #d32f2f; background: #ffebee; padding: 6px 15px; border-radius: 8px; border: 1px solid #ffcdd2;}
+        .btn-submit { 
+            background: var(--primary); color: white; border: none; padding: 8px 25px; 
+            border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px;
+            box-shadow: 0 4px 0 var(--primary-dark); transition: 0.2s;
+        }
+        .btn-submit:active { transform: translateY(4px); box-shadow: none; }
+
+        /* LAYOUT */
+        .container { display: flex; height: calc(100vh - var(--header-h) - var(--footer-h)); width: 100%; }
+        .pane { flex: 1; padding: 35px; overflow-y: auto; position: relative; scroll-behavior: smooth; }
+        .pane-left { border-right: 2px solid var(--border-color); background: #fff; font-size: 16px; line-height: 1.8; text-align: justify; }
+        .pane-right { background: #f9fafb; }
+        
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-thumb { background: #bdbdbd; border-radius: 5px; }
+
+        /* CONTENT */
+        .passage-title { text-align: center; color: var(--primary-dark); margin-bottom: 25px; font-family: 'Lora', serif; border-bottom: 2px dashed var(--accent); padding-bottom: 15px;}
+        .paragraph { margin-bottom: 20px; }
+        .paragraph-label { color: var(--primary); font-weight: 800; font-size: 1.1em; margin-right: 5px; }
+
+        /* HIỆU ỨNG DẪN CHỨNG */
+        .ev-box { 
+            padding: 2px 4px; border-radius: 6px; 
+            transition: all 0.4s ease; 
+            border: 2px solid transparent;
+            background-color: transparent;
+            color: inherit;
+        }
+        .ev-box.focus-blink {
+            border-color: var(--primary-dark) !important;
+            transform: scale(1.02); 
+            box-shadow: 0 4px 15px rgba(214, 51, 132, 0.3) !important; 
+            background-color: var(--highlight-color) !important;
+            z-index: 10; position: relative;
+        }
+
+        /* QUESTIONS */
+        .question-section { padding: 25px; border: 1px solid var(--border-color); background: #fff; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);}
+        .instruction { color: var(--primary-dark); font-weight: 700; margin-bottom: 20px; font-size: 16px; background: var(--exp-bg); padding: 12px 15px; border-radius: 8px; border-left: 4px solid var(--primary);}
+
+        .mcq-item { margin-bottom: 25px; }
+        .mcq-question { font-weight: bold; margin-bottom: 10px; font-size: 16px;}
+        .mcq-option { display: block; padding: 10px 12px; cursor: pointer; border-radius: 8px; margin-bottom: 6px; border: 1px solid transparent; transition: 0.2s;}
+        .mcq-option:hover { background: var(--exp-bg); border-color: var(--accent); }
+        .mcq-option input { margin-right: 12px; transform: scale(1.2);}
+
+        /* DRAG PALETTE */
+        .sticky-palette {
+            position: sticky; top: -25px; background: #fff; padding: 15px 0;
+            border-bottom: 2px solid var(--primary); z-index: 50; margin-bottom: 20px;
+            display: flex; gap: 10px; flex-wrap: wrap; box-shadow: 0 5px 10px rgba(0,0,0,0.02);
+        }
+        .drag-item {
+            background: #fff; border: 1px solid var(--accent); color: var(--primary-dark);
+            padding: 8px 16px; border-radius: 6px; cursor: grab;
+            font-weight: 600; font-size: 14px; user-select: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.2s;
+        }
+        .drag-item:hover { background: var(--exp-bg); }
+        .drag-item:active { cursor: grabbing; background: var(--exp-bg); transform: scale(0.95);}
+
+        .input-gap {
+            display: inline-block; width: 65px; height: 32px;
+            border: 2px solid #cfd8dc; border-radius: 6px; 
+            text-align: center; font-weight: 700; color: var(--primary-dark);
+            font-size: 15px; margin: 0 5px; vertical-align: middle; transition: 0.2s;
+        }
+        .input-gap.drag-over { background: var(--exp-bg); border: 2px dashed var(--primary); }
+        .input-gap.filled { background: var(--exp-bg); border-color: var(--primary); }
+
+        select.input-gap-select {
+            width: 150px; padding: 8px; border: 2px solid #cfd8dc; border-radius: 8px;
+            font-size: 15px; cursor: pointer; font-weight: 600; color: var(--text-color); outline: none;
+        }
+        select.input-gap-select:focus { border-color: var(--primary); }
+
+        /* HỘP GIẢI THÍCH FLASHCARD */
+        .exp-box {
+            display: none; background: #fff;
+            border: 2px solid var(--border-color); border-left: 6px solid var(--primary);
+            padding: 20px; margin-top: 15px; border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(214, 51, 132, 0.08); 
+            animation: slideUp 0.4s ease-out;
+        }
+        .exp-box.show { display: block; }
+        .exp-title { 
+            font-weight: 800; color: var(--primary-dark); font-size: 18px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 2px dashed var(--border-color); padding-bottom: 10px; margin-bottom: 12px;
+        }
+        .locate-btn {
+            background: var(--exp-bg); border: 1px solid var(--accent); color: var(--primary-dark);
+            padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.2s;
+        }
+        .locate-btn:hover { background: var(--primary); color: white; }
+        .exp-translation { background: #fdf8f9; color: #555; padding: 12px; border-radius: 8px; border-left: 3px solid var(--accent); font-style: italic; margin-bottom: 12px; font-size: 15px;}
+        .exp-text { font-size: 15px; line-height: 1.6;}
+        
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* FOOTER */
+        footer {
+            height: var(--footer-h); background: #fff; border-top: 2px solid var(--border-color);
+            display: flex; align-items: center; padding: 0 25px; gap: 15px; z-index: 100;
+        }
+        .palette-scroller { flex: 1; display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; align-items: center;}
+        .nav-dot {
+            min-width: 38px; height: 38px; border: 2px solid #edf1f5; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: bold;
+            cursor: pointer; color: #9aa9b6; background: white; transition: 0.2s; flex-shrink: 0;
+        }
+        .nav-dot.done { background: var(--exp-bg); color: var(--primary-dark); border-color: var(--accent); }
+        .nav-dot:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* HIGHLIGHT MENU */
+        .highlight { background-color: var(--highlight-color); cursor: pointer; border-radius: 3px; padding: 2px 0;}
+        #ctxMenu {
+            position: absolute; display: none; background: white; 
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12); border-radius: 10px; 
+            font-size: 15px; z-index: 99999; border: 1px solid #eee; min-width: 160px; overflow: hidden;
+        }
+        #ctxMenu button {
+            background: none; border: none; padding: 12px 18px; 
+            width: 100%; text-align: left; cursor: pointer; display: block; font-weight: 600; color: #444;
+        }
+        #ctxMenu button:hover { background: #fdf3f6; color: var(--primary-dark); }
+        #ctxMenu button.delete:hover { background: #ffebee; color: var(--wrong); }
+
+        .feedback { display: inline-block; margin-left: 10px; font-weight: bold; font-size: 15px; }
+        .correct { color: var(--correct); }
+        .wrong { color: var(--wrong); }
+
+    </style>
+</head>
+<body>
+
+<div id="setupOverlay" class="custom-overlay">
+    <div class="setup-modal">
+        <h2>Reading Library ✨</h2>
+        <p style="font-size: 16px; color: #666; margin-bottom: 20px;">Hãy cài đặt thời gian để bắt đầu luyện tập Passage 3 nhé!</p>
+        <div id="timeInputBox">
+            <label style="font-size: 16px; font-weight: bold; color: #555;">Thời gian (phút): </label>
+            <input type="number" id="timeInput" value="20" min="5" max="60">
+        </div>
+        <button class="start-btn" onclick="askReady()">Sẵn sàng (OK)</button>
+    </div>
+</div>
+
+<div id="startConfirmOverlay" class="custom-overlay">
+    <div class="custom-modal setup-modal">
+        <h2>Xác nhận bắt đầu</h2>
+        <p id="startConfirmMsg" style="font-size: 16px; color: #555; margin-bottom: 20px; white-space: pre-line;"></p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeStartConfirmModal()">Huỷ</button>
+            <button class="btn-confirm" onclick="startTestActual()">OK</button>
+        </div>
+    </div>
+</div>
+
+<header>
+    <div class="brand"><span>SnapEnglish</span> Passage 3 Test 1</div>
+    <div style="display:flex; align-items:center; gap:15px;">
+        <div class="timer-box">⏱ <span id="timer">00:00</span></div>
+        <button class="btn-submit" onclick="submitTest(true)">NỘP BÀI</button>
+    </div>
+</header>
+
+<div class="container" id="mainContainer">
+    <div class="pane pane-left" id="passagePane">
+        <h2 class="passage-title">Global Warming in New Zealand 2 🇳🇿</h2>
+        <div id="passageText">
+            <p class="paragraph"><span class="paragraph-label">A.</span> <span id="ev-27" class="ev-box">New Zealand is expected to warm by about 3°C over the next century. The northern polar regions will be more than 6°C warmer, while the large continents – also the largest centres of population – will be 4°C or warmer. In contrast, the Southern Ocean, which surrounds New Zealand, may warm by only 2°C. The sea will act as an air conditioner and in this aspect, New Zealand’s location is comparatively fortunate.</span></p>
+            
+            <p class="paragraph"><span class="paragraph-label">B.</span> Any predictions are complicated by the variability of New Zealand’s climate. The annual temperature can fluctuate as much as 1°C above or below the long-term average. The early summer of 2006-7, for instance, was notably cool, thanks in part to the iceberg that drifted up the east coast. A few months later, warm water from the Tasman Sea helped make May 2007 unusually hot. <span id="ev-28" class="ev-box">These variables will continue unaffected so that, although the general pattern will be for rising temperatures, the warming trend may not be uniform.</span></p>
+            
+            <p class="paragraph"><span class="paragraph-label">C.</span> The Ocean to the south of New Zealand will have one important effect. As the world warms, the great bank of west winds that circle Antarctica will become stronger. This has already been observed, and its impact on New Zealand is likely to be profound, <span id="ev-29" class="ev-box">stronger, more frequent west winds will bring increased, sometimes catastrophic rainfall to the west coast of the country and create drier conditions in some eastern regions that are already drought-prone.</span> At the same time, the general warming will spread south.</p>
+            
+            <p class="paragraph"><span class="paragraph-label">D.</span> Furthermore, in the drier regions, the average moisture deficit – that is, the difference between the amount of water in soils available to plants and the amount plants need for optimum growth – will increase. <span id="ev-30" class="ev-box">Soils could go into moisture deficit earlier in the growing season and the deficits could last longer into autumn that at present. What we think of today as a medium-severity drought could be an almost annual occurrence by the end of the century.</span> One direct consequence of warmer – and shorter – winters will be a reduction in snow cover. The permanent snow line in the mountains will rise, while snow cover below this will be shorter-lived. <span id="ev-31" class="ev-box">The amount of snow that falls may actually increase, however, even in some northern centres, owing to the intensification of precipitation, Ski-field base station may eventually have to be moved upwards</span> to be within reach of the new snow line but there could still be plenty of the white stuff up there.</p>
+            
+            <p class="paragraph"><span class="paragraph-label">E.</span> There will also be a marked impact on New Zealand’s glaciers. Over the last 100 years, the glaciers have been reduced by 35%, although since 1978 increase snowfall has offset the effect of warming. The latest studies conducted by the National Institute for Water and Atmospheric. Research (NIWA), however, suggest that by the end of the century, <span id="ev-32" class="ev-box">warming over the Southern Alps could be significantly greater than over the rest of the country.</span></p>
+            
+            <p class="paragraph"><span class="paragraph-label">F.</span> Sea levels around New Zealand have risen by 25cm since the middle of the 9th century and by 7 cm since 1990. Predictions for the coming years cover a wide range, however, partly because of unknown rises resulting from the <span id="ev-33" class="ev-box">melting of the ice in the Arctic, Greenland and Antarctica.</span> In addition, sea level at any given time is affected by many different factors, one of which is called storm surge. When a Coincides with a high tide along low lying coastal areas, this bulge raises the tide higher than normal, creating. Surge not unlike a slow-motion tsunami. Not only does a rise in sea level increase the potential for his sort damage, but it also has less immediate impacts. The one potentially grave outcome is that <span id="ev-34" class="ev-box">groundwater systems may become contaminated with saltwater, spoiling them for the irrigation of farmland, which in turn could diminish crop harvests.</span> Similarly, over time, estuaries may be enlarged by erosion as tidal influences reach further upstream, <span id="ev-35" class="ev-box">altering the contours of whole shorelines</span> and initiating further unforeseen consequences.</p>
+            
+            <p class="paragraph"><span class="paragraph-label">G.</span> The impacts these changes will have on New Zealand are difficult to generalize. <span id="ev-36" class="ev-box">Human systems are better able to adapt to change than natural ecosystems because humans can see a problem coming and plan a response.</span> <span id="ev-37" class="ev-box">Farmers and horticulturalists have made considerable advances, replacing crops they grow to better suit the new conditions.</span> However, plant breeders will need to show considerable ingenuity if they can overcome the acute water shortages that are forecast.</p>
+            
+            <p class="paragraph"><span class="paragraph-label">H.</span> <span id="ev-36" class="ev-box">For natural ecosystems the rate of change is crucial. If it is low, the plants and animals and fish will be able to ‘keep up’; if it is high, only the most adaptable species-those that can survive in the widest range of ecological niches-are likely to survive.</span> Species adapted to only a narrow range of conditions or food sources will find adaptation much more difficult. <span id="ev-39" class="ev-box">Take tuatara, for instance. Their sex is determined by the temperature at which the eggs are incubated in warm (currently above 22 °C) condition become predominately male – and now males already outnumber females by nearly two to one in some island refuges.</span> In the mountains, as the permanent snow line moves upwards, the tolerance zones of some alpine plants and animals may simply disappear. It should also be remembered that global warming is just that – a global phenomenon. ‘New Zealand’s own greenhouse emissions are tiny – around 0.5% of the global total. <span id="ev-40" class="ev-box">Even if New Zealanders were to achieve the government’s target of carbon neutrality, this would have no discernable impact on global climate change.</span></p>
+            
+            <p class="paragraph"><span class="paragraph-label">I.</span> The changes that global warming is going to bring to New Zealand during the 21st century are going to be significant, but where the country is likely to be most vulnerable is with respect to climate change elsewhere. New Zealand may warm more slowly than most places, but if its major export markets undergo damaging change, the economic impact will be severe.</p>
+        </div>
+    </div>
+
+    <div class="pane pane-right" id="questionPane">
+        
+        <div class="question-section" id="q-group-1">
+            <div class="instruction">Questions 27-32: Choose the correct letter, A, B, C, or D.</div>
+            
+            <div class="mcq-item" id="q-27">
+                <div class="mcq-question">27. What is the main idea of the first paragraph?</div>
+                <label class="mcq-option"><input type="radio" name="mcq-27" value="A" onchange="updateNav(27)"> A. The air condition in New Zealand will maintain a high quality because of the ocean</label>
+                <label class="mcq-option"><input type="radio" name="mcq-27" value="B" onchange="updateNav(27)"> B. The Southern Ocean will remain at a constant strength</label>
+                <label class="mcq-option"><input type="radio" name="mcq-27" value="C" onchange="updateNav(27)"> C. The continents will warm more than the point</label>
+                <label class="mcq-option"><input type="radio" name="mcq-27" value="D" onchange="updateNav(27)"> D. New Zealand will not warm as much as other countries in the next century because it is surrounded by sea.</label>
+                <span id="fb-27" class="feedback"></span>
+                <div id="exp-27"></div>
+            </div>
+
+            <div class="mcq-item" id="q-28">
+                <div class="mcq-question">28. What does the writer say about New Zealand’s variable weather?</div>
+                <label class="mcq-option"><input type="radio" name="mcq-28" value="A" onchange="updateNav(28)"> A. Temperature changes of 1°C will not be seem important in future</label>
+                <label class="mcq-option"><input type="radio" name="mcq-28" value="B" onchange="updateNav(28)"> B. Variable weather will continue, unchanged by global warming</label>
+                <label class="mcq-option"><input type="radio" name="mcq-28" value="C" onchange="updateNav(28)"> C. There was an unusually small amount of variation in 2006-2007</label>
+                <label class="mcq-option"><input type="radio" name="mcq-28" value="D" onchange="updateNav(28)"> D. Summer temperatures will vary but winter ones will be consistent</label>
+                <span id="fb-28" class="feedback"></span>
+                <div id="exp-28"></div>
+            </div>
+
+            <div class="mcq-item" id="q-29">
+                <div class="mcq-question">29. What is the predicted impact of conditions in the ocean to the south of New Zealand?</div>
+                <label class="mcq-option"><input type="radio" name="mcq-29" value="A" onchange="updateNav(29)"> A. New Zealand will be more affected by floods and droughts</label>
+                <label class="mcq-option"><input type="radio" name="mcq-29" value="B" onchange="updateNav(29)"> B. Antarctica will not be adversely affected by warming.</label>
+                <label class="mcq-option"><input type="radio" name="mcq-29" value="C" onchange="updateNav(29)"> C. The band of west winds will move further to the south</label>
+                <label class="mcq-option"><input type="radio" name="mcq-29" value="D" onchange="updateNav(29)"> D. The usual west wind will no longer be reliable</label>
+                <span id="fb-29" class="feedback"></span>
+                <div id="exp-29"></div>
+            </div>
+
+            <div class="mcq-item" id="q-30">
+                <div class="mcq-question">30. The writer mentions ‘moisture deficit’ to show?</div>
+                <label class="mcq-option"><input type="radio" name="mcq-30" value="A" onchange="updateNav(30)"> A. The droughts will be shorter but more severe</label>
+                <label class="mcq-option"><input type="radio" name="mcq-30" value="B" onchange="updateNav(30)"> B. How the growing season will become longer.</label>
+                <label class="mcq-option"><input type="radio" name="mcq-30" value="C" onchange="updateNav(30)"> C. How growing conditions will deteriorate</label>
+                <label class="mcq-option"><input type="radio" name="mcq-30" value="D" onchange="updateNav(30)"> D. That farmers should alter the make-up of soils</label>
+                <span id="fb-30" class="feedback"></span>
+                <div id="exp-30"></div>
+            </div>
+
+            <div class="mcq-item" id="q-31">
+                <div class="mcq-question">31. What are the implications of global warming for New Zealand’s ski-fields?</div>
+                <label class="mcq-option"><input type="radio" name="mcq-31" value="A" onchange="updateNav(31)"> A. Skiing may move to lower the altitude in future.</label>
+                <label class="mcq-option"><input type="radio" name="mcq-31" value="B" onchange="updateNav(31)"> B. The ski season will be later in the year than at present.</label>
+                <label class="mcq-option"><input type="radio" name="mcq-31" value="C" onchange="updateNav(31)"> C. The northern ski field will have to move to the south</label>
+                <label class="mcq-option"><input type="radio" name="mcq-31" value="D" onchange="updateNav(31)"> D. Warming may provide more snow for some ski locations</label>
+                <span id="fb-31" class="feedback"></span>
+                <div id="exp-31"></div>
+            </div>
+
+            <div class="mcq-item" id="q-32">
+                <div class="mcq-question">32. The writer refers to NIWA’s latest studies in the 3rd paragraph to show</div>
+                <label class="mcq-option"><input type="radio" name="mcq-32" value="A" onchange="updateNav(32)"> A. how a particular place could be affected by warming</label>
+                <label class="mcq-option"><input type="radio" name="mcq-32" value="B" onchange="updateNav(32)"> B. that the warming trend has been intensifying since 1978</label>
+                <label class="mcq-option"><input type="radio" name="mcq-32" value="C" onchange="updateNav(32)"> C. that freezing levels will rise throughout the century</label>
+                <label class="mcq-option"><input type="radio" name="mcq-32" value="D" onchange="updateNav(32)"> D. how the growth of glaciers is likely to cause damage</label>
+                <span id="fb-32" class="feedback"></span>
+                <div id="exp-32"></div>
+            </div>
+        </div>
+
+        <div class="question-section" id="q-group-2">
+            <div class="instruction">Questions 33-35: Complete the summary below.<br>Choose <strong>NO MORE THAN TWO WORDS from the passage for each answer.</strong></div>
+            
+            <div class="sticky-palette">
+                <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="A">A. agriculture production</div>
+                <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="B">B. tropical waters</div>
+                <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="C">C. tidal waves</div>
+                <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="D">D. polar regions</div>
+                <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="E">E. global warming</div>
+                <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="F">F. coastal land</div>
+                <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="G">G. high tides</div>
+            </div>
+
+            <p style="line-height: 2; margin-top:20px; font-size: 16px;">
+                <strong>Rising sea levels</strong><br>
+                The extent of future sea level rises around New Zealand is uncertain and may be determined in the 
+                <b>33.</b> <input type="text" class="input-gap" id="ans-33" ondrop="drop(event)" ondragover="allowDrop(event)" oninput="updateNav(33)" readonly>
+                <span id="fb-33" class="feedback"></span>. 
+                Another variable is sudden rises in sea level caused by bad weather. Higher sea levels can lead to reduced 
+                <b>34.</b> <input type="text" class="input-gap" id="ans-34" ondrop="drop(event)" ondragover="allowDrop(event)" oninput="updateNav(34)" readonly>
+                <span id="fb-34" class="feedback"></span> 
+                and result in changes to the shape of 
+                <b>35.</b> <input type="text" class="input-gap" id="ans-35" ondrop="drop(event)" ondragover="allowDrop(event)" oninput="updateNav(35)" readonly>
+                <span id="fb-35" class="feedback"></span>.
+            </p>
+            <div id="fb-container-33-35" style="display:flex; flex-direction:column; gap:10px; margin-top: 15px;"></div>
+        </div>
+
+        <div class="question-section" id="q-group-3">
+            <div class="instruction">Questions 36-40: Do the following statements agree with the claims of the writer?<br>YES / NO / NOT GIVEN</div>
+            
+            <div class="mcq-item">
+                <p class="mcq-question">36. The natural world is less responsive to challenges than humans.</p>
+                <select class="input-gap-select" id="ans-36" onchange="updateNav(36)">
+                    <option value="">Select...</option>
+                    <option value="YES">YES</option>
+                    <option value="NO">NO</option>
+                    <option value="NOT GIVEN">NOT GIVEN</option>
+                </select>
+                <span id="fb-36" class="feedback"></span>
+                <div id="exp-36"></div>
+            </div>
+
+            <div class="mcq-item">
+                <p class="mcq-question">37. The agricultural sector is being too conservative and resistant to innovation.</p>
+                <select class="input-gap-select" id="ans-37" onchange="updateNav(37)">
+                    <option value="">Select...</option>
+                    <option value="YES">YES</option>
+                    <option value="NO">NO</option>
+                    <option value="NOT GIVEN">NOT GIVEN</option>
+                </select>
+                <span id="fb-37" class="feedback"></span>
+                <div id="exp-37"></div>
+            </div>
+
+            <div class="mcq-item">
+                <p class="mcq-question">38. The global warming is slow; it will affect different regions in different ways.</p>
+                <select class="input-gap-select" id="ans-38" onchange="updateNav(38)">
+                    <option value="">Select...</option>
+                    <option value="YES">YES</option>
+                    <option value="NO">NO</option>
+                    <option value="NOT GIVEN">NOT GIVEN</option>
+                </select>
+                <span id="fb-38" class="feedback"></span>
+                <div id="exp-38"></div>
+            </div>
+
+            <div class="mcq-item">
+                <p class="mcq-question">39. The tuatara is vulnerable to changes in climate conditions.</p>
+                <select class="input-gap-select" id="ans-39" onchange="updateNav(39)">
+                    <option value="">Select...</option>
+                    <option value="YES">YES</option>
+                    <option value="NO">NO</option>
+                    <option value="NOT GIVEN">NOT GIVEN</option>
+                </select>
+                <span id="fb-39" class="feedback"></span>
+                <div id="exp-39"></div>
+            </div>
+
+            <div class="mcq-item">
+                <p class="mcq-question">40. New Zealand must reduce carbon emission if global warming is to be slowed.</p>
+                <select class="input-gap-select" id="ans-40" onchange="updateNav(40)">
+                    <option value="">Select...</option>
+                    <option value="YES">YES</option>
+                    <option value="NO">NO</option>
+                    <option value="NOT GIVEN">NOT GIVEN</option>
+                </select>
+                <span id="fb-40" class="feedback"></span>
+                <div id="exp-40"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="confirmOverlay" class="custom-overlay">
+    <div class="custom-modal setup-modal">
+        <h2>Xác nhận nộp bài</h2>
+        <p style="font-size: 16px; color: #555; margin-bottom: 15px;">Bạn có chắc chắn muốn nộp bài để xem đáp án và lưu điểm không?</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeConfirmModal()">Quay lại</button>
+            <button class="btn-confirm" onclick="executeSubmit()">Nộp bài</button>
+        </div>
+    </div>
+</div>
+
+<div id="resultOverlay" class="custom-overlay">
+    <div class="custom-modal setup-modal">
+        <h2>🎉 Hoàn thành!</h2>
+        <div id="resultMessage" style="margin: 20px 0; line-height: 1.8;"></div>
+        <button class="btn-confirm" style="width: 100%; margin-top: 10px;" onclick="closeResultModal()">Xem giải thích chi tiết</button>
+    </div>
+</div>
+
+<div id="ctxMenu">
+    <button onclick="doHighlight()">🖍 Bôi vàng Highlight tự do</button>
+    <button onclick="removeHighlight()" class="delete">🗑 Xóa Highlight</button>
+</div>
+
+<footer>
+    <div style="font-size:14px; font-weight:bold; color:#777; text-transform:uppercase;">Điều hướng:</div>
+    <div class="palette-scroller" id="navPalette"></div>
+</footer>
+
+<script>
+    // --- STATE & DATA ---
+    let testDuration = 0; 
+    let timerInterval = null;
+    let isSubmitted = false;
+
+    const correctAnswers = {
+        27: "D", 28: "B", 29: "A", 30: "C", 31: "D", 32: "A",
+        33: "D", 34: "A", 35: "F",
+        36: "YES", 37: "NOT GIVEN", 38: "NOT GIVEN", 39: "YES", 40: "NO"
+    };
+
+    const explanations = {
+        27: { translation: "New Zealand sẽ không ấm lên nhiều như các quốc gia khác trong thế kỷ tới vì nó được bao quanh bởi biển.", exp: "Đoạn A nhắc đến việc biển bao quanh New Zealand hoạt động như 'máy điều hòa' (air conditioner), giúp vị trí của nó may mắn hơn so với các cực hay lục địa lớn.", colorClass: "ev-27" },
+        28: { translation: "Thời tiết thay đổi liên tục sẽ tiếp diễn, không bị ảnh hưởng bởi sự nóng lên toàn cầu.", exp: "Đoạn B khẳng định 'These variables will continue unaffected so that... the warming trend may not be uniform'.", colorClass: "ev-28" },
+        29: { translation: "New Zealand sẽ bị ảnh hưởng nhiều hơn bởi lũ lụt và hạn hán.", exp: "Đoạn C nhắc đến 'catastrophic rainfall to the west coast' (lũ lụt) và 'create drier conditions in some eastern regions' (hạn hán).", colorClass: "ev-29" },
+        30: { translation: "Để chỉ ra điều kiện phát triển sẽ suy thoái như thế nào.", exp: "Đoạn D giải thích 'moisture deficit' là sự thiếu hụt độ ẩm, khiến hạn hán trung bình trở thành sự kiện diễn ra gần như hàng năm, ảnh hưởng xấu tới thực vật.", colorClass: "ev-30" },
+        31: { translation: "Sự nóng lên có thể cung cấp nhiều tuyết hơn cho một số khu vực trượt tuyết.", exp: "Đoạn D đề cập 'The amount of snow that falls may actually increase... owing to the intensification of precipitation'.", colorClass: "ev-31" },
+        32: { translation: "Để chỉ ra một khu vực cụ thể có thể bị ảnh hưởng bởi sự nóng lên như thế nào.", exp: "Đoạn E dẫn nghiên cứu của NIWA để nhấn mạnh rằng 'Southern Alps' (một khu vực cụ thể) có thể bị nóng lên đáng kể hơn phần còn lại của đất nước.", colorClass: "ev-32" },
+        33: { translation: "Vùng cực (D. polar regions)", exp: "Đoạn F nhắc đến sự tan băng ở 'Arctic, Greenland and Antarctica' (Bắc Cực, Nam Cực) tương ứng với 'polar regions'.", colorClass: "ev-33" },
+        34: { translation: "Sản xuất nông nghiệp (A. agriculture production)", exp: "Đoạn F nhắc đến nước ngầm nhiễm mặn phá hỏng hệ thống tưới tiêu, 'diminish crop harvests' (giảm thu hoạch mùa màng), tương ứng với giảm sút 'agriculture production'.", colorClass: "ev-34" },
+        35: { translation: "Vùng đất ven biển (F. coastal land)", exp: "Đoạn F nói sự xói mòn có thể 'altering the contours of whole shorelines' (thay đổi đường nét của toàn bộ bờ biển), tương ứng với 'shape of coastal land'.", colorClass: "ev-35" },
+        36: { translation: "Thế giới tự nhiên phản ứng chậm với thách thức hơn con người.", exp: "Đoạn G & H: Con người 'better able to adapt to change than natural ecosystems' nhờ khả năng dự đoán và lên kế hoạch.", colorClass: "ev-36" },
+        37: { translation: "Ngành nông nghiệp đang quá bảo thủ và chống lại sự đổi mới.", exp: "Không có thông tin. Đoạn G ngược lại cho thấy nông dân đã 'made considerable advances' (tạo ra nhiều tiến bộ).", tip: "Thông tin không có hoặc mâu thuẫn." },
+        38: { translation: "Sự nóng lên toàn cầu là chậm; nó sẽ ảnh hưởng đến các khu vực khác nhau theo nhiều cách.", exp: "Đoạn I nói New Zealand ấm lên chậm hơn hầu hết mọi nơi, nhưng không khẳng định sự nóng lên toàn cầu nói chung là chậm.", tip: "Thông tin có vẻ logic nhưng không được bài báo khẳng định rõ." },
+        39: { translation: "Loài tuatara dễ bị tổn thương trước những thay đổi về điều kiện khí hậu.", exp: "Đoạn H nêu ví dụ về loài tuatara có giới tính bị quyết định bởi nhiệt độ, dẫn đến mất cân bằng giới tính trầm trọng do môi trường ấm lên.", colorClass: "ev-39" },
+        40: { translation: "New Zealand phải giảm lượng khí thải carbon nếu muốn làm chậm sự nóng lên toàn cầu.", exp: "Đoạn H khẳng định lượng khí thải của NZ là siêu nhỏ, ngay cả khi trung hòa carbon cũng 'no discernable impact on global climate change' (không có tác động rõ rệt đến biến đổi khí hậu toàn cầu).", colorClass: "ev-40" }
+    };
+
+    const startQ = 27; const endQ = 40; const totalQuestions = 14;
+
+    // --- INIT ---
+    window.onload = function() {
+        renderPalette();
+        document.getElementById('setupOverlay').style.display = 'flex';
+    }
+
+    function askReady() {
+        let minutes = parseInt(document.getElementById('timeInput').value);
+        if(isNaN(minutes) || minutes < 1) minutes = 20; 
+        document.getElementById('startConfirmMsg').innerText = `Bạn đã cài đặt thời gian là ${minutes} phút.\nSẵn sàng bắt đầu chưa?`;
+        document.getElementById('startConfirmOverlay').style.display = 'flex';
+    }
+
+    function closeStartConfirmModal() { document.getElementById('startConfirmOverlay').style.display = 'none'; }
+
+    function startTestActual() {
+        document.getElementById('startConfirmOverlay').style.display = 'none';
+        let minutes = parseInt(document.getElementById('timeInput').value);
+        if(isNaN(minutes) || minutes < 1) minutes = 20;
+        testDuration = minutes * 60;
+        
+        document.getElementById('setupOverlay').style.display = 'none';
+        startTimer();
+    }
+
+    function renderPalette() {
+        const nav = document.getElementById("navPalette");
+        for (let i = startQ; i <= endQ; i++) {
+            let dot = document.createElement("div");
+            dot.className = "nav-dot"; dot.id = `nav-${i}`; dot.innerText = i;
+            dot.onclick = () => {
+                let targetId = (i <= 32) ? `q-${i}` : `ans-${i}`;
+                let el = document.getElementById(targetId);
+                if(i >= 36 && el) el = el.closest('.mcq-item');
+                if(el) {
+                    el.scrollIntoView({behavior:"smooth", block:"center"});
+                    el.style.backgroundColor = "var(--highlight-color)";
+                    setTimeout(() => el.style.backgroundColor = "", 1000);
+                }
+            };
+            nav.appendChild(dot);
+        }
+    }
+
+    function updateNav(id) {
+        let nav = document.getElementById(`nav-${id}`);
+        if (!nav) return;
+        let val = "";
+        if (id <= 32) {
+            let checked = document.querySelector(`input[name="mcq-${id}"]:checked`);
+            if (checked) val = checked.value;
+        } else {
+            let el = document.getElementById(`ans-${id}`);
+            if (el) val = el.value;
+        }
+        if (val && val.trim() !== "") nav.classList.add("done");
+        else nav.classList.remove("done");
+    }
+
+    // --- DRAG & DROP LOGIC ---
+    function allowDrop(ev) { ev.preventDefault(); ev.target.classList.add("drag-over"); }
+    document.addEventListener("dragleave", (e) => { if (e.target.classList.contains("input-gap")) e.target.classList.remove("drag-over"); });
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.getAttribute("data-val")); }
+    function drop(ev) {
+        ev.preventDefault(); ev.target.classList.remove("drag-over");
+        let val = ev.dataTransfer.getData("text");
+        if (val) {
+            ev.target.value = val; ev.target.classList.add("filled");
+            let id = ev.target.id.split('-')[1]; updateNav(id);
+        }
+    }
+
+    // --- TIMER ---
+    function startTimer() {
+        let display = document.getElementById("timer");
+        timerInterval = setInterval(function () {
+            let m = Math.floor(testDuration / 60);
+            let s = testDuration % 60;
+            display.textContent = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+            if (--testDuration < 0) { clearInterval(timerInterval); executeSubmit(); }
+        }, 1000);
+    }
+
+    // --- SUBMIT & EXPLANATIONS ---
+    function submitTest(manual) {
+        if (isSubmitted) return;
+        if (manual) document.getElementById('confirmOverlay').style.display = 'flex';
+        else executeSubmit();
+    }
+
+    function closeConfirmModal() { document.getElementById('confirmOverlay').style.display = 'none'; }
+    function closeResultModal() { document.getElementById('resultOverlay').style.display = 'none'; }
+
+    function executeSubmit() {
+        document.getElementById('confirmOverlay').style.display = 'none';
+        isSubmitted = true;
+        clearInterval(timerInterval);
+        document.querySelectorAll('input, select').forEach(el => el.disabled = true);
+        
+        let score = 0;
+        const dragExpContainer = document.getElementById('fb-container-33-35');
+        if(dragExpContainer) dragExpContainer.innerHTML = "";
+
+        for (let i = startQ; i <= endQ; i++) {
+            let userAns = "";
+            if (i <= 32) {
+                let checked = document.querySelector(`input[name="mcq-${i}"]:checked`);
+                if (checked) userAns = checked.value;
+            } else {
+                let el = document.getElementById(`ans-${i}`);
+                if (el) userAns = el.value.trim().toUpperCase();
+            }
+
+            let correct = correctAnswers[i];
+            let isCorrect = (userAns === correct);
+            if (isCorrect) score++;
+
+            let fb = document.getElementById(`fb-${i}`);
+            if (fb) {
+                fb.innerText = isCorrect ? "✓" : `✗ (${correct})`;
+                fb.className = isCorrect ? "feedback correct" : "feedback wrong";
+            }
+
+            // Exps
+            if(explanations[i]) {
+                let expData = explanations[i];
+                let htmlContent = `
+                    <div class="exp-box show">
+                        <div class="exp-title">
+                            💡 Câu ${i}
+                            ${expData.colorClass ? `<button class="locate-btn" onclick="scrollToEvidence('${expData.colorClass}')">📍 Xem dẫn chứng</button>` : ''}
+                        </div>
+                        <div class="exp-translation">"${expData.translation}"</div>
+                        <div class="exp-text">${expData.exp}</div>
+                        ${expData.tip ? `<div style="margin-top:8px; font-size:14px; color:#888;"><i>Mẹo: ${expData.tip}</i></div>` : ''}
+                    </div>`;
+
+                if (i >= 33 && i <= 35) {
+                    if(dragExpContainer) dragExpContainer.innerHTML += htmlContent;
+                } else {
+                    let expContainer = document.getElementById(`exp-${i}`);
+                    if(expContainer) expContainer.innerHTML = htmlContent;
+                }
+            }
+
+            let nav = document.getElementById(`nav-${i}`);
+            if(nav) {
+                nav.style.background = isCorrect ? "#e8f5e9" : "#ffebee";
+                nav.style.color = isCorrect ? "#2e7d32" : "#c62828";
+                nav.style.borderColor = isCorrect ? "#a5d6a7" : "#ef9a9a";
+            }
+        }
+
+        // Color ev-boxes
+        const pastelColors = ['#ffadad','#ffd6a5','#caffbf','#9bf6ff','#a0c4ff','#bdb2ff','#ffc6ff','#e2f0cb','#fdede8','#dfd8f5','#cbe3f0','#fce1e4','#e5f6e5'];
+        document.querySelectorAll('.ev-box').forEach((el, index) => {
+            el.style.backgroundColor = pastelColors[index % pastelColors.length];
+            el.style.color = "#333";
+        });
+
+        // Calculate Band and Upload
+        let timeTaken = Math.round(((parseInt(document.getElementById('timeInput').value) * 60) - testDuration) / 60) || 1;
+        if(window.luuDiemLenFirebase) window.luuDiemLenFirebase(score, timeTaken);
+
+        document.getElementById('resultMessage').innerHTML = `
+            <strong style="font-size: 26px; color: var(--primary-dark); display: block; margin-bottom: 10px;">Số câu đúng: ${score}/${totalQuestions}</strong>
+            <p style="font-size: 16px; color: #666;">Đã đồng bộ kết quả lên hệ thống Tracker!</p>
+        `;
+        setTimeout(() => { document.getElementById('resultOverlay').style.display = 'flex'; }, 500);
+    }
+
+    function scrollToEvidence(id) {
+        const evElement = document.getElementById(id);
+        if(evElement) {
+            evElement.scrollIntoView({behavior: "smooth", block: "center"});
+            evElement.classList.remove("focus-blink");
+            void evElement.offsetWidth;
+            evElement.classList.add("focus-blink");
+            setTimeout(() => evElement.classList.remove("focus-blink"), 1500);
+        }
+    }
+
+    // --- HIGHLIGHT SYSTEM ---
+    const container = document.getElementById("mainContainer");
+    const menu = document.getElementById("ctxMenu");
+    let targetEl = null; let selectedRange = null;
+
+    container.addEventListener("contextmenu", (e) => {
+        if (!e.target.closest('.pane')) return;
+        e.preventDefault();
+        targetEl = null; selectedRange = null; menu.style.display = "none";
+        
+        if (e.target.classList.contains("highlight")) {
+            targetEl = e.target;
+            showMenu(e.pageX, e.pageY, "remove"); return;
+        }
+
+        let sel = window.getSelection();
+        if (sel.toString().trim().length > 0 && container.contains(sel.anchorNode)) {
+            selectedRange = sel.getRangeAt(0).cloneRange();
+            showMenu(e.pageX, e.pageY, "add");
+        }
+    });
+
+    document.addEventListener("click", (e) => { if (!menu.contains(e.target)) menu.style.display = "none"; });
+
+    function showMenu(x, y, mode) {
+        menu.style.display = "block";
+        let mw = menu.offsetWidth; let mh = menu.offsetHeight;
+        menu.style.left = (x + mw > window.innerWidth ? window.innerWidth - mw - 10 : x) + "px";
+        menu.style.top = (y + mh > window.innerHeight ? window.innerHeight - mh - 10 : y) + "px";
+        menu.children[0].style.display = (mode === "add") ? "block" : "none";
+        menu.children[1].style.display = (mode === "remove") ? "block" : "none";
+    }
+
+    function doHighlight() {
+        if (selectedRange) {
+            let span = document.createElement("span"); span.className = "highlight";
+            try { selectedRange.surroundContents(span); } catch(e){}
+            window.getSelection().removeAllRanges();
+        }
+        menu.style.display = "none";
+    }
+
+    function removeHighlight() {
+        if (targetEl) {
+            let text = document.createTextNode(targetEl.textContent);
+            targetEl.parentNode.replaceChild(text, targetEl);
+            container.normalize();
+        }
+        menu.style.display = "none";
+    }
+</script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+        authDomain: "snapenglish-cb6e2.firebaseapp.com",
+        projectId: "snapenglish-cb6e2",
+        storageBucket: "snapenglish-cb6e2.firebasestorage.app",
+        messagingSenderId: "373152038413",
+        appId: "1:373152038413:web:19284622571390f8585f44"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            window.currentUserUid = user.uid;
+            window.currentUserEmail = user.email;
+        }
+    });
+
+    // Helper: Tính điểm Band Ielts (Quy đổi theo hệ 40 câu)
+    function calculateIeltsBand(correct, total) {
+        let normalizedCorrect = (correct / total) * 40;
+        if (normalizedCorrect >= 39) return 9.0;
+        if (normalizedCorrect >= 37) return 8.5;
+        if (normalizedCorrect >= 35) return 8.0;
+        if (normalizedCorrect >= 33) return 7.5;
+        if (normalizedCorrect >= 30) return 7.0;
+        if (normalizedCorrect >= 27) return 6.5;
+        if (normalizedCorrect >= 23) return 6.0;
+        if (normalizedCorrect >= 19) return 5.5;
+        if (normalizedCorrect >= 15) return 5.0;
+        if (normalizedCorrect >= 13) return 4.5;
+        if (normalizedCorrect >= 10) return 4.0;
+        if (normalizedCorrect >= 8) return 3.5;
+        if (normalizedCorrect >= 6) return 3.0;
+        return 2.5;
+    }
+
+    window.luuDiemLenFirebase = async function(diemSo, timeTakenMinutes) {
+        if (!window.currentUserUid) return;
+        
+        let tongSoCau = 14; 
+        let bandScore = calculateIeltsBand(diemSo, tongSoCau);
+        let timestamp = Date.now();
+        let idLuotThi = window.currentUserUid + "_ielts_" + timestamp;
+
+        try {
+            await setDoc(doc(db, "user_ielts_scores", idLuotThi), {
+                email: window.currentUserEmail,
+                skill: "Reading",
+                testName: "Test 1",
+                partName: "Passage 3",
+                timeTaken: timeTakenMinutes.toString(),
+                correctQ: diemSo,
+                totalQ: tongSoCau,
+                bandScore: bandScore,
+                date: new Date().toLocaleDateString("vi-VN"),
+                timestamp: timestamp
+            });
+            console.log("Đã lưu điểm thành công lên IELTS Tracker!");
+        } catch(e) {
+            console.error("Lỗi khi lưu điểm: ", e);
+        }
+    }
+</script>
+</body>
+</html>
