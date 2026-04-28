@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 2 Test 1</title>
+  <link rel="icon" type="image/png" href="ảnh.png">
+    <style>
+        /* GIỮ NGUYÊN CSS CỦA BẠN + AUDIO UI MỚI */
+        body { font-family: Poppins, sans-serif; padding: 20px; background: #e3f2fd; text-align: left; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        .btn { padding: 10px 15px; margin-top: 20px; background: #64b5f6; border: none; cursor: pointer; border-radius: 5px; font-size: 14px; color: white; display: block; transition: 0.3s; }
+        .btn:hover { background: #42a5f5; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid black; padding: 10px; text-align: left; }
+        input[type="text"] { min-width: 50px; padding: 3px; border: 1px solid #ccc; border-radius: 3px; }
+        .highlight { background-color: yellow; }
+        .correct-hint { color: blue; font-size: 0.9em; margin-left: 8px; font-weight: bold; }
+        .context-menu { display: none; position: absolute; background: white; border: 1px solid #ccc; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); padding: 5px; z-index: 1000; }
+        .context-menu button { display: block; width: 100%; border: none; background: none; padding: 5px; cursor: pointer; text-align: left; }
+        .context-menu button:hover { background: #f2f2f2; }
+        .question-block { margin-bottom: 15px; }
+
+        /* 🎵 AUDIO CONTROLS PART 2 */
+        .audio-controls { 
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%); 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-bottom: 20px; 
+            text-align: center;
+            color: #333;
+            box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+        }
+        .audio-controls audio { width: 100%; margin-bottom: 15px; border-radius: 8px; }
+        .part-timer { 
+            background: rgba(255,255,255,0.9); 
+            padding: 12px 20px; 
+            border-radius: 25px; 
+            font-size: 20px; 
+            font-weight: bold;
+            color: #ff6b6b;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        .nav-buttons { margin-top: 15px; }
+        .nav-btn { 
+            background: rgba(255,255,255,0.8); 
+            border: 2px solid #ff6b6b; 
+            color: #ff6b6b; 
+            padding: 12px 24px; 
+            margin: 0 8px; 
+            border-radius: 30px; 
+            cursor: pointer; 
+            font-size: 15px;
+            text-decoration: none;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+        .nav-btn:hover { background: #ff6b6b; color: white; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🎧 Part 2 Test 1</h1>
+        
+        <!-- 🎵 AUDIO PLAYER THÔNG MINH - CHỈ PHÁT PART 2 (2:50 - 5:35) -->
+        <div class="audio-controls">
+            <audio id="part2Audio" preload="metadata">
+                <source src="https://drive.google.com/uc?export=download&id=17jmlMUtZO_blYFEdgQrqR7eZIhgdeX3o" type="audio/mpeg">
+                Trình duyệt không hỗ trợ audio!
+            </audio>
+            
+            <div class="part-timer" id="timer">02:50 / 05:35</div>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="playPart2()">🔄 Nghe lại Part 2</button>
+                <a href="player.html" class="nav-btn">🎛️ Player đầy đủ</a>
+                <a href="part1.html" class="nav-btn">⬅️ Part 1</a>
+                <a href="part3.html" class="nav-btn">➡️ Part 3</a>
+            </div>
+        </div>
+
+        <!-- Context menu của bạn -->
+        <div id="contextMenu" class="context-menu">
+            <button onclick="toggleHighlight()">Thêm/Xóa Highlight</button>
+        </div>
+
+        <!-- Questions của bạn - GIỮ NGUYÊN 100% -->
+        <h2>Questions 11-13</h2>
+        <p>Choose the correct letter <strong>A, B or C</strong>.</p>
+
+        <div class="question-block" id="q11-block">
+            <p><strong>11.</strong> Simon's idea for a theme park came from:</p>
+            <label><input type="radio" name="answer-11" value="A"> A. his childhood hobby</label><br>
+            <label><input type="radio" name="answer-11" value="B"> B. his interest in landscape design</label><br>
+            <label><input type="radio" name="answer-11" value="C"> C. his visit to another park</label>
+        </div>
+
+        <div class="question-block" id="q12-block">
+            <p><strong>12.</strong> When they started, the family decided to open the park only when:</p>
+            <label><input type="radio" name="answer-12" value="A"> A. the weather was expected to be good</label><br>
+            <label><input type="radio" name="answer-12" value="B"> B. the children weren't at school</label><br>
+            <label><input type="radio" name="answer-12" value="C"> C. there were fewer farming commitments</label>
+        </div>
+
+        <div class="question-block" id="q13-block">
+            <p><strong>13.</strong> Since opening, the park has had:</p>
+            <label><input type="radio" name="answer-13" value="A"> A. 50,000 visitors</label><br>
+            <label><input type="radio" name="answer-13" value="B"> B. 1,000,000 visitors</label><br>
+            <label><input type="radio" name="answer-13" value="C"> C. 1,500,000 visitors</label>
+        </div>
+
+        <h2>Questions 14-18</h2>
+        <p>What is currently the main area of work of each of the following people? Choose FIVE answers from the box.</p>
+        <div style="border: 1px solid #ccc; padding: 10px; background: #fafafa;">
+            A. advertising | B. animal care | C. building | D. educational links<br>
+            E. engine maintenance | F. food and drink | G. sales | H. staffing
+        </div>
+
+        <p><strong>14.</strong> Simon: <select id="answer-14"><option value="">-- Chọn --</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option></select></p>
+        <p><strong>15.</strong> Liz: <select id="answer-15"><option value="">-- Chọn --</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option></select></p>
+        <p><strong>16.</strong> Sarah: <select id="answer-16"><option value="">-- Chọn --</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option></select></p>
+        <p><strong>17.</strong> Duncan: <select id="answer-17"><option value="">-- Chọn --</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option></select></p>
+        <p><strong>18.</strong> Judith: <select id="answer-18"><option value="">-- Chọn --</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option></select></p>
+
+        <h2>Questions 19-20</h2>
+        <p>Complete the table below. Write <strong>ONE WORD OR A NUMBER</strong>.</p>
+        <table>
+            <tr><th>Feature</th><th>Size</th><th>Biggest Challenge</th></tr>
+            <tr><td>Go-kart arena</td><td><strong>19.</strong> <input type="text" id="answer-19"> sq mt</td><td>Removing mounds on track</td></tr>
+            <tr><td>Target Age Group</td><td><strong>20.</strong> <input type="text" id="answer-20"> year olds</td><td>N/A</td></tr>
+        </table>
+
+        <button class="btn" onclick="submitQuiz()">📩 Nộp bài</button>
+        <p id="score" style="font-weight: bold; margin-top: 15px;"></p>
+    </div>
+
+    <!-- 🎵 JAVASCRIPT AUDIO PART 2 (170s - 335s) -->
+    <script>
+        // 🎵 AUDIO LOGIC PART 2
+        const audio = document.getElementById('part2Audio');
+        const timer = document.getElementById('timer');
+        const PART2_START = 170;  // 2:50
+        const PART2_END = 335;    // 5:35
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        audio.addEventListener('timeupdate', () => {
+            const current = Math.floor(audio.currentTime);
+            // Hiển thị thời gian tương đối Part 2
+            const relativeTime = current - PART2_START;
+            timer.textContent = `${formatTime(relativeTime + PART2_START)} / ${formatTime(PART2_END)}`;
+            
+            // Auto pause + reset khi hết Part 2
+            if (current >= PART2_END) {
+                audio.pause();
+                audio.currentTime = PART2_START;
+                timer.textContent = `${formatTime(PART2_START)} / ${formatTime(PART2_END)}`;
+            }
+        });
+
+        function playPart2() {
+            audio.currentTime = PART2_START;
+            audio.play();
+        }
+
+        // Auto play Part 2 khi load
+        window.addEventListener('load', () => {
+            setTimeout(() => playPart2(), 500);
+        });
+
+        // 🎯 GIỮ NGUYÊN LOGIC CHẤM ĐIỂM CỦA BẠN
+        const correctAnswers = {
+            "answer-11": "C", "answer-12": "A", "answer-13": "C",
+            "answer-14": "E", "answer-15": "H", "answer-16": "F",
+            "answer-17": "C", "answer-18": "G", "answer-19": "120", "answer-20": "5-12"
+        };
+
+        function submitQuiz() {
+            let score = 0;
+            document.querySelectorAll(".correct-hint").forEach(el => el.remove());
+
+            // Check 11-13 (Radio)
+            for (let i = 11; i <= 13; i++) {
+                let name = "answer-" + i;
+                let selected = document.querySelector(`input[name="${name}"]:checked`);
+                let block = document.getElementById(`q${i}-block`);
+                
+                if (selected) {
+                    if (selected.value === correctAnswers[name]) {
+                        score++;
+                        selected.parentElement.style.color = "green";
+                    } else {
+                        selected.parentElement.style.color = "red";
+                        let hint = document.createElement("span");
+                        hint.className = "correct-hint";
+                        hint.innerHTML = `➔ Đáp án: ${correctAnswers[name]}`;
+                        block.querySelector('p').appendChild(hint);
+                    }
+                }
+            }
+
+            // Check 14-20 (Select & Text)
+            for (let i = 14; i <= 20; i++) {
+                let id = "answer-" + i;
+                let element = document.getElementById(id);
+                if (element) {
+                    let val = element.value.trim().toUpperCase();
+                    if (val === correctAnswers[id].toUpperCase()) {
+                        score++;
+                        element.style.color = "green";
+                    } else {
+                        element.style.color = "red";
+                        let hint = document.createElement("span");
+                        hint.className = "correct-hint";
+                        hint.innerHTML = `➔ ${correctAnswers[id]}`;
+                        element.parentNode.insertBefore(hint, element.nextSibling);
+                    }
+                }
+            }
+
+            document.getElementById("score").innerHTML = `🎯 Bạn trả lời đúng ${score} / 10 câu.`;
+        }
+
+        // Highlight logic của bạn
+        let selectedRange;
+        document.addEventListener("mouseup", () => {
+            let selection = window.getSelection();
+            if (!selection.isCollapsed) selectedRange = selection.getRangeAt(0);
+        });
+        document.addEventListener("contextmenu", (e) => {
+            if (window.getSelection().toString()) {
+                e.preventDefault();
+                let menu = document.getElementById("contextMenu");
+                menu.style.display = "block";
+                menu.style.top = e.pageY + "px";
+                menu.style.left = e.pageX + "px";
+            }
+        });
+        document.addEventListener("click", () => document.getElementById("contextMenu").style.display = "none");
+
+        function toggleHighlight() {
+            if (!selectedRange) return;
+            let span = document.createElement("span");
+            span.className = "highlight";
+            if (selectedRange.startContainer.parentElement.className === "highlight") {
+                selectedRange.startContainer.parentElement.replaceWith(selectedRange.startContainer.textContent);
+            } else {
+                selectedRange.surroundContents(span);
+            }
+            window.getSelection().removeAllRanges();
+        }
+    </script>
+</body>
+</html>
