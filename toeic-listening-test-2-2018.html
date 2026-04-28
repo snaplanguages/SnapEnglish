@@ -1856,6 +1856,13 @@
             document.getElementById('btnModePractice').classList.add('selected');
             document.getElementById('timeSettings').style.display = 'block';
             isMockMode = false;
+            
+            // Bật lại các nút Tab cho chế độ luyện tập
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.style.pointerEvents = 'auto'; 
+                btn.style.opacity = '1';
+            });
+            
         } else {
             document.getElementById('btnModeMock').classList.add('selected');
             document.getElementById('timeSettings').style.display = 'none';
@@ -1865,14 +1872,68 @@
         document.getElementById('btnStart').style.display = 'block';
     }
 
-    function startTest() {
+   function startTest() {
         timerDuration = parseInt(document.getElementById('inputTime').value) * 60;
         document.getElementById('setupModal').classList.remove('show');
         renderTest();
         buildNavGrid();
         startTimer();
-    }
 
+        // Thêm dòng này để kích hoạt chế độ thi thật
+        if (isMockMode) {
+            setupMockModeAudio();
+        }
+    }
+// Biến toàn cục lưu danh sách audio
+    let mockAudioList = [];
+
+    function setupMockModeAudio() {
+        // 1. Khóa tính năng bấm chuyển Tab thủ công của người dùng
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.style.pointerEvents = 'none'; 
+            btn.style.opacity = '0.8';
+        });
+
+        // 2. Thu thập toàn bộ thẻ audio trong DOM
+        mockAudioList = Array.from(document.querySelectorAll('audio'));
+        
+        mockAudioList.forEach((audio, index) => {
+            // Xóa thuộc tính controls để ẩn thanh phát nhạc (không cho tua/dừng)
+            audio.removeAttribute('controls'); 
+
+            // 3. Lắng nghe sự kiện khi audio hiện tại kết thúc
+            audio.onended = () => {
+                let nextIndex = index + 1;
+                
+                // Nếu vẫn còn audio tiếp theo
+                if (nextIndex < mockAudioList.length) {
+                    let currentPart = audio.closest('.part-container');
+                    let nextPart = mockAudioList[nextIndex].closest('.part-container');
+
+                    // Kiểm tra xem audio tiếp theo có nằm ở Part khác không
+                    if (currentPart !== nextPart) {
+                        // Tự động chuyển Tab tương ứng
+                        let partId = nextPart.id; // ví dụ: "part2"
+                        let partNum = parseInt(partId.replace('part', ''));
+                        switchTab(partNum);
+                    }
+
+                    // Cuộn màn hình tới câu hỏi của audio tiếp theo và tự động phát
+                    mockAudioList[nextIndex].closest('.q-card').scrollIntoView({behavior: "smooth", block: "center"});
+                    mockAudioList[nextIndex].play();
+                } else {
+                    // Tùy chọn: Tự động nộp bài khi chạy xong audio cuối cùng của Part 4
+                    // executeSubmit();
+                }
+            };
+        });
+
+        // 4. Tự động chuyển về Part 1 và phát file audio đầu tiên
+        if (mockAudioList.length > 0) {
+            switchTab(1);
+            mockAudioList[0].play().catch(e => console.log("Trình duyệt chặn autoplay, cần tương tác từ người dùng."));
+        }
+    }
     function startTimer() {
         const display = document.getElementById('timerDisplay');
         timerInterval = setInterval(() => {
