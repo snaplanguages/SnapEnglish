@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passage 2 Test 3 | SnapEnglish</title>
+  <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Amber / Terracotta Theme - Hoang dã, Năng lượng, Trầm ấm */
+            --primary: #d97706; 
+            --primary-dark: #b45309; 
+            --accent: #fcd34d;
+            --bg-body: #fffbeb;
+            --border-color: #fde68a;
+            --text-color: #1e293b;
+            --highlight-color: #fef08a;
+            --correct: #16a34a;
+            --wrong: #dc2626;
+            --exp-bg: #fef3c7;
+            --header-h: 65px;
+            --footer-h: 70px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- OVERLAY & MODALS --- */
+        .custom-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 99999;
+        }
+        
+        .setup-modal {
+            background: white; padding: 40px 40px; border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(217, 119, 6, 0.15);
+            width: 90%; max-width: 450px; text-align: center;
+            border: 2px solid var(--accent);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .setup-modal h2 { font-family: 'Lora', serif; color: var(--primary-dark); font-size: 28px; margin-top: 0; }
+        
+        #timeInputBox { display: block; margin: 25px 0; }
+        #timeInput { 
+            width: 100px; padding: 10px; font-size: 18px; text-align: center; 
+            border: 2px solid #cbd5e1; border-radius: 10px; font-family: inherit;
+            color: var(--primary-dark); font-weight: bold; outline: none; transition: 0.2s;
+        }
+        #timeInput:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2); }
+        
+        .start-btn {
+            background: var(--primary); color: white; border: none; padding: 12px 35px;
+            border-radius: 50px; font-size: 16px; font-weight: 700; cursor: pointer;
+            transition: 0.3s; display: inline-block; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
+        }
+        .start-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(217, 119, 6, 0.4); }
+
+        .modal-actions { display: flex; gap: 15px; margin-top: 25px; justify-content: center; }
+        .btn-cancel {
+            background: #f1f5f9; color: #475569; border: 2px solid #cbd5e1; padding: 12px 20px;
+            border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s; flex: 1;
+        }
+        .btn-cancel:hover { background: #e2e8f0; border-color: #94a3b8; }
+        .btn-confirm {
+            background: var(--primary); color: white; border: none; padding: 12px 20px;
+            border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s; flex: 1;
+            box-shadow: 0 4px 0 var(--primary-dark);
+        }
+        .btn-confirm:active { transform: translateY(4px); box-shadow: none; }
+
+        /* HEADER */
+        header {
+            height: var(--header-h); background: #fff;
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 25px; z-index: 100;
+        }
+        .brand { font-size: 20px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        .brand span { background: var(--primary); color: white; padding: 4px 10px; border-radius: 8px; font-size: 14px; }
+        
+        .timer-box { font-family: monospace; font-size: 18px; font-weight: 700; color: #b91c1c; background: #fef2f2; padding: 6px 15px; border-radius: 8px; border: 1px solid #fecaca;}
+        .btn-submit { 
+            background: var(--primary); color: white; border: none; padding: 8px 25px; 
+            border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px;
+            box-shadow: 0 4px 0 var(--primary-dark); transition: 0.2s;
+        }
+        .btn-submit:active { transform: translateY(4px); box-shadow: none; }
+
+        /* LAYOUT */
+        .container { display: flex; height: calc(100vh - var(--header-h) - var(--footer-h)); width: 100%; max-width: 100%; }
+        .pane { flex: 1; padding: 35px; overflow-y: auto; position: relative; scroll-behavior: smooth; }
+        .pane-left { border-right: 2px solid var(--border-color); background: #fff; font-size: 16px; line-height: 1.8; text-align: justify; }
+        .pane-right { background: #f8fafc; }
+        
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 5px; }
+
+        /* CONTENT */
+        .passage-title { text-align: center; color: var(--primary-dark); margin-bottom: 25px; font-family: 'Lora', serif; border-bottom: 2px dashed var(--accent); padding-bottom: 15px;}
+        .paragraph { margin-bottom: 20px; }
+        .paragraph-label { color: var(--primary); font-weight: 800; font-size: 1.1em; margin-right: 5px; }
+
+        /* EVIDENCE HIGHLIGHTS */
+        .ev-box { 
+            padding: 2px 4px; border-radius: 6px; 
+            transition: all 0.4s ease; 
+            border: 2px solid transparent;
+            background-color: transparent;
+            color: inherit;
+        }
+        .ev-box.focus-blink {
+            border-color: var(--primary-dark) !important;
+            transform: scale(1.02); 
+            box-shadow: 0 4px 15px rgba(217, 119, 6, 0.2) !important; 
+            background-color: var(--highlight-color) !important;
+            z-index: 10; position: relative;
+        }
+
+        /* QUESTIONS */
+        .question-section { padding: 25px; border: 1px solid var(--border-color); background: #fff; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);}
+        .instruction { color: var(--primary-dark); font-weight: 700; margin-bottom: 20px; font-size: 16px; background: #fef3c7; padding: 12px 15px; border-radius: 8px; border-left: 4px solid var(--primary);}
+
+        .q-row { display: flex; align-items: baseline; margin-bottom: 18px; font-size: 16px; }
+        .q-num { font-weight: bold; min-width: 35px; color: var(--primary); }
+        .q-content { flex: 1; }
+
+        .input-gap {
+            display: inline-block; width: 140px; height: 32px;
+            border: 2px solid #cbd5e1; border-radius: 6px; 
+            text-align: center; font-weight: 700; color: var(--primary-dark);
+            font-size: 15px; margin: 0 5px; vertical-align: middle; transition: 0.2s;
+        }
+        .input-gap:focus { border-color: var(--primary); outline: none; }
+        .input-gap.filled { background: #fef3c7; border-color: var(--primary); }
+
+        select.input-select {
+            padding: 8px; border: 2px solid #cbd5e1; border-radius: 8px;
+            font-size: 15px; cursor: pointer; font-weight: 600; color: var(--text-color); outline: none; margin-top: 8px; margin-right: 10px;
+        }
+        select.input-select:focus { border-color: var(--primary); }
+
+        /* List of Headings Display */
+        .headings-list {
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 25px;
+        }
+        .headings-list p { margin: 8px 0; font-size: 15px; color: #334155; }
+        .headings-list strong { color: var(--primary-dark); display: inline-block; width: 35px; }
+
+        /* EXPLANATION BOX (NÂNG CẤP) */
+        .exp-box {
+            display: none; background: #fff;
+            border: 2px solid var(--border-color); border-left: 6px solid var(--primary);
+            padding: 20px; margin-top: 15px; margin-bottom: 15px; border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(217, 119, 6, 0.08); 
+            animation: slideUp 0.4s ease-out;
+        }
+        .exp-box.show { display: block; }
+        .exp-title { 
+            font-weight: 800; color: var(--primary-dark); font-size: 18px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 2px dashed var(--border-color); padding-bottom: 10px; margin-bottom: 12px;
+        }
+        .locate-btn {
+            background: #fef3c7; border: 1px solid var(--accent); color: var(--primary-dark);
+            padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.2s;
+        }
+        .locate-btn:hover { background: var(--primary); color: white; }
+        
+        .exp-section { margin-bottom: 12px; font-size: 15px; line-height: 1.6; color: #334155; }
+        .exp-label { font-weight: 700; color: var(--primary-dark); display: inline-block; width: 100px; }
+        .exp-translate { background: #f8fafc; padding: 10px; border-radius: 6px; border-left: 3px solid #cbd5e1; font-style: italic; margin-top: 5px; }
+        .exp-keywords { background: #fffbeb; padding: 10px; border-radius: 6px; border: 1px dashed #fde68a; margin-top: 5px;}
+        .exp-detail { margin-top: 5px; }
+        .exp-keyword-match { color: #b45309; font-weight: 600; }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* FOOTER */
+        footer {
+            height: var(--footer-h); background: #fff; border-top: 2px solid var(--border-color);
+            display: flex; align-items: center; padding: 0 25px; gap: 15px; z-index: 100;
+        }
+        .palette-scroller { flex: 1; display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; align-items: center;}
+        .nav-dot {
+            min-width: 38px; height: 38px; border: 2px solid #e2e8f0; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: bold;
+            cursor: pointer; color: #94a3b8; background: white; transition: 0.2s; flex-shrink: 0;
+        }
+        .nav-dot.done { background: var(--exp-bg); color: var(--primary-dark); border-color: var(--accent); }
+        .nav-dot:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* HIGHLIGHT MENU */
+        .highlight { background-color: var(--highlight-color); cursor: pointer; border-radius: 3px; padding: 2px 0;}
+        #ctxMenu {
+            position: absolute; display: none; background: white; 
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12); border-radius: 10px; 
+            font-size: 15px; z-index: 99999; border: 1px solid #eee; min-width: 160px; overflow: hidden;
+        }
+        #ctxMenu button {
+            background: none; border: none; padding: 12px 18px; 
+            width: 100%; text-align: left; cursor: pointer; display: block; font-weight: 600; color: #444;
+        }
+        #ctxMenu button:hover { background: #f8fafc; color: var(--primary-dark); }
+        #ctxMenu button.delete:hover { background: #fef2f2; color: var(--wrong); }
+
+        .feedback { display: inline-block; font-weight: bold; font-size: 15px; margin-left: 10px; }
+        .correct { color: var(--correct); }
+        .wrong { color: var(--wrong); }
+
+    </style>
+</head>
+<body>
+
+<div id="setupOverlay" class="custom-overlay">
+    <div class="setup-modal">
+        <h2>Reading Library ✨</h2>
+        <p style="font-size: 16px; color: #64748b; margin-bottom: 20px;">Hãy cài đặt thời gian để bắt đầu luyện tập Passage 2 nhé!</p>
+        <div id="timeInputBox">
+            <label style="font-size: 16px; font-weight: bold; color: #475569;">Thời gian (phút): </label>
+            <input type="number" id="timeInput" value="20" min="5" max="60">
+        </div>
+        <button class="start-btn" onclick="askReady()">Sẵn sàng (OK)</button>
+    </div>
+</div>
+
+<div id="startConfirmOverlay" class="custom-overlay">
+    <div class="custom-modal setup-modal">
+        <h2>Xác nhận bắt đầu</h2>
+        <p id="startConfirmMsg" style="font-size: 16px; color: #475569; margin-bottom: 20px; white-space: pre-line;"></p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeStartConfirmModal()">Huỷ</button>
+            <button class="btn-confirm" onclick="startTestActual()">OK</button>
+        </div>
+    </div>
+</div>
+
+<header>
+    <div class="brand"><span>SnapEnglish</span> Passage 2 Test 3</div>
+    <div style="display:flex; align-items:center; gap:15px;">
+        <div class="timer-box">⏱ <span id="timer">00:00</span></div>
+        <button class="btn-submit" onclick="submitTest(true)">NỘP BÀI</button>
+    </div>
+</header>
+
+<div class="container" id="mainContainer">
+    <div class="pane pane-left" id="passagePane">
+        <h2 class="passage-title">The Evolutionary Mystery: Crocodile Survives</h2>
+        <div id="passageText">
+            <p class="paragraph"><span class="paragraph-label">A.</span> Crocodiles have been around for 200 million years, but they’re certainly not primitive. The early forms of crocodiles are known as Crocodilian. Since they spent most of their life beneath water, accordingly their body adapted to aquatic lifestyle. Due to the changes formed within their body shape and tendency to adapt according to the climate <span id="ev-14" class="ev-box">they were able to survive when most of the reptiles of their period are just a part of history.</span> In their tenure on Earth, they’ve endured the impacts of meteors, planetary refrigeration, extreme upheavals of the Earth’s tectonic surface and profound climate change. They were around for the rise and fall of the dinosaurs, and even 65 million years of supposed mammalian dominance has failed to loosen their grip on the environments they inhabit. Today's crocodiles and alligators are little changed from their prehistoric ancestors, a telling clue that these reptiles were (and remain) extremely well adapted to their environment.</p>
+
+            <p class="paragraph"><span class="paragraph-label">B.</span> The first crocodile-like ancestors appeared about 230 million years ago, with many of the features that make crocs such successful stealth hunters already in place: streamlined body, long tail, protective armour and long jaws. They have long head and a long tail that helps them to change their direction in water while moving. They have four legs which are short and are webbed. <span id="ev-15" class="ev-box">Never underestimate their ability to move on ground.</span> When they move they can move at such a speed that won't give you a second chance to make a mistake by going close to them especially when hungry. They can lift their whole body within seconds from ground. The fastest way by which most species can move is a sort of "belly run", where the body moves like a snake, members huddled to the side paddling away frenetically while the tail whips back and forth. When "belly running" Crocodiles can reach speeds up to 10 or 11 km/h (about 7mph), and often faster if they are sliding down muddy banks. Other form of movement is their "high walk", where the body is elevated above the ground.</p>
+
+            <p class="paragraph"><span class="paragraph-label">C.</span> Crocodilians have no lips. When submerged in their classic 'sit and wait' position, their mouths fill with water. The nostrils on the tip of the elongated snout lead into canals that run through bone to open behind the valve - allowing the crocodilian to breathe through its nostrils even though its mouth is under water. When the animal is totally submerged, <span id="ev-16" class="ev-box">another valve seals the nostrils, so the crocodilian can open its mouth to catch prey with no fear of drowning. The thin skin on the crocodilian head and face is covered with tiny, pigmented domes, forming a network of neural pressure receptors</span> that can detect barely perceptible vibrations in the water. This enables a crocodile lying in silent darkness to suddenly throw its head sideways and grasp with deadly accuracy small prey moving close by.</p>
+
+            <p class="paragraph"><span class="paragraph-label">D.</span> Like other reptiles, crocodiles are <span id="ev-17" class="ev-box">endothermic animals (cold-blooded, or whose body temperature varies with the temperature of the surrounding environment)</span> and, therefore, need to sunbathe, to raise the temperature of the body. On the contrary, if it is too hot, they prefer being in water or in the shade. Being a cold-blooded species, the crocodilian heart is unique in having an actively controlled valve that can redirect, at will, blood flow away from the lungs and recirculate it around the body, taking oxygen to where it's needed most. In addition, their metabolism is a very slow one, so, they can survive for long periods without feeding. Crocodiles are capable of slowing their metabolism even further allowing them to survive for a full year without feeding. Compared to mammals and birds, crocodilians have slow metabolisms that burn much less fuel, and are ideally suited to relatively unstable environments that would defeat mammals with their high food demands.</p>
+
+            <p class="paragraph"><span class="paragraph-label">E.</span> Crocodiles use a very effective technique to catch the prey. The prey remains almost unaware of the fact that there can be any crocodile beneath water. It is due to the fact that when the crocodile sees its prey it moves under water without making any noise and significant movement. It keeps only its eyes above water surface. When it feels it has reached sufficiently close to the target it whistles out of water with wide open jaws. 80 percent of their attempts are successful. They have very powerful jaws. Once the prey trapped in its jaws they swallow it. Their power can be judged from the fact they can kill the wild zebras which come to watery areas in search of water. They do not chew their food. They normally feed on small animals, big fish, birds and even human flesh. As like some water creatures that interact by making sounds crocodiles also use many sounds to communicate with other crocodiles. They exist where conditions have remained the same and they are free of human interference. <span id="ev-18" class="ev-box">The crocodile is successful because it switches its feeding methods. It hunts fish, grabs birds at the surface, hides among the water edge vegetation to wait for a gazelle to come by</span>, and when there is a chance for an ambush, the crocodile lunges forward, knocks the animal with its powerful tail and then drags it to water where it quickly drowns. Another way is to wait motionless for an animal to come to the water's edge and grabs it by its nose where it is held to drown.</p>
+
+            <p class="paragraph"><span class="paragraph-label">F.</span> In many places inhabited by crocodilians, <span id="ev-19" class="ev-box">the hot season brings drought</span> <span id="ev-21" class="ev-box">(hot season brings drought)</span> that dries up their hunting grounds and takes away the means to regulate their body temperature. They allowed reptiles to dominate the terrestrial environment. Furthermore, many crocs protect themselves from this by <span id="ev-19-part2" class="ev-box">digging burrows and entombing themselves in mud, waiting for months without access to food or water</span>, until the rains arrive. To do this, they sink into a quiescent state called aestivation.</p>
+
+            <p class="paragraph"><span class="paragraph-label">G.</span> Most of (At least nine species of) crocodilian are thought to aestivate during dry periods. <span id="ev-20" class="ev-box">Kennett and Christian's six-year study</span> of Australian freshwater crocodiles Crocodylus johnstoni (the King Crocodiles). <span id="ev-22" class="ev-box">The crocodiles spent almost four months a year underground without access to</span> <span id="ev-23" class="ev-box">water.</span> Doubly labeled water was used to measure field metabolic rates and water flux, and plasma (and cloacal fluid samples were taken at approximately monthly intervals during some years to monitor the effects of aestivation with respect to the accumulation of nitrogenous wastes and electrolyte concentrations. Double found that the crocodiles' metabolic engines tick over, producing waste and using up water and fat reserves. Waste products are stored in the urine, which gets increasingly concentrated as the months pass. However, the concentration of waste products in the blood changes very little, allowing the crocodiles to function normally. Furthermore, <span id="ev-24" class="ev-box">though the animals lost water and body mass (just over one-tenth of their initial mass) while underground, the losses were proportional:</span> on emergence, the aestivating crocodiles <span id="ev-25" class="ev-box">were not dehydrated and exhibited no other detrimental effects</span> such as a <span id="ev-26" class="ev-box">decreased growth rate.</span> Kennett and Christian believe this ability of individuals to sit out the bad times and endure long periods of enforced starvation must surely be key to the survival of the crocodilian line through time.</p>
+        </div>
+    </div>
+
+    <div class="pane pane-right" id="questionPane">
+        
+        <div class="question-section" id="q-group-1">
+            <div class="instruction">Questions 14 - 20: Reading passage 2 has seven paragraphs, A-G. Choose the correct heading for paragraphs A-G from the list below.</div>
+            
+            <div class="headings-list">
+                <p><strong>i.</strong> The competitors with the dinosaur</p>
+                <p><strong>ii.</strong> A historical event for the Supreme survivors</p>
+                <p><strong>iii.</strong> What makes the crocodile the fastest running animal on land</p>
+                <p><strong>iv.</strong> Regulated body temperature by the surrounding environment</p>
+                <p><strong>v.</strong> Underwater aid in body structure offered to a successful predator</p>
+                <p><strong>vi.</strong> The perfectly designed body for a great land roamer</p>
+                <p><strong>vii.</strong> Slow metabolisms which makes crocodile a unique reptile</p>
+                <p><strong>viii.</strong> The favourable features in the impact of a drought</p>
+                <p><strong>ix.</strong> Shifting Eating habits and food intake</p>
+                <p><strong>x.</strong> A project on a special mechanism</p>
+                <p><strong>xi.</strong> A unique findings has been achieved recently</p>
+            </div>
+
+            <div class="q-row" id="q-14">
+                <span class="q-num">14.</span>
+                <span class="q-content">Paragraph A
+                    <select class="input-select" id="ans-14" onchange="updateNav(14)">
+                        <option value="">Select...</option>
+                        <option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option>
+                        <option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option>
+                        <option value="vii">vii</option><option value="viii">viii</option><option value="ix">ix</option>
+                        <option value="x">x</option><option value="xi">xi</option>
+                    </select>
+                    <span id="fb-14" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-14"></div>
+
+            <div class="q-row" id="q-15">
+                <span class="q-num">15.</span>
+                <span class="q-content">Paragraph B
+                    <select class="input-select" id="ans-15" onchange="updateNav(15)">
+                        <option value="">Select...</option>
+                        <option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option>
+                        <option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option>
+                        <option value="vii">vii</option><option value="viii">viii</option><option value="ix">ix</option>
+                        <option value="x">x</option><option value="xi">xi</option>
+                    </select>
+                    <span id="fb-15" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-15"></div>
+
+            <div class="q-row" id="q-16">
+                <span class="q-num">16.</span>
+                <span class="q-content">Paragraph C
+                    <select class="input-select" id="ans-16" onchange="updateNav(16)">
+                        <option value="">Select...</option>
+                        <option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option>
+                        <option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option>
+                        <option value="vii">vii</option><option value="viii">viii</option><option value="ix">ix</option>
+                        <option value="x">x</option><option value="xi">xi</option>
+                    </select>
+                    <span id="fb-16" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-16"></div>
+
+            <div class="q-row" id="q-17">
+                <span class="q-num">17.</span>
+                <span class="q-content">Paragraph D
+                    <select class="input-select" id="ans-17" onchange="updateNav(17)">
+                        <option value="">Select...</option>
+                        <option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option>
+                        <option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option>
+                        <option value="vii">vii</option><option value="viii">viii</option><option value="ix">ix</option>
+                        <option value="x">x</option><option value="xi">xi</option>
+                    </select>
+                    <span id="fb-17" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-17"></div>
+
+            <div class="q-row" id="q-18">
+                <span class="q-num">18.</span>
+                <span class="q-content">Paragraph E
+                    <select class="input-select" id="ans-18" onchange="updateNav(18)">
+                        <option value="">Select...</option>
+                        <option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option>
+                        <option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option>
+                        <option value="vii">vii</option><option value="viii">viii</option><option value="ix">ix</option>
+                        <option value="x">x</option><option value="xi">xi</option>
+                    </select>
+                    <span id="fb-18" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-18"></div>
+
+            <div class="q-row" id="q-19">
+                <span class="q-num">19.</span>
+                <span class="q-content">Paragraph F
+                    <select class="input-select" id="ans-19" onchange="updateNav(19)">
+                        <option value="">Select...</option>
+                        <option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option>
+                        <option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option>
+                        <option value="vii">vii</option><option value="viii">viii</option><option value="ix">ix</option>
+                        <option value="x">x</option><option value="xi">xi</option>
+                    </select>
+                    <span id="fb-19" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-19"></div>
+
+            <div class="q-row" id="q-20">
+                <span class="q-num">20.</span>
+                <span class="q-content">Paragraph G
+                    <select class="input-select" id="ans-20" onchange="updateNav(20)">
+                        <option value="">Select...</option>
+                        <option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option>
+                        <option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option>
+                        <option value="vii">vii</option><option value="viii">viii</option><option value="ix">ix</option>
+                        <option value="x">x</option><option value="xi">xi</option>
+                    </select>
+                    <span id="fb-20" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-20"></div>
+        </div>
+
+        <div class="question-section" id="q-group-2">
+            <div class="instruction">Questions 21 - 26: Complete the summary and write the correct answer (<strong>NO MORE THAN TWO WORDS OR A NUMBER</strong>).</div>
+            
+            <div style="background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px dashed #cbd5e1; line-height: 2.2; font-size: 16px;">
+                In many places inhabited by crocodilians, most types of the crocodile have evolved a successful scheme to survive in the drought brought by a 
+                <b>21.</b> <input type="text" class="input-gap" id="ans-21" oninput="updateNav(21)"> <span id="fb-21" class="feedback"></span> 
+                According to Kennett and Christian’s six-year study of Australian freshwater crocodiles’ aestivation, they found Aestivating crocodiles spent around 
+                <b>22.</b> <input type="text" class="input-gap" style="width: 160px;" id="ans-22" oninput="updateNav(22)"> <span id="fb-22" class="feedback"></span> 
+                a year without access to 
+                <b>23.</b> <input type="text" class="input-gap" id="ans-23" oninput="updateNav(23)"> <span id="fb-23" class="feedback"></span>. 
+                The absolute size of body water pools declined proportionately with 
+                <b>24.</b> <input type="text" class="input-gap" style="width: 160px;" id="ans-24" oninput="updateNav(24)"> <span id="fb-24" class="feedback"></span>; 
+                thus there is no sign of 
+                <b>25.</b> <input type="text" class="input-gap" style="width: 160px;" id="ans-25" oninput="updateNav(25)"> <span id="fb-25" class="feedback"></span> 
+                and other health-damaging impact in the crocodiles even after an aestivation period. This super capacity helps crocodiles endure the tough drought without slowing their speed of 
+                <b>26.</b> <input type="text" class="input-gap" style="width: 160px;" id="ans-26" oninput="updateNav(26)"> <span id="fb-26" class="feedback"></span> 
+                significantly.
+            </div>
+            <div id="fb-container-21-26" style="display:flex; flex-direction:column; gap:10px; margin-top: 15px;"></div>
+        </div>
+
+    </div>
+</div>
+
+<div id="confirmOverlay" class="custom-overlay">
+    <div class="custom-modal setup-modal">
+        <h2>Xác nhận nộp bài</h2>
+        <p style="font-size: 16px; color: #475569; margin-bottom: 15px;">Bạn có chắc chắn muốn nộp bài để xem đáp án và giải thích chi tiết không?</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeConfirmModal()">Quay lại</button>
+            <button class="btn-confirm" onclick="executeSubmit()">Nộp bài</button>
+        </div>
+    </div>
+</div>
+
+<div id="resultOverlay" class="custom-overlay">
+    <div class="custom-modal setup-modal">
+        <h2>🎉 Tuyệt vời!</h2>
+        <div id="resultMessage" style="margin: 20px 0; line-height: 1.8;"></div>
+        <button class="btn-confirm" style="width: 100%; margin-top: 10px;" onclick="closeResultModal()">Xem giải thích chi tiết</button>
+    </div>
+</div>
+
+<div id="ctxMenu">
+    <button onclick="doHighlight()">🖍 Highlight</button>
+    <button onclick="removeHighlight()" class="delete">🗑 Remove Highlight</button>
+</div>
+
+<footer>
+    <div style="font-size:14px; font-weight:bold; color:#64748b; text-transform:uppercase;">Quick Navigation:</div>
+    <div class="palette-scroller" id="navPalette"></div>
+</footer>
+
+<script>
+    // --- STATE & DATA ---
+    let testDuration = 0; 
+    let timerInterval = null;
+    let isSubmitted = false;
+
+    const correctAnswers = {
+        14: "II", 15: "VI", 16: "V", 17: "IV", 18: "IX", 19: "VIII", 20: "X",
+        21: ["HOT SEASON", "DRY SEASON", "DRY PERIOD"], 
+        22: ["FOUR MONTHS", "4 MONTHS"], 
+        23: ["WATER"], 
+        24: ["BODY MASS"], 
+        25: ["DEHYDRATION", "DEHYDRATED"], 
+        26: ["GROWTH", "GROWTH RATE"]
+    };
+
+    const explanations = {
+        14: { 
+            translation: "Một sự kiện lịch sử đối với những sinh vật sống sót tối cao.", 
+            keywords: "<span class='exp-keyword-match'>Supreme survivors = survive when most... are just a part of history</span>",
+            exp: "Đoạn A nói về việc cá sấu đã tồn tại 200 triệu năm, sống sót qua thời kỳ khủng long và các biến đổi khí hậu khắc nghiệt, trong khi các loài bò sát khác đã tuyệt chủng. Chúng thực sự là những sinh vật sống sót tối cao.", 
+            colorClass: "ev-14" 
+        },
+        15: { 
+            translation: "Cơ thể được thiết kế hoàn hảo cho một kẻ lang thang tuyệt vời trên đất liền.", 
+            keywords: "<span class='exp-keyword-match'>great land roamer = move on ground... speed</span>",
+            exp: "Đoạn B không chỉ nói về đặc điểm dưới nước mà còn nhấn mạnh 'Đừng bao giờ đánh giá thấp khả năng di chuyển trên mặt đất của chúng' (Never underestimate their ability to move on ground) với các kiểu đi đặc biệt.", 
+            colorClass: "ev-15" 
+        },
+        16: { 
+            translation: "Sự hỗ trợ dưới nước trong cấu trúc cơ thể dành cho một kẻ săn mồi thành công.", 
+            keywords: "<span class='exp-keyword-match'>Underwater aid in body structure = valves seals the nostrils... network of neural pressure receptors</span>",
+            exp: "Đoạn C mô tả chi tiết các cấu trúc đặc biệt (như van đóng lỗ mũi, thụ thể áp lực trên da) giúp cá sấu săn mồi (catch prey) hiệu quả ngay cả khi bị ngập dưới nước (underwater).", 
+            colorClass: "ev-16" 
+        },
+        17: { 
+            translation: "Nhiệt độ cơ thể được điều chỉnh bởi môi trường xung quanh.", 
+            keywords: "<span class='exp-keyword-match'>Regulated body temperature = body temperature varies with the temperature of the surrounding environment</span>",
+            exp: "Đoạn D nêu rõ cá sấu là động vật máu lạnh, nhiệt độ cơ thể thay đổi theo môi trường xung quanh, khiến chúng phải tắm nắng hoặc xuống nước để tự điều chỉnh.", 
+            colorClass: "ev-17" 
+        },
+        18: { 
+            translation: "Thay đổi thói quen ăn uống và lượng thức ăn tiêu thụ.", 
+            keywords: "<span class='exp-keyword-match'>Shifting Eating habits = switches its feeding methods</span>",
+            exp: "Đoạn E lý giải cá sấu thành công vì nó thay đổi/chuyển đổi phương pháp săn mồi của mình (switches its feeding methods) tùy theo tình huống: săn cá, bắt chim, phục kích linh dương...", 
+            colorClass: "ev-18" 
+        },
+        19: { 
+            translation: "Những đặc điểm thuận lợi dưới tác động của hạn hán.", 
+            keywords: "<span class='exp-keyword-match'>impact of a drought = hot season brings drought... dries up</span>",
+            exp: "Đoạn F mô tả cách cá sấu đối phó với hạn hán (drought) bằng cách đào hang và vùi mình trong bùn (aestivation) để chờ mưa tới mà không cần ăn uống.", 
+            colorClass: "ev-19" 
+        },
+        20: { 
+            translation: "Một dự án về một cơ chế đặc biệt.", 
+            keywords: "<span class='exp-keyword-match'>A project = six-year study</span><br><span class='exp-keyword-match'>special mechanism = aestivation</span>",
+            exp: "Đoạn G trình bày chi tiết về dự án nghiên cứu kéo dài 6 năm (six-year study) của Kennett và Christian về cơ chế ngủ hè (aestivation) kỳ diệu của cá sấu.", 
+            colorClass: "ev-20" 
+        },
+        21: { 
+            translation: "...sống sót qua đợt hạn hán do [mùa nóng / mùa khô] mang lại.", 
+            keywords: "<span class='exp-keyword-match'>drought brought by = hot season brings drought</span>",
+            exp: "Đoạn F có ghi: 'the hot season brings drought...'. Bạn có thể điền 'hot season' hoặc 'dry season'.", 
+            colorClass: "ev-21" 
+        },
+        22: { 
+            translation: "...cá sấu ngủ hè dành khoảng [bốn tháng] mỗi năm...", 
+            keywords: "<span class='exp-keyword-match'>spent around = spent almost</span>",
+            exp: "Đoạn G: 'The crocodiles spent almost four months a year underground...'. Điền 'four months' hoặc '4 months'.", 
+            colorClass: "ev-22" 
+        },
+        23: { 
+            translation: "...không được tiếp cận với [nước].", 
+            keywords: "<span class='exp-keyword-match'>without access to = without access to</span>",
+            exp: "Đoạn G: '...without access to water.' Điền 'water'.", 
+            colorClass: "ev-23" 
+        },
+        24: { 
+            translation: "Lượng nước dự trữ trong cơ thể giảm tỷ lệ thuận với [khối lượng cơ thể].", 
+            keywords: "<span class='exp-keyword-match'>declined proportionately with = losses were proportional... body mass</span>",
+            exp: "Đoạn G: '...though the animals lost water and body mass... the losses were proportional'. Nghĩa là giảm nước và giảm 'body mass' (khối lượng cơ thể) tỷ lệ thuận với nhau.", 
+            colorClass: "ev-24" 
+        },
+        25: { 
+            translation: "...không có dấu hiệu của [sự mất nước] và các tác động gây hại cho sức khỏe khác...", 
+            keywords: "<span class='exp-keyword-match'>no sign of = exhibited no...</span><br><span class='exp-keyword-match'>dehydration = dehydrated</span>",
+            exp: "Đoạn G: 'were not dehydrated and exhibited no other detrimental effects'. Điền danh từ 'dehydration' hoặc tính từ 'dehydrated' đều được chấp nhận.", 
+            colorClass: "ev-25" 
+        },
+        26: { 
+            translation: "...mà không làm chậm đáng kể tốc độ [phát triển] của chúng.", 
+            keywords: "<span class='exp-keyword-match'>slowing their speed of = decreased... rate</span>",
+            exp: "Đoạn G: '...no other detrimental effects such as a decreased growth rate.' (Speed of = Rate of). Điền 'growth' hoặc 'growth rate'.", 
+            colorClass: "ev-26" 
+        }
+    };
+
+    const startQ = 14; const endQ = 26; const totalQuestions = 13;
+
+    // --- INIT ---
+    window.onload = function() {
+        renderPalette();
+        document.getElementById('setupOverlay').style.display = 'flex';
+    }
+
+    function askReady() {
+        let minutes = parseInt(document.getElementById('timeInput').value);
+        if(isNaN(minutes) || minutes < 1) minutes = 20; 
+        document.getElementById('startConfirmMsg').innerText = `Bạn đã cài đặt thời gian là ${minutes} phút.\nSẵn sàng bắt đầu chưa?`;
+        document.getElementById('startConfirmOverlay').style.display = 'flex';
+    }
+
+    function closeStartConfirmModal() { document.getElementById('startConfirmOverlay').style.display = 'none'; }
+
+    function startTestActual() {
+        document.getElementById('startConfirmOverlay').style.display = 'none';
+        let minutes = parseInt(document.getElementById('timeInput').value);
+        if(isNaN(minutes) || minutes < 1) minutes = 20;
+        testDuration = minutes * 60;
+        
+        document.getElementById('setupOverlay').style.display = 'none';
+        startTimer();
+    }
+
+    function renderPalette() {
+        const nav = document.getElementById("navPalette");
+        for (let i = startQ; i <= endQ; i++) {
+            let dot = document.createElement("div");
+            dot.className = "nav-dot"; dot.id = `nav-${i}`; dot.innerText = i;
+            dot.onclick = () => {
+                let targetId = `ans-${i}`;
+                let el = document.getElementById(targetId);
+                if(i <= 20 && el) el = el.closest('.q-row');
+                
+                if(el) {
+                    el.scrollIntoView({behavior:"smooth", block:"center"});
+                    el.style.backgroundColor = "var(--highlight-color)";
+                    setTimeout(() => el.style.backgroundColor = "", 1000);
+                }
+            };
+            nav.appendChild(dot);
+        }
+    }
+
+    function updateNav(id) {
+        let nav = document.getElementById(`nav-${id}`);
+        if (!nav) return;
+        let el = document.getElementById(`ans-${id}`);
+        let val = el ? el.value : "";
+        
+        if (val && val.trim() !== "") nav.classList.add("done");
+        else nav.classList.remove("done");
+    }
+
+    // --- TIMER ---
+    function startTimer() {
+        let display = document.getElementById("timer");
+        timerInterval = setInterval(function () {
+            let m = Math.floor(testDuration / 60);
+            let s = testDuration % 60;
+            display.textContent = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+            if (--testDuration < 0) { clearInterval(timerInterval); executeSubmit(); }
+        }, 1000);
+    }
+
+    // --- SUBMIT & EXPLANATIONS ---
+    function submitTest(manual) {
+        if (isSubmitted) return;
+        if (manual) document.getElementById('confirmOverlay').style.display = 'flex';
+        else executeSubmit();
+    }
+
+    function closeConfirmModal() { document.getElementById('confirmOverlay').style.display = 'none'; }
+    function closeResultModal() { document.getElementById('resultOverlay').style.display = 'none'; }
+
+    function executeSubmit() {
+        document.getElementById('confirmOverlay').style.display = 'none';
+        isSubmitted = true;
+        clearInterval(timerInterval);
+        document.querySelectorAll('input, select').forEach(el => el.disabled = true);
+        
+        let score = 0;
+        const summaryExpContainer = document.getElementById('fb-container-21-26');
+        if(summaryExpContainer) summaryExpContainer.innerHTML = "";
+
+        for (let i = startQ; i <= endQ; i++) {
+            let userAns = "";
+            let el = document.getElementById(`ans-${i}`);
+            if (el) userAns = el.value.trim().toUpperCase();
+
+            let correctAnswer = correctAnswers[i];
+            let isCorrect = false;
+
+            if (Array.isArray(correctAnswer)) {
+                isCorrect = correctAnswer.includes(userAns);
+            } else {
+                isCorrect = (userAns === correctAnswer);
+            }
+
+            if (isCorrect) score++;
+
+            let fb = document.getElementById(`fb-${i}`);
+            let correctStr = Array.isArray(correctAnswer) ? correctAnswer[0] : correctAnswer;
+            if (fb) {
+                fb.innerText = isCorrect ? "✓" : `✗ (${correctStr})`;
+                fb.className = isCorrect ? "feedback correct" : "feedback wrong";
+            }
+
+            // --- NÂNG CẤP HIỂN THỊ GIẢI THÍCH ---
+            if(explanations[i]) {
+                let expData = explanations[i];
+                let htmlContent = `
+                    <div class="exp-box show">
+                        <div class="exp-title">
+                            💡 Giải thích Câu ${i}
+                            ${expData.colorClass ? `<button class="locate-btn" onclick="scrollToEvidence('${expData.colorClass}')">📍 Xem dẫn chứng</button>` : ''}
+                        </div>
+                        
+                        <div class="exp-section">
+                            <span class="exp-label">👉 Dịch nghĩa:</span> 
+                            <div class="exp-translate">${expData.translation}</div>
+                        </div>
+
+                        ${expData.keywords ? `
+                        <div class="exp-section">
+                            <span class="exp-label">🔑 Từ khóa:</span> 
+                            <div class="exp-keywords">${expData.keywords}</div>
+                        </div>` : ''}
+
+                        <div class="exp-section">
+                            <span class="exp-label">🧠 Phân tích:</span> 
+                            <div class="exp-detail">${expData.exp}</div>
+                        </div>
+                    </div>`;
+
+                if (i >= 21 && i <= 26) {
+                    if(summaryExpContainer) summaryExpContainer.innerHTML += htmlContent;
+                } else {
+                    let expContainer = document.getElementById(`exp-${i}`);
+                    if(expContainer) expContainer.innerHTML = htmlContent;
+                }
+            }
+
+            let nav = document.getElementById(`nav-${i}`);
+            if(nav) {
+                nav.style.background = isCorrect ? "#dcfce7" : "#fef2f2";
+                nav.style.color = isCorrect ? "#16a34a" : "#dc2626";
+                nav.style.borderColor = isCorrect ? "#86efac" : "#fca5a5";
+            }
+        }
+
+        // Color ev-boxes in Passage
+        const pastelColors = ['#fde68a','#bfdbfe','#bbf7d0','#fbcfe8','#ddd6fe','#fed7aa','#e9d5ff','#a7f3d0','#fecaca'];
+        document.querySelectorAll('.ev-box').forEach((el, index) => {
+            el.style.backgroundColor = pastelColors[index % pastelColors.length];
+            el.style.color = "#0f172a";
+        });
+
+        // Calculate Band and Upload
+        let timeTaken = Math.round(((parseInt(document.getElementById('timeInput').value) * 60) - testDuration) / 60) || 1;
+        if(window.luuDiemLenFirebase) window.luuDiemLenFirebase(score, timeTaken);
+
+        document.getElementById('resultMessage').innerHTML = `
+            <strong style="font-size: 26px; color: var(--primary-dark); display: block; margin-bottom: 10px;">Số câu đúng: ${score}/${totalQuestions}</strong>
+            <p style="font-size: 16px; color: #475569;">Kết quả của bạn đã được đồng bộ an toàn lên hệ thống IELTS Tracker!</p>
+        `;
+        setTimeout(() => { document.getElementById('resultOverlay').style.display = 'flex'; }, 500);
+    }
+
+    function scrollToEvidence(id) {
+        const evElement = document.getElementById(id);
+        if(evElement) {
+            evElement.scrollIntoView({behavior: "smooth", block: "center"});
+            evElement.classList.remove("focus-blink");
+            void evElement.offsetWidth;
+            evElement.classList.add("focus-blink");
+            setTimeout(() => evElement.classList.remove("focus-blink"), 1500);
+        }
+    }
+
+    // --- HIGHLIGHT SYSTEM ---
+    const container = document.getElementById("mainContainer");
+    const menu = document.getElementById("ctxMenu");
+    let targetEl = null; let selectedRange = null;
+
+    container.addEventListener("contextmenu", (e) => {
+        if (!e.target.closest('.pane')) return;
+        e.preventDefault();
+        targetEl = null; selectedRange = null; menu.style.display = "none";
+        
+        if (e.target.classList.contains("highlight")) {
+            targetEl = e.target;
+            showMenu(e.pageX, e.pageY, "remove"); return;
+        }
+
+        let sel = window.getSelection();
+        if (sel.toString().trim().length > 0 && container.contains(sel.anchorNode)) {
+            selectedRange = sel.getRangeAt(0).cloneRange();
+            showMenu(e.pageX, e.pageY, "add");
+        }
+    });
+
+    document.addEventListener("click", (e) => { if (!menu.contains(e.target)) menu.style.display = "none"; });
+
+    function showMenu(x, y, mode) {
+        menu.style.display = "block";
+        let mw = menu.offsetWidth; let mh = menu.offsetHeight;
+        menu.style.left = (x + mw > window.innerWidth ? window.innerWidth - mw - 10 : x) + "px";
+        menu.style.top = (y + mh > window.innerHeight ? window.innerHeight - mh - 10 : y) + "px";
+        menu.children[0].style.display = (mode === "add") ? "block" : "none";
+        menu.children[1].style.display = (mode === "remove") ? "block" : "none";
+    }
+
+    function doHighlight() {
+        if (selectedRange) {
+            let span = document.createElement("span"); span.className = "highlight";
+            try { selectedRange.surroundContents(span); } catch(e){}
+            window.getSelection().removeAllRanges();
+        }
+        menu.style.display = "none";
+    }
+
+    function removeHighlight() {
+        if (targetEl) {
+            let text = document.createTextNode(targetEl.textContent);
+            targetEl.parentNode.replaceChild(text, targetEl);
+            container.normalize();
+        }
+        menu.style.display = "none";
+    }
+</script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+        authDomain: "snapenglish-cb6e2.firebaseapp.com",
+        projectId: "snapenglish-cb6e2",
+        storageBucket: "snapenglish-cb6e2.firebasestorage.app",
+        messagingSenderId: "373152038413",
+        appId: "1:373152038413:web:19284622571390f8585f44"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            window.currentUserUid = user.uid;
+            window.currentUserEmail = user.email;
+        }
+    });
+
+    // Helper: Tính điểm Band Ielts (Quy đổi hệ 40 câu)
+    function calculateIeltsBand(correct, total) {
+        let normalizedCorrect = (correct / total) * 40;
+        if (normalizedCorrect >= 39) return 9.0;
+        if (normalizedCorrect >= 37) return 8.5;
+        if (normalizedCorrect >= 35) return 8.0;
+        if (normalizedCorrect >= 33) return 7.5;
+        if (normalizedCorrect >= 30) return 7.0;
+        if (normalizedCorrect >= 27) return 6.5;
+        if (normalizedCorrect >= 23) return 6.0;
+        if (normalizedCorrect >= 19) return 5.5;
+        if (normalizedCorrect >= 15) return 5.0;
+        if (normalizedCorrect >= 13) return 4.5;
+        if (normalizedCorrect >= 10) return 4.0;
+        if (normalizedCorrect >= 8) return 3.5;
+        if (normalizedCorrect >= 6) return 3.0;
+        return 2.5;
+    }
+
+    window.luuDiemLenFirebase = async function(diemSo, timeTakenMinutes) {
+        if (!window.currentUserUid) return;
+        
+        let tongSoCau = 13; 
+        let bandScore = calculateIeltsBand(diemSo, tongSoCau);
+        let timestamp = Date.now();
+        let idLuotThi = window.currentUserUid + "_ielts_" + timestamp;
+
+        try {
+            await setDoc(doc(db, "user_ielts_scores", idLuotThi), {
+                email: window.currentUserEmail,
+                skill: "Reading",
+                testName: "Test 3",
+                partName: "Passage 2",
+                timeTaken: timeTakenMinutes.toString(),
+                correctQ: diemSo,
+                totalQ: tongSoCau,
+                bandScore: bandScore,
+                date: new Date().toLocaleDateString("vi-VN"),
+                timestamp: timestamp
+            });
+            console.log("Đã đẩy điểm thành công lên IELTS Tracker!");
+        } catch(e) {
+            console.error("Lỗi khi lưu điểm: ", e);
+        }
+    }
+</script>
+</body>
+</html>
