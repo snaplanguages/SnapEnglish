@@ -2399,10 +2399,11 @@ function renderDynamicContent() {
     applyEvidenceColors(); 
 }
 
-// Helper: Chuyển đáp án Text thành A, B, C, D
 function formatAnswer(options, answer) {
     if(!options) return answer;
     if(Array.isArray(options)) {
+        // Bỏ qua mảng object của Part 7 vì đáp án đã là A,B,C,D sẵn
+        if (typeof options[0] === 'object') return answer; 
         let labels = ["A", "B", "C", "D"];
         let idx = options.indexOf(answer);
         return idx !== -1 ? labels[idx] : answer;
@@ -2410,10 +2411,10 @@ function formatAnswer(options, answer) {
     return answer; 
 }
 
-// Helper: Tạo HTML cho 1 câu hỏi trắc nghiệm
 function createTOEICQuestion(qObj) {
-    if(!qObj || !qObj.id) return ""; // Bypass lỗi nếu cấu trúc data sai
-    let text = qObj.q || qObj.text || "";
+    if(!qObj || !qObj.id) return ""; 
+    // Sửa lỗi 1: Hỗ trợ cả q, text và qEng của Part 7
+    let text = qObj.q || qObj.text || qObj.qEng || "";
     let opts = qObj.options;
     let optsHTML = "";
 
@@ -2423,7 +2424,11 @@ function createTOEICQuestion(qObj) {
     if (Array.isArray(opts)) {
         let labels = ["A", "B", "C", "D"];
         opts.forEach((opt, i) => {
-            optsHTML += `<label class="mc-option" style="${labelStyle}" onmouseover="this.style.background='#edf2ea'" onmouseout="this.style.background='transparent'"><input type="radio" name="q${qObj.id}" value="${labels[i]}" style="${inputStyle}" onclick="checkNav(${qObj.id})"> <b>${labels[i]}.</b> ${opt}</label>`;
+            // Sửa lỗi 2: Tách riêng xử lý object (Part 7) và string (Part 5)
+            let optText = typeof opt === 'object' ? opt.en : opt;
+            let optValue = typeof opt === 'object' ? opt.key : labels[i];
+            
+            optsHTML += `<label class="mc-option" style="${labelStyle}" onmouseover="this.style.background='#edf2ea'" onmouseout="this.style.background='transparent'"><input type="radio" name="q${qObj.id}" value="${optValue}" style="${inputStyle}" onclick="checkNav(${qObj.id})"> <b>${labels[i]}.</b> ${optText}</label>`;
         });
     } else {
         for (let key in opts) {
@@ -2441,19 +2446,24 @@ function createTOEICQuestion(qObj) {
             </div>`;
 }
 
-// Helper: Gom nhóm câu hỏi cho Part 6 & 7 (Cột phải)
 function createQuestionsBlock(passageObj) {
-    // Thêm onmouseenter để tự động hiện đoạn văn tương ứng bên cột trái khi cuộn chuột vào câu hỏi
     let html = `<div class="questions-block" style="margin-bottom: 40px; background: white; padding: 25px; border-radius: 12px; border: 2px solid var(--border); box-shadow:0 4px 10px rgba(0,0,0,0.02);" onmouseenter="showPassage('${passageObj.passageId}')">`;
     html += `<div style="color:var(--primary); font-weight:bold; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">📝 Questions for Passage: ${passageObj.passageId}</div>`;
     
-    // Fix lỗi cú pháp cho passage p7-13 & p7-14 của bạn
     let validQuestions = passageObj.questions.filter(q => q && q.id); 
 
     validQuestions.forEach(q => {
         html += createTOEICQuestion(q);
         allQuestionIds.push(q.id);
-        answerKey[q.id] = formatAnswer(q.options, q.a || q.correct);
+        
+        // Sửa lỗi 3: Tìm đúng thuộc tính đáp án cho cả 3 Part
+        let correctAns = q.a || q.correct;
+        if (!correctAns && Array.isArray(q.options) && typeof q.options[0] === 'object') {
+            let correctObj = q.options.find(o => o.isCorrect);
+            if (correctObj) correctAns = correctObj.key;
+        }
+        
+        answerKey[q.id] = formatAnswer(q.options, correctAns);
     });
     html += `</div>`;
     return html;
