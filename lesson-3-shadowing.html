@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shadowing Practice | SnapEnglish</title>
+  <link rel="icon" type="image/png" href="ảnh.png">
+<style>
+  :root {
+    --vi-display: block;
+    --primary-pastel: #fbc2eb;
+    --secondary-pastel: #a6c1ee;
+    --glass-bg: rgba(255, 255, 255, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.8);
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    min-height: 100vh; 
+    box-sizing: border-box;
+    background: linear-gradient(135deg, var(--primary-pastel) 0%, var(--secondary-pastel) 100%);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: #333;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .container {
+    display: flex;
+    width: 100vw;
+    height: 100vh; 
+    min-height: 700px;
+    flex-direction: row;
+  }
+
+  .left-col {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    box-sizing: border-box;
+    gap: 24px;
+  }
+
+  .right-col {
+    width: 40%;
+    padding: 24px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  }
+
+  .top-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    margin-bottom: 10px;
+  }
+
+  .top-controls h2 {
+    margin: 0;
+    font-size: 1.4em;
+    color: #444;
+  }
+
+  .toggle-btn {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #555;
+    transition: all 0.2s;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+
+  .toggle-btn:hover {
+    background: #f0f0f0;
+  }
+
+  .video-wrapper {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border-radius: 24px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .video-wrapper iframe {
+    width: 100%;
+    height: 100%;
+  }
+
+  .record-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+    padding: 15px 25px;
+    box-sizing: border-box;
+    gap: 20px;
+    overflow: hidden;
+    min-height: 110px;
+  }
+
+  .feedback-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .record-btn {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+    border: none;
+    padding: 14px 30px;
+    border-radius: 30px;
+    color: #444;
+    font-size: 1.1em;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4);
+    transition: all 0.2s ease-in-out;
+    margin-bottom: 0;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .record-btn:active {
+    transform: scale(0.96);
+  }
+
+  .record-btn.recording {
+    background: linear-gradient(135deg, #ff6a88 0%, #ff99ac 100%);
+    color: white;
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 106, 136, 0.6); }
+    70% { box-shadow: 0 0 0 15px rgba(255, 106, 136, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 106, 136, 0); }
+  }
+
+  .result-box {
+    width: 100%;
+    min-height: 40px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    padding: 8px 15px;
+    margin: 0;
+    font-style: italic;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-sizing: border-box;
+    font-size: 0.95em;
+  }
+
+  .metrics-grid {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .metric {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 6px 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  }
+
+  .metric .label {
+    font-size: 0.65em;
+    color: #888;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+
+  .metric .value {
+    font-size: 1.1em;
+    font-weight: 800;
+    color: #444;
+  }
+
+  .script-container {
+    overflow-y: auto;
+    padding-right: 10px;
+    scroll-behavior: smooth;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .script-container::-webkit-scrollbar {
+    width: 6px;
+  }
+  .script-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+  }
+  .script-container::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+  }
+
+  .script-line {
+    padding: 16px 20px;
+    border-radius: 18px;
+    transition: 0.3s ease;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid transparent;
+  }
+
+  .script-line:hover {
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  .script-line.active {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    transform: scale(1.02);
+    border-left: 6px solid #ff9a9e;
+    border-right: 1px solid rgba(255,255,255,0.8);
+    border-top: 1px solid rgba(255,255,255,0.8);
+    border-bottom: 1px solid rgba(255,255,255,0.8);
+  }
+
+  .script-line.active .en-text {
+    color: #d81b60;
+  }
+
+  .en-text {
+    font-size: 1.15em;
+    font-weight: 600;
+    color: #333;
+    line-height: 1.5;
+    transition: color 0.3s ease;
+  }
+
+  .vi-text {
+    font-size: 0.95em;
+    color: #666;
+    margin-top: 8px;
+    line-height: 1.4;
+    display: var(--vi-display);
+  }
+
+  /* Responsive Design cho Mobile */
+  @media (max-width: 992px) {
+    .container {
+      flex-direction: column;
+      height: auto;
+      min-height: 100vh;
+    }
+    .script-line {
+      scroll-margin-top: calc(56.25vw + 280px); 
+    }
+    .left-col {
+      width: 100%;
+      height: auto;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: linear-gradient(135deg, var(--primary-pastel) 0%, var(--secondary-pastel) 100%);
+      padding: 12px;
+      gap: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+    }
+    .right-col {
+      width: 100%;
+      height: auto;
+      padding: 12px;
+    }
+    .record-wrapper {
+      flex-direction: column; /* Xếp dọc trên điện thoại để không bị ép ngang */
+      padding: 12px;
+      gap: 12px;
+      min-height: auto;
+    }
+    .record-btn {
+      width: 100%;
+      margin: 0;
+    }
+    .metrics-grid {
+      flex-wrap: wrap; 
+      gap: 6px;
+    }
+    .metric {
+      min-width: 45%; 
+    }
+    .script-container {
+      max-height: none; 
+      overflow-y: visible;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="left-col">
+      <div class="video-wrapper glass">
+        <div id="ytplayer"></div>
+      </div>
+      
+      <div class="record-wrapper glass">
+        <button id="recordBtn" class="record-btn">Click to Speak</button>
+        
+        <div class="feedback-container">
+          <div id="resultText" class="result-box">Your voice will appear here...</div>
+          
+          <div class="metrics-grid">
+            <div class="metric">
+              <span class="label">Pronunciation</span>
+              <span class="value" id="score-pron">--%</span>
+            </div>
+            <div class="metric">
+              <span class="label">Accuracy</span>
+              <span class="value" id="score-acc">--%</span>
+            </div>
+            <div class="metric">
+              <span class="label">Fluency</span>
+              <span class="value" id="score-flu">--%</span>
+            </div>
+            <div class="metric">
+              <span class="label">Completeness</span>
+              <span class="value" id="score-comp">--%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-col glass">
+      <div class="top-controls">
+        <h2>Transcript</h2>
+        <button class="toggle-btn" onclick="toggleTranslation()">Toggle Translation</button>
+      </div>
+      <div class="script-container" id="script-container"></div>
+    </div>
+  </div>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    // 1. DÁN TOÀN BỘ TEXT TỪ FILE .SRT VÀO GIỮA 2 DẤU MẶC KÉP NGƯỢC (`) DƯỚI ĐÂY
+    // Không cần xóa các tag , hệ thống sẽ tự động dọn dẹp giúp bạn.
+    const rawSrt = `
+
+
+
+
+
+
+
+
+
+
+
+    `;
+
+    // 2. BỘ PHÂN TÍCH TỰ ĐỘNG (Auto-Parser)
+    function parseSRT(text) {
+      // Tự động dọn dẹp các tag rác
+      const cleanText = text.replace(/\\s*/g, '').trim();
+      const lines = cleanText.split('\n').map(l => l.trim()).filter(l => l !== '');
+      
+      const result = [];
+      let currentItem = null;
+      const timeRegex = /(\d{2}):(\d{2}):(\d{2}),(\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2}),(\d{3})/;
+
+      function toSec(h, m, s, ms) {
+        return parseInt(h) * 3600 + parseInt(m) * 60 + parseInt(s) + parseInt(ms) / 1000;
+      }
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const t = line.match(timeRegex);
+
+        if (t) {
+          if (currentItem && currentItem.en) result.push(currentItem);
+          currentItem = {
+            start: toSec(t[1], t[2], t[3], t[4]),
+            end: toSec(t[5], t[6], t[7], t[8]),
+            en: "",
+            vi: ""
+          };
+        } else if (currentItem) {
+          // Bỏ qua các số thứ tự phân đoạn của SRT
+          if (/^\d+$/.test(line) && i + 1 < lines.length && lines[i+1].match(timeRegex)) continue;
+          
+          if (!currentItem.en) {
+            currentItem.en = line;
+          } else if (!currentItem.vi) {
+            currentItem.vi = line;
+          } else {
+            currentItem.vi += " " + line;
+          }
+        }
+      }
+      if (currentItem && currentItem.en) result.push(currentItem);
+      return result;
+    }
+
+    const transcriptData = parseSRT(rawSrt);
+
+    // 3. UI Tương tác
+    let showTranslation = true;
+    function toggleTranslation() {
+      showTranslation = !showTranslation;
+      document.documentElement.style.setProperty('--vi-display', showTranslation ? 'block' : 'none');
+    }
+
+    const scriptContainer = document.getElementById('script-container');
+    
+    // Đẩy dữ liệu ra màn hình
+    transcriptData.forEach((line, index) => {
+      const div = document.createElement('div');
+      div.className = 'script-line';
+      div.id = 'line-' + index;
+      
+      const enDiv = document.createElement('div');
+      enDiv.className = 'en-text';
+      enDiv.innerText = line.en;
+
+      const viDiv = document.createElement('div');
+      viDiv.className = 'vi-text';
+      viDiv.innerText = line.vi || " "; // Xử lý câu không có tiếng Việt
+
+      div.appendChild(enDiv);
+      div.appendChild(viDiv);
+
+      div.onclick = () => {
+        if(player && player.seekTo && line.start !== null) {
+          player.seekTo(line.start, true);
+          player.playVideo();
+        }
+      };
+
+      scriptContainer.appendChild(div);
+    });
+
+    // 4. API YouTube & Xử lý nháy sáng câu
+    let player;
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('ytplayer', {
+        height: '100%',
+        width: '100%',
+        videoId: 'zgAeBUE1Mpg', 
+        playerVars: { 'autoplay': 0, 'controls': 1 },
+        events: {
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
+
+    let checkInterval;
+    let currentLineIndex = -1;
+
+    function onPlayerStateChange(event) {
+      if (event.data == YT.PlayerState.PLAYING) {
+        checkInterval = setInterval(updateHighlight, 200);
+      } else {
+        clearInterval(checkInterval);
+      }
+    }
+
+    function updateHighlight() {
+      if(!player || !player.getCurrentTime) return;
+      const time = player.getCurrentTime();
+      let foundLine = -1;
+
+      for (let i = 0; i < transcriptData.length; i++) {
+        if (time >= transcriptData[i].start && time <= transcriptData[i].end) {
+          foundLine = i;
+          break;
+        }
+      }
+
+      if (foundLine !== -1 && currentLineIndex !== foundLine) {
+        if (currentLineIndex !== -1) {
+          document.getElementById('line-' + currentLineIndex).classList.remove('active');
+        }
+        const activeLine = document.getElementById('line-' + foundLine);
+        activeLine.classList.add('active');
+       
+        // Căn lề mượt mà, phân biệt theo kích thước màn hình
+        if (window.innerWidth <= 992) {
+          // Trên điện thoại: Cuộn dòng chữ lên sát mí trên cùng (start)
+          activeLine.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          // Trên máy tính: Vẫn giữ nguyên cuộn ra giữa màn hình (center)
+          activeLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        currentLineIndex = foundLine;
+      }
+    }
+
+    // 5. Chức năng nhận diện giọng nói (Shadowing Evaluation)
+    const recordBtn = document.getElementById('recordBtn');
+    const resultText = document.getElementById('resultText');
+    const scorePron = document.getElementById('score-pron');
+    const scoreAcc = document.getElementById('score-acc');
+    const scoreFlu = document.getElementById('score-flu');
+    const scoreComp = document.getElementById('score-comp');
+
+    let recognition;
+    let isRecording = false;
+    let recordStartTime = 0;
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRec();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onresult = function(event) {
+        const spoken = event.results[0][0].transcript;
+        const confidence = event.results[0][0].confidence; // Điểm tự tin của API (0.0 đến 1.0)
+        const durationSeconds = (Date.now() - recordStartTime) / 1000;
+        
+        resultText.innerText = `"${spoken}"`;
+        calculateAdvancedScores(spoken, confidence, durationSeconds);
+      };
+
+      recognition.onerror = function(event) {
+        resultText.innerText = "Error recognizing speech. Try again.";
+        resetRecordButton();
+      };
+
+      recognition.onend = function() {
+        if (isRecording) resetRecordButton();
+      };
+
+      recordBtn.onclick = () => {
+        if (!isRecording) {
+          if(player && player.pauseVideo) player.pauseVideo();
+          recordStartTime = Date.now();
+          recognition.start();
+          isRecording = true;
+          recordBtn.innerText = "Stop & Evaluate";
+          recordBtn.classList.add('recording');
+          resultText.innerText = "Listening...";
+          
+          // Reset điểm số
+          ['pron', 'acc', 'flu', 'comp'].forEach(id => {
+            document.getElementById(`score-${id}`).innerText = '--%';
+            document.getElementById(`score-${id}`).style.color = "#444";
+          });
+
+        } else {
+          recognition.stop();
+          resetRecordButton();
+        }
+      };
+    } else {
+      resultText.innerText = "Speech API not supported. Please use Chrome/Edge.";
+    }
+
+    function resetRecordButton() {
+      isRecording = false;
+      recordBtn.innerText = "Click to Speak";
+      recordBtn.classList.remove('recording');
+    }
+
+    function getColorForScore(score) {
+      if (score >= 85) return "#4CAF50"; // Xanh lá
+      if (score >= 60) return "#FF9800"; // Cam
+      return "#ff6a88"; // Đỏ hồng
+    }
+
+    function calculateAdvancedScores(spoken, apiConfidence, durationSec) {
+      if (currentLineIndex === -1) {
+        resultText.innerText = "Please select a sentence first!";
+        return;
+      }
+      
+      const targetText = transcriptData[currentLineIndex].en.toLowerCase().replace(/[^\w\s]/gi, '');
+      const spokenText = spoken.toLowerCase().replace(/[^\w\s]/gi, '');
+      
+      const targetWords = targetText.split(' ').filter(w => w);
+      const spokenWords = spokenText.split(' ').filter(w => w);
+      
+      if (targetWords.length === 0) return;
+
+      // 1. Completeness: Mức độ hoàn thiện (số từ đọc được / tổng số từ cần đọc)
+      let matchedTargetWords = 0;
+      targetWords.forEach(word => {
+        if (spokenWords.includes(word)) matchedTargetWords++;
+      });
+      let completeness = Math.round((matchedTargetWords / targetWords.length) * 100);
+      
+      // 2. Accuracy: Độ chính xác (số từ đúng / tổng số từ đã phát âm)
+      let accuracy = 0;
+      if (spokenWords.length > 0) {
+        accuracy = Math.round((matchedTargetWords / spokenWords.length) * 100);
+      }
+      // Giới hạn Accuracy không vượt quá 100 và không nhỏ hơn Completeness nếu đọc ít từ hơn
+      if (accuracy > 100) accuracy = 100;
+
+      // 3. Pronunciation: Sử dụng độ tin cậy của AI khi nhận diện giọng nói
+      let pronunciation = Math.round(apiConfidence * 100);
+      // Nếu đọc sai quá nhiều từ, phạt điểm Pronunciation
+      if (accuracy < 50) pronunciation -= 20; 
+      pronunciation = Math.max(0, Math.min(100, pronunciation));
+
+      // 4. Fluency: Tính bằng tốc độ đọc (Words Per Minute) kết hợp với Completeness
+      const expectedWPM = 130; 
+      const spokenWPM = (spokenWords.length / durationSec) * 60;
+      let fluency = 100;
+      if (spokenWPM < 80) fluency -= (80 - spokenWPM); // Đọc chậm quá bị trừ
+      if (spokenWPM > 200) fluency -= (spokenWPM - 200); // Đọc nhanh quá bị trừ
+      // Trừ thêm nếu ấp úng (thời gian dài nhưng ra ít chữ hoàn chỉnh)
+      fluency = Math.round((fluency * 0.6) + (completeness * 0.4));
+      fluency = Math.max(0, Math.min(100, fluency));
+
+      // Hiển thị điểm số và đổ màu
+      const metrics = [
+        { el: scorePron, val: pronunciation },
+        { el: scoreAcc, val: accuracy },
+        { el: scoreFlu, val: fluency },
+        { el: scoreComp, val: completeness }
+      ];
+
+      metrics.forEach(m => {
+        m.el.innerText = `${m.val}%`;
+        m.el.style.color = getColorForScore(m.val);
+      });
+    }
+  </script>
+</body>
+</html>
