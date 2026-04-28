@@ -1954,23 +1954,19 @@ function renderDynamicContent() {
 
     // Thay thế đoạn code render Part 7 trong hàm renderDynamicContent():
 if(toeicData.part7) {
-    part7Html += `<div class="instruction" style="background:#e8f5e9; color:#2e7d32; padding:15px; border-radius:12px; margin-bottom:25px; font-weight:bold;"> <u>Part 7: Reading Comprehension</u><br>Read the passages and answer the questions.</div>`;
-    toeicData.part7.forEach(passageObj => {
-        // Cấu trúc chia đôi: Tiếng Anh bên trái, Tiếng Việt bên phải (ẩn đi cho đến khi nộp bài)
-        leftPaneHtml += `
-            <div id="passage-${passageObj.passageId}" class="passage-text-content" style="display:none; margin-bottom: 30px;">
-                <div class="passage-split">
-                    <div class="col-eng">${passageObj.passage}</div>
-                    <div class="col-vie">
-                        <div style="font-weight: bold; color: var(--primary-dark); margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">🇻🇳 Bản dịch tham khảo</div>
-                        ${passageObj.vieHtml || ''}
-                    </div>
-                </div>
-            </div>`;
-        part7Html += createQuestionsBlock(passageObj);
-    });
-    document.getElementById('render-part7').innerHTML = part7Html;
-}
+        part7Html += `<div class="instruction" style="background:#e8f5e9; color:#2e7d32; padding:15px; border-radius:12px; margin-bottom:25px; font-weight:bold;"> <u>Part 7: Reading Comprehension</u><br>Read the passages and answer the questions.</div>`;
+        toeicData.part7.forEach(passageObj => {
+            // Đẩy nội dung tiếng Anh vào cột trái
+            leftPaneHtml += `<div id="passage-${passageObj.passageId}" class="passage-text-content" style="display:none; margin-bottom: 30px;">${passageObj.passage}</div>`;
+            
+            // Đẩy bản dịch vào cột giữa (middle pane)
+            let vieContent = passageObj.vieHtml ? passageObj.vieHtml : "<i>(Đoạn này chưa cập nhật bản dịch tiếng Việt)</i>";
+            middlePaneHtml += `<div id="vie-passage-${passageObj.passageId}" class="passage-text-content" style="display:none; margin-bottom: 30px;">${vieContent}</div>`;
+            
+            part7Html += createQuestionsBlock(passageObj);
+        });
+        document.getElementById('render-part7').innerHTML = part7Html;
+    }
 
     document.getElementById('passage-content-container').innerHTML += leftPaneHtml;
     document.getElementById('vietnamese-content-container').innerHTML += middlePaneHtml; // Đổ vào cột giữa
@@ -2088,7 +2084,7 @@ function showPassage(passageId) {
     let pEng = document.getElementById(`passage-${passageId}`);
     if (pEng) pEng.style.display = 'block';
 
-    // Hiện bản dịch tiếng Việt (bên cột giữa)
+    // Hiện bản dịch tiếng Việt tương ứng (Cột 2)
     let pVie = document.getElementById(`vie-passage-${passageId}`);
     if (pVie) pVie.style.display = 'block';
 }
@@ -2182,7 +2178,7 @@ function executeSubmit() {
     document.querySelectorAll('input, select').forEach(el => el.disabled = true);
     
     // THÊM DÒNG NÀY ĐỂ HIỆN CỘT TIẾNG VIỆT SAU KHI NỘP BÀI
-    document.getElementById('passagePane').classList.add('show-translation');
+    document.getElementById('mainContainer').classList.add('show-translation');
     
     let score = 0;
     let totalQuestions = allQuestionIds.length;
