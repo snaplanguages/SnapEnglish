@@ -36,7 +36,7 @@
 
         .container { 
             width: 100%; 
-            max-width: 100%; /* Full screen width applied */
+            max-width: 100%; 
             background: var(--card-bg); 
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -93,85 +93,73 @@
         .context-menu button { display: block; width: 100%; border: none; background: none; padding: 10px; cursor: pointer; text-align: left; font-weight: 700; border-radius: 5px;}
         .context-menu button:hover { background: #f1f5f9; color: var(--primary); }
 
-        /* Audio & Transcript Module */
-        .interactive-module {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
+        /* Custom AI Player UI */
+        .ai-player-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 25px 35px;
             margin-bottom: 40px;
-        }
-
-        .audio-controls { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            padding: 30px; 
-            border-radius: 20px; 
-            text-align: center;
-            color: white;
             box-shadow: 0 15px 30px rgba(102, 126, 234, 0.3);
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            gap: 15px;
         }
-        .audio-controls audio { width: 100%; margin-bottom: 15px; border-radius: 10px; }
-        
-        .part-timer { 
-            background: rgba(255,255,255,0.2); 
-            padding: 12px; 
-            border-radius: 20px; 
-            font-size: 20px; 
-            font-weight: 800;
-            margin-bottom: 15px;
-        }
-        .nav-buttons { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
-        .nav-btn { 
-            background: rgba(255,255,255,0.2); 
-            border: 2px solid white; 
-            color: white; 
-            padding: 10px 20px; 
-            border-radius: 25px; 
-            cursor: pointer; 
-            font-size: 14px;
-            font-weight: 700;
-            text-decoration: none;
-            transition: 0.3s;
-        }
-        .nav-btn:hover { background: white; color: #667eea; }
 
-        /* Transcript Area */
-        .transcript-container {
+        .ai-player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+        
+        .ai-player-header h3 { margin: 0; font-family: 'Be Vietnam Pro', sans-serif; display: flex; align-items: center; gap: 10px;}
+        .ai-status { font-size: 0.9em; font-weight: 700; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; }
+
+        .ai-controls-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .ai-btn {
             background: white;
-            border-radius: 20px;
-            padding: 20px;
-            border: 2px solid #e2e8f0;
-            max-height: 400px;
-            overflow-y: auto;
+            color: #764ba2;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .ai-btn:hover { transform: scale(1.1); }
+        .ai-btn-stop { background: rgba(255,255,255,0.2); color: white; box-shadow: none; border: 2px solid white;}
+        .ai-btn-stop:hover { background: white; color: #f43f5e; border-color: white;}
+
+        .ai-progress-bg {
+            flex-grow: 1;
+            background: rgba(255, 255, 255, 0.3);
+            height: 8px;
+            border-radius: 4px;
             position: relative;
+            overflow: hidden;
         }
-        .transcript-container::-webkit-scrollbar { width: 8px; }
-        .transcript-container::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 8px; }
-        .transcript-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
-        
-        .dialogue-line {
-            margin-bottom: 15px;
-            padding: 12px;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            line-height: 1.6;
+
+        .ai-progress-fill {
+            position: absolute;
+            top: 0; left: 0; height: 100%;
+            background: white;
+            width: 0%;
+            transition: width 0.3s linear;
+            border-radius: 4px;
         }
-        .dialogue-line.active {
-            background: rgba(102, 126, 234, 0.1);
-            border-left: 5px solid #667eea;
-            transform: scale(1.02);
-        }
-        .role-MAN { color: #3b82f6; font-weight: 800; display: block; font-size: 0.85em; letter-spacing: 1px; margin-bottom: 4px; }
-        .role-WOMAN { color: #ff477e; font-weight: 800; display: block; font-size: 0.85em; letter-spacing: 1px; margin-bottom: 4px; }
-        
+
         #toast { position: fixed; bottom: -120px; right: 30px; background: white; border-left: 8px solid var(--secondary); padding: 20px 30px; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); transition: bottom 0.5s; z-index: 3000; font-weight: 700;}
         #toast.show { bottom: 40px; }
-
-        @media(max-width: 950px) {
-            .interactive-module { grid-template-columns: 1fr; }
-        }
     </style>
 </head>
 <body>
@@ -181,23 +169,18 @@
     <div class="container">
         <h1>🎧 Part 1 Test 1</h1>
         
-        <div class="interactive-module">
-            <div class="audio-controls">
-                <h3>Original Audio File</h3>
-                <audio id="part1Audio" preload="metadata" controls>
-                    <source src="https://drive.google.com/uc?export=download&id=17jmlMUtZO_blYFEdgQrqR7eZIhgdeX3o" type="audio/mpeg">
-                    Your browser does not support the audio element.
-                </audio>
-                <div class="part-timer" id="timer">00:00 / 02:45</div>
-                <div class="nav-buttons">
-                    <button class="nav-btn" onclick="playPart1()">🔄 Replay Part 1</button>
-                    <a href="player.html" class="nav-btn">🎛️ Full Player</a>
-                    <button class="nav-btn" onclick="startAITranscript()" style="background: white; color: #764ba2; border: none;">🤖 Play AI Voices</button>
+        <div class="ai-player-card">
+            <div class="ai-player-header">
+                <h3>🎙️ IELTS Listening Track (AI)</h3>
+                <span class="ai-status" id="aiStatusText">Ready to play</span>
+            </div>
+            <div class="ai-controls-wrapper">
+                <button class="ai-btn" id="aiPlayPauseBtn" onclick="toggleAIAudio()" title="Play/Pause">▶️</button>
+                <button class="ai-btn ai-btn-stop" onclick="stopAIAudio()" title="Stop">⏹️</button>
+                <div class="ai-progress-bg">
+                    <div class="ai-progress-fill" id="aiProgressBar"></div>
                 </div>
             </div>
-
-            <div class="transcript-container" id="transcriptBox">
-                </div>
         </div>
 
         <div id="contextMenu" class="context-menu">
@@ -257,14 +240,12 @@
             }
         });
 
-        // Expose function globally so inline HTML onclick can access it
         window.saveToTracker = async function(score, total) {
             if (!userContext) {
                 alert("You are not logged in. Score will not be saved to the cloud.");
                 return;
             }
             
-            // Calculate band score mapping (10 questions -> approx out of 40)
             let normalizedScore = (score / total) * 40;
             let band = 0;
             if (normalizedScore >= 39) band = 9.0;
@@ -299,32 +280,7 @@
     </script>
 
     <script>
-        // 1. Audio Logic
-        const audio = document.getElementById('part1Audio');
-        const timer = document.getElementById('timer');
-        const PART1_END = 165; 
-
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        audio.addEventListener('timeupdate', () => {
-            const current = Math.floor(audio.currentTime);
-            timer.textContent = `${formatTime(current)} / ${formatTime(PART1_END)}`;
-            if (current >= PART1_END) {
-                audio.pause();
-                audio.currentTime = 0;
-            }
-        });
-
-        function playPart1() {
-            audio.currentTime = 0;
-            audio.play();
-        }
-
-        // 2. Quiz Logic
+        // Quiz Logic
         const answers = {
             "answer-1": ["300"],"answer-2": ["sunshade"],"answer-3": ["balcony"],
             "answer-4": ["forest", "forests"],"answer-5": ["319"],"answer-6": ["10,000", "10000"],
@@ -359,13 +315,12 @@
 
             document.getElementById("score").innerHTML = `🎯 You answered ${score} / ${keys.length} questions correctly.`;
             
-            // Trigger Firebase Sync
             if(window.saveToTracker) {
                 window.saveToTracker(score, keys.length);
             }
         }
 
-        // 3. Highlight Logic
+        // Highlight Logic
         let selectedRange;
         document.addEventListener("mouseup", () => {
             let selection = window.getSelection();
@@ -398,7 +353,7 @@
             window.getSelection().removeAllRanges();
         }
 
-        // 4. AI TTS Shadowing Logic
+        // AI Text-to-Speech Engine (Hidden Script Logic)
         const dialogueData = [
             { role: "MAN", text: "Greek Island Holidays, can I help you?" },
             { role: "WOMAN", text: "Yes, I hope so. I have a friend who's just come back from Corfu and she's recommended some apartments in Arilas. She thought they might be on your list." },
@@ -462,52 +417,66 @@
             { role: "WOMAN", text: "Right, thank you..." }
         ];
 
-        const transcriptBox = document.getElementById('transcriptBox');
-        
-        // Render Transcript
-        dialogueData.forEach((line, index) => {
-            const div = document.createElement('div');
-            div.className = `dialogue-line`;
-            div.id = `line-${index}`;
-            div.innerHTML = `<span class="role-${line.role}">${line.role}</span> ${line.text}`;
-            transcriptBox.appendChild(div);
-        });
-
-        let currentUtterance = null;
-        let isPlayingAI = false;
+        let isPlaying = false;
+        let isPaused = false;
         let currentLineIndex = 0;
+        let currentUtterance = null;
 
-        function startAITranscript() {
-            if (isPlayingAI) {
-                window.speechSynthesis.cancel();
-                isPlayingAI = false;
-                document.querySelectorAll('.dialogue-line').forEach(el => el.classList.remove('active'));
-                return;
+        const playBtn = document.getElementById('aiPlayPauseBtn');
+        const statusText = document.getElementById('aiStatusText');
+        const progressBar = document.getElementById('aiProgressBar');
+
+        function updateProgress() {
+            const percent = (currentLineIndex / dialogueData.length) * 100;
+            progressBar.style.width = percent + '%';
+        }
+
+        function toggleAIAudio() {
+            if (isPlaying && !isPaused) {
+                // Currently playing, so pause
+                window.speechSynthesis.pause();
+                isPaused = true;
+                playBtn.innerText = "▶️";
+                statusText.innerText = "Paused";
+            } else if (isPlaying && isPaused) {
+                // Currently paused, so resume
+                window.speechSynthesis.resume();
+                isPaused = false;
+                playBtn.innerText = "⏸️";
+                statusText.innerText = "Playing...";
+            } else {
+                // Not playing at all, start fresh
+                isPlaying = true;
+                isPaused = false;
+                currentLineIndex = 0;
+                playBtn.innerText = "⏸️";
+                statusText.innerText = "Playing...";
+                playNextAILine();
             }
-            
-            audio.pause(); // Pause standard audio
-            isPlayingAI = true;
+        }
+
+        function stopAIAudio() {
+            window.speechSynthesis.cancel();
+            isPlaying = false;
+            isPaused = false;
             currentLineIndex = 0;
-            playNextAILine();
+            playBtn.innerText = "▶️";
+            statusText.innerText = "Ready to play";
+            updateProgress();
         }
 
         function playNextAILine() {
-            if (currentLineIndex >= dialogueData.length || !isPlayingAI) {
-                isPlayingAI = false;
-                document.querySelectorAll('.dialogue-line').forEach(el => el.classList.remove('active'));
+            if (!isPlaying || currentLineIndex >= dialogueData.length) {
+                stopAIAudio(); // Auto stop when finished
+                statusText.innerText = "Finished";
                 return;
             }
 
-            // Highlight UI
-            document.querySelectorAll('.dialogue-line').forEach(el => el.classList.remove('active'));
-            const activeLine = document.getElementById(`line-${currentLineIndex}`);
-            activeLine.classList.add('active');
-            activeLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
+            updateProgress();
             const lineData = dialogueData[currentLineIndex];
             currentUtterance = new SpeechSynthesisUtterance(lineData.text);
             
-            // Assign English Voices
+            // Assign British English Voices for IELTS simulation
             const voices = window.speechSynthesis.getVoices();
             const ukVoices = voices.filter(v => v.lang === 'en-GB' || v.name.includes('UK'));
             
@@ -519,9 +488,16 @@
             }
             
             if(selectedVoice) currentUtterance.voice = selectedVoice;
-            currentUtterance.rate = 0.95; // Slightly slower for IELTS feel
+            currentUtterance.rate = 0.95; // Slightly slower for listening test feel
 
             currentUtterance.onend = () => {
+                currentLineIndex++;
+                playNextAILine();
+            };
+
+            currentUtterance.onerror = (e) => {
+                console.error("SpeechSynthesis error:", e);
+                // Try to continue on minor errors
                 currentLineIndex++;
                 playNextAILine();
             };
@@ -529,8 +505,13 @@
             window.speechSynthesis.speak(currentUtterance);
         }
 
-        // Initialize voices
+        // Initialize voices on load to prevent lag
         window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
+        
+        // Prevent TTS from getting stuck if user navigates away
+        window.onbeforeunload = function() {
+            window.speechSynthesis.cancel();
+        };
     </script>
 </body>
 </html>
