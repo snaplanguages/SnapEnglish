@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passage 2 Test 2 | SnapEnglish</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Teal Theme - Tươi mát, Hiện đại */
+            --primary: #0d9488; 
+            --primary-dark: #0f766e; 
+            --accent: #99f6e4;
+            --bg-body: #f0fdfa;
+            --border-color: #ccfbf1;
+            --text-color: #1e293b;
+            --highlight-color: #fef08a;
+            --correct: #059669;
+            --wrong: #dc2626;
+            --exp-bg: #f0fdf4;
+            --header-h: 65px;
+            --footer-h: 70px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- OVERLAY & MODALS --- */
+        .custom-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 99999;
+        }
+        
+        .setup-modal {
+            background: white; padding: 40px 40px; border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(13, 148, 136, 0.15);
+            width: 90%; max-width: 450px; text-align: center;
+            border: 2px solid var(--accent);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .setup-modal h2 { font-family: 'Lora', serif; color: var(--primary-dark); font-size: 28px; margin-top: 0; }
+        
+        #timeInputBox { display: block; margin: 25px 0; }
+        #timeInput { 
+            width: 100px; padding: 10px; font-size: 18px; text-align: center; 
+            border: 2px solid #cbd5e1; border-radius: 10px; font-family: inherit;
+            color: var(--primary-dark); font-weight: bold; outline: none; transition: 0.2s;
+        }
+        #timeInput:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.2); }
+        
+        .start-btn {
+            background: var(--primary); color: white; border: none; padding: 12px 35px;
+            border-radius: 50px; font-size: 16px; font-weight: 700; cursor: pointer;
+            transition: 0.3s; display: inline-block; box-shadow: 0 4px 15px rgba(13, 148, 136, 0.3);
+        }
+        .start-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(13, 148, 136, 0.4); }
+
+        .modal-actions { display: flex; gap: 15px; margin-top: 25px; justify-content: center; }
+        .btn-cancel {
+            background: #f1f5f9; color: #475569; border: 2px solid #cbd5e1; padding: 12px 20px;
+            border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s; flex: 1;
+        }
+        .btn-cancel:hover { background: #e2e8f0; border-color: #94a3b8; }
+        .btn-confirm {
+            background: var(--primary); color: white; border: none; padding: 12px 20px;
+            border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s; flex: 1;
+            box-shadow: 0 4px 0 var(--primary-dark);
+        }
+        .btn-confirm:active { transform: translateY(4px); box-shadow: none; }
+
+        /* HEADER */
+        header {
+            height: var(--header-h); background: #fff;
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 25px; z-index: 100;
+        }
+        .brand { font-size: 20px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        .brand span { background: var(--primary); color: white; padding: 4px 10px; border-radius: 8px; font-size: 14px; }
+        
+        .timer-box { font-family: monospace; font-size: 18px; font-weight: 700; color: #b91c1c; background: #fef2f2; padding: 6px 15px; border-radius: 8px; border: 1px solid #fecaca;}
+        .btn-submit { 
+            background: var(--primary); color: white; border: none; padding: 8px 25px; 
+            border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px;
+            box-shadow: 0 4px 0 var(--primary-dark); transition: 0.2s;
+        }
+        .btn-submit:active { transform: translateY(4px); box-shadow: none; }
+
+        /* LAYOUT */
+        .container { display: flex; height: calc(100vh - var(--header-h) - var(--footer-h)); width: 100%; max-width: 100%; }
+        .pane { flex: 1; padding: 35px; overflow-y: auto; position: relative; scroll-behavior: smooth; }
+        .pane-left { border-right: 2px solid var(--border-color); background: #fff; font-size: 16px; line-height: 1.8; text-align: justify; }
+        .pane-right { background: #f8fafc; }
+        
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 5px; }
+
+        /* CONTENT */
+        .passage-title { text-align: center; color: var(--primary-dark); margin-bottom: 25px; font-family: 'Lora', serif; border-bottom: 2px dashed var(--accent); padding-bottom: 15px;}
+        .paragraph { margin-bottom: 20px; }
+        .paragraph-label { color: var(--primary); font-weight: 800; font-size: 1.1em; margin-right: 5px; }
+        .passage-intro { font-style: italic; background: #f1f5f9; padding: 15px; border-radius: 8px; border-left: 4px solid var(--accent); margin-bottom: 25px;}
+
+        /* EVIDENCE HIGHLIGHTS */
+        .ev-box { 
+            padding: 2px 4px; border-radius: 6px; 
+            transition: all 0.4s ease; 
+            border: 2px solid transparent;
+            background-color: transparent;
+            color: inherit;
+        }
+        .ev-box.focus-blink {
+            border-color: var(--primary-dark) !important;
+            transform: scale(1.02); 
+            box-shadow: 0 4px 15px rgba(13, 148, 136, 0.2) !important; 
+            background-color: var(--highlight-color) !important;
+            z-index: 10; position: relative;
+        }
+
+        /* QUESTIONS */
+        .question-section { padding: 25px; border: 1px solid var(--border-color); background: #fff; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);}
+        .instruction { color: var(--primary-dark); font-weight: 700; margin-bottom: 20px; font-size: 16px; background: #e0f2fe; padding: 12px 15px; border-radius: 8px; border-left: 4px solid var(--primary);}
+
+        .q-row { display: flex; align-items: baseline; margin-bottom: 18px; font-size: 16px; }
+        .q-num { font-weight: bold; min-width: 30px; color: var(--primary); }
+        .q-content { flex: 1; }
+
+        /* DRAG PALETTE */
+        .sticky-palette {
+            position: sticky; top: -25px; background: #fff; padding: 15px 0;
+            border-bottom: 2px solid var(--primary); z-index: 50; margin-bottom: 20px;
+            display: flex; gap: 10px; flex-wrap: wrap; box-shadow: 0 5px 10px rgba(0,0,0,0.02);
+        }
+        .drag-item {
+            background: #fff; border: 1px solid var(--primary); color: var(--primary-dark);
+            padding: 8px 16px; border-radius: 6px; cursor: grab;
+            font-weight: 600; font-size: 14px; user-select: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.2s;
+        }
+        .drag-item:hover { background: #e0f2fe; }
+        .drag-item:active { cursor: grabbing; background: #e0f2fe; transform: scale(0.95);}
+
+        .input-gap {
+            display: inline-block; width: 140px; height: 32px;
+            border: 2px solid #cbd5e1; border-radius: 6px; 
+            text-align: center; font-weight: 700; color: var(--primary-dark);
+            font-size: 15px; margin: 0 5px; vertical-align: middle; transition: 0.2s;
+        }
+        .input-gap.drag-over { background: #e0f2fe; border: 2px dashed var(--primary); }
+        .input-gap.filled { background: #e0f2fe; border-color: var(--primary); }
+
+        select.input-select {
+            padding: 8px; border: 2px solid #cbd5e1; border-radius: 8px;
+            font-size: 15px; cursor: pointer; font-weight: 600; color: var(--text-color); outline: none; margin-top: 8px;
+        }
+        select.input-select:focus { border-color: var(--primary); }
+
+        /* SUMMARY BOX */
+        .summary-box {
+            background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px dashed #cbd5e1; line-height: 2.2; font-size: 16px; margin-bottom: 15px;
+        }
+
+        /* EXPLANATION BOX */
+        .exp-box {
+            display: none; background: #fff;
+            border: 2px solid var(--border-color); border-left: 6px solid var(--primary);
+            padding: 20px; margin-top: 15px; margin-bottom: 15px; border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(13, 148, 136, 0.08); 
+            animation: slideUp 0.4s ease-out;
+        }
+        .exp-box.show { display: block; }
+        .exp-title { 
+            font-weight: 800; color: var(--primary-dark); font-size: 18px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 2px dashed var(--border-color); padding-bottom: 10px; margin-bottom: 12px;
+        }
+        .locate-btn {
+            background: #e0f2fe; border: 1px solid var(--accent); color: var(--primary-dark);
+            padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.2s;
+        }
+        .locate-btn:hover { background: var(--primary); color: white; }
+        .exp-translation { background: #fdf8f9; color: #555; padding: 12px; border-radius: 8px; border-left: 3px solid #fecdd3; font-style: italic; margin-bottom: 12px; font-size: 15px;}
+        .exp-text { font-size: 15px; line-height: 1.6; color: #334155;}
+        
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* FOOTER */
+        footer {
+            height: var(--footer-h); background: #fff; border-top: 2px solid var(--border-color);
+            display: flex; align-items: center; padding: 0 25px; gap: 15px; z-index: 100;
+        }
+        .palette-scroller { flex: 1; display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; align-items: center;}
+        .nav-dot {
+            min-width: 38px; height: 38px; border: 2px solid #e2e8f0; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: bold;
+            cursor: pointer; color: #94a3b8; background: white; transition: 0.2s; flex-shrink: 0;
+        }
+        .nav-dot.done { background: #e0f2fe; color: var(--primary-dark); border-color: var(--accent); }
+        .nav-dot:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* HIGHLIGHT MENU */
+        .highlight { background-color: var(--highlight-color); cursor: pointer; border-radius: 3px; padding: 2px 0;}
+        #ctxMenu {
+            position: absolute; display: none; background: white; 
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12); border-radius: 10px; 
+            font-size: 15px; z-index: 99999; border: 1px solid #eee; min-width: 160px; overflow: hidden;
+        }
+        #ctxMenu button {
+            background: none; border: none; padding: 12px 18px; 
+            width: 100%; text-align: left; cursor: pointer; display: block; font-weight: 600; color: #444;
+        }
+        #ctxMenu button:hover { background: #f8fafc; color: var(--primary-dark); }
+        #ctxMenu button.delete:hover { background: #fef2f2; color: var(--wrong); }
+
+        .feedback { display: inline-block; margin-left: 10px; font-weight: bold; font-size: 15px; }
+        .correct { color: var(--correct); }
+        .wrong { color: var(--wrong); }
+
+    </style>
+</head>
+<body>
+
+<div id="setupOverlay" class="custom-overlay">
+    <div class="setup-modal">
+        <h2>Reading Library ✨</h2>
+        <p style="font-size: 16px; color: #64748b; margin-bottom: 20px;">Hãy cài đặt thời gian để bắt đầu luyện tập Passage 2 nhé!</p>
+        <div id="timeInputBox">
+            <label style="font-size: 16px; font-weight: bold; color: #475569;">Thời gian (phút): </label>
+            <input type="number" id="timeInput" value="20" min="5" max="60">
+        </div>
+        <button class="start-btn" onclick="askReady()">Sẵn sàng (OK)</button>
+    </div>
+</div>
+
+<div id="startConfirmOverlay" class="custom-overlay">
+    <div class="custom-modal setup-modal">
+        <h2>Xác nhận bắt đầu</h2>
+        <p id="startConfirmMsg" style="font-size: 16px; color: #475569; margin-bottom: 20px; white-space: pre-line;"></p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeStartConfirmModal()">Huỷ</button>
+            <button class="btn-confirm" onclick="startTestActual()">OK</button>
+        </div>
+    </div>
+</div>
+
+<header>
+    <div class="brand"><span>SnapEnglish</span> Passage 2 Test 2</div>
+    <div style="display:flex; align-items:center; gap:15px;">
+        <div class="timer-box">⏱ <span id="timer">00:00</span></div>
+        <button class="btn-submit" onclick="submitTest(true)">NỘP BÀI</button>
+    </div>
+</header>
+
+<div class="container" id="mainContainer">
+    <div class="pane pane-left" id="passagePane">
+        <h2 class="passage-title">Optimism and Health 2</h2>
+        <div id="passageText">
+            <div class="passage-intro">
+                <strong>Mindset</strong> is all. How you start the year will set the template for 2009, and two scientifically-backed character traits hold the key: optimism and resilience (if the prospect leaves you feeling pessimistically spineless, the good news is that you can significantly boost both of these qualities).
+            </div>
+
+            <p class="paragraph"><span class="paragraph-label">A.</span> Faced with 12 months of plummeting economics and rising human distress, staunchly maintaining a rosy view might seem deludedly Pollyannaish. But here we encounter the optimism paradox. As <span id="ev-22" class="ev-box">Brice Pitt</span>, an emeritus professor of the psychiatry of old age at Imperial College, London, told me: optimists are unrealistic. Depressive people see things as they really are, but that is a disadvantage from an evolutionary point of view. <span id="ev-22-part2" class="ev-box">Optimism is a piece of evolutionary equipment</span> that carried us through millennia of setbacks.</p>
+            
+            <p class="paragraph"><span class="paragraph-label">B.</span> <span id="ev-24" class="ev-box">It has been known that optimistic has something to do with the long life</span>, and optimists have plenty to be happy about. In other words, if you can convince yourself that things will get better, the odds of it happening will improve – because you keep on playing the game. In this light, optimism “is a habitual way of explaining your setbacks to yourself”, reports Martin Seligman, the psychology professor and author of Learned Optimism. The research shows that when times get tough, optimists do better than pessimists – they succeed better at work, respond better to stress, suffer fewer depressive episodes, and achieve more personal goals.</p>
+            
+            <p class="paragraph"><span class="paragraph-label">C.</span> Studies also show that belief can help with the financial pinch. <span id="ev-20" class="ev-box">Chad Wallens</span>, a social forecaster at the Henley Centre who surveyed middle-class Britons’ beliefs about income, has found that <span id="ev-20-part2" class="ev-box">“the people who feel wealthiest, and those who feel poorest, actually have almost the same amount of money at their disposal.</span> Their attitudes and behaviour patterns, however, are different from one another.”</p>
+            
+            <p class="paragraph"><span class="paragraph-label">D.</span> Optimists have something else to be cheerful about – in general, they are more robust. For example, a study of 660 volunteers by the Yale University psychologist <span id="ev-14" class="ev-box">Dr Becca Levy, found that thinking positively adds an average of 7 years to your life.</span> Other American research claims to have identified a physical mechanism behind this. A Harvard Medical School study of <span id="ev-15" class="ev-box">670</span> men found that the optimists have significantly better <span id="ev-16" class="ev-box">lung function</span>. The lead author, Dr Rosalind Wright, believes that attitude somehow strengthens the <span id="ev-17" class="ev-box">immune system</span>. “Preliminary studies on <span id="ev-18" class="ev-box">heart patients</span> suggest that, by changing a per­son’s outlook, you can improve their mortality risk,” she says.</p>
+            
+            <p class="paragraph"><span class="paragraph-label">E.</span> Few studies have tried to ascertain the proportion of optimists in the world. But a 1995 nationwide survey conducted by the <span id="ev-19" class="ev-box">American magazine Adweek</span> found that about half the population counted themselves as optimists, with <span id="ev-19-part2" class="ev-box">women slightly more apt than men</span> (53 per cent versus 48 per cent) to see the sunny side.</p>
+            
+            <p class="paragraph"><span class="paragraph-label">F.</span> Although some optimists may be accurate in their positive beliefs about the future, others may be unrealistic-their optimism is misplaced, according to the <span id="ev-21" class="ev-box">American Psychological Association. Research shows that some smokers exhibit unrealistic optimism</span> by underestimating their relative chances of experiencing disease. An important question is whether such unrealistic optimism is associated with risk-related attitudes and behavior. We addressed this question by investigating if one’s perceived the risk of developing lung cancer, over and above one’s objective risk, predicted acceptance of myths and other beliefs about smoking. Hierarchical regressions showed that those individuals who were unrealistically optimistic were more likely to endorse beliefs that there is no risk of lung cancer if one only smokes for a few years and that getting lung cancer depends on one’s genes.</p>
+            
+            <p class="paragraph"><span class="paragraph-label">G.</span> Of course, there is no guarantee that optimism will insulate you from the crunch’s worst effects, but the best strategy is still to keep smiling and thank your lucky stars. Because (as every good sports coach knows) adversity is character-forming – so long as you practise the skills of resilience. <span id="ev-27" class="ev-box">Research among tycoons and business leaders shows that the path to success is often littered with failure</span>: a record of sackings, bankruptcies and blistering castigation. But instead of curling into a foetal ball beneath the coffee table, they resiliently pick themselves up, learn from their pratfalls and march boldly towards the next opportunity.</p>
+            
+            <p class="paragraph"><span class="paragraph-label">H.</span> The American Psychological Association defines resilience as the ability to adapt in the face of adversity, trauma or tragedy. A resilient person may go through difficulty and uncertainty, but he or she will doggedly bounce back.</p>
+            
+            <p class="paragraph"><span class="paragraph-label">I.</span> Optimism is one of the central traits required in building resilience, say Yale University investigators in the <span id="ev-23" class="ev-box">Annual Review of Clinical Psychology</span>. They add that resilient people learn to hold on to their sense of humour and this can help them to <span id="ev-23-part2" class="ev-box">keep a flexible attitude when big changes of plan are warranted.</span> The ability to accept your lot with equanimity also plays an important role, the study adds.</p>
+            
+            <p class="paragraph"><span class="paragraph-label">J.</span> One of the best ways to acquire resilience is through experiencing a difficult childhood, the sociologist Steven Stack reports in the Journal of Social Psych­ology. For example, short men are less likely to commit suicide than tall guys, he says, because shorties develop psychological defence skills to handle the bullies and mickey-taking that their lack of stature attracts. By contrast, those who enjoyed adversity-free youths can get derailed by setbacks later on because they’ve never been inoculated against agro.</p>
+            
+            <p class="paragraph"><span class="paragraph-label">K.</span> Learning to overcome your fears. <span id="ev-26" class="ev-box">If you are handicapped by having had a happy childhood, then practising proactive optimism can help you to become more resilient.</span> Studies of resilient people show that they take more risks; they court failure and learn not to fear it. And despite being thick-skinned, resilient types are also more open than aver­age to other people. Bouncing through knock-backs is all part of the process. It’s about optimistic risk-taking – being confident that people will like you. Simply smiling and being warm to people can help. It’s an altruistic path to self-interest – and if it achieves nothing else, it will reinforce an age-old adage: hard times can bring out the best in you.</p>
+        </div>
+    </div>
+
+    <div class="pane pane-right" id="questionPane">
+        
+        <div class="question-section" id="q-group-1">
+            <div class="instruction">Câu 14-18: Hoàn thành bản tóm tắt dưới đây.<br>Sử dụng <strong>KHÔNG QUÁ HAI TỪ</strong> từ bài đọc cho mỗi câu trả lời.</div>
+            
+            <div class="summary-box">
+                Optimists generally are more robust. Yale University psychologist Dr Becca Levy found that an extension of around 
+                <b>14.</b> <input type="text" class="input-gap" id="ans-14" oninput="updateNav(14)"> <span id="fb-14" class="feedback"></span> 
+                to your life will be achieved by a positive attitude toward life. A Harvard Medical School conduct a research which study of 
+                <b>15.</b> <input type="text" class="input-gap" style="width: 80px;" id="ans-15" oninput="updateNav(15)"> <span id="fb-15" class="feedback"></span> 
+                male volunteers found that the optimists have remarkably better 
+                <b>16.</b> <input type="text" class="input-gap" id="ans-16" oninput="updateNav(16)"> <span id="fb-16" class="feedback"></span>. 
+                And Dr Rosalind Wright believes optimistic life may enhance the 
+                <b>17.</b> <input type="text" class="input-gap" id="ans-17" oninput="updateNav(17)"> <span id="fb-17" class="feedback"></span>. 
+                Some initiative studies on 
+                <b>18.</b> <input type="text" class="input-gap" id="ans-18" oninput="updateNav(18)"> <span id="fb-18" class="feedback"></span> 
+                indicate that people can improve their mortality risk by changing into a positive outlook.
+            </div>
+            <div id="fb-container-14-18" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+
+        <div class="question-section" id="q-group-2">
+            <div class="instruction">Câu 19-23: Sử dụng thông tin trong bài để nối người hoặc tổ chức (A-G) với các ý kiến hoặc hành động bên dưới.<br>Kéo thả chữ cái (A-G) vào ô trống.</div>
+            
+            <div class="sticky-palette" style="font-size: 14px;">
+                <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="A">A. Brice Pitt</div>
+                <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="B">B. American Psychological Association</div>
+                <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="C">C. Martin Seligman</div>
+                <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="D">D. Chad Wallens</div>
+                <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="E">E. Annual Review of Clinical Psychology</div>
+                <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="F">F. Steven Stack</div>
+                <div class="drag-item" draggable="true" ondragstart="drag(event)" data-val="G">G. American magazine Adweek</div>
+            </div>
+            
+            <div class="q-row" id="q-19">
+                <span class="q-num">19.</span>
+                <span class="q-content">Different optimism result found according to gender. <input type="text" class="input-gap" style="width: 60px;" id="ans-19" ondrop="drop(event)" ondragover="allowDrop(event)" oninput="updateNav(19)" readonly> <span id="fb-19" class="feedback"></span></span>
+            </div>
+            <div id="exp-19"></div>
+
+            <div class="q-row" id="q-20">
+                <span class="q-num">20.</span>
+                <span class="q-content">There is no necessary relationship between happiness and money. <input type="text" class="input-gap" style="width: 60px;" id="ans-20" ondrop="drop(event)" ondragover="allowDrop(event)" oninput="updateNav(20)" readonly> <span id="fb-20" class="feedback"></span></span>
+            </div>
+            <div id="exp-20"></div>
+
+            <div class="q-row" id="q-21">
+                <span class="q-num">21.</span>
+                <span class="q-content">Excessive optimism may be incorrect in everyday life. <input type="text" class="input-gap" style="width: 60px;" id="ans-21" ondrop="drop(event)" ondragover="allowDrop(event)" oninput="updateNav(21)" readonly> <span id="fb-21" class="feedback"></span></span>
+            </div>
+            <div id="exp-21"></div>
+
+            <div class="q-row" id="q-22">
+                <span class="q-num">22.</span>
+                <span class="q-content">Optimists are advantageous for human evolution. <input type="text" class="input-gap" style="width: 60px;" id="ans-22" ondrop="drop(event)" ondragover="allowDrop(event)" oninput="updateNav(22)" readonly> <span id="fb-22" class="feedback"></span></span>
+            </div>
+            <div id="exp-22"></div>
+
+            <div class="q-row" id="q-23">
+                <span class="q-num">23.</span>
+                <span class="q-content">Occurrence of emergency assists resilient people in a positive way. <input type="text" class="input-gap" style="width: 60px;" id="ans-23" ondrop="drop(event)" ondragover="allowDrop(event)" oninput="updateNav(23)" readonly> <span id="fb-23" class="feedback"></span></span>
+            </div>
+            <div id="exp-23"></div>
+        </div>
+
+        <div class="question-section" id="q-group-3">
+            <div class="instruction">Câu 24-27: Các nhận định sau đây có đồng tình với thông tin được đưa ra trong Bài đọc 2 không?</div>
+            
+            <div class="q-row" id="q-24">
+                <span class="q-num">24.</span>
+                <span class="q-content">
+                    The link between longevity and optimism has been known.<br>
+                    <select class="input-select" id="ans-24" onchange="updateNav(24)">
+                        <option value="">Chọn...</option>
+                        <option value="YES">YES</option>
+                        <option value="NO">NO</option>
+                        <option value="NOT GIVEN">NOT GIVEN</option>
+                    </select>
+                    <span id="fb-24" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-24"></div>
+
+            <div class="q-row" id="q-25">
+                <span class="q-num">25.</span>
+                <span class="q-content">
+                    Optimists have a better personal relationship than those pessimists.<br>
+                    <select class="input-select" id="ans-25" onchange="updateNav(25)">
+                        <option value="">Chọn...</option>
+                        <option value="YES">YES</option>
+                        <option value="NO">NO</option>
+                        <option value="NOT GIVEN">NOT GIVEN</option>
+                    </select>
+                    <span id="fb-25" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-25"></div>
+
+            <div class="q-row" id="q-26">
+                <span class="q-num">26.</span>
+                <span class="q-content">
+                    People who had a happy childhood do not need to practise optimism.<br>
+                    <select class="input-select" id="ans-26" onchange="updateNav(26)">
+                        <option value="">Chọn...</option>
+                        <option value="YES">YES</option>
+                        <option value="NO">NO</option>
+                        <option value="NOT GIVEN">NOT GIVEN</option>
+                    </select>
+                    <span id="fb-26" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-26"></div>
+
+            <div class="q-row" id="q-27">
+                <span class="q-num">27.</span>
+                <span class="q-content">
+                    Experience of difficulties will eventually help people accumulate a fortune.<br>
+                    <select class="input-select" id="ans-27" onchange="updateNav(27)">
+                        <option value="">Chọn...</option>
+                        <option value="YES">YES</option>
+                        <option value="NO">NO</option>
+                        <option value="NOT GIVEN">NOT GIVEN</option>
+                    </select>
+                    <span id="fb-27" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-27"></div>
+
+        </div>
+
+    </div>
+</div>
+
+<div id="confirmOverlay" class="custom-overlay">
+    <div class="custom-modal setup-modal">
+        <h2>Xác nhận nộp bài</h2>
+        <p style="font-size: 16px; color: #475569; margin-bottom: 15px;">Bạn có chắc chắn muốn nộp bài để xem đáp án và lưu điểm không?</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeConfirmModal()">Quay lại</button>
+            <button class="btn-confirm" onclick="executeSubmit()">Nộp bài</button>
+        </div>
+    </div>
+</div>
+
+<div id="resultOverlay" class="custom-overlay">
+    <div class="custom-modal setup-modal">
+        <h2>🎉 Hoàn thành!</h2>
+        <div id="resultMessage" style="margin: 20px 0; line-height: 1.8;"></div>
+        <button class="btn-confirm" style="width: 100%; margin-top: 10px;" onclick="closeResultModal()">Xem giải thích chi tiết</button>
+    </div>
+</div>
+
+<div id="ctxMenu">
+    <button onclick="doHighlight()">🖍 Bôi vàng Highlight tự do</button>
+    <button onclick="removeHighlight()" class="delete">🗑 Xóa Highlight</button>
+</div>
+
+<footer>
+    <div style="font-size:14px; font-weight:bold; color:#64748b; text-transform:uppercase;">Điều hướng nhanh:</div>
+    <div class="palette-scroller" id="navPalette"></div>
+</footer>
+
+<script>
+    // --- STATE & DATA ---
+    let testDuration = 0; 
+    let timerInterval = null;
+    let isSubmitted = false;
+
+    const correctAnswers = {
+        14: "7 YEARS", 15: "670", 16: "LUNG FUNCTION", 17: "IMMUNE SYSTEM", 18: "HEART PATIENTS",
+        19: "G", 20: "D", 21: "B", 22: "A", 23: "E",
+        24: "YES", 25: "NOT GIVEN", 26: "NO", 27: "YES"
+    };
+
+    const explanations = {
+        14: { translation: "...kéo dài thêm khoảng 7 năm tuổi thọ...", exp: "Đoạn D ghi rõ: '...thinking positively adds an average of 7 years to your life.'", colorClass: "ev-14" },
+        15: { translation: "...nghiên cứu trên 670 nam tình nguyện viên...", exp: "Đoạn D đề cập: 'A Harvard Medical School study of 670 men found...'", colorClass: "ev-15" },
+        16: { translation: "...có chức năng phổi tốt hơn đáng kể.", exp: "Đoạn D: '...optimists have significantly better lung function.'", colorClass: "ev-16" },
+        17: { translation: "...có thể tăng cường hệ miễn dịch.", exp: "Đoạn D: 'Dr Rosalind Wright, believes that attitude somehow strengthens the immune system.'", colorClass: "ev-17" },
+        18: { translation: "Một số nghiên cứu bước đầu trên bệnh nhân tim...", exp: "Đoạn D: 'Preliminary studies on heart patients suggest that... you can improve their mortality risk.'", colorClass: "ev-18" },
+        19: { translation: "Kết quả về sự lạc quan khác nhau theo giới tính.", exp: "Đoạn E nhắc đến 'American magazine Adweek' (G) khảo sát thấy phụ nữ có xu hướng nhìn mặt tích cực hơn nam giới (53% vs 48%).", colorClass: "ev-19" },
+        20: { translation: "Không có mối quan hệ tất yếu giữa hạnh phúc và tiền bạc.", exp: "Đoạn C nhắc đến 'Chad Wallens' (D) phát hiện ra những người cảm thấy giàu nhất và nghèo nhất thực chất có số tiền tương đương nhau, điểm khác biệt là thái độ.", colorClass: "ev-20" },
+        21: { translation: "Sự lạc quan thái quá có thể không chính xác trong cuộc sống.", exp: "Đoạn F nhắc đến 'American Psychological Association' (B) chỉ ra rằng một số người hút thuốc thể hiện sự lạc quan phi thực tế (unrealistic optimism) khi đánh giá sai nguy cơ mắc bệnh.", colorClass: "ev-21" },
+        22: { translation: "Những người lạc quan có lợi thế cho sự tiến hóa của con người.", exp: "Đoạn A trích lời 'Brice Pitt' (A) rằng sự lạc quan là một phần 'trang bị tiến hóa' (evolutionary equipment) giúp con người vượt qua hàng ngàn năm thất bại.", colorClass: "ev-22" },
+        23: { translation: "Sự xuất hiện của tình huống khẩn cấp/thay đổi lớn hỗ trợ người kiên cường theo hướng tích cực.", exp: "Đoạn I nhắc đến nghiên cứu trên 'Annual Review of Clinical Psychology' (E) rằng người kiên cường giữ được thái độ linh hoạt khi có những thay đổi lớn về kế hoạch.", colorClass: "ev-23" },
+        24: { translation: "Mối liên hệ giữa tuổi thọ và sự lạc quan đã được biết đến.", exp: "Đoạn B khẳng định ngay câu đầu: 'It has been known that optimistic has something to do with the long life...'", colorClass: "ev-24" },
+        25: { translation: "Người lạc quan có mối quan hệ cá nhân tốt hơn người bi quan.", exp: "Bài đọc ở Đoạn B có nhắc người lạc quan thành công hơn trong công việc, giảm stress... nhưng KHÔNG hề so sánh về 'mối quan hệ cá nhân' (personal relationship).", tip: "Đừng nhầm lẫn 'personal goals' với 'personal relationship'." },
+        26: { translation: "Người có tuổi thơ hạnh phúc không cần thực hành sự lạc quan.", exp: "Đoạn K nói ngược lại: 'If you are handicapped by having had a happy childhood, then practising proactive optimism can help...' -> Vẫn rất cần thực hành để trở nên kiên cường hơn.", colorClass: "ev-26" },
+        27: { translation: "Kinh nghiệm trải qua khó khăn cuối cùng sẽ giúp con người tích lũy được khối tài sản.", exp: "Đoạn G nhấn mạnh con đường đi đến thành công của các tài phiệt (tycoons) và lãnh đạo kinh doanh đầy rẫy sự thất bại, và họ mạnh mẽ tiến tới cơ hội tiếp theo. Ý ngầm ở đây là họ đạt được thành công/tài sản nhờ vượt qua khó khăn.", colorClass: "ev-27" }
+    };
+
+    const startQ = 14; const endQ = 27; const totalQuestions = 14;
+
+    // --- INIT ---
+    window.onload = function() {
+        renderPalette();
+        document.getElementById('setupOverlay').style.display = 'flex';
+    }
+
+    function askReady() {
+        let minutes = parseInt(document.getElementById('timeInput').value);
+        if(isNaN(minutes) || minutes < 1) minutes = 20; 
+        document.getElementById('startConfirmMsg').innerText = `Bạn đã cài đặt thời gian là ${minutes} phút.\nSẵn sàng bắt đầu chưa?`;
+        document.getElementById('startConfirmOverlay').style.display = 'flex';
+    }
+
+    function closeStartConfirmModal() { document.getElementById('startConfirmOverlay').style.display = 'none'; }
+
+    function startTestActual() {
+        document.getElementById('startConfirmOverlay').style.display = 'none';
+        let minutes = parseInt(document.getElementById('timeInput').value);
+        if(isNaN(minutes) || minutes < 1) minutes = 20;
+        testDuration = minutes * 60;
+        
+        document.getElementById('setupOverlay').style.display = 'none';
+        startTimer();
+    }
+
+    function renderPalette() {
+        const nav = document.getElementById("navPalette");
+        for (let i = startQ; i <= endQ; i++) {
+            let dot = document.createElement("div");
+            dot.className = "nav-dot"; dot.id = `nav-${i}`; dot.innerText = i;
+            dot.onclick = () => {
+                let targetId = `ans-${i}`;
+                let el = document.getElementById(targetId);
+                if(i >= 24 && el) el = el.closest('.q-row');
+                
+                if(el) {
+                    el.scrollIntoView({behavior:"smooth", block:"center"});
+                    el.style.backgroundColor = "var(--highlight-color)";
+                    setTimeout(() => el.style.backgroundColor = "", 1000);
+                }
+            };
+            nav.appendChild(dot);
+        }
+    }
+
+    function updateNav(id) {
+        let nav = document.getElementById(`nav-${id}`);
+        if (!nav) return;
+        let el = document.getElementById(`ans-${id}`);
+        let val = el ? el.value : "";
+        
+        if (val && val.trim() !== "") nav.classList.add("done");
+        else nav.classList.remove("done");
+    }
+
+    // --- DRAG & DROP LOGIC ---
+    function allowDrop(ev) { ev.preventDefault(); ev.target.classList.add("drag-over"); }
+    document.addEventListener("dragleave", (e) => { if (e.target.classList.contains("input-gap")) e.target.classList.remove("drag-over"); });
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.getAttribute("data-val").charAt(0)); }
+    function drop(ev) {
+        ev.preventDefault(); ev.target.classList.remove("drag-over");
+        let val = ev.dataTransfer.getData("text");
+        if (val) {
+            ev.target.value = val; ev.target.classList.add("filled");
+            let id = ev.target.id.split('-')[1]; updateNav(id);
+        }
+    }
+
+    // --- TIMER ---
+    function startTimer() {
+        let display = document.getElementById("timer");
+        timerInterval = setInterval(function () {
+            let m = Math.floor(testDuration / 60);
+            let s = testDuration % 60;
+            display.textContent = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+            if (--testDuration < 0) { clearInterval(timerInterval); executeSubmit(); }
+        }, 1000);
+    }
+
+    // --- SUBMIT & EXPLANATIONS ---
+    function submitTest(manual) {
+        if (isSubmitted) return;
+        if (manual) document.getElementById('confirmOverlay').style.display = 'flex';
+        else executeSubmit();
+    }
+
+    function closeConfirmModal() { document.getElementById('confirmOverlay').style.display = 'none'; }
+    function closeResultModal() { document.getElementById('resultOverlay').style.display = 'none'; }
+
+    function executeSubmit() {
+        document.getElementById('confirmOverlay').style.display = 'none';
+        isSubmitted = true;
+        clearInterval(timerInterval);
+        document.querySelectorAll('input, select').forEach(el => el.disabled = true);
+        
+        let score = 0;
+        const dragExpContainer = document.getElementById('fb-container-14-18');
+        if(dragExpContainer) dragExpContainer.innerHTML = "";
+
+        for (let i = startQ; i <= endQ; i++) {
+            let userAns = "";
+            let el = document.getElementById(`ans-${i}`);
+            if (el) userAns = el.value.trim().toUpperCase();
+
+            let correct = correctAnswers[i];
+            let isCorrect = (userAns === correct);
+            if (isCorrect) score++;
+
+            let fb = document.getElementById(`fb-${i}`);
+            if (fb) {
+                fb.innerText = isCorrect ? "✓" : `✗ (${correct})`;
+                fb.className = isCorrect ? "feedback correct" : "feedback wrong";
+            }
+
+            // Exps
+            if(explanations[i]) {
+                let expData = explanations[i];
+                let htmlContent = `
+                    <div class="exp-box show">
+                        <div class="exp-title">
+                            💡 Giải thích Câu ${i}
+                            ${expData.colorClass ? `<button class="locate-btn" onclick="scrollToEvidence('${expData.colorClass}')">📍 Xem dẫn chứng</button>` : ''}
+                        </div>
+                        ${expData.translation ? `<div class="exp-translation">"${expData.translation}"</div>` : ''}
+                        <div class="exp-text">${expData.exp}</div>
+                        ${expData.tip ? `<div style="margin-top:8px; font-size:14px; color:#64748b;"><i>Mẹo: ${expData.tip}</i></div>` : ''}
+                    </div>`;
+
+                if (i >= 14 && i <= 18) {
+                    if(dragExpContainer) dragExpContainer.innerHTML += htmlContent;
+                } else {
+                    let expContainer = document.getElementById(`exp-${i}`);
+                    if(expContainer) expContainer.innerHTML = htmlContent;
+                }
+            }
+
+            let nav = document.getElementById(`nav-${i}`);
+            if(nav) {
+                nav.style.background = isCorrect ? "#ecfdf5" : "#fef2f2";
+                nav.style.color = isCorrect ? "#059669" : "#dc2626";
+                nav.style.borderColor = isCorrect ? "#6ee7b7" : "#fca5a5";
+            }
+        }
+
+        // Color ev-boxes
+        const pastelColors = ['#fef08a','#bfdbfe','#bbf7d0','#fbcfe8','#ddd6fe','#fed7aa','#e9d5ff','#a7f3d0','#fecaca'];
+        document.querySelectorAll('.ev-box').forEach((el, index) => {
+            el.style.backgroundColor = pastelColors[index % pastelColors.length];
+            el.style.color = "#0f172a";
+        });
+
+        // Calculate Band and Upload
+        let timeTaken = Math.round(((parseInt(document.getElementById('timeInput').value) * 60) - testDuration) / 60) || 1;
+        if(window.luuDiemLenFirebase) window.luuDiemLenFirebase(score, timeTaken);
+
+        document.getElementById('resultMessage').innerHTML = `
+            <strong style="font-size: 26px; color: var(--primary-dark); display: block; margin-bottom: 10px;">Số câu đúng: ${score}/${totalQuestions}</strong>
+            <p style="font-size: 16px; color: #475569;">Kết quả của bạn đã được đồng bộ an toàn lên hệ thống IELTS Tracker!</p>
+        `;
+        setTimeout(() => { document.getElementById('resultOverlay').style.display = 'flex'; }, 500);
+    }
+
+    function scrollToEvidence(id) {
+        const evElement = document.getElementById(id);
+        if(evElement) {
+            evElement.scrollIntoView({behavior: "smooth", block: "center"});
+            evElement.classList.remove("focus-blink");
+            void evElement.offsetWidth;
+            evElement.classList.add("focus-blink");
+            setTimeout(() => evElement.classList.remove("focus-blink"), 1500);
+        }
+    }
+
+    // --- HIGHLIGHT SYSTEM ---
+    const container = document.getElementById("mainContainer");
+    const menu = document.getElementById("ctxMenu");
+    let targetEl = null; let selectedRange = null;
+
+    container.addEventListener("contextmenu", (e) => {
+        if (!e.target.closest('.pane')) return;
+        e.preventDefault();
+        targetEl = null; selectedRange = null; menu.style.display = "none";
+        
+        if (e.target.classList.contains("highlight")) {
+            targetEl = e.target;
+            showMenu(e.pageX, e.pageY, "remove"); return;
+        }
+
+        let sel = window.getSelection();
+        if (sel.toString().trim().length > 0 && container.contains(sel.anchorNode)) {
+            selectedRange = sel.getRangeAt(0).cloneRange();
+            showMenu(e.pageX, e.pageY, "add");
+        }
+    });
+
+    document.addEventListener("click", (e) => { if (!menu.contains(e.target)) menu.style.display = "none"; });
+
+    function showMenu(x, y, mode) {
+        menu.style.display = "block";
+        let mw = menu.offsetWidth; let mh = menu.offsetHeight;
+        menu.style.left = (x + mw > window.innerWidth ? window.innerWidth - mw - 10 : x) + "px";
+        menu.style.top = (y + mh > window.innerHeight ? window.innerHeight - mh - 10 : y) + "px";
+        menu.children[0].style.display = (mode === "add") ? "block" : "none";
+        menu.children[1].style.display = (mode === "remove") ? "block" : "none";
+    }
+
+    function doHighlight() {
+        if (selectedRange) {
+            let span = document.createElement("span"); span.className = "highlight";
+            try { selectedRange.surroundContents(span); } catch(e){}
+            window.getSelection().removeAllRanges();
+        }
+        menu.style.display = "none";
+    }
+
+    function removeHighlight() {
+        if (targetEl) {
+            let text = document.createTextNode(targetEl.textContent);
+            targetEl.parentNode.replaceChild(text, targetEl);
+            container.normalize();
+        }
+        menu.style.display = "none";
+    }
+</script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+        authDomain: "snapenglish-cb6e2.firebaseapp.com",
+        projectId: "snapenglish-cb6e2",
+        storageBucket: "snapenglish-cb6e2.firebasestorage.app",
+        messagingSenderId: "373152038413",
+        appId: "1:373152038413:web:19284622571390f8585f44"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            window.currentUserUid = user.uid;
+            window.currentUserEmail = user.email;
+        }
+    });
+
+    // Helper: Tính điểm Band Ielts (Quy đổi hệ 40 câu)
+    function calculateIeltsBand(correct, total) {
+        let normalizedCorrect = (correct / total) * 40;
+        if (normalizedCorrect >= 39) return 9.0;
+        if (normalizedCorrect >= 37) return 8.5;
+        if (normalizedCorrect >= 35) return 8.0;
+        if (normalizedCorrect >= 33) return 7.5;
+        if (normalizedCorrect >= 30) return 7.0;
+        if (normalizedCorrect >= 27) return 6.5;
+        if (normalizedCorrect >= 23) return 6.0;
+        if (normalizedCorrect >= 19) return 5.5;
+        if (normalizedCorrect >= 15) return 5.0;
+        if (normalizedCorrect >= 13) return 4.5;
+        if (normalizedCorrect >= 10) return 4.0;
+        if (normalizedCorrect >= 8) return 3.5;
+        if (normalizedCorrect >= 6) return 3.0;
+        return 2.5;
+    }
+
+    window.luuDiemLenFirebase = async function(diemSo, timeTakenMinutes) {
+        if (!window.currentUserUid) return;
+        
+        let tongSoCau = 14; 
+        let bandScore = calculateIeltsBand(diemSo, tongSoCau);
+        let timestamp = Date.now();
+        let idLuotThi = window.currentUserUid + "_ielts_" + timestamp;
+
+        try {
+            await setDoc(doc(db, "user_ielts_scores", idLuotThi), {
+                email: window.currentUserEmail,
+                skill: "Reading",
+                testName: "Test 2",
+                partName: "Passage 2",
+                timeTaken: timeTakenMinutes.toString(),
+                correctQ: diemSo,
+                totalQ: tongSoCau,
+                bandScore: bandScore,
+                date: new Date().toLocaleDateString("vi-VN"),
+                timestamp: timestamp
+            });
+            console.log("Đã đẩy điểm thành công lên IELTS Tracker!");
+        } catch(e) {
+            console.error("Lỗi khi lưu điểm: ", e);
+        }
+    }
+</script>
+</body>
+</html>
