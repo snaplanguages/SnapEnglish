@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Listening Test 1</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+        :root {
+            --pastel-bg: #fdf6f5;
+            --pastel-card: #ffffff;
+            --pastel-primary: #a3b899;
+            --pastel-primary-hover: #8da483;
+            --pastel-secondary: #e2d5de;
+            --pastel-accent: #f0c9c9;
+            --text-main: #4a4a4a;
+            --text-light: #7a7a7a;
+            --correct-color: #8ed081;
+            --incorrect-color: #ff9b9b;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--pastel-bg);
+            color: var(--text-main);
+            width: 100%;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--pastel-card);
+            padding: 40px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: var(--pastel-primary);
+        }
+
+        .btn {
+            background-color: var(--pastel-primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            background-color: var(--pastel-primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--pastel-secondary);
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover {
+            background-color: #d1c1cb;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Main Layout */
+        header {
+            background-color: var(--pastel-card);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .audio-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        audio {
+            border-radius: 30px;
+            height: 40px;
+        }
+
+        .skip-btn {
+            background: var(--pastel-secondary);
+            border: none;
+            border-radius: 50%;
+            width: 35px; height: 35px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--text-main);
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* Navigation Drawer */
+        .nav-drawer {
+            position: fixed;
+            right: -300px;
+            top: 70px;
+            width: 280px;
+            height: calc(100vh - 70px);
+            background: var(--pastel-card);
+            box-shadow: -2px 0 15px rgba(0,0,0,0.05);
+            transition: 0.3s;
+            z-index: 90;
+            padding: 20px;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        .nav-drawer.open { right: 0; }
+
+        .nav-toggle-btn {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background: var(--pastel-primary);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            z-index: 95;
+        }
+
+        .q-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .q-circle {
+            width: 35px; height: 35px;
+            border-radius: 50%;
+            background: #eee;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 14px;
+            cursor: pointer;
+            color: #333;
+        }
+        .q-circle.answered { background: var(--pastel-secondary); }
+        .q-circle.correct { background: var(--correct-color); color: white; }
+        .q-circle.incorrect { background: var(--incorrect-color); color: white; }
+
+        /* Content Area - Full Width */
+        .main-content {
+            width: 100%;
+            max-width: 100%;
+            padding: 30px 5%;
+            box-sizing: border-box;
+            flex-grow: 1;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .tab {
+            padding: 12px 30px;
+            background: var(--pastel-card);
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-light);
+            border: 2px solid transparent;
+        }
+
+        .tab.active {
+            background: var(--pastel-primary);
+            color: white;
+            border-color: var(--pastel-primary);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Tables & Inputs */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+
+        th, td {
+            padding: 15px;
+            border: 1px solid #eee;
+            text-align: left;
+        }
+
+        th { background: var(--pastel-secondary); color: var(--text-main); }
+
+        input[type="text"] {
+            border: 0; border-bottom: 2px dashed var(--pastel-primary);
+            background: transparent;
+            padding: 5px; width: 150px; font-family: inherit; font-size: 16px;
+            outline: none; color: var(--text-main);
+        }
+        input[type="text"]:focus { border-bottom-style: solid; }
+
+        .mcq-option {
+            display: block;
+            margin: 10px 0;
+            padding: 12px 20px;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 2px solid #eee;
+            transition: 0.2s;
+        }
+        .mcq-option:hover { border-color: var(--pastel-primary); }
+        .mcq-option input { margin-right: 15px; }
+
+        select {
+            padding: 8px; border-radius: 8px; border: 1px solid #ccc;
+            outline: none; font-family: inherit; font-size: 15px;
+        }
+
+        /* Results & Lightbulb */
+        .results-section {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .score-display {
+            font-size: 48px;
+            font-weight: bold;
+            color: var(--pastel-primary);
+            margin: 15px 0;
+        }
+
+        .lightbulb {
+            display: inline-flex; align-items: center; gap: 8px;
+            color: #f39c12; font-weight: bold; text-decoration: none;
+            margin-top: 15px; padding: 10px 20px; background: #fff8e1;
+            border-radius: 20px;
+            transition: 0.2s;
+        }
+        .lightbulb:hover { background: #ffe082; }
+
+    </style>
+</head>
+<body>
+
+    <div id="initModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Welcome to IELTS Listening Test</h2>
+            <p>Please select your test mode to begin.</p>
+            <button class="btn" onclick="startTest('practice')">Practice Mode</button>
+            <button class="btn btn-secondary" onclick="startTest('exam')">Exam Mode</button>
+        </div>
+    </div>
+
+    <div id="submitModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>Submit Assessment?</h2>
+            <p>Are you sure you want to submit your answers?</p>
+            <button class="btn" onclick="evaluateTest()">Yes, Submit</button>
+            <button class="btn btn-secondary" onclick="closeModal('submitModal')">Cancel</button>
+        </div>
+    </div>
+
+    <header>
+        <div style="font-weight: bold; font-size: 20px; color: var(--pastel-primary);">SnapEnglish</div>
+        <div class="audio-container" id="audioContainer">
+            <button class="skip-btn" id="btn-backward" onclick="skipAudio(-10)">-10</button>
+            <audio id="testAudio" controls>
+                <source src="https://raw.githubusercontent.com/snaplanguages/SnapEnglish-audioieltslistening01/1f5e120d9f5c3c2598b4ffea2baf89c6a33ba1ae/IELTS%20Listening%20Test%201.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+            <button class="skip-btn" id="btn-forward" onclick="skipAudio(10)">+10</button>
+        </div>
+        <button class="btn" id="topSubmitBtn" onclick="requestSubmit()">Submit Test</button>
+    </header>
+
+    <button class="nav-toggle-btn" onclick="toggleNav()">☰ Nav</button>
+    <div class="nav-drawer" id="navDrawer">
+        <h3 style="margin-top:0;">Questions</h3>
+        <div class="q-grid" id="qGrid"></div>
+    </div>
+
+    <div class="main-content">
+        
+        <div id="resultsSection" class="results-section hidden">
+            <h2>Test Results</h2>
+            <div class="score-display" id="finalScore">0 / 40</div>
+            <h3 id="bandScore">Band: 0.0</h3>
+            <p>Review your answers below. Check the navigation panel for correct/incorrect indicators.</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab(1)">Part 1</div>
+            <div class="tab" onclick="switchTab(2)">Part 2</div>
+            <div class="tab" onclick="switchTab(3)">Part 3</div>
+            <div class="tab" onclick="switchTab(4)">Part 4</div>
+        </div>
+
+        <div id="part1" class="tab-content active">
+            <h2>Part 1: Questions 1-10</h2>
+            <p><strong>Questions 1-5:</strong> Complete the table below. Write ONE WORD OR A NUMBER.</p>
+            <table>
+                <tr>
+                    <th>Apartments</th><th>Facilities</th><th>Other Information</th><th>Cost</th>
+                </tr>
+                <tr>
+                    <td>Rose Garden Apartments</td>
+                    <td>Studio Flat<br>Entertainment programme: Greek dancing</td>
+                    <td>Just (1) <input type="text" id="q1" oninput="markAnswered(1)"> meters from beach<br>Near shops</td>
+                    <td>£ 219</td>
+                </tr>
+                <tr>
+                    <td>Blue Bay Apartments</td>
+                    <td>Large salt water swimming pool</td>
+                    <td>Watersports<br>Overlooking (4) <input type="text" id="q4" oninput="markAnswered(4)"></td>
+                    <td>£ 275</td>
+                </tr>
+                <tr>
+                    <td>(2) <input type="text" id="q2" oninput="markAnswered(2)"> Apartments</td>
+                    <td>Terrace</td>
+                    <td>Near a supermarket and a disco</td>
+                    <td>£ 490</td>
+                </tr>
+                <tr>
+                    <td>The Grand</td>
+                    <td>Greek paintings and (3) <input type="text" id="q3" oninput="markAnswered(3)"></td>
+                    <td></td>
+                    <td>(5) £ <input type="text" id="q5" oninput="markAnswered(5)"></td>
+                </tr>
+            </table>
+
+            <p><strong>Questions 6-10:</strong> Complete the table below. Write ONE WORD OR A NUMBER.</p>
+            <h3>GREEK ISLAND HOLIDAYS</h3>
+            <table>
+                <tr>
+                    <th>Insurance Benefits</th><th>Maximum Amount</th>
+                </tr>
+                <tr>
+                    <td>Cancellation</td><td>(6) £ <input type="text" id="q6" oninput="markAnswered(6)"></td>
+                </tr>
+                <tr>
+                    <td>Hospital</td><td>£ 600 additional benefit allows a (7) <input type="text" id="q7" oninput="markAnswered(7)"> to travel to resort</td>
+                </tr>
+                <tr>
+                    <td>(8) <input type="text" id="q8" oninput="markAnswered(8)"> departure</td><td>Up to £ 1000 depends on reason</td>
+                </tr>
+                <tr>
+                    <td>Personal belongings</td><td>Up to £ 3000<br>£ 500 for one (9) <input type="text" id="q9" oninput="markAnswered(9)"></td>
+                </tr>
+            </table>
+            <p>Name of assistant manager: Ben (10) <input type="text" id="q10" oninput="markAnswered(10)"></p>
+            <a href="quiz1-listening.html" id="lb1" class="lightbulb hidden" target="_blank">💡 View Detailed Explanation for Part 1</a>
+        </div>
+
+        <div id="part2" class="tab-content">
+            <h2>Part 2: Questions 11-20</h2>
+            <p><strong>Questions 11-13:</strong> Choose the correct letter A, B or C.</p>
+            <h3>WINRIDGE FOREST RAILWAY PARK</h3>
+            
+            <p>11. Simon's idea for a theme park came from</p>
+            <label class="mcq-option"><input type="radio" name="q11" value="A" onchange="markAnswered(11)"> A. his childhood hobby</label>
+            <label class="mcq-option"><input type="radio" name="q11" value="B" onchange="markAnswered(11)"> B. his interest in landscape design</label>
+            <label class="mcq-option"><input type="radio" name="q11" value="C" onchange="markAnswered(11)"> C. his visit to another park</label>
+
+            <p>12. When they started, the family decided to open the park only when</p>
+            <label class="mcq-option"><input type="radio" name="q12" value="A" onchange="markAnswered(12)"> A. the weather was expected to be good</label>
+            <label class="mcq-option"><input type="radio" name="q12" value="B" onchange="markAnswered(12)"> B. the children weren't at school</label>
+            <label class="mcq-option"><input type="radio" name="q12" value="C" onchange="markAnswered(12)"> C. there were fewer farming commitments</label>
+
+            <p>13. Since opening, the park has had</p>
+            <label class="mcq-option"><input type="radio" name="q13" value="A" onchange="markAnswered(13)"> A. 50,000 visitors</label>
+            <label class="mcq-option"><input type="radio" name="q13" value="B" onchange="markAnswered(13)"> B. 1,000,000 visitors</label>
+            <label class="mcq-option"><input type="radio" name="q13" value="C" onchange="markAnswered(13)"> C. 1,500,000 visitors</label>
+
+            <p><strong>Questions 14-18:</strong> What is currently the main area of work of each of the following people? Choose FIVE answers from the box.</p>
+            <div style="background:#fff; padding:15px; border-radius:12px; margin-bottom:15px;">
+                <strong>Area of work:</strong><br>
+                A. advertising &nbsp; B. animal care &nbsp; C. building &nbsp; D. educational links <br>
+                E. engine maintenance &nbsp; F. food and drink &nbsp; G. sales &nbsp; H. staffing
+            </div>
+            <p>14. Simon <select id="q14" onchange="markAnswered(14)"><option value="">--Select--</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option></select></p>
+            <p>15. Liz <select id="q15" onchange="markAnswered(15)"><option value="">--Select--</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option></select></p>
+            <p>16. Sarah <select id="q16" onchange="markAnswered(16)"><option value="">--Select--</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option></select></p>
+            <p>17. Duncan <select id="q17" onchange="markAnswered(17)"><option value="">--Select--</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option></select></p>
+            <p>18. Judith <select id="q18" onchange="markAnswered(18)"><option value="">--Select--</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option></select></p>
+
+            <p><strong>Questions 19 and 20:</strong> Complete the table below. Write ONE WORD OR A NUMBER.</p>
+            <table>
+                <tr><th>Feature</th><th>Size</th><th>Biggest Challenge</th><th>Target Age Group</th></tr>
+                <tr><td>Railway</td><td>1.2 km</td><td>Making tunnels</td><td></td></tr>
+                <tr><td>Go-kart arena</td><td>(19) <input type="text" id="q19" oninput="markAnswered(19)"> sq mt</td><td>Removing mounds on track</td><td>(20) <input type="text" id="q20" oninput="markAnswered(20)"> year olds</td></tr>
+            </table>
+            <a href="quiz2-listening.html" id="lb2" class="lightbulb hidden" target="_blank">💡 View Detailed Explanation for Part 2</a>
+        </div>
+
+        <div id="part3" class="tab-content">
+            <h2>Part 3: Questions 21-30</h2>
+            <p><strong>Questions 21-30:</strong> Complete the notes below. Write NO MORE THAN TWO WORDS OR A NUMBER.</p>
+            <h3>Study Skills Tutorial - Caroline Benning</h3>
+            <p>Dissertation topic: the (21) <input type="text" id="q21" oninput="markAnswered(21)"></p>
+            <p><strong>Strengths:</strong></p>
+            <ul>
+                <li>(22) <input type="text" id="q22" oninput="markAnswered(22)"></li>
+                <li>Computer modeling</li>
+            </ul>
+            <p><strong>Weaknesses:</strong></p>
+            <ul>
+                <li>Poor (23) <input type="text" id="q23" oninput="markAnswered(23)"> skills</li>
+                <li>lack of background information</li>
+            </ul>
+            
+            <table>
+                <tr><th>Possible strategy</th><th>Benefits</th><th>Problems</th></tr>
+                <tr><td>Peer group discussion</td><td>Increase (24) <input type="text" id="q24" oninput="markAnswered(24)"></td><td>Dissertations tend to contain the same (25) <input type="text" id="q25" oninput="markAnswered(25)"></td></tr>
+                <tr><td>Use the (26) <input type="text" id="q26" oninput="markAnswered(26)"> service</td><td>Provides structured programme</td><td>Limited (27) <input type="text" id="q27" oninput="markAnswered(27)"></td></tr>
+                <tr><td>Consult study skill books</td><td>Are a good source of reference</td><td>Can be too (28) <input type="text" id="q28" oninput="markAnswered(28)"></td></tr>
+            </table>
+
+            <p><strong>Recommendations:</strong></p>
+            <ul>
+                <li>use a card index</li>
+                <li>Read all notes (29) <input type="text" id="q29" oninput="markAnswered(29)"></li>
+            </ul>
+            <p>Next tutorial date: (30) <input type="text" id="q30" oninput="markAnswered(30)"> January</p>
+            <a href="quiz3-listening.html" id="lb3" class="lightbulb hidden" target="_blank">💡 View Detailed Explanation for Part 3</a>
+        </div>
+
+        <div id="part4" class="tab-content">
+            <h2>Part 4: Questions 31-40</h2>
+            <p><strong>Questions 31 and 32:</strong> Choose the correct letter, A, B or C.</p>
+            <p>31. The owners of the underground house</p>
+            <label class="mcq-option"><input type="radio" name="q31" value="A" onchange="markAnswered(31)"> A. had no experience of living in a rural area</label>
+            <label class="mcq-option"><input type="radio" name="q31" value="B" onchange="markAnswered(31)"> B. were interested in environmental issues</label>
+            <label class="mcq-option"><input type="radio" name="q31" value="C" onchange="markAnswered(31)"> C. wanted a professional project manager</label>
+
+            <p>32. What does the speaker say about the site of the house?</p>
+            <label class="mcq-option"><input type="radio" name="q32" value="A" onchange="markAnswered(32)"> A. The land was quite cheap</label>
+            <label class="mcq-option"><input type="radio" name="q32" value="B" onchange="markAnswered(32)"> B. Stone was being extracted nearby</label>
+            <label class="mcq-option"><input type="radio" name="q32" value="C" onchange="markAnswered(32)"> C. It was in a completely unspoilt area</label>
+
+            <p><strong>Questions 33-40:</strong> Complete the notes below. Write NO MORE THAN TWO WORDS AND/OR A NUMBER.</p>
+            <h3>THE UNDERGROUND HOUSE</h3>
+            <p><strong>Design</strong></p>
+            <ul>
+                <li>Built in the earth, with two floors</li>
+                <li>The south-facing side was constructed of two layers of (33) <input type="text" id="q33" oninput="markAnswered(33)"></li>
+                <li>Photovoltaic tiles were attached</li>
+                <li>A layer of foam was used to improve the (34) <input type="text" id="q34" oninput="markAnswered(34)"> of the building</li>
+            </ul>
+            <p><strong>Special features</strong></p>
+            <ul>
+                <li>To increase the light, the building has many internal mirrors and (35) <input type="text" id="q35" oninput="markAnswered(35)"></li>
+                <li>In future, the house may produce more (36) <input type="text" id="q36" oninput="markAnswered(36)"> than it needs</li>
+                <li>Recycled wood was used for the (37) <input type="text" id="q37" oninput="markAnswered(37)"> of the house</li>
+                <li>The system for processing domestic (38) <input type="text" id="q38" oninput="markAnswered(38)"> is organic</li>
+            </ul>
+            <p><strong>Environmental issues</strong></p>
+            <ul>
+                <li>The use of large quantities of (39) <input type="text" id="q39" oninput="markAnswered(39)"> in construction was environmentally harmful</li>
+                <li>But the house will have paid its 'environmental debt' within (40) <input type="text" id="q40" oninput="markAnswered(40)"></li>
+            </ul>
+            <a href="quiz4-listening.html" id="lb4" class="lightbulb hidden" target="_blank">💡 View Detailed Explanation for Part 4</a>
+        </div>
+
+    </div>
+
+    <script>
+        const answerKey = {
+            1: ["300"], 2: ["sunshade"], 3: ["balcony"], 4: ["forest", "forests"], 5: ["319"],
+            6: ["10,000", "10000"], 7: ["relative"], 8: ["missed"], 9: ["item"], 10: ["ludlow"],
+            11: ["C"], 12: ["A"], 13: ["C"], 14: ["E"], 15: ["H"], 16: ["F"], 17: ["C"], 18: ["G"],
+            19: ["120"], 20: ["5-12"], 21: ["fishing industry"], 22: ["statistics"], 23: ["note-taking"],
+            24: ["confidence"], 25: ["ideas"], 26: ["student support"], 27: ["places"], 28: ["general"],
+            29: ["3 times"], 30: ["25"], 31: ["B"], 32: ["A"], 33: ["glass"], 34: ["insulation"],
+            35: ["windows"], 36: ["electricity"], 37: ["floor", "floors"], 38: ["waste"], 39: ["concrete"], 40: ["15 years"]
+        };
+
+        let mode = '';
+        const audio = document.getElementById('testAudio');
+        let isSubmitted = false;
+
+        // Initialize Navigation Drawer
+        const qGrid = document.getElementById('qGrid');
+        for (let i = 1; i <= 40; i++) {
+            let div = document.createElement('div');
+            div.className = 'q-circle';
+            div.id = 'nav-' + i;
+            div.innerText = i;
+            div.onclick = () => {
+                let part = i <= 10 ? 1 : i <= 20 ? 2 : i <= 30 ? 3 : 4;
+                switchTab(part);
+                document.getElementById('q'+i)?.scrollIntoView({behavior: "smooth", block: "center"});
+                if(document.getElementsByName('q'+i).length > 0) {
+                    document.getElementsByName('q'+i)[0].scrollIntoView({behavior: "smooth", block: "center"});
+                }
+            };
+            qGrid.appendChild(div);
+        }
+
+        function startTest(selectedMode) {
+            mode = selectedMode;
+            document.getElementById('initModal').classList.add('hidden');
+            
+            if(mode === 'exam') {
+                document.getElementById('btn-backward').classList.add('hidden');
+                document.getElementById('btn-forward').classList.add('hidden');
+                audio.removeAttribute('controls');
+                audio.play();
+                
+                audio.onended = () => {
+                    setTimeout(() => {
+                        if(!isSubmitted) evaluateTest();
+                    }, 60000); // Auto submit 1 minute after audio ends
+                };
+            }
+        }
+
+        function toggleNav() {
+            document.getElementById('navDrawer').classList.toggle('open');
+        }
+
+        function skipAudio(seconds) {
+            audio.currentTime += seconds;
+        }
+
+        function switchTab(tabNum) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('part' + tabNum).classList.add('active');
+            document.querySelectorAll('.tab')[tabNum-1].classList.add('active');
+        }
+
+        function markAnswered(qNum) {
+            if(isSubmitted) return;
+            const navCircle = document.getElementById('nav-' + qNum);
+            let answered = false;
+            
+            const textInput = document.getElementById('q' + qNum);
+            if(textInput && textInput.value.trim() !== '') answered = true;
+            
+            const radios = document.getElementsByName('q' + qNum);
+            for(let r of radios) { if(r.checked) answered = true; }
+
+            if(answered) navCircle.classList.add('answered');
+            else navCircle.classList.remove('answered');
+        }
+
+        function requestSubmit() {
+            if (mode === 'practice') {
+                document.getElementById('submitModal').classList.remove('hidden');
+            } else {
+                evaluateTest();
+            }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function evaluateTest() {
+            isSubmitted = true;
+            closeModal('submitModal');
+            document.getElementById('topSubmitBtn').classList.add('hidden');
+            audio.pause();
+            
+            let score = 0;
+
+            for(let i = 1; i <= 40; i++) {
+                let userAnswer = '';
+                const textInput = document.getElementById('q' + i);
+                if(textInput) userAnswer = textInput.value.trim().toLowerCase();
+                
+                const radios = document.getElementsByName('q' + i);
+                for(let r of radios) { if(r.checked) userAnswer = r.value.toLowerCase(); }
+
+                const navCircle = document.getElementById('nav-' + i);
+                navCircle.classList.remove('answered');
+
+                const correctAnswers = answerKey[i].map(a => a.toLowerCase());
+                if(correctAnswers.includes(userAnswer)) {
+                    score++;
+                    navCircle.classList.add('correct');
+                    if(textInput) textInput.style.color = 'var(--correct-color)';
+                } else {
+                    navCircle.classList.add('incorrect');
+                    if(textInput) {
+                        textInput.style.color = 'var(--incorrect-color)';
+                        textInput.value = userAnswer + " (" + answerKey[i][0] + ")";
+                    }
+                }
+            }
+
+            document.getElementById('resultsSection').classList.remove('hidden');
+            document.getElementById('finalScore').innerText = score + " / 40";
+            document.getElementById('bandScore').innerText = "Band: " + calculateBand(score);
+            
+            // Show lightbulbs
+            document.getElementById('lb1').classList.remove('hidden');
+            document.getElementById('lb2').classList.remove('hidden');
+            document.getElementById('lb3').classList.remove('hidden');
+            document.getElementById('lb4').classList.remove('hidden');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function calculateBand(score) {
+            if(score >= 39) return "9.0";
+            if(score >= 37) return "8.5";
+            if(score >= 35) return "8.0";
+            if(score >= 32) return "7.5";
+            if(score >= 30) return "7.0";
+            if(score >= 26) return "6.5";
+            if(score >= 23) return "6.0";
+            if(score >= 18) return "5.5";
+            if(score >= 16) return "5.0";
+            if(score >= 13) return "4.5";
+            if(score >= 10) return "4.0";
+            return "< 4.0";
+        }
+    </script>
+</body>
+</html>
