@@ -1,0 +1,448 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Writing Task 2 - Paraphrase Trainer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #2980b9;
+            --accent: #e67e22;
+            --success: #27ae60;
+            --danger: #c0392b;
+            --light: #ecf0f1;
+            --dark: #34495e;
+        }
+
+        body { font-family: 'Roboto', sans-serif; background: #f4f7f6; margin: 0; display: flex; height: 100vh; overflow: hidden; color: #333; }
+
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--primary); color: white; display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header h2 { margin: 0; font-size: 1.4rem; }
+        .menu-item { padding: 15px 20px; cursor: pointer; transition: 0.2s; border-left: 4px solid transparent; font-size: 0.95rem; }
+        .menu-item:hover { background: rgba(255,255,255,0.1); }
+        .menu-item.active { background: rgba(0,0,0,0.2); border-left-color: var(--accent); font-weight: bold; }
+
+        /* Main Content */
+        .main-content { flex: 1; padding: 25px; overflow-y: auto; display: flex; gap: 25px; }
+
+        /* Left Column: Theory & Original Prompt */
+        .info-column { flex: 1; display: flex; flex-direction: column; gap: 20px; max-width: 40%; }
+        
+        .card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        
+        .prompt-box { border-left: 5px solid var(--accent); background: #fff8e1; }
+        .prompt-label { text-transform: uppercase; color: var(--accent); font-weight: bold; font-size: 0.85rem; margin-bottom: 5px; display: block; }
+        .prompt-text { font-size: 1.1rem; font-weight: 500; color: #2c3e50; }
+
+        .theory-box h3 { margin-top: 0; color: var(--secondary); border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .formula-item { margin-bottom: 10px; padding: 10px; background: #f8f9fa; border-radius: 6px; font-size: 0.9rem; }
+        .formula-tag { display: inline-block; padding: 2px 6px; background: var(--primary); color: white; border-radius: 4px; font-size: 0.7rem; margin-right: 5px; }
+
+        /* Right Column: Practice Area */
+        .practice-column { flex: 1.5; display: flex; flex-direction: column; }
+        
+        /* Drag & Drop Areas */
+        .drop-zone { 
+            min-height: 100px; 
+            border: 2px dashed #bdc3c7; 
+            border-radius: 10px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            background: #fdfdfd; 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 10px; 
+            align-items: center;
+            transition: 0.3s;
+        }
+        .drop-zone.correct { border-color: var(--success); background: #eafaf1; border-style: solid; }
+        .drop-zone.wrong { border-color: var(--danger); background: #fceceb; border-style: solid; }
+
+        .word-bank { display: flex; flex-wrap: wrap; gap: 10px; padding: 15px; background: #e8ecef; border-radius: 10px; min-height: 60px; margin-bottom: 20px; }
+
+        .draggable { 
+            background: white; 
+            padding: 8px 16px; 
+            border-radius: 25px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            cursor: grab; 
+            font-size: 1rem; 
+            border: 1px solid #dcdcdc;
+            transition: transform 0.1s;
+        }
+        .draggable:active { transform: scale(0.95); cursor: grabbing; }
+
+        /* Analysis Table (Hidden by default) */
+        .analysis-box { margin-top: 20px; display: none; animation: fadeIn 0.5s; }
+        .analysis-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.95rem; }
+        .analysis-table th { text-align: left; background: var(--secondary); color: white; padding: 10px; }
+        .analysis-table td { border-bottom: 1px solid #eee; padding: 10px; }
+        .synonym-pair { color: var(--success); font-weight: 500; }
+
+        /* Controls */
+        .controls { display: flex; justify-content: flex-end; gap: 10px; }
+        .btn { padding: 10px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: 0.2s; }
+        .btn-check { background: var(--secondary); color: white; }
+        .btn-check:hover { background: #1f618d; }
+        .btn-next { background: var(--success); color: white; display: none; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main-content { flex-direction: column; }
+            .info-column { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h2>IELTS Writing Task 2</h2>
+        <small style="opacity: 0.7;">Paraphrase & Thesis Builder</small>
+    </div>
+    <div class="menu-item active" onclick="loadCategory('advDis')">Advantages - Disadvantages</div>
+    <div class="menu-item" onclick="loadCategory('agreeDisagree')">Agree - Disagree</div>
+    <div class="menu-item" onclick="loadCategory('discuss')">Discuss Both Views</div>
+    <div class="menu-item" onclick="loadCategory('causeProblem')">Cause - Problem</div>
+    <div class="menu-item" onclick="loadCategory('consolidation')">Consolidation (Mixed)</div>
+</div>
+
+<div class="main-content">
+    
+    <div class="info-column">
+        <div class="card prompt-box">
+            <span class="prompt-label">Đề bài gốc (Original Prompt):</span>
+            <div class="prompt-text" id="original-prompt">
+                Loading...
+            </div>
+        </div>
+
+        <div class="card theory-box">
+            <h3>Công thức áp dụng</h3>
+            <div id="theory-content">
+                </div>
+        </div>
+    </div>
+
+    <div class="practice-column">
+        <div class="card">
+            <h3 style="margin-top:0;">Xây dựng câu mở bài (Introduction):</h3>
+            <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">Kéo các cụm từ bên dưới vào khung để tạo thành câu hoàn chỉnh (Paraphrase hoặc Thesis).</p>
+            
+            <div class="drop-zone" id="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <span class="placeholder" style="color: #ccc; pointer-events: none;">Thả các cụm từ vào đây...</span>
+            </div>
+
+            <div class="word-bank" id="word-bank" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+
+            <div class="controls">
+                <button class="btn btn-check" onclick="checkAnswer()">Kiểm tra & Phân tích</button>
+                <button class="btn btn-next" onclick="nextQuestion()">Câu tiếp theo ➜</button>
+            </div>
+
+            <div class="analysis-box" id="analysis-box">
+                <h4 style="color: var(--success); margin: 0 0 10px 0;">✅ Phân tích từ vựng & Cấu trúc:</h4>
+                <div id="structure-note" style="font-style: italic; color: #555; margin-bottom: 10px;"></div>
+                <table class="analysis-table">
+                    <thead>
+                        <tr>
+                            <th width="45%">Đề bài gốc</th>
+                            <th width="10%">➜</th>
+                            <th width="45%">Từ vựng trong bài làm (Paraphrase)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="synonym-list">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // === DATA SOURCE ===
+    // Dữ liệu bao gồm: Đề gốc, Câu bài tập (đã tách), Công thức liên quan, và Map từ đồng nghĩa
+    const data = {
+        advDis: {
+            theory: `
+<div class="formula-item"><span class="formula-tag"><u><red>Câu số 1:</u></red></span>                
+                <div class="formula-item"><span class="formula-tag">Cách 1</span> There has been a trend that (A - paraphrase)...</div>
+                <div class="formula-item"><span class="formula-tag">Cách 2</span> An increasing number of people have (A)...</div>
+                <div class="formula-item"><span class="formula-tag">Cách 3</span> (A - vấn đề trong bài) has increasingly become</div>
+
+<div class="formula-item"><span class="formula-tag"><u><red>Câu số 2:</u></red></span>  
+                <div class="formula-item"><span class="formula-tag">Cách 1</span> In my opinion, this situation represents a positive/negative development (+ to + somebody)</div>
+            `,
+            questions: [
+                {
+                    prompt: "Many people prefer to work from home instead of going to the office.",
+                    sentence: "There has been / a trend that / an increasing number of employees / opt for remote working / rather than commuting to workplaces.",
+                    structureNote: "Sử dụng cấu trúc 'There has been a trend that...'",
+                    synonyms: [
+                        { original: "Many people", new: "an increasing number of employees" },
+                        { original: "prefer to work from home", new: "opt for remote working" },
+                        { original: "going to the office", new: "commuting to workplaces" }
+                    ]
+                },
+                {
+                    prompt: "Do the advantages of studying abroad outweigh the disadvantages?",
+                    sentence: "In my opinion, / studying in a foreign country / is more advantageous / to students / due to the exposure to new cultures.",
+                    structureNote: "Sử dụng cấu trúc Thesis Outweigh [Source: 17]",
+                    synonyms: [
+                        { original: "studying abroad", new: "studying in a foreign country" },
+                        { original: "outweigh", new: "is more advantageous to" }
+                    ]
+                },
+                {
+                    prompt: "Computers are becoming an essential part of education.",
+                    sentence: "Technology / has increasingly become / an indispensable part / of the academic environment.",
+                    structureNote: "Sử dụng cấu trúc '(A) has increasingly become...' [Source: 9]",
+                    synonyms: [
+                        { original: "Computers", new: "Technology" },
+                        { original: "essential part", new: "indispensable part" },
+                        { original: "education", new: "the academic environment" }
+                    ]
+                }
+            ]
+        },
+        agreeDisagree: {
+            theory: `
+                <div class="formula-item"><span class="formula-tag">Source 38</span> One school of thought holds that...</div>
+                <div class="formula-item"><span class="formula-tag">Source 39</span> Some people argue that..., while others believe that...</div>
+                <div class="formula-item"><span class="formula-tag">Source 41</span> From my point of view, I completely oppose the statement...</div>
+            `,
+            questions: [
+                {
+                    prompt: "The government should ban dangerous sports.",
+                    sentence: "One school of thought / holds that / the authority / ought to prohibit / life-threatening activities.",
+                    structureNote: "Sử dụng cấu trúc giới thiệu quan điểm [Source: 38]",
+                    synonyms: [
+                        { original: "The government", new: "the authority" },
+                        { original: "ban", new: "prohibit" },
+                        { original: "should", new: "ought to" },
+                        { original: "dangerous sports", new: "life-threatening activities" }
+                    ]
+                },
+                {
+                    prompt: "Some say technology makes us alone. To what extent do you agree?",
+                    sentence: "From my point of view, / I completely oppose / the statement / because digital tools / help us connect globally.",
+                    structureNote: "Câu Thesis: Phản đối hoàn toàn [Source: 41]",
+                    synonyms: [
+                        { original: "technology", new: "digital tools" },
+                        { original: "makes us alone", new: "help us connect globally (counter-argument)" }
+                    ]
+                }
+            ]
+        },
+        discuss: {
+            theory: `
+                <div class="formula-item"><span class="formula-tag">Source 53</span> A number of people believe that... However, others contend that...</div>
+                <div class="formula-item"><span class="formula-tag">Source 56</span> Both viewpoints are valid, but I lean towards...</div>
+            `,
+            questions: [
+                {
+                    prompt: "Some people think museums should be free. Others think visitors should pay.",
+                    sentence: "A number of people / believe that / entrance to museums / should be free of charge. / However, others contend that / a fee is necessary.",
+                    structureNote: "Cấu trúc giới thiệu 2 luồng ý kiến [Source: 53]",
+                    synonyms: [
+                        { original: "museums should be free", new: "entrance to museums should be free of charge" },
+                        { original: "visitors should pay", new: "a fee is necessary" }
+                    ]
+                }
+            ]
+        },
+        causeProblem: {
+            theory: `
+                <div class="formula-item"><span class="formula-tag">Source 74</span> It is true that...</div>
+                <div class="formula-item"><span class="formula-tag">Source 77</span> There are a number of reasons behind this trend...</div>
+            `,
+            questions: [
+                {
+                    prompt: "Obesity rates among children are increasing.",
+                    sentence: "It is true that / the rate of / overweight youngsters / is rising / at an alarming rate.",
+                    structureNote: "Sử dụng cấu trúc thừa nhận thực trạng [Source: 74]",
+                    synonyms: [
+                        { original: "Obesity rates", new: "the rate of overweight" },
+                        { original: "children", new: "youngsters" },
+                        { original: "increasing", new: "rising at an alarming rate" }
+                    ]
+                },
+                {
+                    prompt: "Discuss the causes and solutions.",
+                    sentence: "There are / a number of reasons / behind this situation, / and several solutions / should be adopted / to address it.",
+                    structureNote: "Câu dẫn vào thân bài (Standard Thesis) [Source: 77]",
+                    synonyms: [
+                        { original: "causes", new: "reasons behind this situation" },
+                        { original: "solutions", new: "solutions should be adopted to address it" }
+                    ]
+                }
+            ]
+        },
+        consolidation: {
+            theory: `
+                <div class="formula-item"><span class="formula-tag">Source 85</span> Some people state that (paraphrase)...</div>
+                <div class="formula-item"><span class="formula-tag">Source 89</span> There is a range of reasons... and I believe...</div>
+            `,
+            questions: [
+                {
+                    prompt: "Fewer people are reading newspapers these days.",
+                    sentence: "It is believed that / traditional print media / is falling out of favor / as digital news platforms / gain popularity.",
+                    structureNote: "Paraphrase vấn đề sử dụng từ vựng chủ đề Media [Source: 86, 208]",
+                    synonyms: [
+                        { original: "Fewer people reading newspapers", new: "traditional print media is falling out of favor" },
+                        { original: "these days", new: "as digital news platforms gain popularity" }
+                    ]
+                }
+            ]
+        }
+    };
+
+    // === APP STATE ===
+    let currentCat = 'advDis';
+    let currentIndex = 0;
+    let draggedItem = null;
+
+    // === FUNCTIONS ===
+
+    function init() {
+        loadCategory('advDis');
+    }
+
+    function loadCategory(catKey) {
+        currentCat = catKey;
+        currentIndex = 0;
+
+        // Active Menu
+        document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+        document.querySelector(`.menu-item[onclick="loadCategory('${catKey}')"]`).classList.add('active');
+
+        // Load Theory
+        document.getElementById('theory-content').innerHTML = data[catKey].theory;
+
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const qData = data[currentCat].questions[currentIndex];
+        
+        // Reset UI
+        document.getElementById('original-prompt').innerText = qData.prompt;
+        document.getElementById('analysis-box').style.display = 'none';
+        document.querySelector('.btn-check').style.display = 'inline-block';
+        document.querySelector('.btn-next').style.display = 'none';
+        
+        const dropZone = document.getElementById('drop-zone');
+        dropZone.innerHTML = '<span class="placeholder" style="color: #ccc; pointer-events: none;">Thả các cụm từ vào đây...</span>';
+        dropZone.className = 'drop-zone';
+
+        const wordBank = document.getElementById('word-bank');
+        wordBank.innerHTML = '';
+
+        // Create draggable items (shuffled)
+        const parts = qData.sentence.split(' / ').map(s => s.trim());
+        const shuffled = [...parts].sort(() => Math.random() - 0.5);
+
+        shuffled.forEach((text, i) => {
+            const el = document.createElement('div');
+            el.className = 'draggable';
+            el.draggable = true;
+            el.innerText = text;
+            el.id = `drag-${i}`;
+            el.ondragstart = drag;
+            wordBank.appendChild(el);
+        });
+    }
+
+    // Drag & Drop Handlers
+    function allowDrop(ev) { ev.preventDefault(); }
+    
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+        draggedItem = ev.target;
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        let target = ev.target;
+        if (target.classList.contains('draggable')) target = target.parentNode;
+        
+        if (target.id === 'drop-zone' || target.id === 'word-bank') {
+            if (target.id === 'drop-zone') {
+                const placeholder = target.querySelector('.placeholder');
+                if (placeholder) placeholder.remove();
+            }
+            target.appendChild(draggedItem);
+        }
+    }
+
+    // Check Logic
+    function checkAnswer() {
+        const qData = data[currentCat].questions[currentIndex];
+        const correctSentence = qData.sentence.split(' / ').map(s => s.trim()).join(' ');
+        
+        // Get user sentence
+        const userWords = Array.from(document.getElementById('drop-zone').children)
+                              .filter(el => el.classList.contains('draggable'))
+                              .map(el => el.innerText);
+        const userSentence = userWords.join(' ');
+
+        const dropZone = document.getElementById('drop-zone');
+
+        if (userSentence === correctSentence) {
+            // Correct
+            dropZone.className = 'drop-zone correct';
+            showAnalysis(qData);
+            document.querySelector('.btn-check').style.display = 'none';
+            document.querySelector('.btn-next').style.display = 'inline-block';
+        } else {
+            // Wrong
+            dropZone.className = 'drop-zone wrong';
+            setTimeout(() => {
+                alert("Chưa đúng thứ tự. Bạn hãy thử lại nhé!");
+            }, 100);
+        }
+    }
+
+    function showAnalysis(qData) {
+        const box = document.getElementById('analysis-box');
+        const list = document.getElementById('synonym-list');
+        const note = document.getElementById('structure-note');
+
+        box.style.display = 'block';
+        note.innerText = qData.structureNote;
+        list.innerHTML = '';
+
+        qData.synonyms.forEach(pair => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${pair.original}</td>
+                <td style="color: #999;">➜</td>
+                <td class="synonym-pair">${pair.new}</td>
+            `;
+            list.appendChild(row);
+        });
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        if (currentIndex < data[currentCat].questions.length) {
+            loadQuestion();
+        } else {
+            alert("Chúc mừng! Bạn đã hoàn thành phần bài tập của dạng này.");
+            loadCategory(currentCat); // Reset loop for demo
+        }
+    }
+
+    // Initialize
+    init();
+
+</script>
+
+</body>
+</html>
