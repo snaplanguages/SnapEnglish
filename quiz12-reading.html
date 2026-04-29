@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passage 3 Test 4 | SnapEnglish</title>
+  <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Cerulean / Medical Blue Theme - Khoa học, Thanh dịu, Chuyên nghiệp */
+            --primary: #0284c7; 
+            --primary-dark: #0369a1; 
+            --accent: #bae6fd;
+            --bg-body: #f0f9ff;
+            --border-color: #e0f2fe;
+            --text-color: #0f172a;
+            --highlight-color: #fef08a;
+            --correct: #16a34a;
+            --wrong: #dc2626;
+            --exp-bg: #e0f2fe;
+            --header-h: 65px;
+            --footer-h: 70px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- OVERLAY & MODALS --- */
+        .custom-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 99999;
+        }
+        
+        .setup-modal {
+            background: white; padding: 40px 40px; border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(2, 132, 199, 0.15);
+            width: 90%; max-width: 450px; text-align: center;
+            border: 2px solid var(--accent);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .setup-modal h2 { font-family: 'Lora', serif; color: var(--primary-dark); font-size: 28px; margin-top: 0; }
+        
+        #timeInputBox { display: block; margin: 25px 0; }
+        #timeInput { 
+            width: 100px; padding: 10px; font-size: 18px; text-align: center; 
+            border: 2px solid #cbd5e1; border-radius: 10px; font-family: inherit;
+            color: var(--primary-dark); font-weight: bold; outline: none; transition: 0.2s;
+        }
+        #timeInput:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2); }
+        
+        .start-btn {
+            background: var(--primary); color: white; border: none; padding: 12px 35px;
+            border-radius: 50px; font-size: 16px; font-weight: 700; cursor: pointer;
+            transition: 0.3s; display: inline-block; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3);
+        }
+        .start-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4); }
+
+        .modal-actions { display: flex; gap: 15px; margin-top: 25px; justify-content: center; }
+        .btn-cancel {
+            background: #f1f5f9; color: #475569; border: 2px solid #cbd5e1; padding: 12px 20px;
+            border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s; flex: 1;
+        }
+        .btn-cancel:hover { background: #e2e8f0; border-color: #94a3b8; }
+        .btn-confirm {
+            background: var(--primary); color: white; border: none; padding: 12px 20px;
+            border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s; flex: 1;
+            box-shadow: 0 4px 0 var(--primary-dark);
+        }
+        .btn-confirm:active { transform: translateY(4px); box-shadow: none; }
+
+        /* HEADER */
+        header {
+            height: var(--header-h); background: #fff;
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 25px; z-index: 100;
+        }
+        .brand { font-size: 20px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        .brand span { background: var(--primary); color: white; padding: 4px 10px; border-radius: 8px; font-size: 14px; }
+        
+        .timer-box { font-family: monospace; font-size: 18px; font-weight: 700; color: #b91c1c; background: #fef2f2; padding: 6px 15px; border-radius: 8px; border: 1px solid #fecaca;}
+        .btn-submit { 
+            background: var(--primary); color: white; border: none; padding: 8px 25px; 
+            border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px;
+            box-shadow: 0 4px 0 var(--primary-dark); transition: 0.2s;
+        }
+        .btn-submit:active { transform: translateY(4px); box-shadow: none; }
+
+        /* LAYOUT */
+        .container { display: flex; height: calc(100vh - var(--header-h) - var(--footer-h)); width: 100%; max-width: 100%; }
+        .pane { flex: 1; padding: 35px; overflow-y: auto; position: relative; scroll-behavior: smooth; }
+        .pane-left { border-right: 2px solid var(--border-color); background: #fff; font-size: 16px; line-height: 1.8; text-align: justify; }
+        .pane-right { background: #f8fafc; }
+        
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 5px; }
+
+        /* CONTENT */
+        .passage-title { text-align: center; color: var(--primary-dark); margin-bottom: 25px; font-family: 'Lora', serif; border-bottom: 2px dashed var(--accent); padding-bottom: 15px;}
+        .paragraph { margin-bottom: 20px; }
+        .paragraph-label { color: var(--primary); font-weight: 800; font-size: 1.1em; margin-right: 5px; }
+
+        /* EVIDENCE HIGHLIGHTS */
+        .ev-box { 
+            padding: 2px 4px; border-radius: 6px; 
+            transition: all 0.4s ease; 
+            border: 2px solid transparent;
+            background-color: transparent;
+            color: inherit;
+        }
+        .ev-box.focus-blink {
+            border-color: var(--primary-dark) !important;
+            transform: scale(1.02); 
+            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.2) !important; 
+            background-color: var(--highlight-color) !important;
+            z-index: 10; position: relative;
+        }
+
+        /* QUESTIONS */
+        .question-section { padding: 25px; border: 1px solid var(--border-color); background: #fff; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);}
+        .instruction { color: var(--primary-dark); font-weight: 700; margin-bottom: 20px; font-size: 16px; background: #e0f2fe; padding: 12px 15px; border-radius: 8px; border-left: 4px solid var(--primary);}
+
+        .q-row { display: flex; align-items: baseline; margin-bottom: 18px; font-size: 16px; }
+        .q-num { font-weight: bold; min-width: 35px; color: var(--primary); }
+        .q-content { flex: 1; }
+
+        .input-gap {
+            display: inline-block; width: 140px; height: 32px;
+            border: 2px solid #cbd5e1; border-radius: 6px; 
+            text-align: center; font-weight: 700; color: var(--primary-dark);
+            font-size: 15px; margin: 0 5px; vertical-align: middle; transition: 0.2s;
+        }
+        .input-gap:focus { border-color: var(--primary); outline: none; }
+        .input-gap.filled { background: #e0f2fe; border-color: var(--primary); }
+
+        select.input-select {
+            padding: 8px; border: 2px solid #cbd5e1; border-radius: 8px;
+            font-size: 15px; cursor: pointer; font-weight: 600; color: var(--text-color); outline: none; margin-top: 8px; margin-right: 10px;
+        }
+        select.input-select:focus { border-color: var(--primary); }
+
+        /* Match Headings List */
+        .headings-list {
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 25px;
+        }
+        .headings-list p { margin: 8px 0; font-size: 15px; color: #334155; }
+        .headings-list strong { color: var(--primary-dark); display: inline-block; width: 35px; }
+
+        /* EXPLANATION BOX (NÂNG CẤP) */
+        .exp-box {
+            display: none; background: #fff;
+            border: 2px solid var(--border-color); border-left: 6px solid var(--primary);
+            padding: 20px; margin-top: 15px; margin-bottom: 15px; border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.08); 
+            animation: slideUp 0.4s ease-out;
+        }
+        .exp-box.show { display: block; }
+        .exp-title { 
+            font-weight: 800; color: var(--primary-dark); font-size: 18px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 2px dashed var(--border-color); padding-bottom: 10px; margin-bottom: 12px;
+        }
+        .locate-btn {
+            background: #e0f2fe; border: 1px solid var(--accent); color: var(--primary-dark);
+            padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.2s;
+        }
+        .locate-btn:hover { background: var(--primary); color: white; }
+        
+        .exp-section { margin-bottom: 12px; font-size: 15px; line-height: 1.6; color: #334155; }
+        .exp-label { font-weight: 700; color: var(--primary-dark); display: inline-block; width: 100px; }
+        .exp-translate { background: #f8fafc; padding: 10px; border-radius: 6px; border-left: 3px solid #cbd5e1; font-style: italic; margin-top: 5px; }
+        .exp-keywords { background: #fffbeb; padding: 10px; border-radius: 6px; border: 1px dashed #fde68a; margin-top: 5px;}
+        .exp-detail { margin-top: 5px; }
+        .exp-keyword-match { color: #b45309; font-weight: 600; }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* FOOTER */
+        footer {
+            height: var(--footer-h); background: #fff; border-top: 2px solid var(--border-color);
+            display: flex; align-items: center; padding: 0 25px; gap: 15px; z-index: 100;
+        }
+        .palette-scroller { flex: 1; display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; align-items: center;}
+        .nav-dot {
+            min-width: 38px; height: 38px; border: 2px solid #e2e8f0; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: bold;
+            cursor: pointer; color: #94a3b8; background: white; transition: 0.2s; flex-shrink: 0;
+        }
+        .nav-dot.done { background: var(--exp-bg); color: var(--primary-dark); border-color: var(--accent); }
+        .nav-dot:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* HIGHLIGHT MENU */
+        .highlight { background-color: var(--highlight-color); cursor: pointer; border-radius: 3px; padding: 2px 0;}
+        #ctxMenu {
+            position: absolute; display: none; background: white; 
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12); border-radius: 10px; 
+            font-size: 15px; z-index: 99999; border: 1px solid #eee; min-width: 160px; overflow: hidden;
+        }
+        #ctxMenu button {
+            background: none; border: none; padding: 12px 18px; 
+            width: 100%; text-align: left; cursor: pointer; display: block; font-weight: 600; color: #444;
+        }
+        #ctxMenu button:hover { background: #f8fafc; color: var(--primary-dark); }
+        #ctxMenu button.delete:hover { background: #fef2f2; color: var(--wrong); }
+
+        .feedback { display: inline-block; font-weight: bold; font-size: 15px; margin-left: 10px; }
+        .correct { color: var(--correct); }
+        .wrong { color: var(--wrong); }
+        
+        .diagram-container {
+            text-align: center;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px dashed #cbd5e1;
+            margin-bottom: 20px;
+        }
+        .diagram-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="setupOverlay" class="custom-overlay">
+    <div class="setup-modal">
+        <h2>Reading Library ✨</h2>
+        <p style="font-size: 16px; color: #64748b; margin-bottom: 20px;">Hãy cài đặt thời gian để bắt đầu luyện tập Passage 3 nhé!</p>
+        <div id="timeInputBox">
+            <label style="font-size: 16px; font-weight: bold; color: #475569;">Thời gian (phút): </label>
+            <input type="number" id="timeInput" value="20" min="5" max="60">
+        </div>
+        <button class="start-btn" onclick="askReady()">Sẵn sàng (OK)</button>
+    </div>
+</div>
+
+<div id="startConfirmOverlay" class="custom-overlay">
+    <div class="custom-modal setup-modal">
+        <h2>Xác nhận bắt đầu</h2>
+        <p id="startConfirmMsg" style="font-size: 16px; color: #475569; margin-bottom: 20px; white-space: pre-line;"></p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeStartConfirmModal()">Huỷ</button>
+            <button class="btn-confirm" onclick="startTestActual()">OK</button>
+        </div>
+    </div>
+</div>
+
+<header>
+    <div class="brand"><span>SnapEnglish</span> Passage 3 Test 4</div>
+    <div style="display:flex; align-items:center; gap:15px;">
+        <div class="timer-box">⏱ <span id="timer">00:00</span></div>
+        <button class="btn-submit" onclick="submitTest(true)">NỘP BÀI</button>
+    </div>
+</header>
+
+<div class="container" id="mainContainer">
+    <div class="pane pane-left" id="passagePane">
+        <h2 class="passage-title">Antibiotic Resistance</h2>
+        <div id="passageText">
+            <p class="paragraph">An antibiotic is a drug that kills or prevents the growth of bacteria. The term ‘antibiotic’, coined by Selman Waksman, originally described only those antibiotics derived from living bodies, in contrast to ‘chemotherapeutic agents’, which are purely synthetic. <span id="ev-34" class="ev-box">Currently, the term antibiotic is also applied to synthetic antimicrobials.</span></p>
+
+            <p class="paragraph">Overuse or misuse of antibiotics may result in the development of antibiotic resistance in the infecting organisms, similar to the development of pesticide resistance in insects. Doctor Iain Nicholson explains. <span id="ev-32" class="ev-box">“The concept of genetic selection requires that as close as possible to 100 per cent of the infecting organisms be killed off to avoid selection of resistance.</span> If a small subset of the population survives the treatment and is allowed to multiply, the average susceptibility of this new population to the compound will be much less than that of the original population, since they have descended from those few organisms that survived the original treatment.”</p>
+
+            <p class="paragraph"><span id="ev-35" class="ev-box">Antibiotic resistance has become a serious problem in both developed and underdeveloped nations.</span> In certain settings, <span id="ev-36" class="ev-box">such as hospitals, the rate of antibiotic resistance is so high today that the normal, low-cost antibiotics are virtually useless for the treatment of frequently seen infections.</span> This leads to more common use of newer and more expensive compounds, which in turn leads to the rise of resistance to those drugs. Drug company spokesperson, Emma Thompson, explains the challenge facing the drug industry. “A continuous race to discover new and different antibiotics results in an attempt to keep humanity from losing ground in the battle against infection. <span id="ev-31" class="ev-box">The fear is that we will eventually fail to keep up in this race</span>, and that <span id="ev-28" class="ev-box">people may again face life-threatening bacterial infections.</span>”</p>
+
+            <p class="paragraph">An example of antibiotic resistance is Staphylococcus aureus, which used to be treated successfully with penicillin in the 1940’s and 1950’s. At present, nearly all strains are resistant to penicillin, and many are resistant to other antibiotics, leaving only a narrow selection of drugs useful for treatment. The situation is worsened by the fact that gene coding for antibiotic resistance can be transferred between bacteria, making it possible for bacteria never exposed to an antibiotic to acquire resistance from those which have.</p>
+
+            <p class="paragraph">Microbial resistance to antibiotics is a natural consequence of selective pressures placed on bacteria. However, humans have greatly accelerated the evolution of resistant bacteria by the overuse and misuse of antibiotics in the community. Government health official, Georgina Haynes, explains. “One of the major problems is when antibiotics are used to treat disorders for which they have no efficacy, such as the common cold or other viral complaints, and <span id="ev-29" class="ev-box">when they are used widely as prophylaxis rather than treatment, because this exposes more bacteria to selection for resistance.</span>” Similarly, in order to kill all the bacteria of an infection, antibiotics must be used for a whole course and not stopped just when symptoms improve. The discoverer of penicillin himself, Alexander Fleming, warned the scientific community: <span id="ev-27" class="ev-box">“The administration of too small doses leads to the production of resistant strains of bacteria.”</span> This can happen due to patient ignorance and to improper pharmacy actions, usually in the developing world. In developing countries, antibiotic prescriptions are often broken up. For example, in some Asian countries, it is common for pharmacies to sell as many tablets as the patient can afford, which may only be two or three. This is an insufficient dose to cure infection and will only further contribute to the evolution of resistant strains of bacteria. Recent reports have also shown that containers of medicine from some African countries sometimes contain only half the drug content that was indicated on the label. This may be due to ‘counterfeit’ medicines or improper storage, but also <span id="ev-37" class="ev-box">tropical conditions, such as those often found in Africa, readily cause degradation of medical compounds.</span> Chenbo Okonkwa, a pharmaceutical wholesaler, describes the problem. “Although local regulations may require pharmacies to store drugs in air-conditioned premises, most undergo frequent power outages and warehouses are rarely kept cool. Furthermore, <span id="ev-33" class="ev-box">unauthorised dealers rarely bother to follow official storage guidelines.</span>”</p>
+
+            <p class="paragraph">Another problem contributing to antibiotic resistance is that antibiotics are widely used in foodproducing animals, which contributes to the emergence of antibiotic-resistant bacteria in them. <span id="ev-38" class="ev-box">These resistant bacteria can contaminate the foods that come from these animals, and persons who consume these foods can develop antibiotic-resistant infections.</span> This can be seen, for instance, in the fish farm industry. It is common to put upwards of 100,000 fish into each pen, which creates cramped and stressful conditions. This increases the susceptibility of fish to certain bacterial diseases, such as furunculosis. Furunculosis, an infection of the kidneys, is easily transmitted through water and so is devastating to fish farms. To combat the disease, <span id="ev-39" class="ev-box">antibiotics were added to fish food pellets</span>, but these were unpalatable to the fish. <span id="ev-40" class="ev-box">They were already suffering from loss of appetite due to their infections</span> and so most of the antibiotics ended up at the bottom of the pens, allowing residual drugs to spread throughout the marine environment. Fish farmer, Jo Hardwick, explains that this is different now. <span id="ev-30" class="ev-box">“Today, vaccines are replacing the antibiotic pellets as a treatment for the disease, but unfortunately, most of the damage has already been done.”</span></p>
+
+            <p class="paragraph">In conclusion, antibiotics must be used judiciously in humans and animals, because both uses contribute to the emergence, persistence, and spread of resistant bacteria. Resistant bacteria in foodproducing animals are of particular concern. Food animals serve as a reservoir of resistant pathogens and resistance mechanisms that can directly or indirectly result in antibiotic resistant infections in humans. If people do not wish to be faced with an attack of all the diseases they thought they had conquered in the twentieth century, society has to change its approach to antibiotic use.</p>
+        </div>
+    </div>
+
+    <div class="pane pane-right" id="questionPane">
+        
+        <div class="question-section" id="q-group-1">
+            <div class="instruction">Questions 27-33: Look at the following statements and the list of people below. Match each statement with the correct person’s initials.</div>
+            
+            <div class="headings-list" style="display:flex; flex-wrap:wrap; gap: 20px;">
+                <div style="flex:1;">
+                    <p><strong>IN</strong> Iain Nicholson</p>
+                    <p><strong>ET</strong> Emma Thompson</p>
+                    <p><strong>GH</strong> Georgina Haynes</p>
+                </div>
+                <div style="flex:1;">
+                    <p><strong>AF</strong> Alexander Fleming</p>
+                    <p><strong>CO</strong> Chenbo Okonkwa</p>
+                    <p><strong>JH</strong> Jo Hardwick</p>
+                </div>
+            </div>
+
+            <div class="q-row" id="q-27">
+                <span class="q-num">27.</span>
+                <span class="q-content">Resistant bacteria can develop if doctors do not prescribe enough antibiotic.
+                    <select class="input-select" id="ans-27" onchange="updateNav(27)">
+                        <option value="">Select...</option>
+                        <option value="IN">IN</option><option value="ET">ET</option><option value="GH">GH</option>
+                        <option value="AF">AF</option><option value="CO">CO</option><option value="JH">JH</option>
+                    </select>
+                    <span id="fb-27" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-27"></div>
+
+            <div class="q-row" id="q-28">
+                <span class="q-num">28.</span>
+                <span class="q-content">Society may again have to face infectious diseases that were previously thought treatable.
+                    <select class="input-select" id="ans-28" onchange="updateNav(28)">
+                        <option value="">Select...</option>
+                        <option value="IN">IN</option><option value="ET">ET</option><option value="GH">GH</option>
+                        <option value="AF">AF</option><option value="CO">CO</option><option value="JH">JH</option>
+                    </select>
+                    <span id="fb-28" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-28"></div>
+
+            <div class="q-row" id="q-29">
+                <span class="q-num">29.</span>
+                <span class="q-content">Using antibiotics as a preventative measure is a key factor in the development of antibiotic resistance.
+                    <select class="input-select" id="ans-29" onchange="updateNav(29)">
+                        <option value="">Select...</option>
+                        <option value="IN">IN</option><option value="ET">ET</option><option value="GH">GH</option>
+                        <option value="AF">AF</option><option value="CO">CO</option><option value="JH">JH</option>
+                    </select>
+                    <span id="fb-29" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-29"></div>
+
+            <div class="q-row" id="q-30">
+                <span class="q-num">30.</span>
+                <span class="q-content">Better practice in fish farms when dealing with disease is too late when it comes to the spread of antibiotics in the environments around fish farms.
+                    <select class="input-select" id="ans-30" onchange="updateNav(30)">
+                        <option value="">Select...</option>
+                        <option value="IN">IN</option><option value="ET">ET</option><option value="GH">GH</option>
+                        <option value="AF">AF</option><option value="CO">CO</option><option value="JH">JH</option>
+                    </select>
+                    <span id="fb-30" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-30"></div>
+
+            <div class="q-row" id="q-31">
+                <span class="q-num">31.</span>
+                <span class="q-content">Drug companies may not be able to keep finding new antibiotics to fight lethal resistant infections.
+                    <select class="input-select" id="ans-31" onchange="updateNav(31)">
+                        <option value="">Select...</option>
+                        <option value="IN">IN</option><option value="ET">ET</option><option value="GH">GH</option>
+                        <option value="AF">AF</option><option value="CO">CO</option><option value="JH">JH</option>
+                    </select>
+                    <span id="fb-31" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-31"></div>
+
+            <div class="q-row" id="q-32">
+                <span class="q-num">32.</span>
+                <span class="q-content">All a patient’s infection must be destroyed by prescribed antibiotics in order to stop resistance growing.
+                    <select class="input-select" id="ans-32" onchange="updateNav(32)">
+                        <option value="">Select...</option>
+                        <option value="IN">IN</option><option value="ET">ET</option><option value="GH">GH</option>
+                        <option value="AF">AF</option><option value="CO">CO</option><option value="JH">JH</option>
+                    </select>
+                    <span id="fb-32" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-32"></div>
+
+            <div class="q-row" id="q-33">
+                <span class="q-num">33.</span>
+                <span class="q-content">Illicit antibiotic salesmen hardly ever follow the instructions for keeping antibiotics in the right way.
+                    <select class="input-select" id="ans-33" onchange="updateNav(33)">
+                        <option value="">Select...</option>
+                        <option value="IN">IN</option><option value="ET">ET</option><option value="GH">GH</option>
+                        <option value="AF">AF</option><option value="CO">CO</option><option value="JH">JH</option>
+                    </select>
+                    <span id="fb-33" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-33"></div>
+        </div>
+
+        <div class="question-section" id="q-group-2">
+            <div class="instruction">Questions 34-38: Do the following statements agree with the information given in the text?</div>
+            
+            <div class="q-row" id="q-34">
+                <span class="q-num">34.</span>
+                <span class="q-content">The current definition of an antibiotic only includes drugs originating from live organisms.
+                    <select class="input-select" id="ans-34" onchange="updateNav(34)">
+                        <option value="">Select...</option>
+                        <option value="TRUE">TRUE</option>
+                        <option value="FALSE">FALSE</option>
+                        <option value="NOT GIVEN">NOT GIVEN</option>
+                    </select>
+                    <span id="fb-34" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-34"></div>
+
+            <div class="q-row" id="q-35">
+                <span class="q-num">35.</span>
+                <span class="q-content">Antibiotic resistance is a significant issue in both first and second world countries.
+                    <select class="input-select" id="ans-35" onchange="updateNav(35)">
+                        <option value="">Select...</option>
+                        <option value="TRUE">TRUE</option>
+                        <option value="FALSE">FALSE</option>
+                        <option value="NOT GIVEN">NOT GIVEN</option>
+                    </select>
+                    <span id="fb-35" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-35"></div>
+
+            <div class="q-row" id="q-36">
+                <span class="q-num">36.</span>
+                <span class="q-content">Some hospitals nowadays have to fund new antibiotic research themselves.
+                    <select class="input-select" id="ans-36" onchange="updateNav(36)">
+                        <option value="">Select...</option>
+                        <option value="TRUE">TRUE</option>
+                        <option value="FALSE">FALSE</option>
+                        <option value="NOT GIVEN">NOT GIVEN</option>
+                    </select>
+                    <span id="fb-36" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-36"></div>
+
+            <div class="q-row" id="q-37">
+                <span class="q-num">37.</span>
+                <span class="q-content">Climate conditions in some parts of Africa can damage antibiotics in their containers.
+                    <select class="input-select" id="ans-37" onchange="updateNav(37)">
+                        <option value="">Select...</option>
+                        <option value="TRUE">TRUE</option>
+                        <option value="FALSE">FALSE</option>
+                        <option value="NOT GIVEN">NOT GIVEN</option>
+                    </select>
+                    <span id="fb-37" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-37"></div>
+
+            <div class="q-row" id="q-38">
+                <span class="q-num">38.</span>
+                <span class="q-content">Resistant bacteria in food cannot be passed on to humans who eat it.
+                    <select class="input-select" id="ans-38" onchange="updateNav(38)">
+                        <option value="">Select...</option>
+                        <option value="TRUE">TRUE</option>
+                        <option value="FALSE">FALSE</option>
+                        <option value="NOT GIVEN">NOT GIVEN</option>
+                    </select>
+                    <span id="fb-38" class="feedback"></span>
+                </span>
+            </div>
+            <div id="exp-38"></div>
+
+        </div>
+
+        <div class="question-section" id="q-group-3">
+            <div class="instruction">Questions 39-40: Label the diagram below.<br>Write <strong>NO MORE THAN THREE WORDS</strong> from the text for each answer.</div>
+            
+            <div class="diagram-container">
+                <strong style="display:block; margin-bottom: 10px; font-size:18px;">The Misuse of Antibiotics in the Fish Farm Industry</strong>
+                <img src="https://ieltstrainingonline.com/wp-content/uploads/2020/03/04-IELTS-Reading-q27-40-Q39-40-1024x736.jpg" alt="Fish Farm Diagram">
+                
+                <div style="display:flex; justify-content:center; gap:30px; flex-wrap:wrap;">
+                    <div>
+                        <span class="q-num">39.</span>
+                        <input type="text" class="input-gap" style="width: 200px;" id="ans-39" oninput="updateNav(39)">
+                        <span id="fb-39" class="feedback"></span>
+                    </div>
+                    <div>
+                        <span class="q-num">40.</span>
+                        <input type="text" class="input-gap" style="width: 200px;" id="ans-40" oninput="updateNav(40)">
+                        <span id="fb-40" class="feedback"></span>
+                    </div>
+                </div>
+            </div>
+            <div id="exp-39"></div>
+            <div id="exp-40"></div>
+
+        </div>
+
+    </div>
+</div>
+
+<div id="confirmOverlay" class="custom-overlay">
+    <div class="custom-modal setup-modal">
+        <h2>Xác nhận nộp bài</h2>
+        <p style="font-size: 16px; color: #475569; margin-bottom: 15px;">Bạn có chắc chắn muốn nộp bài để xem đáp án và giải thích chi tiết không?</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeConfirmModal()">Quay lại</button>
+            <button class="btn-confirm" onclick="executeSubmit()">Nộp bài</button>
+        </div>
+    </div>
+</div>
+
+<div id="resultOverlay" class="custom-overlay">
+    <div class="custom-modal setup-modal">
+        <h2>🎉 Tuyệt vời!</h2>
+        <div id="resultMessage" style="margin: 20px 0; line-height: 1.8;"></div>
+        <button class="btn-confirm" style="width: 100%; margin-top: 10px;" onclick="closeResultModal()">Xem giải thích chi tiết</button>
+    </div>
+</div>
+
+<div id="ctxMenu">
+    <button onclick="doHighlight()">🖍 Highlight</button>
+    <button onclick="removeHighlight()" class="delete">🗑 Remove Highlight</button>
+</div>
+
+<footer>
+    <div style="font-size:14px; font-weight:bold; color:#64748b; text-transform:uppercase;">Quick Navigation:</div>
+    <div class="palette-scroller" id="navPalette"></div>
+</footer>
+
+<script>
+    // --- STATE & DATA ---
+    let testDuration = 0; 
+    let timerInterval = null;
+    let isSubmitted = false;
+
+    const correctAnswers = {
+        27: "AF", 28: "ET", 29: "GH", 30: "JH", 31: "ET", 32: "IN", 33: "CO",
+        34: "FALSE", 35: "TRUE", 36: "NOT GIVEN", 37: "TRUE", 38: "FALSE",
+        39: ["FISH FOOD PELLETS", "FOOD PELLETS", "PELLETS", "FISH PELLETS", "ANTIBIOTIC PELLETS"],
+        40: ["LOSS OF APPETITE", "APPETITE"]
+    };
+
+    const explanations = {
+        27: { 
+            translation: "Vi khuẩn kháng thuốc có thể phát triển nếu bác sĩ không kê đủ thuốc kháng sinh.", 
+            keywords: "<span class='exp-keyword-match'>do not prescribe enough = too small doses</span>",
+            exp: "Đoạn 5, Alexander Fleming cảnh báo: 'The administration of too small doses leads to the production of resistant strains of bacteria.'", 
+            colorClass: "ev-27" 
+        },
+        28: { 
+            translation: "Xã hội có thể một lần nữa phải đối mặt với các bệnh truyền nhiễm mà trước đây được cho là có thể chữa khỏi.", 
+            keywords: "<span class='exp-keyword-match'>face infectious diseases = face life-threatening bacterial infections</span>",
+            exp: "Đoạn 3, Emma Thompson nói: '...people may again face life-threatening bacterial infections.'", 
+            colorClass: "ev-28" 
+        },
+        29: { 
+            translation: "Sử dụng thuốc kháng sinh như một biện pháp phòng ngừa là yếu tố chính trong sự phát triển kháng kháng sinh.", 
+            keywords: "<span class='exp-keyword-match'>preventative measure = prophylaxis</span>",
+            exp: "Đoạn 5, Georgina Haynes giải thích vấn đề là khi kháng sinh được dùng rộng rãi làm phương pháp phòng ngừa (prophylaxis) thay vì điều trị.", 
+            colorClass: "ev-29" 
+        },
+        30: { 
+            translation: "Thực hành tốt hơn ở các trang trại nuôi cá khi đối phó với dịch bệnh là quá muộn khi nói đến sự lây lan của kháng sinh trong môi trường xung quanh.", 
+            keywords: "<span class='exp-keyword-match'>too late = most of the damage has already been done</span>",
+            exp: "Đoạn 6, Jo Hardwick cho biết dù hiện nay đã dùng vắc-xin, nhưng 'unfortunately, most of the damage has already been done.'", 
+            colorClass: "ev-30" 
+        },
+        31: { 
+            translation: "Các công ty dược phẩm có thể không thể tiếp tục tìm ra thuốc kháng sinh mới để chống lại các bệnh nhiễm trùng kháng thuốc gây tử vong.", 
+            keywords: "<span class='exp-keyword-match'>not be able to keep finding new = eventually fail to keep up in this race</span>",
+            exp: "Đoạn 3, Emma Thompson giải thích: 'The fear is that we will eventually fail to keep up in this race...'", 
+            colorClass: "ev-31" 
+        },
+        32: { 
+            translation: "Toàn bộ vi khuẩn gây bệnh của bệnh nhân phải bị tiêu diệt bằng thuốc kháng sinh được kê đơn để ngăn chặn tình trạng kháng thuốc phát triển.", 
+            keywords: "<span class='exp-keyword-match'>All a patient's infection must be destroyed = 100 per cent of the infecting organisms be killed off</span>",
+            exp: "Đoạn 2, Iain Nicholson cho biết cần tiêu diệt gần như 100% sinh vật lây nhiễm để tránh chọn lọc kháng thuốc.", 
+            colorClass: "ev-32" 
+        },
+        33: { 
+            translation: "Những người bán thuốc kháng sinh bất hợp pháp hầu như không bao giờ làm theo hướng dẫn bảo quản thuốc đúng cách.", 
+            keywords: "<span class='exp-keyword-match'>Illicit salesmen = unauthorised dealers</span><br><span class='exp-keyword-match'>hardly ever follow = rarely bother to follow</span>",
+            exp: "Đoạn 5, Chenbo Okonkwa nói: 'unauthorised dealers rarely bother to follow official storage guidelines.'", 
+            colorClass: "ev-33" 
+        },
+        34: { 
+            translation: "Định nghĩa hiện tại của thuốc kháng sinh chỉ bao gồm các loại thuốc có nguồn gốc từ sinh vật sống.", 
+            keywords: "<span class='exp-keyword-match'>current definition = currently</span><br><span class='exp-keyword-match'>only includes... live organisms = derived from living bodies</span>",
+            exp: "Đoạn 1 viết: 'Currently, the term antibiotic is also applied to synthetic antimicrobials' (Hiện nay thuật ngữ này CŨNG áp dụng cho chất kháng khuẩn tổng hợp). Do đó từ 'only' trong câu hỏi là sai. => <b>FALSE</b>", 
+            colorClass: "ev-34" 
+        },
+        35: { 
+            translation: "Kháng kháng sinh là một vấn đề đáng kể ở cả các nước thế giới thứ nhất và thứ hai (phát triển và đang phát triển).", 
+            keywords: "<span class='exp-keyword-match'>first and second world countries = developed and underdeveloped nations</span>",
+            exp: "Đầu đoạn 3 khẳng định rõ: 'Antibiotic resistance has become a serious problem in both developed and underdeveloped nations.' => <b>TRUE</b>", 
+            colorClass: "ev-35" 
+        },
+        36: { 
+            translation: "Một số bệnh viện ngày nay phải tự tài trợ cho nghiên cứu thuốc kháng sinh mới.", 
+            keywords: "Không tìm thấy thông tin 'fund new antibiotic research themselves'",
+            exp: "Đoạn 3 có nhắc đến bệnh viện (hospitals) nhưng KHÔNG hề đề cập đến việc họ phải tự tài trợ (fund) nghiên cứu thuốc mới. => <b>NOT GIVEN</b>", 
+            colorClass: "ev-36" 
+        },
+        37: { 
+            translation: "Điều kiện khí hậu ở một số vùng của Châu Phi có thể làm hỏng thuốc kháng sinh trong hộp đựng của chúng.", 
+            keywords: "<span class='exp-keyword-match'>Climate conditions = tropical conditions</span><br><span class='exp-keyword-match'>damage = cause degradation</span>",
+            exp: "Đoạn 5 viết: '...tropical conditions, such as those often found in Africa, readily cause degradation of medical compounds.' => <b>TRUE</b>", 
+            colorClass: "ev-37" 
+        },
+        38: { 
+            translation: "Vi khuẩn kháng thuốc trong thực phẩm không thể truyền sang người ăn chúng.", 
+            keywords: "<span class='exp-keyword-match'>cannot be passed on to humans >< can develop... infections</span>",
+            exp: "Đoạn 6 ghi rõ: '...and persons who consume these foods can develop antibiotic-resistant infections.' (người tiêu thụ có thể bị nhiễm). Vậy 'cannot' là sai. => <b>FALSE</b>", 
+            colorClass: "ev-38" 
+        },
+        39: { 
+            translation: "Mũi tên chỉ vào các viên thức ăn rơi xuống đáy lồng lưới.", 
+            keywords: "<span class='exp-keyword-match'>pellets, bottom of the pens</span>",
+            exp: "Đoạn 6: 'antibiotics were added to fish food pellets... most of the antibiotics ended up at the bottom of the pens...'", 
+            colorClass: "ev-39" 
+        },
+        40: { 
+            translation: "Cá mệt mỏi, không muốn ăn.", 
+            keywords: "<span class='exp-keyword-match'>suffering from</span>",
+            exp: "Đoạn 6: 'They were already suffering from loss of appetite due to their infections...'", 
+            colorClass: "ev-40" 
+        }
+    };
+
+    const startQ = 27; const endQ = 40; const totalQuestions = 14;
+
+    // --- INIT ---
+    window.onload = function() {
+        renderPalette();
+        document.getElementById('setupOverlay').style.display = 'flex';
+    }
+
+    function askReady() {
+        let minutes = parseInt(document.getElementById('timeInput').value);
+        if(isNaN(minutes) || minutes < 1) minutes = 20; 
+        document.getElementById('startConfirmMsg').innerText = `Bạn đã cài đặt thời gian là ${minutes} phút.\nSẵn sàng bắt đầu chưa?`;
+        document.getElementById('startConfirmOverlay').style.display = 'flex';
+    }
+
+    function closeStartConfirmModal() { document.getElementById('startConfirmOverlay').style.display = 'none'; }
+
+    function startTestActual() {
+        document.getElementById('startConfirmOverlay').style.display = 'none';
+        let minutes = parseInt(document.getElementById('timeInput').value);
+        if(isNaN(minutes) || minutes < 1) minutes = 20;
+        testDuration = minutes * 60;
+        
+        document.getElementById('setupOverlay').style.display = 'none';
+        startTimer();
+    }
+
+    function renderPalette() {
+        const nav = document.getElementById("navPalette");
+        for (let i = startQ; i <= endQ; i++) {
+            let dot = document.createElement("div");
+            dot.className = "nav-dot"; dot.id = `nav-${i}`; dot.innerText = i;
+            dot.onclick = () => {
+                let targetId = `ans-${i}`;
+                let el = document.getElementById(targetId);
+                if(i <= 38 && el) el = el.closest('.q-row');
+                
+                if(el) {
+                    el.scrollIntoView({behavior:"smooth", block:"center"});
+                    el.style.backgroundColor = "var(--highlight-color)";
+                    setTimeout(() => el.style.backgroundColor = "", 1000);
+                }
+            };
+            nav.appendChild(dot);
+        }
+    }
+
+    function updateNav(id) {
+        let nav = document.getElementById(`nav-${id}`);
+        if (!nav) return;
+        
+        let el = document.getElementById(`ans-${id}`);
+        let val = el ? el.value : "";
+        
+        if (val && val.trim() !== "") nav.classList.add("done");
+        else nav.classList.remove("done");
+    }
+
+    // --- TIMER ---
+    function startTimer() {
+        let display = document.getElementById("timer");
+        timerInterval = setInterval(function () {
+            let m = Math.floor(testDuration / 60);
+            let s = testDuration % 60;
+            display.textContent = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+            if (--testDuration < 0) { clearInterval(timerInterval); executeSubmit(); }
+        }, 1000);
+    }
+
+    // --- SUBMIT & EXPLANATIONS ---
+    function submitTest(manual) {
+        if (isSubmitted) return;
+        if (manual) document.getElementById('confirmOverlay').style.display = 'flex';
+        else executeSubmit();
+    }
+
+    function closeConfirmModal() { document.getElementById('confirmOverlay').style.display = 'none'; }
+    function closeResultModal() { document.getElementById('resultOverlay').style.display = 'none'; }
+
+    function executeSubmit() {
+        document.getElementById('confirmOverlay').style.display = 'none';
+        isSubmitted = true;
+        clearInterval(timerInterval);
+        document.querySelectorAll('input, select').forEach(el => el.disabled = true);
+        
+        let score = 0;
+
+        for (let i = startQ; i <= endQ; i++) {
+            let userAns = "";
+            let el = document.getElementById(`ans-${i}`);
+            if (el) userAns = el.value.trim().toUpperCase();
+
+            let correctAnswer = correctAnswers[i];
+            let isCorrect = false;
+
+            if (Array.isArray(correctAnswer)) {
+                isCorrect = correctAnswer.includes(userAns);
+            } else {
+                isCorrect = (userAns === correctAnswer);
+            }
+
+            if (isCorrect) score++;
+
+            let fb = document.getElementById(`fb-${i}`);
+            let correctStr = Array.isArray(correctAnswer) ? correctAnswer[0] : correctAnswer;
+            if (fb) {
+                fb.innerText = isCorrect ? "✓" : `✗ (${correctStr})`;
+                fb.className = isCorrect ? "feedback correct" : "feedback wrong";
+            }
+
+            // --- HIỂN THỊ GIẢI THÍCH ---
+            if(explanations[i]) {
+                let expData = explanations[i];
+                let htmlContent = `
+                    <div class="exp-box show">
+                        <div class="exp-title">
+                            💡 Giải thích Câu ${i}
+                            ${expData.colorClass ? `<button class="locate-btn" onclick="scrollToEvidence('${expData.colorClass}')">📍 Xem dẫn chứng</button>` : ''}
+                        </div>
+                        
+                        <div class="exp-section">
+                            <span class="exp-label">👉 Dịch nghĩa:</span> 
+                            <div class="exp-translate">${expData.translation}</div>
+                        </div>
+
+                        ${expData.keywords ? `
+                        <div class="exp-section">
+                            <span class="exp-label">🔑 Từ khóa:</span> 
+                            <div class="exp-keywords">${expData.keywords}</div>
+                        </div>` : ''}
+
+                        <div class="exp-section">
+                            <span class="exp-label">🧠 Phân tích:</span> 
+                            <div class="exp-detail">${expData.exp}</div>
+                        </div>
+                    </div>`;
+
+                let expContainer = document.getElementById(`exp-${i}`);
+                if(expContainer) expContainer.innerHTML = htmlContent;
+            }
+
+            let nav = document.getElementById(`nav-${i}`);
+            if(nav) {
+                nav.style.background = isCorrect ? "#dcfce7" : "#fef2f2";
+                nav.style.color = isCorrect ? "#16a34a" : "#dc2626";
+                nav.style.borderColor = isCorrect ? "#86efac" : "#fca5a5";
+            }
+        }
+
+        // Color ev-boxes in Passage
+        const pastelColors = ['#bae6fd','#bfdbfe','#bbf7d0','#fbcfe8','#ddd6fe','#fed7aa','#e9d5ff','#a7f3d0','#fecaca'];
+        document.querySelectorAll('.ev-box').forEach((el, index) => {
+            el.style.backgroundColor = pastelColors[index % pastelColors.length];
+            el.style.color = "#0f172a";
+        });
+
+        // Calculate Band and Upload
+        let timeTaken = Math.round(((parseInt(document.getElementById('timeInput').value) * 60) - testDuration) / 60) || 1;
+        if(window.luuDiemLenFirebase) window.luuDiemLenFirebase(score, timeTaken);
+
+        document.getElementById('resultMessage').innerHTML = `
+            <strong style="font-size: 26px; color: var(--primary-dark); display: block; margin-bottom: 10px;">Số câu đúng: ${score}/${totalQuestions}</strong>
+            <p style="font-size: 16px; color: #475569;">Kết quả của bạn đã được đồng bộ an toàn lên hệ thống IELTS Tracker!</p>
+        `;
+        setTimeout(() => { document.getElementById('resultOverlay').style.display = 'flex'; }, 500);
+    }
+
+    function scrollToEvidence(id) {
+        const evElement = document.getElementById(id);
+        if(evElement) {
+            evElement.scrollIntoView({behavior: "smooth", block: "center"});
+            evElement.classList.remove("focus-blink");
+            void evElement.offsetWidth;
+            evElement.classList.add("focus-blink");
+            setTimeout(() => evElement.classList.remove("focus-blink"), 1500);
+        }
+    }
+
+    // --- HIGHLIGHT SYSTEM ---
+    const container = document.getElementById("mainContainer");
+    const menu = document.getElementById("ctxMenu");
+    let targetEl = null; let selectedRange = null;
+
+    container.addEventListener("contextmenu", (e) => {
+        if (!e.target.closest('.pane')) return;
+        e.preventDefault();
+        targetEl = null; selectedRange = null; menu.style.display = "none";
+        
+        if (e.target.classList.contains("highlight")) {
+            targetEl = e.target;
+            showMenu(e.pageX, e.pageY, "remove"); return;
+        }
+
+        let sel = window.getSelection();
+        if (sel.toString().trim().length > 0 && container.contains(sel.anchorNode)) {
+            selectedRange = sel.getRangeAt(0).cloneRange();
+            showMenu(e.pageX, e.pageY, "add");
+        }
+    });
+
+    document.addEventListener("click", (e) => { if (!menu.contains(e.target)) menu.style.display = "none"; });
+
+    function showMenu(x, y, mode) {
+        menu.style.display = "block";
+        let mw = menu.offsetWidth; let mh = menu.offsetHeight;
+        menu.style.left = (x + mw > window.innerWidth ? window.innerWidth - mw - 10 : x) + "px";
+        menu.style.top = (y + mh > window.innerHeight ? window.innerHeight - mh - 10 : y) + "px";
+        menu.children[0].style.display = (mode === "add") ? "block" : "none";
+        menu.children[1].style.display = (mode === "remove") ? "block" : "none";
+    }
+
+    function doHighlight() {
+        if (selectedRange) {
+            let span = document.createElement("span"); span.className = "highlight";
+            try { selectedRange.surroundContents(span); } catch(e){}
+            window.getSelection().removeAllRanges();
+        }
+        menu.style.display = "none";
+    }
+
+    function removeHighlight() {
+        if (targetEl) {
+            let text = document.createTextNode(targetEl.textContent);
+            targetEl.parentNode.replaceChild(text, targetEl);
+            container.normalize();
+        }
+        menu.style.display = "none";
+    }
+</script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+        authDomain: "snapenglish-cb6e2.firebaseapp.com",
+        projectId: "snapenglish-cb6e2",
+        storageBucket: "snapenglish-cb6e2.firebasestorage.app",
+        messagingSenderId: "373152038413",
+        appId: "1:373152038413:web:19284622571390f8585f44"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            window.currentUserUid = user.uid;
+            window.currentUserEmail = user.email;
+        }
+    });
+
+    // Helper: Tính điểm Band Ielts (Quy đổi hệ 40 câu)
+    function calculateIeltsBand(correct, total) {
+        let normalizedCorrect = (correct / total) * 40;
+        if (normalizedCorrect >= 39) return 9.0;
+        if (normalizedCorrect >= 37) return 8.5;
+        if (normalizedCorrect >= 35) return 8.0;
+        if (normalizedCorrect >= 33) return 7.5;
+        if (normalizedCorrect >= 30) return 7.0;
+        if (normalizedCorrect >= 27) return 6.5;
+        if (normalizedCorrect >= 23) return 6.0;
+        if (normalizedCorrect >= 19) return 5.5;
+        if (normalizedCorrect >= 15) return 5.0;
+        if (normalizedCorrect >= 13) return 4.5;
+        if (normalizedCorrect >= 10) return 4.0;
+        if (normalizedCorrect >= 8) return 3.5;
+        if (normalizedCorrect >= 6) return 3.0;
+        return 2.5;
+    }
+
+    window.luuDiemLenFirebase = async function(diemSo, timeTakenMinutes) {
+        if (!window.currentUserUid) return;
+        
+        let tongSoCau = 14; 
+        let bandScore = calculateIeltsBand(diemSo, tongSoCau);
+        let timestamp = Date.now();
+        let idLuotThi = window.currentUserUid + "_ielts_" + timestamp;
+
+        try {
+            await setDoc(doc(db, "user_ielts_scores", idLuotThi), {
+                email: window.currentUserEmail,
+                skill: "Reading",
+                testName: "Test 4",
+                partName: "Passage 3",
+                timeTaken: timeTakenMinutes.toString(),
+                correctQ: diemSo,
+                totalQ: tongSoCau,
+                bandScore: bandScore,
+                date: new Date().toLocaleDateString("vi-VN"),
+                timestamp: timestamp
+            });
+            console.log("Đã đẩy điểm thành công lên IELTS Tracker!");
+        } catch(e) {
+            console.error("Lỗi khi lưu điểm: ", e);
+        }
+    }
+</script>
+</body>
+</html>
