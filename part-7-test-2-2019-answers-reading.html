@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giải thích chi tiết Part 7 - Test 3 | SnapEnglish</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Tông màu Trưởng thành, Cute (Matcha & Milk Tea) */
+            --primary: #d4a373; /* Trà sữa / Camel */
+            --primary-light: #faedcd; /* Kem nhạt */
+            --primary-dark: #bc6c25; /* Cam đất trầm */
+            --accent: #8b9a73; /* Xanh Matcha xám */
+            --bg-body: #fdfcf8; /* Off-white / Vàng ấm cực nhạt */
+            --text-main: #4a4a4a; /* Xám than, dễ đọc hơn đen */
+            --border: #e9edc9; /* Xanh bơ nhạt */
+            --correct: #658c70; /* Xanh lá rêu trầm */
+            --correct-bg: #eaf2eb;
+            --wrong: #c96b6b; /* Đỏ hồng trầm */
+            --wrong-bg: #fae8e8;
+            --highlight: #ffe3a1; /* Vàng sáng */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(135deg, #d4a373, #8b9a73);
+            height: 75px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 4px 15px rgba(139, 154, 115, 0.2);
+            z-index: 10;
+        }
+
+        .brand {
+            font-size: 22px;
+            font-weight: 800;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .brand span {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        #progress-text {
+            font-weight: 800; color: #fff; margin-right: 15px; background: rgba(0,0,0,0.15); padding: 6px 15px; border-radius: 20px;
+        }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 15px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn-outline {
+            background: rgba(255,255,255,0.15);
+            border: 2px solid white;
+            color: white;
+        }
+
+        .btn-outline:hover { background: white; color: var(--primary-dark); }
+        
+        .btn-primary {
+            background: white;
+            color: var(--primary-dark);
+            box-shadow: 0 4px 0 rgba(255,255,255,0.3);
+        }
+
+        .btn-primary:active { transform: translateY(4px); box-shadow: none; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; transform: none; background: #e2e8f0; color: #94a3b8; border-color: transparent;}
+
+        /* MAIN LAYOUT */
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .passage-section {
+            flex: 6;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid var(--border);
+            background: #fff;
+        }
+
+        .passage-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .col-eng, .col-vie {
+            padding: 35px;
+            line-height: 1.85;
+            font-size: 16px;
+            overflow-y: auto;
+        }
+
+        .col-eng { border-right: 2px dashed var(--primary-light); background: #fffcf7; color: #3d3d3d; }
+        .col-vie { background: #f7f9f4; color: #555c4d; }
+        
+        .col-title {
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 25px;
+            font-size: 17px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        .question-section {
+            flex: 4;
+            padding: 35px;
+            overflow-y: auto;
+            background: var(--bg-body);
+        }
+
+        /* HIGHLIGHT EVIDENCE EFFECT */
+        .ev-box {
+            border-radius: 6px;
+            transition: all 0.4s ease;
+            padding: 2px 4px;
+            border: 1px solid transparent;
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.03);
+            font-weight: 700;
+        }
+
+        .ev-box.focus-blink {
+            background-color: var(--highlight) !important;
+            border-color: #f7b733;
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(247, 183, 51, 0.5);
+            z-index: 10;
+            position: relative;
+            color: #d35400 !important;
+        }
+
+        /* QUESTION CARDS */
+        .q-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 20px -5px rgba(0,0,0,0.04);
+            border: 1px solid var(--primary-light);
+            border-top: 6px solid var(--primary);
+        }
+
+        .q-text { font-size: 18px; font-weight: 800; margin-bottom: 12px; color: #2c3e50; }
+        .q-text-vi { font-size: 15.5px; color: var(--accent); font-style: italic; margin-bottom: 22px; font-weight: 600; }
+
+        .option {
+            padding: 14px 18px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            border: 2px solid var(--border);
+            font-size: 15.5px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: #fafaf9;
+            transition: 0.25s ease;
+        }
+
+        .opt-en { font-weight: 800; color: #4a4a4a;}
+        .opt-vi { font-size: 14.5px; color: #878c82; font-style: italic; }
+
+        .option.is-correct { background: var(--correct-bg); border-color: var(--correct); box-shadow: 0 4px 12px rgba(101, 140, 112, 0.15);}
+        .option.is-correct .opt-en { color: #2d5a3e; }
+
+        /* EXPLANATION BOX */
+        .exp-box {
+            margin-top: 25px;
+            padding: 22px;
+            background: var(--primary-light);
+            border-radius: 16px;
+            border: 1px solid #f2e3be;
+        }
+        .exp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px dashed #e6d3a8; padding-bottom: 12px; }
+        .exp-title { font-weight: 800; color: var(--primary-dark); font-size: 17px; display: flex; align-items: center; gap: 8px; }
+        .btn-locate { background: #fff; border: 2px solid var(--primary); color: var(--primary); padding: 8px 16px; border-radius: 20px; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s; box-shadow: 0 3px 6px rgba(212, 163, 115, 0.15); }
+        .btn-locate:hover { background: var(--primary); color: white; transform: translateY(-2px);}
+        .exp-content { line-height: 1.75; font-size: 15.5px; margin-bottom: 18px; color: #4a4238;}
+        .exp-vocab { background: #fff; padding: 18px; border-radius: 14px; border: 1px solid #e9edc9; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);}
+        .exp-vocab ul { padding-left: 22px; margin: 0; }
+        .exp-vocab li { margin-bottom: 8px; color: #5c6255;}
+        .exp-vocab b { color: var(--primary-dark); background: #faedcd; padding: 3px 8px; border-radius: 6px; font-weight: 800;}
+
+        /* DOC BOX STYLING */
+        .doc-box { border: 1px solid #e9edc9; padding: 28px; border-radius: 18px; background: #fff; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);}
+        .email-header { background: #fdfbf7; padding: 18px; border-radius: 12px; border-left: 5px solid var(--accent); margin-bottom: 20px; font-size: 15.5px; line-height: 1.6; border-top: 1px solid #e9edc9; border-right: 1px solid #e9edc9; border-bottom: 1px solid #e9edc9;}
+        .center-text { text-align: center; }
+        table.table-data { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 15px; border-radius: 10px; overflow: hidden; box-shadow: 0 0 0 1px #e9edc9; }
+        table.table-data th, table.table-data td { padding: 12px; text-align: center; border: 1px solid #e9edc9; }
+        table.table-data th { background: #f2f5e1; color: var(--accent); font-weight: 800; }
+        .divider { text-align: center; color: #d4a373; margin: 25px 0; font-size: 22px; letter-spacing: 6px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand"><span>SnapEnglish</span> Giải Thích Chi Tiết Part 7 - Test 3</div>
+    <div class="nav-controls">
+        <span id="progress-text">Đoạn 1 / 15</span>
+        <button class="btn btn-outline" id="btn-prev" onclick="navigate(-1)">⬅ Quay lại</button>
+        <button class="btn btn-primary" id="btn-next" onclick="navigate(1)">Đoạn tiếp theo ➡</button>
+    </div>
+</header>
+
+<div class="container">
+    <div class="passage-section">
+        <div class="passage-grid">
+            <div class="col-eng">
+                <div class="col-title">🌿 Bài đọc gốc (English)</div>
+                <div id="eng-content"></div>
+            </div>
+            <div class="col-vie">
+                <div class="col-title">🌷 Bản dịch (Vietnamese)</div>
+                <div id="vie-content"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="question-section" id="questions-container"></div>
+</div>
+
+<script>
+    const reviewData = [
+        {
+            id: 1,
+            engHtml: `
+                <div class="doc-box">
+                    <h3 class="center-text" style="color: var(--primary-dark);">Fastest Fleet</h3>
+                    <p class="center-text" style="font-weight: 800; font-size: 18px; margin-bottom: 15px;">RATE OUR SERVICES AND WIN FREE TRAVEL!</p>
+                    <p>Visit our Web site at www.fastestfleet.com/feedback and <span id="ev-148" class="ev-box">fill out the 5-minute questionnaire.</span> You could win one of 10 FREE round-trip <span id="ev-147" class="ev-box">bus trips</span> to any destination within the continental United States!</p><br>
+                    <p>You must be 18 or older to participate. Only customers who have previously traveled with Fastest Fleet are eligible to enter.</p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box">
+                    <h3 class="center-text" style="color: var(--primary-dark);">Đội xe Nhanh nhất</h3>
+                    <p class="center-text" style="font-weight: 800; font-size: 18px; margin-bottom: 15px;">ĐÁNH GIÁ DỊCH VỤ CỦA CHÚNG TÔI VÀ ĐƯỢC DU LỊCH MIỄN PHÍ!</p>
+                    <p>Truy cập trang web của chúng tôi tại www.fastestfleet.com/feedback và điền vào bảng câu hỏi dài 5 phút. Bạn có thể giành được một trong 10 chuyến xe buýt khứ hồi MIỄN PHÍ đến bất kỳ điểm đến nào trong lục địa Hoa Kỳ!</p><br>
+                    <p>Bạn phải đủ 18 tuổi trở lên để tham gia. Chỉ những khách hàng trước đây đã đi với Đội xe Nhanh nhất mới đủ điều kiện tham gia.</p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 147,
+                    qEng: "Where would the notice likely be seen?",
+                    qVie: "Thông báo có thể được nhìn thấy ở đâu?",
+                    options: [
+                        { key: "A", en: "In an airport", vi: "Trong một sân bay", isCorrect: false },
+                        { key: "B", en: "In a bus station", vi: "Trong một trạm xe buýt", isCorrect: true },
+                        { key: "C", en: "In a train station", vi: "Trong một nhà ga xe lửa", isCorrect: false },
+                        { key: "D", en: "In a ferry terminal", vi: "Trong một bến phà", isCorrect: false }
+                    ],
+                    evidenceId: "ev-147",
+                    expText: "Thông báo trên là về dịch vụ của Fastest Fleet, giải thưởng được cung cấp là “bus trips” (chuyến xe buýt). Do đó Fastest Fleet là một hãng xe buýt, và thông báo của họ thường sẽ được đăng ở trạm xe buýt (bus station).",
+                    vocab: "<li><b>Destination</b>: Điểm đến</li><li><b>Continental</b>: Lục địa</li><li><b>Eligible</b>: Đủ điều kiện</li>"
+                },
+                {
+                    id: 148,
+                    qEng: "What are customers asked to do?",
+                    qVie: "Khách hàng được yêu cầu làm gì?",
+                    options: [
+                        { key: "A", en: "Provide feedback", vi: "Cung cấp thông tin phản hồi", isCorrect: true },
+                        { key: "B", en: "Buy a round-trip ticket", vi: "Mua vé khứ hồi", isCorrect: false },
+                        { key: "C", en: "Take advantage of a discount", vi: "Tận dụng giảm giá", isCorrect: false },
+                        { key: "D", en: "Join a customer loyalty program", vi: "Tham gia chương trình khách hàng thân thiết", isCorrect: false }
+                    ],
+                    evidenceId: "ev-148",
+                    expText: "Tựa đề thông báo nhắc tới “RATE OUR SERVICES…” (Đánh giá dịch vụ của chúng tôi) và yêu cầu “fill out the 5-minute questionnaire” (điền vào bảng câu hỏi). Những hành động này đồng nghĩa với việc cung cấp phản hồi (Provide feedback).",
+                    vocab: "<li><b>Provide feedback</b>: Cung cấp phản hồi</li><li><b>Questionnaire</b>: Bảng câu hỏi khảo sát</li>"
+                }
+            ]
+        },
+        {
+            id: 2,
+            engHtml: `
+                <div class="doc-box" style="background: #fafaf9;">
+                    <p><strong>Daniel Mather (9:38 A.M.)</strong><br>Hi Sue, are you working at home today?</p><br>
+                    <p><strong>Susan Maldini (9:39 A.M.)</strong><br>No, but I'm at an off-site meeting. What's up?</p><br>
+                    <p><strong>Daniel Mather (9:41 A.M.)</strong><br>The manager asked me to <span id="ev-149" class="ev-box">make hard copies of some contract agreements</span> for our records. I forgot my printer card at home. <span id="ev-150" class="ev-box">Could I borrow yours?</span></p><br>
+                    <p><strong>Susan Maldini (9:42 A.M.)</strong><br><span id="ev-150-2" class="ev-box">Sure thing.</span> It's in the business card holder on my desk.</p><br>
+                    <p><strong>Daniel Mather (9:55 A.M.)</strong><br>Okay, done. Thank you! I put it back on your desk.</p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box" style="background: #fafaf9;">
+                    <p><strong>Daniel Mather (9:38 A.M.)</strong><br>Chào Sue, hôm nay bạn có làm việc ở nhà không?</p><br>
+                    <p><strong>Susan Maldini (9:39 A.M.)</strong><br>Không, nhưng tôi đang ở một cuộc họp ngoài văn phòng. Chuyện gì thế?</p><br>
+                    <p><strong>Daniel Mather (9:41 A.M.)</strong><br>Người quản lý yêu cầu tôi tạo các bản sao giấy của một số thỏa thuận hợp đồng cho hồ sơ của chúng tôi. Tôi quên thẻ dùng máy in ở nhà. Tôi có thể mượn của bạn không?</p><br>
+                    <p><strong>Susan Maldini (9:42 A.M.)</strong><br>Chắc chắn rồi. Nó ở trong ngăn đựng danh thiếp trên bàn của tôi.</p><br>
+                    <p><strong>Daniel Mather (9:55 A.M.)</strong><br>Được rồi, xong rồi. Cảm ơn bạn! Tôi đặt nó trở lại bàn của bạn đấy.</p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 149,
+                    qEng: "What task was Mr. Mather given?",
+                    qVie: "Mather được giao nhiệm vụ gì?",
+                    options: [
+                        { key: "A", en: "To send out contracts", vi: "Gửi hợp đồng", isCorrect: false },
+                        { key: "B", en: "To repair the photocopier", vi: "Sửa chữa máy photocopy", isCorrect: false },
+                        { key: "C", en: "To monitor employee attendance", vi: "Theo dõi sự tham dự của nhân viên", isCorrect: false },
+                        { key: "D", en: "To make copies of some documents", vi: "Tạo bản sao của một số tài liệu", isCorrect: true }
+                    ],
+                    evidenceId: "ev-149",
+                    expText: "Mather nói: “The manager asked me to make hard copies of some contract agreements” (Quản lý yêu cầu tôi tạo bản sao giấy của vài hợp đồng). “Contract agreements” chính là một loại tài liệu (documents), vì vậy nhiệm vụ là photo tài liệu (make copies of some documents).",
+                    vocab: "<li><b>Make hard copies</b>: In ra bản cứng / Tạo bản sao giấy</li><li><b>Contract agreement</b>: Thỏa thuận hợp đồng</li>"
+                },
+                {
+                    id: 150,
+                    qEng: "At 9:42 A.M., what does Ms. Maldini most likely mean when she writes 'Sure thing'?",
+                    qVie: "Vào lúc 9:42 A.M., Cô Maldini có ý gì khi cô ấy viết 'Chắc chắn rồi'?",
+                    options: [
+                        { key: "A", en: "She can lend Mr. Mather her card.", vi: "Cô ấy có thể cho ông Mather mượn thẻ của mình.", isCorrect: true },
+                        { key: "B", en: "She will return to the office.", vi: "Cô ấy sẽ trở lại văn phòng.", isCorrect: false },
+                        { key: "C", en: "She will contact the manager.", vi: "Cô ấy sẽ liên lạc với người quản lý.", isCorrect: false },
+                        { key: "D", en: "She can copy the agreements.", vi: "Cô ấy có thể sao chép các thỏa thuận.", isCorrect: false }
+                    ],
+                    evidenceId: "ev-150-2",
+                    expText: "Câu hỏi của Mather ngay trước đó là: “Could I borrow yours?” (Tôi mượn thẻ máy in của bạn được không?). Câu trả lời “Sure thing” (Chắc chắn rồi) thể hiện sự đồng ý cho Mather mượn thẻ của cô ấy.",
+                    vocab: "<li><b>Sure thing</b>: Chắc chắn rồi / Tất nhiên rồi</li><li><b>Borrow/Lend</b>: Mượn / Cho mượn</li>"
+                }
+            ]
+        },
+        {
+            id: 3,
+            engHtml: `
+                <div class="doc-box">
+                    <div class="email-header">
+                        <strong>To:</strong> Westhauser Laboratories Staff<br>
+                        <strong>From:</strong> Area manager<br>
+                        <strong>Date:</strong> March 22<br>
+                        <strong>Re:</strong> Break-time beverages
+                    </div>
+                    <p><span id="ev-151" class="ev-box">Beginning immediately, staff members are asked to contribute toward the cost of hot beverages available in our kitchenette.</span> For each cup of coffee or tea you pour for yourself, we are requesting that you leave fifty cents. Please note that this amount is still far less than what you would pay at the cafe next to our building.</p><br>
+                    <p>Each time you prepare a beverage, <span id="ev-152" class="ev-box">just place your payment in the marked can</span> on the counter next to the sink. As in the past, a variety of high-quality tea and coffee supplies will be made available, and products will be restocked monthly. Your understanding is appreciated so that everyone can continue to enjoy conveniently located hot beverages throughout the workday.</p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box">
+                    <div class="email-header">
+                        <strong>Kính gửi:</strong> Nhân viên phòng thí nghiệm Westhauser<br>
+                        <strong>Từ:</strong> Quản lý khu vực<br>
+                        <strong>Ngày:</strong> 22 tháng 3<br>
+                        <strong>V/v:</strong> Đồ uống giải lao
+                    </div>
+                    <p>Bắt đầu ngay lập tức, các nhân viên được yêu cầu đóng góp vào chi phí đồ uống nóng có sẵn trong bếp nhỏ của chúng tôi. Đối với mỗi tách cà phê hoặc trà bạn tự rót, chúng tôi yêu cầu bạn để lại năm mươi xu. Xin lưu ý rằng số tiền này vẫn còn ít hơn nhiều so với số tiền bạn sẽ trả tại quán cà phê bên cạnh tòa nhà của chúng tôi.</p><br>
+                    <p>Mỗi khi bạn chuẩn bị đồ uống, chỉ cần đặt khoản thanh toán của bạn vào hộp được đánh dấu trên quầy bên cạnh bồn rửa. Như trong quá khứ, một loạt các nguồn cung cấp trà và cà phê chất lượng cao sẽ được cung cấp, và các sản phẩm sẽ được bổ sung hàng tháng. Chúng tôi rất trân trọng sự thông cảm của bạn để mọi người có thể tiếp tục thưởng thức đồ uống nóng có vị trí thuận tiện trong suốt cả ngày làm việc.</p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 151,
+                    qEng: "What is the purpose of the memo?",
+                    qVie: "Mục đích của bản ghi nhớ là gì?",
+                    options: [
+                        { key: "A", en: "To explain a new policy", vi: "Để giải thích một chính sách mới", isCorrect: true },
+                        { key: "B", en: "To discourage long breaks", vi: "Để ngăn chặn việc giải lao dài", isCorrect: false },
+                        { key: "C", en: "To provide a budget update", vi: "Để cung cấp cập nhật ngân sách", isCorrect: false },
+                        { key: "D", en: "To address staff complaints", vi: "Để giải quyết khiếu nại của nhân viên", isCorrect: false }
+                    ],
+                    evidenceId: "ev-151",
+                    expText: "Trong đoạn văn có câu: “Beginning immediately, staff members are asked to contribute toward the cost...” (Bắt đầu ngay lập tức, nhân viên ĐƯỢC YÊU CẦU đóng góp chi phí...). Việc ban hành một quy định yêu cầu nhân viên phải trả tiền cho đồ uống chính là việc giải thích một chính sách mới (new policy).",
+                    vocab: "<li><b>Policy</b>: Chính sách, quy định</li><li><b>Contribute toward</b>: Đóng góp vào</li><li><b>Kitchenette</b>: Khu bếp nhỏ (trong văn phòng)</li>"
+                },
+                {
+                    id: 152,
+                    qEng: "What are staff members asked to do?",
+                    qVie: "Nhân viên được yêu cầu làm gì?",
+                    options: [
+                        { key: "A", en: "Bring their own beverages to work", vi: "Mang đồ uống của riêng họ đi làm", isCorrect: false },
+                        { key: "B", en: "Leave payments in a container", vi: "Để lại các khoản thanh toán trong một chỗ đựng", isCorrect: true },
+                        { key: "C", en: "Submit requests for supplies", vi: "Gửi yêu cầu cho nguồn cung cấp", isCorrect: false },
+                        { key: "D", en: "Keep the kitchenette tidy", vi: "Giữ bếp nhỏ gọn gàng", isCorrect: false }
+                    ],
+                    evidenceId: "ev-152",
+                    expText: "Đoạn văn hướng dẫn: “Each time you prepare a beverage, just place your payment in the marked can…” (Chỉ cần đặt khoản tiền của bạn vào cái lon được đánh dấu). Việc để tiền vào 'marked can' (chiếc lon/hộp đựng) tương đương với 'Leave payments in a container'.",
+                    vocab: "<li><b>Payment</b>: Khoản thanh toán, tiền trả</li><li><b>Can / Container</b>: Lon, hộp đựng</li><li><b>Restock</b>: Bổ sung (hàng hóa)</li>"
+                }
+            ]
+        },
+        {
+            id: 4,
+            engHtml: `
+                <div class="doc-box">
+                    <h3 class="center-text" style="color: var(--primary-dark);">Attention Milwaukee Modern Art Museum Visitors</h3><br>
+                    <p>The Meacham Room is closed temporarily as we prepare the space for the Modern Artist Showcase, which will run from April 1 to June 30.</p><br>
+                    <p>We encourage you to return to experience this much-anticipated exhibit that will feature paintings, sculpture, and multimedia works by acclaimed international artists such as Sally Acosta, Frank Kember, Kimberly Hong, and <span id="ev-154" class="ev-box">Matilda Breeland</span>. Of note is newcomer <span id="ev-155" class="ev-box">Theodore Carmody's sculpture collection that was dubbed "most exciting debut of the decade" by Ethan Lerner</span>, renowned and respected critic of the Ireland Arts Chronicle. <span id="ev-153" class="ev-box">More information about the featured artists and the exhibit can be found at www.milwaukeemodernart.org.</span> Or download our museum app to keep current with all upcoming events.</p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box">
+                    <h3 class="center-text" style="color: var(--primary-dark);">Thông báo tới Khách tham quan Bảo tàng nghệ thuật hiện đại Milwaukee</h3><br>
+                    <p>Phòng Meacham tạm thời đóng cửa khi chúng tôi chuẩn bị không gian cho Showcase Nghệ sĩ hiện đại, sẽ diễn ra từ ngày 1 tháng 4 đến ngày 30 tháng 6.</p><br>
+                    <p>Chúng tôi khuyến khích bạn quay trở lại để trải nghiệm triển lãm được mong đợi này với các tác phẩm hội họa, điêu khắc và đa phương tiện của các nghệ sĩ quốc tế nổi tiếng như Sally Acosta, Frank Kember, Kimberly Hong và Matilda Breeland. Đáng chú ý là Bộ sưu tập điêu khắc của cái tên mới Theodore Carmody, được mệnh danh là "tác phẩm đầu tay thú vị nhất thập kỷ" bởi Ethan Lerner, nhà phê bình nổi tiếng và đáng kính của tờ Thời báo Nghệ thuật Ireland. Thông tin thêm về các nghệ sĩ nổi bật và triển lãm có thể được tìm thấy tại www.milwaukeemodernart.org. Hoặc tải xuống ứng dụng bảo tàng của chúng tôi để cập nhật với tất cả các sự kiện sắp tới.</p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 153,
+                    qEng: "What is indicated about the museum?",
+                    qVie: "Những gì được chỉ định về bảo tàng?",
+                    options: [
+                        { key: "A", en: "It is promoting an upcoming exhibit on its Web site.", vi: "Nó đang quảng bá một triển lãm sắp tới trên trang web của nó.", isCorrect: true },
+                        { key: "B", en: "It is known for its sculpture exhibits.", vi: "Nó được biết đến với triển lãm điêu khắc của nó.", isCorrect: false },
+                        { key: "C", en: "It will be closed for renovations in April.", vi: "Nó sẽ bị đóng cửa để cải tạo vào tháng Tư.", isCorrect: false },
+                        { key: "D", en: "Its upcoming exhibit is free for museum members.", vi: "Triển lãm sắp tới của nó là miễn phí cho bảo tàng các thành viên.", isCorrect: false }
+                    ],
+                    evidenceId: "ev-153",
+                    expText: "Đoạn văn có câu: “More information about the featured artists and the exhibit can be found at www.milwaukeemodernart.org” (Thông tin thêm về triển lãm có thể tìm thấy trên website). Việc kêu gọi người xem lên website để đọc thêm thông tin chính là một hình thức quảng bá (promoting) cho sự kiện sắp tới.",
+                    vocab: "<li><b>Upcoming exhibit</b>: Triển lãm sắp tới</li><li><b>Promote</b>: Quảng bá, thúc đẩy</li>"
+                },
+                {
+                    id: 154,
+                    qEng: "Who is Ms. Breeland?",
+                    qVie: "Bà Breeland là ai?",
+                    options: [
+                        { key: "A", en: "A journalist", vi: "Một nhà báo", isCorrect: false },
+                        { key: "B", en: "An artist", vi: "Một nghệ sĩ", isCorrect: true },
+                        { key: "C", en: "A museum curator", vi: "Một người phụ trách bảo tàng", isCorrect: false },
+                        { key: "D", en: "An art critic", vi: "Một nhà phê bình nghệ thuật", isCorrect: false }
+                    ],
+                    evidenceId: "ev-154",
+                    expText: "Breeland được nhắc tới trong danh sách: “international artists such as Sally Acosta... and Matilda Breeland”. Tức là cô ấy nằm trong nhóm các nghệ sĩ quốc tế (international artists).",
+                    vocab: "<li><b>Acclaimed artist</b>: Nghệ sĩ được ca ngợi/nổi tiếng</li><li><b>Journalist</b>: Nhà báo</li>"
+                },
+                {
+                    id: 155,
+                    qEng: "Who was praised by Mr. Lerner?",
+                    qVie: "Ai được ông Lerner khen ngợi?",
+                    options: [
+                        { key: "A", en: "Ms. Acosta", vi: "Bà Acosta", isCorrect: false },
+                        { key: "B", en: "Mr. Kember", vi: "Ông Kember", isCorrect: false },
+                        { key: "C", en: "Ms. Hong", vi: "Cô Hong", isCorrect: false },
+                        { key: "D", en: "Mr. Carmody", vi: "Ông Carmody", isCorrect: true }
+                    ],
+                    evidenceId: "ev-155",
+                    expText: "Văn bản viết: “Theodore Carmody's sculpture collection that was dubbed 'most exciting debut of the decade' by Ethan Lerner” (Bộ sưu tập của Theodore Carmody được mệnh danh là màn ra mắt thú vị nhất thập kỷ bởi Ethan Lerner). Lời khen ngợi này dành cho tác phẩm của ông Carmody.",
+                    vocab: "<li><b>Praise</b>: Khen ngợi</li><li><b>Dub</b>: Đặt cho cái tên, mệnh danh</li><li><b>Debut</b>: Lần ra mắt đầu tiên</li>"
+                }
+            ]
+        },
+        {
+            id: 5,
+            engHtml: `
+                <div class="doc-box">
+                    <h3 class="center-text" style="color: var(--primary-dark);">Change of Work Order</h3>
+                    <p><strong>General Contractor:</strong> Howard Kleiber Mercrest Construction. 106 Pickens Way. Columbus. OH 43211<br>
+                    <strong>Property Owner:</strong> Oscar Copeland. 866 Andell Road. Columbus. OH 43215<br>
+                    <strong>Project Start Date:</strong> July 10<br>
+                    <strong>Project End Date:</strong> July 15</p><br>
+                    
+                    <p>The contractor is hereby instructed to make the following changes to the contract documents:</p><br>
+                    
+                    <p><strong>Description of Work Added/Deleted:</strong><br>
+                    <span id="ev-156" class="ev-box">Client will now be supplying the countertops and faucet</span> in addition to the kitchen cabinets. Therefore, the total project cost will be adjusted to only include the cost of installation.</p><br>
+                    
+                    <p><strong>Original Contract Price:</strong> $3,496<br>
+                    <strong>Net Reduction from Previous Contract:</strong> -$2,412<br>
+                    <strong>Total Project Cost with Approved Changes:</strong> $1,084</p><br>
+                    
+                    <p><strong>Revised Payment Schedule:</strong><br>
+                    15% of total project cost ($162) is due upfront to secure contractor. $222 is due on project start date, and <span id="ev-157" class="ev-box">the remainder ($700) is due upon project completion.</span></p><br>
+                    
+                    <p><strong>Accepted by:</strong><br>
+                    Contractor: Howard Kleiber<br>
+                    Property Owner: Oscar Copeland</p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box">
+                    <h3 class="center-text" style="color: var(--primary-dark);">Thay đổi thứ tự công việc</h3>
+                    <p><strong>Tổng thầu:</strong> Howard Kleiber Mercrest Construction. 106 Pickens Way. Columbus. OH 43211<br>
+                    <strong>Chủ sở hữu tài sản:</strong> Oscar Copeland. 866 đường Andell. Columbus. OH 43215<br>
+                    <strong>Ngày bắt đầu dự án:</strong> ngày 10 tháng 7<br>
+                    <strong>Ngày kết thúc dự án:</strong> 15/7</p><br>
+                    
+                    <p>Nhà thầu được hướng dẫn thực hiện các thay đổi sau đây đối với các tài liệu hợp đồng:</p><br>
+                    
+                    <p><strong>Mô tả công việc đã Thêm / Xóa:</strong><br>
+                    Bây giờ khách hàng sẽ được cung cấp thêm mặt bàn và vòi bên cạnh tủ bếp. Do đó, tổng chi phí dự án sẽ được điều chỉnh để chỉ bao gồm chi phí lắp đặt.</p><br>
+                    
+                    <p><strong>Giá hợp đồng gốc:</strong> $3,496<br>
+                    <strong>Giảm ròng từ hợp đồng trước:</strong> -$2,412<br>
+                    <strong>Tổng chi phí dự án với các thay đổi được phê duyệt:</strong> $1,084</p><br>
+                    
+                    <p><strong>Lịch thanh toán sửa đổi:</strong><br>
+                    15% tổng chi phí dự án ($162) sẽ được trả trước cho nhà thầu an toàn. $222 được trả vào ngày bắt đầu dự án và phần còn lại ($700) được trả khi hoàn thành dự án.</p><br>
+                    
+                    <p><strong>Được chấp nhận bởi:</strong><br>
+                    Nhà thầu: Howard Kleiber<br>
+                    Chủ sở hữu tài sản: Oscar Copeland</p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 156,
+                    qEng: "Why has the price of a project been adjusted?",
+                    qVie: "Tại sao giá của một dự án đã được điều chỉnh?",
+                    options: [
+                        { key: "A", en: "The client is providing all the materials", vi: "Khách hàng đang cung cấp tất cả các vật liệu.", isCorrect: true },
+                        { key: "B", en: "The client wants to match a competitor's price.", vi: "Khách hàng muốn khớp giá của đối thủ cạnh tranh.", isCorrect: false },
+                        { key: "C", en: "The contractor installed countertops incorrectly.", vi: "Nhà thầu lắp đặt mặt bàn không chính xác.", isCorrect: false },
+                        { key: "D", en: "The contractor overestimated the cost of labor.", vi: "Nhà thầu đã đánh giá quá cao chi phí lao động.", isCorrect: false }
+                    ],
+                    evidenceId: "ev-156",
+                    expText: "Trong đoạn văn có giải thích lý do: “Client will now be supplying the countertops and faucet in addition to the kitchen cabinets... Therefore, the total project cost will be adjusted” (Khách hàng bây giờ sẽ cung cấp mặt bàn và vòi... Do đó, tổng chi phí dự án sẽ được điều chỉnh). Nghĩa là vì khách hàng tự cung cấp vật liệu (providing all the materials) nên giá mới giảm đi.",
+                    vocab: "<li><b>Adjust</b>: Điều chỉnh</li><li><b>Provide materials</b>: Cung cấp vật liệu</li><li><b>Countertop</b>: Bàn bếp</li>"
+                },
+                {
+                    id: 157,
+                    qEng: "How much money will Mr. Copeland most likely give Mr. Kleiber on July 15?",
+                    qVie: "Ông Copeland sẽ trả bao nhiêu tiền cho ông Kleiber vào ngày 15 tháng 7?",
+                    options: [
+                        { key: "A", en: "$162", vi: "$162", isCorrect: false },
+                        { key: "B", en: "$222", vi: "$222", isCorrect: false },
+                        { key: "C", en: "$700", vi: "$700", isCorrect: true },
+                        { key: "D", en: "$1,084", vi: "$1,084", isCorrect: false }
+                    ],
+                    evidenceId: "ev-157",
+                    expText: "Phần lịch thanh toán ghi: “the remainder ($700) is due upon project completion” (phần còn lại 700$ sẽ được trả KHI HOÀN THÀNH dự án). Nhìn lên trên, “Project End Date” (Ngày kết thúc/hoàn thành dự án) là July 15. Do đó vào ngày 15/7, số tiền cần trả là $700.",
+                    vocab: "<li><b>Remainder</b>: Phần còn lại</li><li><b>Upon completion</b>: Khi hoàn thành</li><li><b>Due</b>: Đến hạn (phải trả)</li>"
+                }
+            ]
+        },
+        {
+            id: 6,
+            engHtml: `
+                <div class="doc-box">
+                    <div class="email-header">
+                        <strong>To:</strong> Dahlia Pawar &lt;dpawar@bronsonco.ca&gt;<br>
+                        <strong>From:</strong> Anna Bondell &lt;abondell@noaaa.com&gt;<br>
+                        <strong>Subject:</strong> Information<br>
+                        <strong>Date:</strong> August 25
+                    </div>
+                    <p>Dear Ms. Pawar:</p><br>
+                    <p>Thank you for your <span id="ev-158" class="ev-box">continued membership in the North American Architects Association.</span> I'm writing to remind you that preregistration for the annual conference closes on September 15. - [1] - . This year's conference features more than 100 sessions, an exhibit hall, and special workshops. - [2] - .</p><br>
+                    <p><span id="ev-159" class="ev-box">Preregistration will save you $30 off the regular registration fee.</span> - [3] -. At the same time, you'll be able to <span id="ev-159-2" class="ev-box">sign up in advance for a group tour of the city and for the VIP Banquet</span>, which always fills up quickly. Visit <span id="ev-160" class="ev-box">our Web site</span> to register online. - [4] -. If you prefer to register by telephone, contact us at 1-249-555-0177. Please have your membership number available.</p><br>
+                    <p>Looking forward to seeing you in Mexico City!</p><br>
+                    <p>Sincerely,<br>Anna Bondell<br>Membership Coordinator</p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box">
+                    <div class="email-header">
+                        <strong>Tới:</strong> Dahlia Pawar &lt;dpawar@bronsonco.ca&gt;<br>
+                        <strong>Từ:</strong> Anna Bondell &lt;abondell@noaaa.com&gt;<br>
+                        <strong>Chủ đề:</strong> Thông tin<br>
+                        <strong>Ngày:</strong> 25 tháng 8
+                    </div>
+                    <p>Kính gửi cô Pawar:</p><br>
+                    <p>Cảm ơn bạn đã tiếp tục là thành viên của Hiệp hội Kiến trúc sư Bắc Mỹ. Tôi đang viết để nhắc bạn rằng việc đăng ký trước cho hội nghị thường niên sẽ kết thúc vào ngày 15 tháng 9 - [1] -. Hội nghị năm nay có hơn 100 phiên, một phòng triển lãm và các hội thảo đặc biệt. - [2] -.</p><br>
+                    <p>Việc đăng ký trước sẽ giúp bạn tiết kiệm được 30 đô la phí đăng ký thông thường. - [3] -. Đồng thời, bạn sẽ có thể đăng ký trước cho một chuyến tham quan nhóm của thành phố và cho bữa tiệc VIP, nơi luôn đầy ắp nhanh chóng. Ghé thăm trang web của chúng tôi để đăng ký trực tuyến. - [4] - . Nếu bạn muốn đăng ký qua điện thoại, liên hệ với chúng tôi theo số 1-249-555-0177. Vui lòng có sẵn số thành viên của bạn.</p><br>
+                    <p>Mong được gặp bạn ở Mexico City!</p><br>
+                    <p>Trân trọng,<br>Anna Bondell<br>Điều phối viên</p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 158,
+                    qEng: "What most likely is Ms. Pawar's occupation?",
+                    qVie: "Nghề nghiệp của cô Pawar là gì?",
+                    options: [
+                        { key: "A", en: "Architect", vi: "Kiến trúc sư", isCorrect: true },
+                        { key: "B", en: "Writer", vi: "Nhà văn", isCorrect: false },
+                        { key: "C", en: "Travel agent", vi: "Đại lý du lịch", isCorrect: false },
+                        { key: "D", en: "Conference organizer", vi: "Nhà tổ chức hội nghị", isCorrect: false }
+                    ],
+                    evidenceId: "ev-158",
+                    expText: "Đầu thư có cảm ơn: “continued membership in the North American Architects Association” (tiếp tục tư cách thành viên của Hiệp hội Kiến trúc sư Bắc Mỹ). Là thành viên của hội kiến trúc sư thì cô ấy chắc chắn làm nghề Kiến trúc sư (Architect).",
+                    vocab: "<li><b>Occupation</b>: Nghề nghiệp</li><li><b>Architect</b>: Kiến trúc sư</li>"
+                },
+                {
+                    id: 159,
+                    qEng: "What is NOT a benefit of conference preregistration?",
+                    qVie: "Điều gì KHÔNG phải là lợi ích của việc đăng ký trước cho hội nghị?",
+                    options: [
+                        { key: "A", en: "A tour of Mexico City", vi: "Một tour du lịch của Mexico City", isCorrect: false },
+                        { key: "B", en: "A hotel room upgrade", vi: "Nâng cấp phòng khách sạn", isCorrect: true },
+                        { key: "C", en: "Admission to a dinner", vi: "Vé vào một bữa ăn tối", isCorrect: false },
+                        { key: "D", en: "Reduced registration fees", vi: "Giảm phí đăng ký", isCorrect: false }
+                    ],
+                    evidenceId: "ev-159",
+                    expText: "Xét các lợi ích trong bài:<br>A (Tour thành phố): Có nhắc đến “tour of the city” (thành phố tổ chức là Mexico City).<br>C (Bữa tối): Có nhắc đến “VIP Banquet” (Banquet = bữa tiệc tối lớn).<br>D (Giảm phí): Có nhắc đến “save you $30 off the regular registration fee” (giảm 30$).<br>Chỉ có B (Nâng cấp phòng khách sạn) là KHÔNG xuất hiện.",
+                    vocab: "<li><b>Preregistration</b>: Việc đăng ký trước</li><li><b>Banquet = Dinner</b>: Bữa tiệc / Bữa ăn tối</li><li><b>Upgrade</b>: Nâng cấp</li>"
+                },
+                {
+                    id: 160,
+                    qEng: "In which of the positions marked [1], [2], [3], and [4] does the following sentence best belong? 'You will also find the complete conference program there.'",
+                    qVie: "Ở vị trí nào [1]-[4], câu sau phù hợp nhất? 'Bạn cũng sẽ tìm thấy chương trình hội nghị hoàn chỉnh ở đó.'",
+                    options: [
+                        { key: "A", en: "[1]", vi: "Vị trí [1]", isCorrect: false },
+                        { key: "B", en: "[2]", vi: "Vị trí [2]", isCorrect: false },
+                        { key: "C", en: "[3]", vi: "Vị trí [3]", isCorrect: false },
+                        { key: "D", en: "[4]", vi: "Vị trí [4]", isCorrect: true }
+                    ],
+                    evidenceId: "ev-160",
+                    expText: "Câu cần chèn có từ khóa “there” (ở đó), ám chỉ một địa điểm vừa được nhắc tới ngay trước nó. Trước vị trí [4] có câu: “Visit our Web site to register online” (Ghé thăm TRANG WEB CỦA CHÚNG TÔI...). Đặt vào vị trí [4] sẽ tạo liên kết logic: Ghé trang web, bạn cũng sẽ tìm thấy chương trình hội nghị 'ở đó' (trên web).",
+                    vocab: "<li><b>Belong</b>: Thuộc về, đặt vào vị trí phù hợp</li><li><b>Complete program</b>: Chương trình hoàn chỉnh</li>"
+                }
+            ]
+        },
+        {
+            id: 7,
+            engHtml: `
+                <div class="doc-box" style="background: #fafaf9;">
+                    <p><strong>Kurt Webber (4:30 P.M.)</strong><br><span id="ev-161" class="ev-box">Jake and I are grabbing a bite to eat after work, around 5:30.</span> Anyone care to join us?</p><br>
+                    <p><strong>Davi Avril (4:31 P.M.)</strong><br>Maybe. I still have some work to do on the midyear report. Where are you planning to go?</p><br>
+                    <p><strong>Kurt Webber (4:32 P.M.)</strong><br><span id="ev-163" class="ev-box">We're thinking of trying the new Mexican place on Slate Road. It's called Ocho Coronas.</span></p><br>
+                    <p><strong>Tim Foxx (4:33 P.M.)</strong><br>You're out of luck. <span id="ev-162" class="ev-box">That place closed a few days ago.</span></p><br>
+                    <p><strong>Kurt Webber (4:34 P.M.)</strong><br>That's too bad. I heard great things about it.</p><br>
+                    <p><strong>Tim Foxx (4:36 P.M.)</strong><br>How about Lotus Tacos around the corner? They always have a special menu on Fridays.</p><br>
+                    <p><strong>Kurt Webber (4:37 P.M.)</strong><br>That would be great. Do you want to go to Lotus Tacos, Jake?</p><br>
+                    <p><strong>Davi Avril (4:38 P.M.)</strong><br><span id="ev-164" class="ev-box">OK, but I won't be able to get there till about six.</span></p><br>
+                    <p><strong>Jake Rivas (4:39 P.M.)</strong><br>Sounds good to me. And Davi, I just sent you the updated figures for the report.</p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box" style="background: #fafaf9;">
+                    <p><strong>Kurt Webber (4:30 P.M.)</strong><br>Jake và tôi đang tìm một món để ăn sau giờ làm việc, khoảng 5:30. Có ai muốn tham gia với chúng tôi?</p><br>
+                    <p><strong>Davi Avril (4:31 P.M.)</strong><br>Có lẽ. Tôi vẫn còn một số việc phải làm trên báo cáo giữa năm. Bạn định đi đâu?</p><br>
+                    <p><strong>Kurt Webber (4:32 P.M.)</strong><br>Chúng tôi đang nghĩ đến việc thử quán Mexico mới trên Đường Slate. Nó được gọi là Ocho Coronas.</p><br>
+                    <p><strong>Tim Foxx (4:33 P.M.)</strong><br>Bạn xui rồi. Nơi đó đã đóng cửa vài ngày trước.</p><br>
+                    <p><strong>Kurt Webber (4:34 P.M.)</strong><br>Điều đó thật tệ. Tôi đã nghe những điều tuyệt vời về nó.</p><br>
+                    <p><strong>Tim Foxx (4:36 P.M.)</strong><br>Lotus Tacos gần đây thì sao? Họ luôn có một thực đơn đặc biệt vào thứ Sáu.</p><br>
+                    <p><strong>Kurt Webber (4:37 P.M.)</strong><br>Điều đó sẽ rất tuyệt. Bạn có muốn đến Lotus Tacos không, Jake?</p><br>
+                    <p><strong>Davi Avril (4:38 P.M.)</strong><br>OK, nhưng tôi sẽ không thể đến đó khoảng sáu giờ.</p><br>
+                    <p><strong>Jake Rivas (4:39 P.M.)</strong><br>Nghe có vẻ tốt với tôi. Và Davi, tôi vừa gửi cho bạn các số liệu cập nhật cho báo cáo.</p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 161,
+                    qEng: "What are the writers discussing?",
+                    qVie: "Các nhân vật đang thảo luận về điều gì?",
+                    options: [
+                        { key: "A", en: "Where to hold a company banquet", vi: "Nơi tổ chức tiệc công ty", isCorrect: false },
+                        { key: "B", en: "What restaurant serves the best food", vi: "Nhà hàng nào phục vụ thức ăn tốt nhất", isCorrect: false },
+                        { key: "C", en: "What is on the menu at Ocho Coronas", vi: "Có gì trong thực đơn tại Ocho Coronas", isCorrect: false },
+                        { key: "D", en: "Where to go for dinner", vi: "Đi ăn tối ở đâu", isCorrect: true }
+                    ],
+                    evidenceId: "ev-161",
+                    expText: "Câu đầu tiên Webber nhắn: “grabbing a bite to eat after work, around 5:30” (tìm đồ ăn sau giờ làm việc, tầm 5h30 chiều). Ăn vào buổi chiều tối sau giờ làm chính là đi ăn tối (go for dinner), và họ đang bàn luận xem đi ăn ở đâu.",
+                    vocab: "<li><b>Grab a bite to eat</b>: Ăn lót dạ, đi ăn gì đó</li><li><b>Banquet</b>: Bữa tiệc lớn</li>"
+                },
+                {
+                    id: 162,
+                    qEng: "What information does Mr. Foxx provide about Ocho Coronas?",
+                    qVie: "Foxx cung cấp thông tin gì về Ocho Coronas?",
+                    options: [
+                        { key: "A", en: "People have recommended it to him.", vi: "Mọi người đã giới thiệu nó cho anh ta.", isCorrect: false },
+                        { key: "B", en: "It usually opens early on Fridays.", vi: "Nó thường mở sớm vào thứ Sáu.", isCorrect: false },
+                        { key: "C", en: "The food there is not very authentic.", vi: "Thực phẩm ở đó không được chuẩn vị.", isCorrect: false },
+                        { key: "D", en: "It is no longer in business.", vi: "Nó không còn kinh doanh.", isCorrect: true }
+                    ],
+                    evidenceId: "ev-162",
+                    expText: "Khi Webber đề xuất ăn ở nhà hàng Ocho Coronas, Foxx báo lại: “That place closed a few days ago” (Nơi đó đã đóng cửa vài ngày trước). “Closed” đồng nghĩa với việc không còn hoạt động kinh doanh (no longer in business).",
+                    vocab: "<li><b>Closed = No longer in business</b>: Đã đóng cửa, ngừng kinh doanh</li><li><b>Authentic</b>: Chuẩn vị, đích thực</li>"
+                },
+                {
+                    id: 163,
+                    qEng: "At 4:34 P.M., why most likely does Mr. Webber write, 'That's too bad'?",
+                    qVie: "Vào lúc 4:34 P.M., tại sao Webber viết 'Điều đó quá tệ'?",
+                    options: [
+                        { key: "A", en: "He wanted to try a new restaurant.", vi: "Anh ấy muốn thử một nhà hàng mới.", isCorrect: true },
+                        { key: "B", en: "Mr. Foxx cannot complete a project.", vi: "Foxx không thể hoàn thành một dự án.", isCorrect: false },
+                        { key: "C", en: "Slate Road is too far away.", vi: "Slate Road quá xa.", isCorrect: false },
+                        { key: "D", en: "He has a scheduling conflict.", vi: "Anh ấy có một xung đột lịch trình.", isCorrect: false }
+                    ],
+                    evidenceId: "ev-163",
+                    expText: "Ngay trước đó Webber háo hức đề xuất: “We're thinking of trying the new Mexican place... Ocho Coronas” (Chúng tôi đang tính thử quán mới...). Nhưng nghe tin quán đóng cửa, anh thất vọng nói “That's too bad”. Sự thất vọng này xuất phát từ việc ý định thử nhà hàng mới (wanted to try a new restaurant) của anh bị dập tắt.",
+                    vocab: "<li><b>Try a new restaurant</b>: Dùng thử nhà hàng mới</li><li><b>Scheduling conflict</b>: Trùng lịch, xung đột lịch trình</li>"
+                },
+                {
+                    id: 164,
+                    qEng: "What does Mr. Avril decide to do?",
+                    qVie: "Avril quyết định làm gì?",
+                    options: [
+                        { key: "A", en: "Research nearby restaurants", vi: "Nghiên cứu các nhà hàng gần đó", isCorrect: false },
+                        { key: "B", en: "Work extra hours tomorrow", vi: "Làm thêm giờ vào ngày mai", isCorrect: false },
+                        { key: "C", en: "Join his coworkers for a meal", vi: "Tham gia cùng đồng nghiệp của anh ấy cho một bữa ăn", isCorrect: true },
+                        { key: "D", en: "Have food delivered to the office", vi: "Gọi thức ăn giao đến văn phòng", isCorrect: false }
+                    ],
+                    evidenceId: "ev-164",
+                    expText: "Đầu đoạn chat, Avril nói “Maybe” (Có lẽ) khi được rủ đi ăn. Nhưng sau khi cả nhóm chốt sẽ ăn ở Lotus Tacos, Avril trả lời: “OK, but I won't be able to get there till about six” (OK, nhưng phải tới 6h tôi mới đến đó được). Việc nói “OK” và hẹn giờ đến chứng tỏ anh ấy đã đồng ý tham gia đi ăn cùng nhóm (Join his coworkers for a meal).",
+                    vocab: "<li><b>Coworker</b>: Đồng nghiệp</li><li><b>Join</b>: Tham gia cùng</li>"
+                }
+            ]
+        },
+        {
+            id: 8,
+            engHtml: `
+                <div class="doc-box">
+                    <div class="email-header">
+                        <strong>Multinational Voice Magazine</strong><br>
+                        PO Box 17999, Greenlane, Auckland 1546<br><br>
+                        Tuata Wehi<br>
+                        16 Page Street, Wellington 6023
+                    </div>
+                    <p>Dear Mr. Wehi,</p><br>
+                    <p>On 25 March, <span id="ev-166" class="ev-box">your three-month trial subscription</span> to Multinational Voice Magazine will expire. <span id="ev-165" class="ev-box">To continue to receive this vital news resource, please fill out the postage-paid renewal card included with this letter</span> and mail it in before the end of this month. You may select from a three-month, six-month, one-year, or two-year subscription. Do note that our two-year offer is by far the most economical. Also, the one- and two-year options include the "Notable People of the Year" special edition.</p><br>
+                    <p>Thank you once again for choosing Multinational Voice Magazine. We continually strive to provide the best commentary on global affairs from a New Zealand perspective. <span id="ev-167" class="ev-box">To provide your feedback, please visit www.mvmagazine.co.nz and fill out our online comment form.</span></p><br>
+                    <p>Sincerely,<br>Estelle Pearson, Customer Service Representative</p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box">
+                    <div class="email-header">
+                        <strong>Tạp chí thoại Đa Quốc Gia</strong><br>
+                        Hộp thư 17999, Greenlane, Auckland 1546<br><br>
+                        Tuata Wehi<br>
+                        Đường 16 Page, Wellington 6023
+                    </div>
+                    <p>Thưa ông Wehi,</p><br>
+                    <p>Vào ngày 25 tháng 3, đăng ký dùng thử ba tháng của ông cho Tạp chí thoại Đa Quốc Gia sẽ hết hạn. Để tiếp tục nhận những nguồn tin tức quan trọng này, vui lòng điền vào thẻ gia hạn trả phí bưu chính kèm theo thư này và gửi thư trước khi kết thúc tháng này. Ông có thể chọn từ đăng ký ba tháng, sáu tháng, một năm hoặc hai năm. Xin lưu ý rằng đề nghị hai năm của chúng tôi cho đến nay là tiết kiệm nhất. Ngoài ra, các tùy chọn một và hai năm bao gồm phiên bản đặc biệt "Những người đáng chú ý của năm".</p><br>
+                    <p>Cảm ơn ông một lần nữa vì đã chọn Tạp chí thoại Đa Quốc Gia. Chúng tôi liên tục cố gắng để cung cấp các bình luận tốt nhất về các vấn đề toàn cầu từ quan điểm của New Zealand. Để cung cấp phản hồi của ông, vui lòng truy cập www.mvmagazine.co.nz và điền vào mẫu nhận xét trực tuyến của chúng tôi.</p><br>
+                    <p>Trân trọng,<br>Estelle Pearson, Đại diện dịch vụ khách hàng</p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 165,
+                    qEng: "Why was the letter sent to Mr. Wehi?",
+                    qVie: "Tại sao bức thư được gửi cho ông Wehi?",
+                    options: [
+                        { key: "A", en: "To report a late payment", vi: "Để báo cáo một khoản thanh toán trễ", isCorrect: false },
+                        { key: "B", en: "To offer him a refund", vi: "Cung cấp cho ông ta một khoản hoàn lại", isCorrect: false },
+                        { key: "C", en: "To promote a new service", vi: "Để quảng bá một dịch vụ mới", isCorrect: false },
+                        { key: "D", en: "To remind him to resubscribe", vi: "Để nhắc ông ấy đăng ký lại", isCorrect: true }
+                    ],
+                    evidenceId: "ev-165",
+                    expText: "Trong văn bản có nói: “your trial subscription... will expire. To continue... please fill out the renewal card” (Đăng ký dùng thử của ông sắp hết hạn. Để tiếp tục, xin hãy điền vào thẻ gia hạn). “Gia hạn” (renewal) chính là việc yêu cầu khách hàng đăng ký lại (resubscribe).",
+                    vocab: "<li><b>Subscription</b>: Sự đặt mua/đăng ký dài hạn</li><li><b>Expire</b>: Hết hạn</li><li><b>Renewal / Resubscribe</b>: Gia hạn / Đăng ký lại</li>"
+                },
+                {
+                    id: 166,
+                    qEng: "For about how long has Mr. Wehi been receiving Multinational Voice Magazine?",
+                    qVie: "Ông Wehi đã nhận được Tạp chí trong bao lâu?",
+                    options: [
+                        { key: "A", en: "For three months", vi: "Trong ba tháng", isCorrect: true },
+                        { key: "B", en: "For six months", vi: "Trong sáu tháng", isCorrect: false },
+                        { key: "C", en: "For one year", vi: "Trong một năm", isCorrect: false },
+                        { key: "D", en: "For two years", vi: "Trong hai năm", isCorrect: false }
+                    ],
+                    evidenceId: "ev-166",
+                    expText: "Trong thư báo: “your three-month trial subscription will expire” (đăng ký dùng thử BA THÁNG của ông sắp hết hạn). Điều này có nghĩa là gói dùng thử kéo dài 3 tháng đã sắp sửa chạy hết thời gian, tức là ông ấy đã nhận báo trong khoảng thời gian 3 tháng đó.",
+                    vocab: "<li><b>Trial</b>: Dùng thử</li><li><b>For how long</b>: Trong khoảng thời gian bao lâu</li>"
+                },
+                {
+                    id: 167,
+                    qEng: "What is one thing that Mr. Wehi is encouraged to do?",
+                    qVie: "Một điều mà ông Wehi được khuyến khích làm là gì?",
+                    options: [
+                        { key: "A", en: "Call Ms. Pearson directly", vi: "Gọi trực tiếp cho bà Pearson", isCorrect: false },
+                        { key: "B", en: "Offer his opinion", vi: "Đưa ra ý kiến của mình", isCorrect: true },
+                        { key: "C", en: "Attend an event", vi: "Tham dự một sự kiện", isCorrect: false },
+                        { key: "D", en: "Confirm his address", vi: "Xác nhận địa chỉ của anh ấy", isCorrect: false }
+                    ],
+                    evidenceId: "ev-167",
+                    expText: "Đoạn cuối thư viết: “To provide your feedback, please visit www.mvmagazine.co.nz...” (Để CUNG CẤP PHẢN HỒI, vui lòng truy cập...). “Feedback” (Phản hồi/Nhận xét) đồng nghĩa với việc đưa ra ý kiến cá nhân (Offer his opinion).",
+                    vocab: "<li><b>Encourage</b>: Khuyến khích</li><li><b>Feedback = Opinion</b>: Phản hồi, ý kiến</li>"
+                }
+            ]
+        },
+        {
+            id: 9,
+            engHtml: `
+                <div class="doc-box">
+                    <div class="email-header">
+                        <strong>From:</strong> info@morganairportshuttle.com<br>
+                        <strong>To:</strong> tgrant@tivimail.com<br>
+                        <strong>Subject:</strong> re: Suitcase on board<br>
+                        <strong>Date:</strong> January 19
+                    </div>
+                    <p>Dear Mr. Grant,</p><br>
+                    <p>Thanks for your inquiry. <span id="ev-169" class="ev-box">There are a number of suitcases in our storeroom that match the description you provided</span>, but we have not found one bearing a name tag identifying you as the owner. You will need to come over and find yours on-site at 620 Baker St. Please note that <span id="ev-170" class="ev-box">you will be asked to indicate what time your bus left the airport terminal</span> or, better yet, to present your ticket if you still have it.</p><br>
+                    <p>We are open 6 A.M.-10 P.M. every day. <span id="ev-171" class="ev-box">Please do not delay.</span> Due to the large number of items found by our drivers, we have no choice but to limit storage time to 7 days only, after which we dispose of the item.</p><br>
+                    <p>Regards,<br><span id="ev-168" class="ev-box">Gina Steiner<br>Morgan Airport Shuttle</span></p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box">
+                    <div class="email-header">
+                        <strong>Từ:</strong> info@morganairportshuttle.com<br>
+                        <strong>Tới:</strong> tgrant@tivimail.com<br>
+                        <strong>Chủ đề:</strong> re: Vali trên xe<br>
+                        <strong>Ngày:</strong> 19 tháng 1
+                    </div>
+                    <p>Thưa ông Grant,</p><br>
+                    <p>Cảm ơn về yêu cầu của bạn. Có một số vali trong kho của chúng tôi phù hợp với mô tả mà bạn cung cấp, nhưng chúng tôi không tìm thấy một chiếc nào mang thẻ tên xác định bạn là chủ sở hữu. Bạn sẽ cần đến và tìm thấy cái của bạn ngay địa điểm tại 620 đường Baker. Xin lưu ý rằng bạn sẽ được yêu cầu cho biết thời gian xe buýt của bạn rời nhà ga sân bay hoặc tốt hơn là xuất trình vé nếu bạn vẫn còn vé.</p><br>
+                    <p>Chúng tôi mở cửa từ 6 A.M. đến 10 P.M. mỗi ngày. Xin đừng trì hoãn. Do số lượng lớn các món đồ được tìm thấy bởi các tài xế của chúng tôi, chúng tôi không có lựa chọn nào khác ngoài việc giới hạn thời gian lưu trữ chỉ trong 7 ngày, sau đó chúng tôi sẽ xử lý mặt hàng đó.</p><br>
+                    <p>Trân trọng,<br>Gina Steiner<br>Xe đưa đón sân bay Morgan</p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 168,
+                    qEng: "Where does Ms. Steiner work?",
+                    qVie: "Cô Steiner làm việc ở đâu?",
+                    options: [
+                        { key: "A", en: "At a transportation service", vi: "Tại một dịch vụ vận chuyển", isCorrect: true },
+                        { key: "B", en: "At an insurance company", vi: "Tại một công ty bảo hiểm", isCorrect: false },
+                        { key: "C", en: "At a car rental company", vi: "Tại một công ty cho thuê xe hơi", isCorrect: false },
+                        { key: "D", en: "At a travel agency", vi: "Tại một công ty du lịch", isCorrect: false }
+                    ],
+                    evidenceId: "ev-168",
+                    expText: "Chữ ký ở cuối e-mail ghi chức danh/nơi làm việc của cô Steiner là “Morgan Airport Shuttle” (Xe đưa đón sân bay Morgan). Đây là một công ty cung cấp xe buýt đưa rước sân bay, tức là hoạt động trong lĩnh vực dịch vụ vận chuyển (transportation service).",
+                    vocab: "<li><b>Shuttle</b>: Xe đưa đón (chạy tuyến cố định)</li><li><b>Transportation service</b>: Dịch vụ vận tải / chuyên chở</li>"
+                },
+                {
+                    id: 169,
+                    qEng: "What did Mr. Grant most likely inquire about?",
+                    qVie: "Ông Grant có thể đã yêu cầu/hỏi về vấn đề gì nhất?",
+                    options: [
+                        { key: "A", en: "Reservation options", vi: "Lựa chọn đặt phòng/vé", isCorrect: false },
+                        { key: "B", en: "Luggage limitations", vi: "Các giới hạn về hành lý", isCorrect: false },
+                        { key: "C", en: "Travel expenses", vi: "Các chi phí đi lại", isCorrect: false },
+                        { key: "D", en: "Lost property", vi: "Tài sản bị mất", isCorrect: true }
+                    ],
+                    evidenceId: "ev-169",
+                    expText: "Công ty phản hồi: “There are a number of suitcases in our storeroom that match the description you provided...” (Có một số vali trong kho của chúng tôi khớp với mô tả mà bạn cung cấp). Việc ông ấy mô tả hình dáng chiếc vali và công ty đang giúp tìm trong kho đồ thất lạc chứng tỏ ông ấy đang hỏi thăm về tài sản bị đánh mất (lost property).",
+                    vocab: "<li><b>Inquire</b>: Hỏi thăm, dò hỏi</li><li><b>Suitcase / Luggage</b>: Vali / Hành lý</li><li><b>Lost property</b>: Tài sản bị thất lạc</li>"
+                },
+                {
+                    id: 170,
+                    qEng: "What information will Mr. Grant be asked to provide?",
+                    qVie: "Ông Grant sẽ được yêu cầu cung cấp thông tin gì?",
+                    options: [
+                        { key: "A", en: "His address", vi: "Địa chỉ của ông ấy", isCorrect: false },
+                        { key: "B", en: "His phone number", vi: "Số điện thoại của ông ấy", isCorrect: false },
+                        { key: "C", en: "His departure time", vi: "Thời điểm rời đi của ông ấy", isCorrect: true },
+                        { key: "D", en: "His final destination", vi: "Nơi đến cuối cùng của anh ấy", isCorrect: false }
+                    ],
+                    evidenceId: "ev-170",
+                    expText: "Thư ghi rõ: “you will be asked to indicate what time your bus left the airport terminal” (bạn sẽ được yêu cầu chỉ ra THỜI GIAN xe buýt của bạn RỜI KHỎI nhà ga sân bay). Thời gian xe rời khỏi ga chính là thời gian xuất phát/khởi hành (departure time).",
+                    vocab: "<li><b>Indicate</b>: Chỉ ra, cho biết</li><li><b>Departure time</b>: Thời gian khởi hành / rời đi</li>"
+                },
+                {
+                    id: 171,
+                    qEng: "What is Mr. Grant advised to do?",
+                    qVie: "Ông Grant được khuyên làm điều gì?",
+                    options: [
+                        { key: "A", en: "Take advantage of a discount", vi: "Tận dụng phần giảm giá", isCorrect: false },
+                        { key: "B", en: "Compare payment options", vi: "So sánh các lựa chọn thanh toán", isCorrect: false },
+                        { key: "C", en: "Visit the office as soon as possible", vi: "Ghé thăm văn phòng càng sớm càng tốt", isCorrect: true },
+                        { key: "D", en: "Print out an electronic ticket", vi: "In ra vé điện tử", isCorrect: false }
+                    ],
+                    evidenceId: "ev-171",
+                    expText: "Bên cạnh việc nói ông ấy cần đến văn phòng lấy (come over and find yours on-site), thư còn nhấn mạnh: “Please do not delay... limit storage time to 7 days only” (Xin ĐỪNG TRÌ HOÃN... chỉ giữ đồ trong 7 ngày). Đừng trì hoãn có nghĩa là ông ấy cần phải đến văn phòng sớm nhất có thể (as soon as possible).",
+                    vocab: "<li><b>Advise</b>: Khuyên bảo</li><li><b>Do not delay</b>: Đừng trì hoãn</li><li><b>As soon as possible</b>: Càng sớm càng tốt</li>"
+                }
+            ]
+        },
+        {
+            id: 10,
+            engHtml: `
+                <div class="doc-box">
+                    <h3 class="center-text" style="color: var(--primary-dark);">Spectacular Bridge Created with Super Cranes</h3>
+                    <p class="center-text">By Marcia Brunon | March 14</p><br>
+                    <p>Five years ago, the town of Stonewell, situated at the foot of the Marshall Mountains, decided to finance the building of a bridge across the Stonewell River. It was planned as a much-needed northern route for the town. ---- [1] --- . The efficiency of the project was directly attributable to two RWC451 cranes, manufactured by Ronsonworks, a company based in England.</p><br>
+                    <p>The two identical tower cranes were owned by the construction firm Redding Builders. <span id="ev-172" class="ev-box">One crane was assembled at the south bank of the river, while the other one was placed on a concrete pylon in the center of the Stonewell River.</span> -- [2] --. The assembly of the second crane was particularly challenging, as it required the use of another crane on a floating barge.</p><br>
+                    <p>"<span id="ev-173" class="ev-box">Any large project is going to require unforeseen adjustments that may disrupt an official construction schedule</span>," said Roger Lee, chief engineer of Redding Builders. -- [3] -- . In this case, the metal anchors that connected the bridge to the pylons were determined to be too small. The new anchors weighed 22 tons, which is within the safe lifting capacity of an RWC451 crane. -- [4] -- . Engineers reinforced the existing cranes for extra security, and the cranes performed well.</p><br>
+                    <p>Today, this postcard-worthy bridge is the pride of Stonewell, featuring viewing platforms for pedestrians, hikers, and visitors at the base of each pier overlooking the mountainous valley. <span id="ev-174" class="ev-box">Construction materials and colors harmonize beautifully with the local environment. All design elements, including the piers, viewing platforms, and railings, complement the natural landscape</span>, making the bridge a hit with everyone from hikers to the truck drivers who now include it in their regular route.</p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box">
+                    <h3 class="center-text" style="color: var(--primary-dark);">Chiếc cầu ngoạn mục được tạo ra với siêu cần cẩu</h3>
+                    <p class="center-text">Tác giả Marcia | Ngày 14 tháng 3</p><br>
+                    <p>Năm năm trước, thị trấn Stonewell, nằm dưới chân dãy núi Marshall, đã quyết định tài trợ cho việc xây dựng một cây cầu bắc qua sông Stonewell. Nó đã được lên kế hoạch như một tuyến đường phía bắc rất cần thiết cho thị trấn. ---- [1] ---. Hiệu quả của dự án là trực tiếp nhờ vào hai cần cẩu RWC451, được sản xuất bởi Ronsonworks, một công ty có trụ sở tại Anh.</p><br>
+                    <p>Hai cần cẩu tháp giống hệt nhau thuộc sở hữu của công ty xây dựng Redding Builders. Một cần cẩu đã được lắp ráp ở bờ nam của dòng sông, trong khi một cần cẩu khác được đặt trên một trụ bê tông ở trung tâm của sông Stonewell. - [2] -. Việc lắp ráp cần cẩu thứ hai đặc biệt khó khăn, vì nó yêu cầu sử dụng một cần cẩu khác trên sà lan nổi.</p><br>
+                    <p>"Bất kỳ dự án lớn nào cũng sẽ yêu cầu những điều chỉnh không lường trước có thể gây gián đoạn lịch trình xây dựng chính thức, "Roger Lee, kỹ sư trưởng của Redding Builders nói. - [3] -. Trong trường hợp này, các neo kim loại nối cầu với trụ được xác định là quá nhỏ. Các neo mới nặng 22 tấn, vốn nằm trong khả năng nâng hạ an toàn của cần cẩu RWC451. - [4] -. Các kỹ sư đã gia cố các cần cẩu hiện có để gia tăng sự an toàn hơn, và các cần cẩu hoạt động tốt.</p><br>
+                    <p>Ngày nay, cây cầu đẹp như trên bưu thiếp này là niềm tự hào của Stonewell, có các bệ ngắm cảnh cho người đi bộ, người đi bộ đường dài và du khách ở chân của mỗi trụ cầu nhìn ra thung lũng núi. Vật liệu xây dựng và màu sắc hài hòa tuyệt đẹp với môi trường địa phương. Tất cả các yếu tố thiết kế, bao gồm cả trụ cầu, bệ ngắm cảnh và lan can, bổ sung cho cảnh quan thiên nhiên, làm cho cây cầu trở thành điểm nhấn với tất cả mọi người từ những người đi bộ đường dài cho đến những tài xế xe tải hiện đang đưa nó vào tuyến đường thường xuyên của họ.</p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 172,
+                    qEng: "What is mentioned about the cranes?",
+                    qVie: "Điều gì được nhắc đến về những cần cẩu?",
+                    options: [
+                        { key: "A", en: "They are owned by Ronsonworks.", vi: "Chúng thuộc sở hữu của Ronsonworks.", isCorrect: false },
+                        { key: "B", en: "They were designed specifically for the Stonewell Bridge project.", vi: "Chúng được thiết kế dành riêng cho dự án Cầu Stonewell.", isCorrect: false },
+                        { key: "C", en: "They were assembled on the Stonewell Bridge construction site.", vi: "Chúng được lắp ráp trên công trường xây dựng cầu Stonewell.", isCorrect: true },
+                        { key: "D", en: "They weigh more than 22 tons.", vi: "Chúng nặng hơn 22 tấn.", isCorrect: false }
+                    ],
+                    evidenceId: "ev-172",
+                    expText: "Đoạn 2 mô tả chi tiết: “One crane was assembled at the south bank of the river, while the other one was placed on a concrete pylon in the center of the Stonewell River” (Một cẩu được lắp ráp ở bờ nam, một cái đặt ở giữa sông Stonewell). Vị trí trên sông này chính là công trường xây dựng chiếc cầu (construction site).",
+                    vocab: "<li><b>Crane</b>: Cần cẩu</li><li><b>Assemble</b>: Lắp ráp</li><li><b>Construction site</b>: Công trường xây dựng</li>"
+                },
+                {
+                    id: 173,
+                    qEng: "What is indicated by Mr. Lee?",
+                    qVie: "Những gì được chỉ ra bởi ông Lee?",
+                    options: [
+                        { key: "A", en: "His professional specialty is bridge construction.", vi: "Chuyên môn của anh ấy là xây dựng cầu.", isCorrect: false },
+                        { key: "B", en: "He believes that projects like the Stonewell Bridge always present problems.", vi: "Ông tin rằng các dự án như Cầu Stonewell luôn có vấn đề.", isCorrect: true },
+                        { key: "C", en: "He delayed the Stonewell Bridge project for budgetary reasons.", vi: "Ông đã trì hoãn dự án Stonewell Bridge vì lý do ngân sách.", isCorrect: false },
+                        { key: "D", en: "His first project as a chief engineer was the Stonewell Bridge.", vi: "Dự án đầu tiên của anh với tư cách là kỹ sư trưởng là Cầu Stonewell", isCorrect: false }
+                    ],
+                    evidenceId: "ev-173",
+                    expText: "Kỹ sư trưởng Lee chia sẻ: “Any large project is going to require unforeseen adjustments that may disrupt...” (Bất kỳ dự án lớn nào cũng sẽ đòi hỏi những điều chỉnh không lường trước làm gián đoạn...). Phát biểu “Any large project” ám chỉ ông ấy tin rằng những dự án lớn (như cầu Stonewell này) sẽ luôn luôn phát sinh vấn đề/thách thức (always present problems).",
+                    vocab: "<li><b>Unforeseen adjustments</b>: Những điều chỉnh không lường trước được</li><li><b>Disrupt</b>: Làm gián đoạn</li><li><b>Present problems</b>: Xuất hiện/Gây ra vấn đề</li>"
+                },
+                {
+                    id: 174,
+                    qEng: "What is NOT suggested about the Stonewell Bridge?",
+                    qVie: "Điều gì KHÔNG được gợi ý về Cầu Stonewell?",
+                    options: [
+                        { key: "A", en: "It provides a northward exit out of town.", vi: "Nó cung cấp một lối ra phía bắc ra khỏi thị trấn.", isCorrect: false },
+                        { key: "B", en: "It was designed for both pedestrians and vehicles.", vi: "Nó được thiết kế cho cả người đi bộ và xe cộ.", isCorrect: false },
+                        { key: "C", en: "It was designed to blend with the natural setting.", vi: "Nó được thiết kế để hòa vào khung cảnh tự nhiên.", isCorrect: false },
+                        { key: "D", en: "It required more workers than first estimated.", vi: "Nó đòi hỏi nhiều công nhân hơn so với ước tính đầu tiên.", isCorrect: true }
+                    ],
+                    evidenceId: "ev-174",
+                    expText: "Đối chiếu các đáp án:<br>A: Có nhắc “northern route for the town” (tuyến đường phía bắc).<br>B: Có nhắc “pedestrians... truck drivers” (người đi bộ và tài xế xe tải/xe cộ).<br>C: Có nhắc “materials and colors harmonize beautifully... complement the natural landscape” (hòa quyện với cảnh quan thiên nhiên).<br>D (Đòi hỏi nhiều công nhân hơn ước tính) hoàn toàn KHÔNG ĐƯỢC ĐỀ CẬP.",
+                    vocab: "<li><b>Pedestrian</b>: Người đi bộ</li><li><b>Blend with</b>: Hòa trộn, hòa quyện với</li><li><b>Estimate</b>: Ước tính</li>"
+                },
+                {
+                    id: 175,
+                    qEng: "In which of the positions marked [1], [2], [3], and [4] does the following sentence best belong? 'The project, which was expected to take four years, was completed in less than three.'",
+                    qVie: "Vị trí nào [1]-[4] phù hợp với câu sau: 'Dự án, dự kiến mất 4 năm, đã hoàn thành trong chưa đầy 3 năm.'",
+                    options: [
+                        { key: "A", en: "[1]", vi: "Vị trí [1]", isCorrect: true },
+                        { key: "B", en: "[2]", vi: "Vị trí [2]", isCorrect: false },
+                        { key: "C", en: "[3]", vi: "Vị trí [3]", isCorrect: false },
+                        { key: "D", en: "[4]", vi: "Vị trí [4]", isCorrect: false }
+                    ],
+                    evidenceId: "ev-175",
+                    expText: "Câu này cung cấp thông tin tổng quan về thời gian hoàn thành (hoàn thành sớm hơn dự kiến). Vị trí [1] ở cuối phần giới thiệu tổng quan về dự án. Đặt câu này ở [1] rất logic vì câu ngay sau nó giải thích nguyên nhân hoàn thành nhanh: “The efficiency of the project was directly attributable to two RWC451 cranes” (Hiệu quả của dự án trực tiếp nhờ vào 2 chiếc cẩu).",
+                    vocab: "<li><b>Take four years</b>: Mất 4 năm</li><li><b>Efficiency</b>: Sự hiệu quả, năng suất</li>"
+                }
+            ]
+        }
+      ,
+        {
+            // PASSAGE 11: Câu 176-180
+            id: 11,
+            engHtml: `
+                <div class="doc-box">
+                    <div class="email-header">
+                        <strong>To:</strong> Absalom and Twigg Law Firm employees<br>
+                        <strong>From:</strong> Shawna Montgomery, Office Manager<br>
+                        <strong>Subject:</strong> March plans<br>
+                        <strong>Sent:</strong> February 12<br>
+                        <strong>Attachment:</strong> Schedule
+                    </div>
+                    <p>As most of you are aware, our schedule will be a bit challenging during the first week in March. <span id="ev-176" class="ev-box">Various rooms and offices will need to be vacated for certain periods to allow work crews to repaint, recarpet, and replace old furniture.</span> <span id="ev-179" class="ev-box">Affected employees will need to box up all their office items by 3 P.M. on the day before their room is scheduled for work</span> (please see the attached schedule). Two teams of workers will be on-site, so more than one room at a time will need to be vacated. Note that any rooms due for work on Monday must be packed up and vacated by Friday afternoon, February 27.</p><br>
+                    
+                    <p>Boxes will be provided. Leave your boxes in the rooms for the work crews to remove. <span id="ev-177" class="ev-box">Please label them with your name and office number</span> so that the crews can return them to the correct offices once the work is complete.</p><br>
+                    
+                    <p>Please make arrangements to continue working on your assignments while the work crews are in your rooms. <span id="ev-178" class="ev-box">The conference room (Room 409) will remain available to be used as a workspace</span> during the entire week. Another possible option is to request permission from your supervisor to telecommute for one or two days.</p><br>
+                    
+                    <p>Please have patience with these temporary inconveniences and do not hesitate to contact me with any questions or concerns.</p>
+                    
+                    <hr class="divider" style="margin: 20px 0; border: 0; border-top: 2px dashed #e9edc9;">
+                    
+                    <h3 class="center-text" style="color: var(--primary-dark);">WORK SCHEDULE - March 2 to March 6</h3>
+                    <table class="table-data" style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                        <tr><th colspan="2" style="background: #faedcd;">MONDAY, March 2</th></tr>
+                        <tr><td>Room 401 (Meeting room)</td><td>Room 403 (Allie Stevens & Matt Beale)</td></tr>
+                        <tr><th colspan="2" style="background: #faedcd;">TUESDAY, March 3</th></tr>
+                        <tr><td colspan="2">-</td></tr>
+                        <tr><th colspan="2" style="background: #faedcd;">WEDNESDAY, March 4</th></tr>
+                        <tr><td><span id="ev-179-2" class="ev-box">Room 402 (Marlene Asbury</span> & Luke Roe)</td><td>Room 408 (Meeting room)</td></tr>
+                        <tr><th colspan="2" style="background: #faedcd;">THURSDAY, March 5</th></tr>
+                        <tr><td colspan="2">-</td></tr>
+                        <tr><th colspan="2" style="background: #faedcd;">FRIDAY, March 6</th></tr>
+                        <tr><td>Room 407 (Jung Li)</td><td><span id="ev-180" class="ev-box">Room 404 (Elliot Hagburg & Ana Keller)</span></td></tr>
+                    </table>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box">
+                    <div class="email-header">
+                        <strong>Kính gửi:</strong> Các nhân viên của Công ty Luật Absalom và Twigg<br>
+                        <strong>Từ:</strong> Shawna Montgomery, Giám đốc văn phòng<br>
+                        <strong>Chủ đề:</strong> Kế hoạch tháng 3<br>
+                        <strong>Đã gửi:</strong> Ngày 12 tháng 2<br>
+                        <strong>Đính kèm:</strong> Lịch trình
+                    </div>
+                    <p>Như hầu hết các bạn đều biết, lịch trình của chúng ta sẽ có một chút thách thức trong tuần đầu tiên vào tháng Ba. Nhiều phòng và văn phòng khác nhau sẽ cần phải được bỏ trống trong một số giai đoạn nhất định để cho phép các đội làm việc sơn lại, trải lại thảm và thay thế đồ nội thất cũ. Các nhân viên bị ảnh hưởng sẽ cần phải đóng gói tất cả các đồ dùng văn phòng của họ trước 3 P.M. vào ngày trước khi phòng của họ được lên lịch làm việc (vui lòng xem lịch trình đính kèm). Hai đội công nhân sẽ có mặt tại chỗ làm, vì vậy nhiều hơn một phòng tại một thời điểm sẽ cần phải được bỏ trống. Lưu ý rằng bất kỳ phòng nào đến hạn làm việc vào thứ Hai phải được đóng gói và bỏ trống vào chiều thứ Sáu, ngày 27 tháng 2.</p><br>
+                    
+                    <p>Những hộp giấy sẽ được cung cấp. Để hộp của bạn trong phòng để các nhóm công nhân di chuyển đi. Vui lòng dán nhãn với tên và số văn phòng của bạn để các công nhân có thể đưa chúng trở lại đúng văn phòng sau khi hoàn thành.</p><br>
+                    
+                    <p>Vui lòng sắp xếp để tiếp tục làm các phần việc của bạn trong khi các nhóm công nhân ở tại phòng của bạn. Phòng hội thảo (Phòng 409) sẽ vẫn có sẵn để được sử dụng làm không gian làm việc trong cả tuần. Một lựa chọn khác có thể là yêu cầu sự cho phép từ người giám sát của bạn để làm việc từ xa trong một hoặc hai ngày.</p><br>
+                    
+                    <p>Xin hãy kiên nhẫn với những bất tiện tạm thời này và đừng ngần ngại liên hệ với tôi với bất kỳ câu hỏi hoặc thắc mắc nào.</p>
+                    
+                    <hr class="divider" style="margin: 20px 0; border: 0; border-top: 2px dashed #e9edc9;">
+                    
+                    <h3 class="center-text" style="color: var(--primary-dark);">LỊCH TRÌNH - 2/3 đến 6/3</h3>
+                    <table class="table-data" style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                        <tr><th colspan="2" style="background: #faedcd;">THỨ HAI, 2 tháng 3</th></tr>
+                        <tr><td>Phòng 401 (Phòng họp)</td><td>Phòng 403 (Allie Stevens & Matt Beale)</td></tr>
+                        <tr><th colspan="2" style="background: #faedcd;">THỨ BA, 3 tháng 3</th></tr>
+                        <tr><td colspan="2">-</td></tr>
+                        <tr><th colspan="2" style="background: #faedcd;">THỨ TƯ, 4 tháng 3</th></tr>
+                        <tr><td>Phòng 402 (Marlene Asbury & Luke Roe)</td><td>Phòng 408 (Phòng họp)</td></tr>
+                        <tr><th colspan="2" style="background: #faedcd;">THỨ NĂM, 5 tháng 3</th></tr>
+                        <tr><td colspan="2">-</td></tr>
+                        <tr><th colspan="2" style="background: #faedcd;">THỨ SÁU, 6 tháng 3</th></tr>
+                        <tr><td>Phòng 407 (Jung Li)</td><td>Phòng 404 (Elliot Hagburg & Ana Keller)</td></tr>
+                    </table>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 176,
+                    qEng: "Why was the memo sent to employees?",
+                    qVie: "Tại sao bản ghi nhớ được gửi cho nhân viên?",
+                    options: [
+                        { key: "A", en: "To alert them to upcoming renovations", vi: "Để cảnh báo họ về việc cải tạo sắp tới", isCorrect: true },
+                        { key: "B", en: "To announce that the firm will be relocating", vi: "Để thông báo rằng công ty sẽ di dời", isCorrect: false },
+                        { key: "C", en: "To request feedback about new workplace facilities", vi: "Để yêu cầu phản hồi về cơ sở vật chất nơi làm việc mới", isCorrect: false },
+                        { key: "D", en: "To address their complaints about building maintenance", vi: "Để giải quyết các khiếu nại của họ về việc bảo trì tòa nhà", isCorrect: false }
+                    ],
+                    evidenceId: "ev-176",
+                    expText: "Trong bài có nói về việc vào thời gian sắp tới nhiều phòng sẽ phải bỏ trống để: <em>“allow work crews to repaint, recarpet, and replace old furniture”</em> (cho phép các đội công nhân sơn lại, trải lại thảm và thay thế đồ nội thất cũ). Đây là những công việc cải tạo, nâng cấp văn phòng (renovations).",
+                    vocab: "<li><b>Vacate</b>: Bỏ trống, dọn đi</li><li><b>Renovation</b>: Sự cải tạo, nâng cấp</li><li><b>Alert</b>: Cảnh báo, báo trước</li>"
+                },
+                {
+                    id: 177,
+                    qEng: "What are employees instructed to do?",
+                    qVie: "Nhân viên được hướng dẫn làm gì?",
+                    options: [
+                        { key: "A", en: "Report for work early", vi: "Báo cáo công việc sớm", isCorrect: false },
+                        { key: "B", en: "Schedule a meeting with a manager", vi: "Lên lịch một cuộc họp với người quản lý", isCorrect: false },
+                        { key: "C", en: "Indicate which office supplies are theirs", vi: "Cho biết đồ dùng văn phòng nào là của họ", isCorrect: true },
+                        { key: "D", en: "Update their contact information online", vi: "Cập nhật thông tin liên lạc trực tuyến", isCorrect: false }
+                    ],
+                    evidenceId: "ev-177",
+                    expText: "Văn bản hướng dẫn: <em>“Please label them with your name and office number so that the crews can return them to the correct offices”</em> (Vui lòng dán nhãn ghi tên và số văn phòng của bạn để công nhân có thể trả lại đúng phòng). Việc dán nhãn tên chính là để chỉ ra/xác nhận đồ dùng đó là của họ (indicate which supplies are theirs).",
+                    vocab: "<li><b>Label</b>: Dán nhãn</li><li><b>Indicate</b>: Chỉ ra, cho biết</li><li><b>Office supplies</b>: Đồ dùng văn phòng</li>"
+                },
+                {
+                    id: 178,
+                    qEng: "What is stated about Room 409?",
+                    qVie: "Điều gì được nêu về Phòng 409?",
+                    options: [
+                        { key: "A", en: "It will be available for videoconferencing.", vi: "Nó sẽ có sẵn cho họp qua video.", isCorrect: false },
+                        { key: "B", en: "Employees may gather there for work.", vi: "Nhân viên có thể tập trung ở đó để làm việc.", isCorrect: true },
+                        { key: "C", en: "A scheduling meeting will be held there.", vi: "Một cuộc họp xếp lịch sẽ được tổ chức ở đó.", isCorrect: false },
+                        { key: "D", en: "Its furniture will be removed temporarily.", vi: "Đồ đạc của nó sẽ được gỡ bỏ tạm thời.", isCorrect: false }
+                    ],
+                    evidenceId: "ev-178",
+                    expText: "Về phòng 409, đoạn 3 ghi rõ: <em>“The conference room (Room 409) will remain available to be used as a workspace”</em> (Phòng hội thảo 409 sẽ vẫn có sẵn để sử dụng làm không gian làm việc). Tức là nhân viên có thể dùng phòng này để tập trung làm việc trong lúc phòng của họ đang sửa.",
+                    vocab: "<li><b>Available</b>: Có sẵn, trống</li><li><b>Workspace</b>: Không gian làm việc</li><li><b>Gather</b>: Tụ tập, tập trung</li>"
+                },
+                {
+                    id: 179,
+                    qEng: "When should Ms. Asbury be ready to vacate her office?",
+                    qVie: "Khi nào cô Asbury nên sẵn sàng rời khỏi văn phòng của mình?",
+                    options: [
+                        { key: "A", en: "On February 12", vi: "Vào ngày 12 tháng 2", isCorrect: false },
+                        { key: "B", en: "On February 27", vi: "Vào ngày 27 tháng 2", isCorrect: false },
+                        { key: "C", en: "On March 3", vi: "Vào ngày 3 tháng 3", isCorrect: true },
+                        { key: "D", en: "On March 4", vi: "Vào ngày 4 tháng 3", isCorrect: false }
+                    ],
+                    evidenceId: "ev-179-2",
+                    expText: "Xem bảng Lịch trình, tên của cô <strong>Marlene Asbury (Phòng 402)</strong> nằm ở lịch sửa chữa vào <strong>Wednesday, March 4</strong>. Theo quy định ở đoạn 1: <em>“Affected employees will need to box up all their office items by 3 P.M. on the day before their room is scheduled”</em> (Nhân viên bị ảnh hưởng phải đóng hộp đồ đạc trước 3h chiều VÀO NGÀY TRƯỚC ngày phòng được xếp lịch). Trước ngày 4/3 một ngày chính là ngày 3/3.",
+                    vocab: "<li><b>Vacate</b>: Bỏ trống, dời đi</li><li><b>The day before</b>: Ngày hôm trước</li>"
+                },
+                {
+                    id: 180,
+                    qEng: "What is suggested about Mr. Hagburg?",
+                    qVie: "Điều gì được đề xuất về ông Hagburg?",
+                    options: [
+                        { key: "A", en: "He shares an office with a colleague.", vi: "Anh ấy chia sẻ một văn phòng với một đồng nghiệp.", isCorrect: true },
+                        { key: "B", en: "He will work off-site on March 5.", vi: "Anh ấy sẽ làm việc ngoài văn phòng vào 5/3.", isCorrect: false },
+                        { key: "C", en: "He is the head of a department.", vi: "Ông là người đứng đầu một bộ phận.", isCorrect: false },
+                        { key: "D", en: "He requested the use of a conference room.", vi: "Ông yêu cầu sử dụng phòng hội thảo.", isCorrect: false }
+                    ],
+                    evidenceId: "ev-180",
+                    expText: "Nhìn vào lịch trình ngày thứ Sáu (Friday, March 6), ta thấy thông tin: <em>“Room 404 (Elliot Hagburg & Ana Keller)”</em>. Việc có hai cái tên cùng xuất hiện tại một phòng làm việc chứng tỏ ông Hagburg đang dùng chung (share) văn phòng 404 với đồng nghiệp tên Ana Keller.",
+                    vocab: "<li><b>Share</b>: Chia sẻ, dùng chung</li><li><b>Colleague</b>: Đồng nghiệp</li>"
+                }
+            ]
+        },
+        {
+            // PASSAGE 12: Câu 181-185
+            id: 12,
+            engHtml: `
+                <div class="doc-box">
+                    <h3 class="center-text" style="color: var(--primary-dark);">Livrou FarmFresh Organic Produce</h3>
+                    <p class="center-text" style="font-style: italic;">From Our Farm to Your Home</p><br>
+                    
+                    <p>Livrou Farm in Bromont, Quebec, <span id="ev-181" class="ev-box">invites you to participate in its community-supported agriculture program.</span> <span id="ev-182" class="ev-box">Members enjoy fresh farm produce during our growing season from June to November.</span></p><br>
+                    
+                    <p>Sign up for a farm share and receive these benefits:</p>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>More than 30 varieties of in-season vegetables, fruits, and herbs, <span id="ev-182-2" class="ev-box">harvested by our farm staff</span> and prepared for you to pick up at our barn</li>
+                        <li><span id="ev-184" class="ev-box">A selection of pick-your-own strawberries, apples, and other fruits</span></li>
+                        <li>Access to our member Web site with recipes, farm updates, and a farm newsletter</li>
+                        <li>Discounts on events at the farm, such as the annual summer music festival. Events typically cost $15, but members pay $10.</li>
+                    </ul><br>
+                    
+                    <p>Members pick up their shares once a week at the farm. <span id="ev-185" class="ev-box">A full-size share is $700 per season, and a half-size share is $350. Half-size shareholders receive half the amount of produce each week. All other benefits remain the same.</span></p><br>
+                    
+                    <p>Our farm produce is grown without the use of pesticides or herbicides, and we use only naturally occurring fertilizers. For more information or to register for a membership, please see our Web site at www.livroufarm.ca</p>
+                    
+                    <hr class="divider" style="margin: 20px 0; border: 0; border-top: 2px dashed #e9edc9;">
+                    
+                    <p><strong>http://www.livroufarm.ca</strong><br>
+                    <strong>Livrou Farm</strong><br>
+                    Membership | Home | Locations | Reviews</p><br>
+                    
+                    <p><strong>Name:</strong> Julien Bernard<br>
+                    <strong>Address:</strong> 78 Dorion Street, Bromont, QC J2L 2K7<br>
+                    <strong>First choice pick-up day:</strong> Thursday [X] Friday [ ] Saturday [ ] Sunday [ ]<br>
+                    <strong>Second choice pick-up day:</strong> Thursday [ ] Friday [X] Saturday [ ] Sunday [ ]<br>
+                    <strong>Size of share:</strong> Full [ ] Half [X]<br>
+                    <strong>NOTE:</strong> Pick-up is between 3 P.M. and 6 P.M.</p><br>
+                    
+                    <p>Please provide the names of other individuals in your household. These are the only other individuals who will be permitted to pick up your weekly share.</p>
+                    <p><strong>Names:</strong> Margaux Bernard, Laurent Bernard</p><br>
+                    <p>Click HERE to enter payment information on the next page.</p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box">
+                    <h3 class="center-text" style="color: var(--primary-dark);">Sản phẩm hữu cơ tươi từ Trang trại Livrou</h3>
+                    <p class="center-text" style="font-style: italic;">Từ trang trại của chúng tôi đến nhà của bạn</p><br>
+                    
+                    <p>Nông trại Livrou ở Bromont, Quebec, mời bạn tham gia chương trình nông nghiệp hỗ trợ cộng đồng. Các thành viên sẽ thưởng thức nông sản tươi trong mùa trồng trọt của chúng tôi từ tháng 6 đến tháng 11.</p><br>
+                    
+                    <p>Đăng ký cổ phần trang trại và nhận những lợi ích sau:</p>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Hơn 30 loại rau, trái cây và thảo mộc theo mùa, được thu hoạch bởi nhân viên trang trại và chuẩn bị sẵn để bạn đến lấy tại kho.</li>
+                        <li>Được phép tự tay hái dâu tây, táo và các loại trái cây khác.</li>
+                        <li>Truy cập vào trang web thành viên với các công thức nấu ăn, cập nhật và bản tin trang trại.</li>
+                        <li>Giảm giá cho các sự kiện tại trang trại, như lễ hội âm nhạc mùa hè. Sự kiện thường có giá $15, nhưng thành viên chỉ trả $10.</li>
+                    </ul><br>
+                    
+                    <p>Các thành viên nhận phần chia của họ mỗi tuần một lần. Một suất toàn phần là $700 mỗi mùa và suất bán phần là $350. Cổ đông bán phần nhận được một nửa số lượng sản phẩm mỗi tuần. Tất cả các lợi ích khác vẫn giữ nguyên.</p><br>
+                    
+                    <p>Nông sản của chúng tôi được trồng không dùng thuốc trừ sâu hay diệt cỏ, chỉ dùng phân bón tự nhiên. Để biết thêm thông tin, vui lòng xem website www.livroufarm.ca</p>
+                    
+                    <hr class="divider" style="margin: 20px 0; border: 0; border-top: 2px dashed #e9edc9;">
+                    
+                    <p><strong>Tên:</strong> Julien Bernard<br>
+                    <strong>Địa chỉ:</strong> 78 Dorion Street, Bromont, QC J2L 2K7<br>
+                    <strong>Ngày lấy hàng NV 1:</strong> Thứ Năm [X] Thứ Sáu [ ] Thứ Bảy [ ] Chủ Nhật [ ]<br>
+                    <strong>Ngày lấy hàng NV 2:</strong> Thứ Năm [ ] Thứ Sáu [X] Thứ Bảy [ ] Chủ Nhật [ ]<br>
+                    <strong>Kích cỡ phần mua:</strong> Toàn phần [ ] Bán phần (Một nửa) [X]<br>
+                    <strong>LƯU Ý:</strong> Giờ nhận hàng từ 3 P.M. đến 6 P.M.</p><br>
+                    
+                    <p>Vui lòng cung cấp tên những người khác trong hộ gia đình bạn. Đây là những người duy nhất được phép lấy phần hàng tuần thay bạn.</p>
+                    <p><strong>Tên:</strong> Margaux Bernard, Laurent Bernard</p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 181,
+                    qEng: "What is the purpose of the flyer?",
+                    qVie: "Mục đích của tờ rơi là gì?",
+                    options: [
+                        { key: "A", en: "To invite people to a farm festival", vi: "Để mời mọi người đến một lễ hội nông trại", isCorrect: false },
+                        { key: "B", en: "To promote community service opportunities", vi: "Để thúc đẩy các cơ hội dịch vụ cộng đồng", isCorrect: false },
+                        { key: "C", en: "To share recipes for healthy eating", vi: "Để chia sẻ các công thức nấu ăn lành mạnh", isCorrect: false },
+                        { key: "D", en: "To advertise a farm program", vi: "Để quảng cáo một chương trình trang trại", isCorrect: true }
+                    ],
+                    evidenceId: "ev-181",
+                    expText: "Đoạn đầu tờ rơi kêu gọi: <em>“invites you to participate in its community-supported agriculture program”</em> (mời bạn tham gia vào chương trình nông nghiệp hỗ trợ cộng đồng). Mục đích chính là quảng bá và lôi kéo mọi người đăng ký mua gói thành viên/cổ phần của chương trình nông trại này.",
+                    vocab: "<li><b>Flyer</b>: Tờ rơi quảng cáo</li><li><b>Promote / Advertise</b>: Quảng bá, quảng cáo</li><li><b>Agriculture program</b>: Chương trình nông nghiệp</li>"
+                },
+                {
+                    id: 182,
+                    qEng: "What is suggested about the workers at Livrou Farm?",
+                    qVie: "Điều gì được gợi ý về các công nhân tại Nông trại Livrou?",
+                    options: [
+                        { key: "A", en: "They collect farm produce from June to November.", vi: "Họ thu hoạch nông sản từ tháng 6 đến tháng 11.", isCorrect: true },
+                        { key: "B", en: "They update the farm's Web site once a week.", vi: "Họ cập nhật trang web của trang trại mỗi tuần một lần.", isCorrect: false },
+                        { key: "C", en: "They create meals using the farm's products.", vi: "Họ tạo ra các bữa ăn bằng cách sử dụng sản phẩm trang trại.", isCorrect: false },
+                        { key: "D", en: "They sell farm products at several local markets.", vi: "Họ bán nông sản tại một số chợ địa phương.", isCorrect: false }
+                    ],
+                    evidenceId: "ev-182",
+                    expText: "Đoạn văn nêu rõ mùa màng kéo dài từ tháng 6 đến tháng 11 (<em>“growing season from June to November”</em>). Ở phần quyền lợi, có ghi rau quả được <em>“harvested by our farm staff”</em> (được thu hoạch bởi nhân viên nông trại của chúng tôi). Gộp 2 ý này lại: Nhân viên nông trại đảm nhiệm việc thu hoạch nông sản trong khoảng thời gian từ tháng 6 đến tháng 11.",
+                    vocab: "<li><b>Farm produce</b>: Nông sản</li><li><b>Harvest = Collect</b>: Thu hoạch, thu thập</li>"
+                },
+                {
+                    id: 183,
+                    qEng: "What is NOT indicated about Livrou Farm?",
+                    qVie: "Điều gì KHÔNG được chỉ ra về Nông trại Livrou?",
+                    options: [
+                        { key: "A", en: "It publishes a newsletter.", vi: "Nó xuất bản một bản tin.", isCorrect: false },
+                        { key: "B", en: "It uses natural fertilizers.", vi: "Nó sử dụng phân bón tự nhiên.", isCorrect: false },
+                        { key: "C", en: "It hosts musical performances.", vi: "Nó tổ chức biểu diễn âm nhạc.", isCorrect: false },
+                        { key: "D", en: "It offers cooking classes.", vi: "Nó cung cấp các lớp học nấu ăn.", isCorrect: true }
+                    ],
+                    evidenceId: "ev-181",
+                    expText: "Kiểm tra các lựa chọn:<br>- A (Bản tin): Có nhắc đến <em>“farm newsletter”</em>.<br>- B (Phân bón tự nhiên): Có nhắc đến <em>“use only naturally occurring fertilizers”</em>.<br>- C (Biểu diễn âm nhạc): Có nhắc đến <em>“annual summer music festival”</em>.<br>Chỉ có D (Lớp học nấu ăn - cooking classes) là không hề được đề cập trong bài.",
+                    vocab: "<li><b>Newsletter</b>: Bản tin nội bộ/định kỳ</li><li><b>Natural fertilizer</b>: Phân bón tự nhiên</li>"
+                },
+                {
+                    id: 184,
+                    qEng: "What is true about Mr. Bernard's membership?",
+                    qVie: "Điều gì là đúng về thẻ thành viên của ông Bernard?",
+                    options: [
+                        { key: "A", en: "He must pick up his produce on Sundays.", vi: "Anh ấy phải nhận sản phẩm của mình vào Chủ nhật.", isCorrect: false },
+                        { key: "B", en: "He is the only person allowed to pick up his farm share.", vi: "Anh ấy là người duy nhất được phép lấy phần hàng.", isCorrect: false },
+                        { key: "C", en: "He will be allowed to pick some of his own fruit.", vi: "Anh ta sẽ được phép hái một số trái cây của mình.", isCorrect: true },
+                        { key: "D", en: "He will be able to plant and grow his own vegetables.", vi: "Anh ta có thể tự trồng rau của riêng mình.", isCorrect: false }
+                    ],
+                    evidenceId: "ev-184",
+                    expText: "Ông Bernard đã đăng ký loại thẻ Bán phần (Half). Theo quy định trên tờ rơi: <em>“Half-size shareholders receive half the amount of produce... All other benefits remain the same”</em> (Người mua bán phần nhận được nửa lượng hàng. MỌI QUYỀN LỢI KHÁC VẪN GIỮ NGUYÊN). Một trong các quyền lợi đó là <em>“pick-your-own strawberries, apples...”</em> (tự hái dâu tây, táo...). Vậy nên ông ấy vẫn được phép tự tay hái trái cây.",
+                    vocab: "<li><b>Pick-your-own</b>: Tự tay hái</li><li><b>Shareholder</b>: Cổ đông, người mua phần/gói</li>"
+                },
+                {
+                    id: 185,
+                    qEng: "How much should Mr. Bernard pay for the membership?",
+                    qVie: "Ông Bernard phải trả bao nhiêu cho quyền thành viên của mình?",
+                    options: [
+                        { key: "A", en: "$10", vi: "$10", isCorrect: false },
+                        { key: "B", en: "$15", vi: "$15", isCorrect: false },
+                        { key: "C", en: "$350", vi: "$350", isCorrect: true },
+                        { key: "D", en: "$700", vi: "$700", isCorrect: false }
+                    ],
+                    evidenceId: "ev-185",
+                    expText: "Trong form đăng ký, ông Bernard đã tích vào ô <strong>Size of share: Half [X]</strong> (Kích cỡ phần mua: Bán phần). Đối chiếu với bảng giá phía trên tờ rơi: <em>“a half-size share is $350”</em>. Do đó, ông ấy sẽ phải trả 350 đô la.",
+                    vocab: "<li><b>Full-size share</b>: Suất nguyên / Toàn phần</li><li><b>Half-size share</b>: Suất một nửa / Bán phần</li>"
+                }
+            ]
+        },
+        {
+            // PASSAGE 13: Câu 186-190
+            id: 13,
+            engHtml: `
+                <div class="doc-box">
+                    <div class="email-header">
+                        <strong>Jorge Janssen</strong> &lt;jjanssen@blitzer.com&gt;<br>
+                        <strong>Topic:</strong> Real Estate and Housing<br>
+                        <strong>Date:</strong> June 23
+                    </div>
+                    <p><span id="ev-186" class="ev-box">I accepted a new position in Burlington</span> and need to relocate near the downtown area before my start date on August 15. I'm seeking a simple, clean, one-bedroom rental or larger, depending on price. A relaxing location with outdoor seating for entertaining friends or family would be a plus. I do have a car, but I'd appreciate having good access to public transportation. <span id="ev-187" class="ev-box">I have a budget of around $1,400 monthly to cover all housing costs, including utilities.</span></p>
+                    
+                    <hr class="divider" style="margin: 20px 0; border: 0; border-top: 2px dashed #e9edc9;">
+                    
+                    <div class="email-header">
+                        <strong>Eloise McMahon</strong> &lt;mcmahonrental@hmail.com&gt;<br>
+                        <strong>Topic:</strong> Apartment for Rent in Burlington<br>
+                        <strong>Date:</strong> June 23
+                    </div>
+                    <p>Be the first to rent this two-bedroom apartment upon completion of extensive renovations. <span id="ev-190" class="ev-box">This property is anticipated to be move-in ready on August 1.</span> It will feature a clean modern look, new floors throughout, and all-new appliances. The apartment is situated downtown, and students are welcome as it's less than ten minutes by bus to Denton University. On-street parking is available with a decal from the City Transportation Office. <span id="ev-188" class="ev-box">Cats or small dogs are potentially permitted, but with conditions, so please inquire.</span> $1,400 rent also pays for water, sewer, garbage pickups, and general upkeep of the property. <span id="ev-187-2" class="ev-box">Electricity and natural gas will be the responsibility of the tenant.</span> A one-time security deposit equal to one month's rent should be paid upon signing the rental agreement.</p>
+                    
+                    <hr class="divider" style="margin: 20px 0; border: 0; border-top: 2px dashed #e9edc9;">
+                    
+                    <div class="email-header">
+                        <strong>To:</strong> Eloise McMahon &lt;mcmahonrental@hmail.com&gt;<br>
+                        <strong>From:</strong> Jorge Janssen &lt;jjanssen@blitzer.com&gt;<br>
+                        <strong>Date:</strong> June 24
+                    </div>
+                    <p>Dear Ms. McMahon,</p><br>
+                    <p>I noticed your rental listing on communitylinkforum.org. From the description it sounds as if it may be just what I've been looking for. <span id="ev-189" class="ev-box">I'm eager to look over the apartment</span>, and I just happen to be in Burlington all this week. My last day in town will be Sunday June 30. <span id="ev-190-2" class="ev-box">If the place suits me, I'd want to move in the same day that it's expected to be available.</span> The timing would be perfect! I hope to hear from you soon.</p><br>
+                    <p>Thank you.<br>Jorge Janssen</p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box">
+                    <div class="email-header">
+                        <strong>Jorge Janssen</strong> &lt;jjanssen@blitzer.com&gt;<br>
+                        <strong>Chủ đề:</strong> Bất động sản và nhà ở<br>
+                        <strong>Ngày:</strong> 23 tháng 6
+                    </div>
+                    <p>Tôi đã nhận một công việc mới ở Burlington và cần chuyển nhà đến gần khu vực trung tâm thành phố trước ngày bắt đầu vào 15/8. Tôi đang tìm kiếm một phòng cho thuê đơn giản, sạch sẽ có 1 phòng ngủ hoặc lớn hơn, tùy giá. Một vị trí thư giãn với chỗ ngồi ngoài trời để tiếp bạn bè là một điểm cộng. Tôi có xe hơi, nhưng cũng muốn tiện sử dụng giao thông công cộng. Tôi có ngân sách khoảng 1.400 đô la mỗi tháng để trang trải mọi chi phí nhà ở, bao gồm cả phí tiện ích điện nước.</p>
+                    
+                    <hr class="divider" style="margin: 20px 0; border: 0; border-top: 2px dashed #e9edc9;">
+                    
+                    <div class="email-header">
+                        <strong>Eloise McMahon</strong> &lt;mcmahonrental@hmail.com&gt;<br>
+                        <strong>Chủ đề:</strong> Căn hộ cho thuê tại Burlington<br>
+                        <strong>Ngày:</strong> 23 tháng 6
+                    </div>
+                    <p>Hãy là người đầu tiên thuê căn hộ hai phòng ngủ này ngay khi hoàn thành sửa chữa. Căn hộ dự kiến sẽ sẵn sàng dọn vào từ ngày 1/8. Nơi đây sẽ có diện mạo hiện đại, sàn mới toàn bộ và thiết bị mới tinh. Nằm ở trung tâm thành phố, cách Đại học Denton chưa đến 10 phút đi xe buýt. Có bãi đậu xe trên đường. Mèo hoặc chó nhỏ có thể được phép, nhưng có điều kiện, vui lòng hỏi thêm để biết thông tin. Tiền thuê 1.400 đô bao gồm cả tiền nước, cống rãnh, rác và phí bảo trì. Điện và khí đốt tự nhiên sẽ thuộc trách nhiệm của người thuê tự trả. Tiền cọc bằng 1 tháng tiền thuê phải nộp khi ký hợp đồng.</p>
+                    
+                    <hr class="divider" style="margin: 20px 0; border: 0; border-top: 2px dashed #e9edc9;">
+                    
+                    <div class="email-header">
+                        <strong>Tới:</strong> Eloise McMahon &lt;mcmahonrental@hmail.com&gt;<br>
+                        <strong>Từ:</strong> Jorge Janssen &lt;jjanssen@blitzer.com&gt;<br>
+                        <strong>Ngày:</strong> 24 tháng 6
+                    </div>
+                    <p>Gửi cô McMahon,</p><br>
+                    <p>Tôi thấy tin cho thuê của cô trên diễn đàn. Qua mô tả, có vẻ đó là những gì tôi đang tìm kiếm. Tôi rất háo hức muốn đến xem căn hộ, và tôi tình cờ ở Burlington cả tuần nay. Ngày cuối cùng của tôi trong thị trấn là Chủ nhật 30/6. Nếu nơi đó phù hợp, tôi muốn dọn vào đúng cái ngày mà căn hộ dự kiến sẽ sẵn sàng. Thời gian đó sẽ rất hoàn hảo! Mong sớm nhận được hồi âm.</p><br>
+                    <p>Cảm ơn cô.<br>Jorge Janssen</p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 186,
+                    qEng: "Why is Mr. Janssen relocating?",
+                    qVie: "Tại sao ông Janssen chuyển chỗ ở?",
+                    options: [
+                        { key: "A", en: "To begin a new job", vi: "Để bắt đầu một công việc mới", isCorrect: true },
+                        { key: "B", en: "To return to his hometown", vi: "Để trở về quê nhà", isCorrect: false },
+                        { key: "C", en: "To study part-time", vi: "Để học bán thời gian", isCorrect: false },
+                        { key: "D", en: "To start his retirement", vi: "Để bắt đầu nghỉ hưu", isCorrect: false }
+                    ],
+                    evidenceId: "ev-186",
+                    expText: "Ngay câu đầu tiên của bài đăng tìm nhà, ông Janssen viết: <em>“I accepted a new position in Burlington and need to relocate...”</em> (Tôi đã chấp nhận một vị trí mới ở Burlington và cần chuyển chỗ ở...). “New position” (vị trí công tác mới) đồng nghĩa với “new job” (công việc mới).",
+                    vocab: "<li><b>Relocate</b>: Chuyển chỗ ở, dời đi</li><li><b>Position</b>: Vị trí (công việc)</li>"
+                },
+                {
+                    id: 187,
+                    qEng: "What aspect of the property does NOT match Mr. Janssen's preferences?",
+                    qVie: "Đặc điểm nào của căn hộ KHÔNG phù hợp với yêu cầu của ông Janssen?",
+                    options: [
+                        { key: "A", en: "The location", vi: "Địa điểm", isCorrect: false },
+                        { key: "B", en: "The monthly costs", vi: "Chi phí hàng tháng", isCorrect: true },
+                        { key: "C", en: "The parking availability", vi: "Bãi đậu xe", isCorrect: false },
+                        { key: "D", en: "The size", vi: "Kích thước", isCorrect: false }
+                    ],
+                    evidenceId: "ev-187",
+                    expText: "Ông Janssen yêu cầu: <em>“budget of around $1,400 monthly to cover ALL housing costs, including utilities”</em> (ngân sách 1.400$ để trang trải TẤT CẢ chi phí, BAO GỒM tiện ích điện nước). Tuy nhiên, tin đăng cho thuê ghi: giá thuê là 1.400$, nhưng <em>“Electricity and natural gas will be the responsibility of the tenant”</em> (Tiền điện và khí đốt sẽ DO NGƯỜI THUÊ TỰ TRẢ). Vậy nếu thuê căn này, tổng chi phí hàng tháng (monthly costs) của ông sẽ bị vượt quá ngân sách 1.400$.",
+                    vocab: "<li><b>Preference</b>: Sở thích, yêu cầu ưu tiên</li><li><b>Utilities</b>: Phí tiện ích (điện, nước, gas)</li><li><b>Tenant</b>: Người thuê nhà</li>"
+                },
+                {
+                    id: 188,
+                    qEng: "For what situation does Ms. McMahon mention that she will need additional information?",
+                    qVie: "Cô McMahon đề cập rằng cô sẽ cần thêm thông tin trong trường hợp nào?",
+                    options: [
+                        { key: "A", en: "When changes to the decor are preferred", vi: "Khi muốn thay đổi trang trí", isCorrect: false },
+                        { key: "B", en: "When a tenant is ready to pay a security deposit", vi: "Khi người thuê nhà sẵn sàng trả tiền cọc", isCorrect: false },
+                        { key: "C", en: "When repairs to the apartment are needed", vi: "Khi cần sửa chữa căn hộ", isCorrect: false },
+                        { key: "D", en: "When someone wants to keep an indoor pet", vi: "Khi có người muốn nuôi thú cưng trong nhà", isCorrect: true }
+                    ],
+                    evidenceId: "ev-188",
+                    expText: "Trong bài đăng của cô McMahon có ghi: <em>“Cats or small dogs are potentially permitted, but with conditions, so please inquire.”</em> (Mèo hoặc chó nhỏ có thể được phép, nhưng kèm điều kiện, vui lòng hỏi thêm thông tin). Chó và mèo chính là vật nuôi trong nhà (indoor pet).",
+                    vocab: "<li><b>Additional information</b>: Thông tin thêm</li><li><b>Inquire</b>: Hỏi thăm, yêu cầu thông tin</li><li><b>Indoor pet</b>: Thú cưng nuôi trong nhà</li>"
+                },
+                {
+                    id: 189,
+                    qEng: "Why does Mr. Janssen send the e-mail?",
+                    qVie: "Tại sao ông Janssen lại gửi email thứ ba?",
+                    options: [
+                        { key: "A", en: "To agree to the terms of a rental contract", vi: "Để đồng ý với các điều khoản hợp đồng", isCorrect: false },
+                        { key: "B", en: "To change the details of a residential advertisement", vi: "Để thay đổi chi tiết quảng cáo", isCorrect: false },
+                        { key: "C", en: "To ask about a feature of an apartment", vi: "Để hỏi về một tính năng của căn hộ", isCorrect: false },
+                        { key: "D", en: "To make arrangements to view a property", vi: "Để sắp xếp thời gian đến xem nhà", isCorrect: true }
+                    ],
+                    evidenceId: "ev-189",
+                    expText: "Trong email cuối, ông Janssen viết: <em>“I'm eager to look over the apartment, and I just happen to be in Burlington all this week. My last day in town will be Sunday...”</em> (Tôi rất háo hức muốn ĐẾN XEM CĂN HỘ, tôi đang ở Burlington tuần này...). Mục đích email là để thông báo lịch trình và sắp xếp thời gian đến xem trực tiếp căn hộ (make arrangements to view a property).",
+                    vocab: "<li><b>Look over</b>: Xem xét, tham quan</li><li><b>Make arrangements</b>: Sắp xếp</li><li><b>Property</b>: Bất động sản, căn nhà</li>"
+                },
+                {
+                    id: 190,
+                    qEng: "When does Mr. Janssen wish to start living in the residence?",
+                    qVie: "Khi nào ông Janssen muốn bắt đầu dọn vào sống ở căn hộ?",
+                    options: [
+                        { key: "A", en: "On June 24", vi: "Vào ngày 24 tháng 6", isCorrect: false },
+                        { key: "B", en: "On June 30", vi: "Vào ngày 30 tháng 6", isCorrect: false },
+                        { key: "C", en: "On August 1", vi: "Vào ngày 1 tháng 8", isCorrect: true },
+                        { key: "D", en: "On August 15", vi: "Vào ngày 15 tháng 8", isCorrect: false }
+                    ],
+                    evidenceId: "ev-190-2",
+                    expText: "Ông Janssen viết trong email: <em>“I'd want to move in the same day that it's expected to be available.”</em> (Tôi muốn dọn vào CÙNG VỚI CÁI NGÀY mà căn hộ dự kiến sẽ sẵn sàng). Nhìn lên tin đăng cho thuê của cô McMahon: <em>“This property is anticipated to be move-in ready on August 1.”</em> (Căn hộ dự kiến sẵn sàng dọn vào ngày 1/8). Do đó, ngày ông ấy muốn dọn vào sống (move in) chính là ngày 1 tháng 8.",
+                    vocab: "<li><b>Move in</b>: Dọn vào ở</li><li><b>Anticipated = Expected</b>: Được dự kiến, mong đợi</li>"
+                }
+            ]
+        },
+        {
+            // PASSAGE 14: Câu 191-195
+            id: 14,
+            engHtml: `
+                <div class="doc-box">
+                    <h3 class="center-text" style="color: var(--primary-dark);">Kitchenware Utopia Food Processor-Model C3</h3>
+                    <p>You will never need to buy another food processor! Our best-selling model, the C3, is made of high-quality plastic and easy-to-clean stainless steel.</p><br>
+                    
+                    <p><strong>FEATURES:</strong> The unique blade design and powerful motor make this a professional-grade appliance, ideal for busy restaurants of any size.</p><br>
+                    
+                    <p><strong>WARRANTY:</strong> We include a seven-year warranty on all parts and labor - a reassurance to you that our food processor will last a long time.</p><br>
+                    
+                    <p><strong>Special purchase price:</strong> $319.00<br>
+                    <strong>KU Club Members:</strong> $299.00</p>
+                    
+                    <hr class="divider" style="margin: 20px 0; border: 0; border-top: 2px dashed #e9edc9;">
+                    
+                    <p><strong>Rating:</strong> ⭐⭐⭐⭐⭐<br>
+                    <strong>Review:</strong> This product is amazing! I work as a caterer, and I've used a lot of different food processors. Kitchenware Utopia's C3 is by far the best I've found. Its motor is very powerful, and the many different blades and settings make it extremely versatile. The settings are also straightforward. It's expensive but well worth the investment, and since <span id="ev-193" class="ev-box">I'm a loyalty club member</span>, the price was reasonable. <span id="ev-194" class="ev-box">My only complaint would be that it's very heavy</span> and therefore not as portable as I'd hoped. <span id="ev-192" class="ev-box">Overall, though, I'm exceptionally satisfied with this product.</span></p><br>
+                    <p><em>Posted by Eli Perles on March 27</em></p>
+                    
+                    <hr class="divider" style="margin: 20px 0; border: 0; border-top: 2px dashed #e9edc9;">
+                    
+                    <p>We are very glad to hear you are happy with our C3 food processor. Customer satisfaction is our number one priority. We would like to respond to your complaint and provide a <span id="ev-195" class="ev-box">suggestion regarding your concerns</span>. <span id="ev-194-2" class="ev-box">Our C2 processor might be better suited to your professional needs... it is much smaller than the C3 in general.</span> However, this model does cost slightly more than the C3. You can view the product description by visiting www.kitchenwareutopia.com/C2.</p><br>
+                    <p><em>Posted by Kitchenware Utopia Customer Service on March 28</em></p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box">
+                    <h3 class="center-text" style="color: var(--primary-dark);">Đồ dùng nhà bếp Utopia Bộ xử lý thực phẩm Mẫu C3</h3>
+                    <p>Bạn sẽ không bao giờ cần phải mua một máy xay/xử lý thực phẩm nào khác! Mẫu bán chạy nhất của chúng tôi, C3, được làm bằng nhựa chất lượng cao và thép không gỉ dễ lau chùi.</p><br>
+                    
+                    <p><strong>CÁC TÍNH NĂNG:</strong> Thiết kế lưỡi dao độc đáo và động cơ mạnh mẽ khiến cho thiết bị này trở thành một thiết bị cấp độ chuyên nghiệp, lý tưởng cho các nhà hàng đông khách ở mọi quy mô.</p><br>
+                    
+                    <p><strong>BẢO HÀNH:</strong> Chúng tôi bảo hành bảy năm cho tất cả các bộ phận và nhân công sửa chữa – đó là sự đảm bảo với bạn rằng máy của chúng tôi sẽ dùng được rất lâu.</p><br>
+                    
+                    <p><strong>Giá mua đặc biệt:</strong> $319.00<br>
+                    <strong>Cho thành viên Câu lạc bộ KU:</strong> $299.00</p>
+                    
+                    <hr class="divider" style="margin: 20px 0; border: 0; border-top: 2px dashed #e9edc9;">
+                    
+                    <p><strong>Xếp hạng:</strong> ⭐⭐⭐⭐⭐<br>
+                    <strong>Đánh giá:</strong> Sản phẩm này thật tuyệt vời! Tôi là một người cung cấp thực phẩm (caterer) và tôi đã sử dụng rất nhiều máy xử lý khác nhau. C3 của Utopia là sản phẩm tốt nhất tôi từng thấy. Động cơ của nó rất mạnh mẽ, nhiều lưỡi dao làm cho nó cực kỳ linh hoạt. Thiết bị đắt tiền nhưng đáng đầu tư, và vì tôi là thành viên câu lạc bộ khách hàng thân thiết, nên giá cả cũng hợp lý. Than phiền duy nhất của tôi là nó rất nặng và do đó khó mang theo. Tuy nhiên, nhìn chung, tôi đặc biệt hài lòng với sản phẩm này.</p><br>
+                    <p><em>Đăng bởi Eli Perles vào ngày 27 tháng Ba</em></p>
+                    
+                    <hr class="divider" style="margin: 20px 0; border: 0; border-top: 2px dashed #e9edc9;">
+                    
+                    <p>Chúng tôi rất vui khi biết bạn hài lòng với C3. Sự hài lòng của khách hàng là ưu tiên số một của chúng tôi. Chúng tôi muốn trả lời khiếu nại và đưa ra đề nghị liên quan đến mối bận tâm của bạn. Máy xử lý C2 của chúng tôi có thể phù hợp hơn với bạn... nó nhỏ hơn nhiều so với C3. Tuy nhiên, mẫu C2 có giá cao hơn một chút so với C3. Bạn có thể xem mô tả trên web.</p><br>
+                    <p><em>Đăng bởi Dịch vụ khách hàng Utopia vào ngày 28 tháng 3</em></p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 191,
+                    qEng: "What is NOT mentioned in the product description as a feature of the C3 food processor?",
+                    qVie: "Tính năng nào KHÔNG được đề cập trong phần mô tả sản phẩm của máy xử lý thực phẩm C3?",
+                    options: [
+                        { key: "A", en: "It is very durable.", vi: "Nó rất bền.", isCorrect: false },
+                        { key: "B", en: "It is suitable for commercial kitchens.", vi: "Nó phù hợp cho nhà bếp thương mại/kinh doanh.", isCorrect: false },
+                        { key: "C", en: "It is larger than competitors' food processors.", vi: "Nó lớn hơn các máy của đối thủ cạnh tranh.", isCorrect: true },
+                        { key: "D", en: "It is a popular model.", vi: "Nó là mẫu phổ biến.", isCorrect: false }
+                    ],
+                    evidenceId: "ev-191",
+                    expText: "Đối chiếu các đáp án với phần Mô tả sản phẩm (Product description):<br>A (Rất bền): Có nhắc “last a long time” và bảo hành 7 năm.<br>B (Nhà bếp thương mại): Có nhắc “professional-grade appliance, ideal for busy restaurants”.<br>D (Mẫu phổ biến): Có nhắc “best-selling model” (mẫu bán chạy nhất).<br>Chỉ có đáp án C (Lớn hơn đối thủ cạnh tranh) là không hề được đề cập.",
+                    vocab: "<li><b>Durable</b>: Bền bỉ</li><li><b>Commercial kitchen</b>: Bếp thương mại (nhà hàng, quán ăn)</li><li><b>Competitor</b>: Đối thủ cạnh tranh</li>"
+                },
+                {
+                    id: 192,
+                    qEng: "What is indicated in the customer review?",
+                    qVie: "Điều gì được chỉ ra trong đánh giá của khách hàng?",
+                    options: [
+                        { key: "A", en: "The C3 comes with detailed instructions.", vi: "C3 đi kèm với hướng dẫn chi tiết.", isCorrect: false },
+                        { key: "B", en: "Mr. Perles is pleased with his purchase.", vi: "Ông Perles hài lòng với việc mua sắm của mình.", isCorrect: true },
+                        { key: "C", en: "Kitchenware Utopia's customer service is very good.", vi: "Dịch vụ CSKH của hãng rất tốt.", isCorrect: false },
+                        { key: "D", en: "Users find the C3 difficult to clean.", vi: "Người dùng thấy C3 khó vệ sinh.", isCorrect: false }
+                    ],
+                    evidenceId: "ev-192",
+                    expText: "Mặc dù chê máy nặng, nhưng ông Perles chốt lại bài đánh giá: <em>“Overall, though, I'm exceptionally satisfied with this product.”</em> (Tuy nhiên, nhìn chung, tôi đặc biệt hài lòng với sản phẩm này). Điều này cho thấy ông ấy rất vui lòng với món đồ mình đã mua (pleased with his purchase).",
+                    vocab: "<li><b>Exceptionally satisfied</b>: Cực kỳ/Đặc biệt hài lòng</li><li><b>Pleased with</b>: Hài lòng với</li>"
+                },
+                {
+                    id: 193,
+                    qEng: "What is suggested about Mr. Perles?",
+                    qVie: "Điều gì đúng về ông Perles?",
+                    options: [
+                        { key: "A", en: "He paid $299 for the food processor.", vi: "Ông ấy đã trả 299 đô cho chiếc máy.", isCorrect: true },
+                        { key: "B", en: "He purchased some optional parts for the processor.", vi: "Ông đã mua một số bộ phận tùy chọn thêm.", isCorrect: false },
+                        { key: "C", en: "He catered a large-scale event on March 27.", vi: "Ông phục vụ sự kiện quy mô lớn vào 27/3.", isCorrect: false },
+                        { key: "D", en: "He has never used a food processor before.", vi: "Ông chưa bao giờ sử dụng loại máy này trước đây.", isCorrect: false }
+                    ],
+                    evidenceId: "ev-193",
+                    expText: "Ông Perles nói trong bài đánh giá: <em>“since I'm a loyalty club member, the price was reasonable”</em> (vì tôi là thành viên câu lạc bộ khách hàng thân thiết nên giá hợp lý). Nhìn lên bảng giá ở mục quảng cáo: <strong>KU Club Members: $299.00</strong>. Do ông ấy là thành viên nên ông ấy được mua với mức giá ưu đãi $299.",
+                    vocab: "<li><b>Loyalty club member</b>: Thành viên câu lạc bộ (khách hàng thân thiết)</li>"
+                },
+                {
+                    id: 194,
+                    qEng: "Why would the C2 processor likely be recommended as more suitable for Mr. Perles?",
+                    qVie: "Tại sao bộ xử lý C2 lại được đề xuất là phù hợp hơn với ông Perles?",
+                    options: [
+                        { key: "A", en: "It is inexpensive.", vi: "Nó không đắt.", isCorrect: false },
+                        { key: "B", en: "It is dishwasher safe.", vi: "Nó an toàn với máy rửa chén.", isCorrect: false },
+                        { key: "C", en: "It is easy to assemble.", vi: "Nó dễ dàng để lắp ráp.", isCorrect: false },
+                        { key: "D", en: "It is lightweight.", vi: "Nó có trọng lượng nhẹ.", isCorrect: true }
+                    ],
+                    evidenceId: "ev-194-2",
+                    expText: "Trong bài review, ông Perles có phàn nàn: <em>“My only complaint would be that it's very heavy”</em> (Than phiền duy nhất của tôi là nó RẤT NẶNG). Do đó, bộ phận CSKH đã đề xuất máy C2 vì <em>“it is much smaller than the C3 in general”</em> (nó NHỎ HƠN nhiều). Một chiếc máy nhỏ hơn sẽ giải quyết được vấn đề “nặng nề”, tức là nó nhẹ hơn (lightweight).",
+                    vocab: "<li><b>Complaint</b>: Lời phàn nàn</li><li><b>Heavy</b>: Nặng</li><li><b>Lightweight</b>: Trọng lượng nhẹ</li>"
+                },
+                {
+                    id: 195,
+                    qEng: "In the online response, the word 'regarding' in paragraph 1, line 3, is closest in meaning to",
+                    qVie: "Trong phần phản hồi trực tuyến, từ 'regarding' có nghĩa gần nhất với:",
+                    options: [
+                        { key: "A", en: "looking after", vi: "chăm sóc", isCorrect: false },
+                        { key: "B", en: "about", vi: "về / liên quan đến", isCorrect: true },
+                        { key: "C", en: "in comparison", vi: "so sánh với", isCorrect: false },
+                        { key: "D", en: "admiring", vi: "ngưỡng mộ", isCorrect: false }
+                    ],
+                    evidenceId: "ev-195",
+                    expText: "Câu gốc: <em>“provide a suggestion regarding your concerns”</em> (đưa ra lời gợi ý 'regarding' những bận tâm của bạn). Từ 'regarding' là giới từ mang nghĩa 'về việc, liên quan đến vấn đề gì đó', đồng nghĩa hoàn toàn với từ 'about'.",
+                    vocab: "<li><b>Regarding = About</b>: Về, liên quan tới</li><li><b>Concern</b>: Mối bận tâm, sự lo ngại</li>"
+                }
+            ]
+        },
+        {
+            // PASSAGE 15: Câu 196-200
+            id: 15,
+            engHtml: `
+                <div class="doc-box">
+                    <h3 class="center-text" style="color: var(--primary-dark);">Ment Hall to Host Piasek Cup Final</h3>
+                    <p>Ment Hall, which is currently undergoing extensive renovation, will be ready to host the final game of the Piasek Cup Volleyball Championship to be held in Warsaw this June. Although the project has been in the works for some time, it was the opportunity to host this championship that provided the economic incentive to push the project to its completion.</p><br>
+                    
+                    <p>City officials have confirmed that the construction is progressing according to schedule and will be complete well before the finals of the championship. Since Ment Hall is the only major arena in the country that has never hosted a Piasek Cup event, the hall's owners were proud to have been chosen to host this year's finale. The final game will inaugurate the refurbished hall. The event is expected to <span id="ev-196" class="ev-box">draw thousands of volleyball fans</span>, and the organizers are confident that Ment Hall will live up to the occasion. <span id="ev-197" class="ev-box">Seating 19,000 spectators, Ment Hall will be double its previous size.</span></p>
+                    
+                    <hr class="divider" style="margin: 20px 0; border: 0; border-top: 2px dashed #e9edc9;">
+                    
+                    <h3 class="center-text" style="color: var(--primary-dark);">Piasek Cup Volleyball Championship</h3>
+                    
+                    <table class="table-data" style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                        <tr><th colspan="2" style="background: #faedcd;">Quarterfinal Games (Tứ kết)</th></tr>
+                        <tr><td>Venezuela-Australia<br><span id="ev-200" class="ev-box">10 June, 3:00 P.M.<br>Loave Arena, Bydgoszcz</span></td><td>Poland-France<br>10 June, 6:00 P.M.<br>Timpani Hall, Katowice</td></tr>
+                        <tr><td>Brazil-USA<br>11 June, 3:00 P.M.<br>Polana Center, Cracow</td><td>Cuba-Egypt<br>11 June, 6:00 P.M.<br>Mistrz Arena, Wroclaw</td></tr>
+                        <tr><th colspan="2" style="background: #faedcd;">Semifinal Games (Bán kết)</th></tr>
+                        <tr><td>Winners of 10 June games<br>13 June, 3:00 P.M.<br>Timpani Hall, Katowice</td><td>Winners of 11 June games<br>13 June, 3:00 P.M.<br>Polana Center, Cracow</td></tr>
+                        <tr><th colspan="2" style="background: #faedcd;">Final Game (Chung kết)</th></tr>
+                        <tr><td colspan="2"><span id="ev-198" class="ev-box">16 June, 6:00 P.M.<br>Ment Hall, Warsaw</span></td></tr>
+                    </table>
+                    
+                    <p><strong>NOTE:</strong> <span id="ev-199" class="ev-box">Tickets for the final game are selling fast, so don't wait until after the semifinal games to order.</span> Reserved seating only, no general admission. No refunds.</p>
+                    
+                    <hr class="divider" style="margin: 20px 0; border: 0; border-top: 2px dashed #e9edc9;">
+                    
+                    <h3 class="center-text" style="color: var(--primary-dark);">News Update - HALLAX RADIO 108.3 FM</h3>
+                    <p><strong>Sports-Volleyball, 10 June</strong></p><br>
+                    <p>At 3:00 P.M., <span id="ev-200-2" class="ev-box">Venezuela will take on Australia</span> for qualification to the semifinals. <span id="ev-200-3" class="ev-box">Our guest announcer will be Vin Cote</span>, retired coach of last year's winning team from Canada.</p><br>
+                    <p>At 6:00 P.M., host team Poland will face off against France. The game will be covered live by Jeremy Bosko.</p>
+                </div>
+            `,
+            vieHtml: `
+                <div class="doc-box">
+                    <h3 class="center-text" style="color: var(--primary-dark);">Sân Ment tổ chức trận chung kết cúp Piasek</h3>
+                    <p>Sân vận động Ment, hiện đang được cải tạo lớn, sẽ sẵn sàng tổ chức trận chung kết Giải vô địch bóng chuyền Cúp Piasek tại Warsaw vào tháng Sáu này. Mặc dù dự án đã diễn ra được một thời gian, nhưng cơ hội tổ chức giải vô địch này đã mang lại động lực kinh tế để đẩy nhanh dự án đến lúc hoàn thành.</p><br>
+                    
+                    <p>Các quan chức thành phố xác nhận rằng việc xây dựng đang đúng tiến độ và sẽ hoàn thành tốt trước trận chung kết. Vì Sân Ment là nhà thi đấu lớn duy nhất chưa từng tổ chức sự kiện Cúp Piasek, nên chủ sở hữu rất tự hào được chọn cho sự kiện năm nay. Trận chung kết sẽ khánh thành nhà thi đấu mới được tân trang. Sự kiện dự kiến sẽ thu hút hàng ngàn người hâm mộ bóng chuyền. Với chỗ ngồi cho 19.000 khán giả, Ment Hall sẽ tăng gấp đôi kích thước trước đó.</p>
+                    
+                    <hr class="divider" style="margin: 20px 0; border: 0; border-top: 2px dashed #e9edc9;">
+                    
+                    <h3 class="center-text" style="color: var(--primary-dark);">Giải Vô Địch Cúp Piasek</h3>
+                    
+                    <table class="table-data" style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                        <tr><th colspan="2" style="background: #faedcd;">Tứ kết (Quarterfinal)</th></tr>
+                        <tr><td>Venezuela vs Úc<br>10/6, 3:00 P.M.<br>Loave Arena, Bydgoszcz</td><td>Ba Lan vs Pháp<br>10/6, 6:00 P.M.<br>Timpani Hall, Katowice</td></tr>
+                        <tr><td>Brazil vs Mỹ<br>11/6, 3:00 P.M.<br>Polana Center, Cracow</td><td>Cuba vs Ai Cập<br>11/6, 6:00 P.M.<br>Mistrz Arena, Wroclaw</td></tr>
+                        <tr><th colspan="2" style="background: #faedcd;">Bán kết (Semifinal)</th></tr>
+                        <tr><td>Đội thắng ngày 10/6<br>13/6, 3:00 P.M.<br>Timpani Hall, Katowice</td><td>Đội thắng ngày 11/6<br>13/6, 3:00 P.M.<br>Polana Center, Cracow</td></tr>
+                        <tr><th colspan="2" style="background: #faedcd;">Chung kết (Final)</th></tr>
+                        <tr><td colspan="2">16/6, 6:00 P.M.<br>Ment Hall, Warsaw</td></tr>
+                    </table>
+                    
+                    <p><strong>LƯU Ý:</strong> Vé cho trận chung kết đang bán rất nhanh, vì vậy đừng đợi đến sau các trận bán kết mới mua. Chỉ có ghế đặt trước, không có vé vào cửa tự do. Không hoàn tiền.</p>
+                    
+                    <hr class="divider" style="margin: 20px 0; border: 0; border-top: 2px dashed #e9edc9;">
+                    
+                    <h3 class="center-text" style="color: var(--primary-dark);">Bản tin Thể thao - RADIO 108.3 FM</h3>
+                    <p><strong>Thể thao Bóng chuyền, ngày 10/6</strong></p><br>
+                    <p>Vào lúc 3:00 P.M., Venezuela sẽ đối đầu với Úc để giành quyền vào bán kết. Phát thanh viên khách mời của chúng tôi sẽ là Vin Cote, cựu huấn luyện viên của đội vô địch năm ngoái đến từ Canada.</p><br>
+                    <p>Vào lúc 6:00 P.M., đội chủ nhà Ba Lan sẽ đối đầu với Pháp. Trận đấu sẽ được Jeremy Bosko bình luận trực tiếp.</p>
+                </div>
+            `,
+            questions: [
+                {
+                    id: 196,
+                    qEng: "In the article, the word 'draw' in paragraph 2, line 7, is closest in meaning to",
+                    qVie: "Trong bài viết, từ 'draw' có nghĩa gần nhất với",
+                    options: [
+                        { key: "A", en: "promote", vi: "quảng bá", isCorrect: false },
+                        { key: "B", en: "attract", vi: "thu hút", isCorrect: true },
+                        { key: "C", en: "sketch", vi: "phác họa / vẽ", isCorrect: false },
+                        { key: "D", en: "remove", vi: "loại bỏ", isCorrect: false }
+                    ],
+                    evidenceId: "ev-196",
+                    expText: "Câu gốc: <em>“The event is expected to draw thousands of volleyball fans...”</em> (Sự kiện dự kiến sẽ 'draw' hàng ngàn người hâm mộ bóng chuyền...). Trong ngữ cảnh nói về đám đông khán giả, 'draw' có nghĩa là kéo tới, lôi kéo, thu hút (attract) người xem.",
+                    vocab: "<li><b>Draw = Attract</b>: Thu hút, lôi kéo sự chú ý</li><li><b>Spectator / Fan</b>: Khán giả / Người hâm mộ</li>"
+                },
+                {
+                    id: 197,
+                    qEng: "What will be changed about Ment Hall?",
+                    qVie: "Sân Ment sẽ được thay đổi về điều gì?",
+                    options: [
+                        { key: "A", en: "Its ownership", vi: "Quyền sở hữu", isCorrect: false },
+                        { key: "B", en: "Its ticket prices", vi: "Giá vé", isCorrect: false },
+                        { key: "C", en: "Its seating capacity", vi: "Sức chứa chỗ ngồi", isCorrect: true },
+                        { key: "D", en: "Its location", vi: "Vị trí địa điểm", isCorrect: false }
+                    ],
+                    evidenceId: "ev-197",
+                    expText: "Đoạn cuối của bài báo đầu tiên khẳng định: <em>“Seating 19,000 spectators, Ment Hall will be double its previous size.”</em> (Với chỗ ngồi cho 19.000 khán giả, sân Ment sẽ có kích thước TĂNG GẤP ĐÔI so với trước đây). Sự thay đổi lớn nhất được nhắc đến là nâng cấp số lượng chỗ ngồi (seating capacity).",
+                    vocab: "<li><b>Seating capacity</b>: Sức chứa chỗ ngồi</li><li><b>Spectator</b>: Khán giả ngồi xem</li>"
+                },
+                {
+                    id: 198,
+                    qEng: "When will the first game be held at a new host venue?",
+                    qVie: "Khi nào trận đầu tiên được tổ chức tại địa điểm thi đấu mới?",
+                    options: [
+                        { key: "A", en: "On June 10", vi: "Vào ngày 10 tháng 6", isCorrect: false },
+                        { key: "B", en: "On June 13", vi: "Vào ngày 13 tháng 6", isCorrect: false },
+                        { key: "C", en: "On June 14", vi: "Vào ngày 14 tháng 6", isCorrect: false },
+                        { key: "D", en: "On June 16", vi: "Vào ngày 16 tháng 6", isCorrect: true }
+                    ],
+                    evidenceId: "ev-198",
+                    expText: "Bài báo nhắc đến <em>“Ment Hall”</em> là địa điểm thi đấu vừa được khánh thành / sửa mới (new host venue). Nhìn vào bảng Lịch thi đấu, sân Ment Hall chỉ được sử dụng cho một trận duy nhất là <strong>Final Game</strong> (Trận Chung kết), diễn ra vào ngày <strong>16 June</strong>.",
+                    vocab: "<li><b>Host venue</b>: Địa điểm tổ chức / Nhà thi đấu</li><li><b>Inaugurate</b>: Khánh thành (sử dụng lần đầu tiên)</li>"
+                },
+                {
+                    id: 199,
+                    qEng: "In the schedule, what are people advised to do?",
+                    qVie: "Theo lịch thi đấu, mọi người được khuyên nên làm gì?",
+                    options: [
+                        { key: "A", en: "Request a refund for tickets that they do not plan to use", vi: "Yêu cầu hoàn tiền vé", isCorrect: false },
+                        { key: "B", en: "Order tickets immediately after the semifinal games", vi: "Đặt vé ngay sau trận bán kết", isCorrect: false },
+                        { key: "C", en: "Buy tickets for the final game as soon as possible", vi: "Mua vé trận chung kết càng sớm càng tốt", isCorrect: true },
+                        { key: "D", en: "Arrive at the final game early", vi: "Đến trận chung kết sớm", isCorrect: false }
+                    ],
+                    evidenceId: "ev-199",
+                    expText: "Phần LƯU Ý (NOTE) dưới lịch thi đấu ghi rõ: <em>“Tickets for the final game are selling fast, so don't wait until after the semifinal games to order.”</em> (Vé chung kết đang bán rất nhanh, vì vậy ĐỪNG ĐỢI đến sau bán kết mới đặt). Tức là khán giả được khuyên phải mua vé ngay lập tức / càng sớm càng tốt.",
+                    vocab: "<li><b>Selling fast</b>: Đang bán rất nhanh (sắp hết)</li><li><b>As soon as possible</b>: Càng sớm càng tốt</li>"
+                },
+                {
+                    id: 200,
+                    qEng: "Where will Mr. Cote be reporting from?",
+                    qVie: "Ông Cote sẽ tường thuật / bình luận từ đâu?",
+                    options: [
+                        { key: "A", en: "Bydgoszcz", vi: "Bydgoszcz", isCorrect: true },
+                        { key: "B", en: "Katowice", vi: "Katowice", isCorrect: false },
+                        { key: "C", en: "Cracow", vi: "Cracow", isCorrect: false },
+                        { key: "D", en: "Wroclaw", vi: "Wroclaw", isCorrect: false }
+                    ],
+                    evidenceId: "ev-200",
+                    expText: "Trong Bản tin Radio, phát thanh viên nói: <em>“Venezuela will take on Australia... Our guest announcer will be Vin Cote”</em> (Trận Venezuela gặp Úc... Bình luận viên khách mời là Vin Cote). Đối chiếu lên bảng Lịch thi đấu ở trên, trận đấu giữa <strong>Venezuela-Australia</strong> sẽ diễn ra tại <strong>Loave Arena, Bydgoszcz</strong>. Do đó ông ấy sẽ bình luận tại thành phố Bydgoszcz.",
+                    vocab: "<li><b>Guest announcer</b>: Phát thanh viên / Bình luận viên khách mời</li><li><b>Report</b>: Báo cáo, tường thuật trực tiếp</li>"
+                }
+            ]
+        }
+    ];
+
+    let currentPassageIdx = 0;
+    const savedAnswersJSON = localStorage.getItem('snapEnglish_userAnswers');
+    const userAnswers = savedAnswersJSON ? JSON.parse(savedAnswersJSON) : {};
+
+    function renderPassage(idx) {
+        const data = reviewData[idx];
+        
+        document.getElementById('progress-text').innerText = `Đoạn ${idx + 1} / ${reviewData.length}`;
+        document.getElementById('eng-content').innerHTML = data.engHtml;
+        document.getElementById('vie-content').innerHTML = data.vieHtml;
+
+        let qHtml = '';
+        data.questions.forEach(q => {
+            let optsHtml = '';
+            let correctAnswer = ''; 
+
+            q.options.forEach(opt => {
+                if(opt.isCorrect) correctAnswer = opt.key; 
+                let statusClass = opt.isCorrect ? 'is-correct' : '';
+                let checkIcon = opt.isCorrect ? '✨' : '';
+                
+                optsHtml += `
+                    <div class="option ${statusClass}">
+                        <div class="opt-en"><strong>${opt.key}.</strong> ${opt.en} ${checkIcon}</div>
+                        <div class="opt-vi">${opt.vi}</div>
+                    </div>
+                `;
+            });
+
+            let resultHtml = '';
+            if (savedAnswersJSON) { 
+                let userAnswer = userAnswers[q.id];
+                let bg, text, border, msg;
+                if (!userAnswer) {
+                    bg = '#f5f5f5'; text = '#7a7a7a'; border = '#e0e0e0'; msg = 'Bạn chưa chọn đáp án ⚪';
+                } else if (userAnswer === correctAnswer) {
+                    bg = '#eaf2eb'; text = '#2d5a3e'; border = '#bcd9c4'; msg = `Bạn đã chọn: <strong>(${userAnswer})</strong> <span style="margin-left: 8px;">✔️ Đúng</span>`;
+                } else {
+                    bg = '#fae8e8'; text = '#c96b6b'; border = '#f5c6c6'; msg = `Bạn đã chọn: <strong>(${userAnswer})</strong> <span style="margin-left: 8px;">❌ Sai</span>`;
+                }
+                resultHtml = `<div style="margin: 15px 0 10px 0; font-weight: 800; padding: 12px 18px; border-radius: 12px; font-size: 15px; display: inline-block; background-color: ${bg}; color: ${text}; border: 1px solid ${border}; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">${msg}</div>`;
+            }
+
+            qHtml += `
+                <div class="q-card">
+                    <div class="q-text">Câu ${q.id}: ${q.qEng}</div>
+                    <div class="q-text-vi">${q.qVie}</div>
+                    <div class="options-container">${optsHtml}</div>
+                    
+                    ${resultHtml} <div class="exp-box">
+                        <div class="exp-header">
+                            <div class="exp-title">💡 Giải thích Câu ${q.id}</div>
+                            <button class="btn-locate" onclick="scrollToEvidence('${q.evidenceId}')">📍 Xem dẫn chứng</button>
+                        </div>
+                        <div class="exp-content">${q.expText}</div>
+                        <div class="exp-vocab">
+                            <div style="font-weight:800; color:var(--primary-dark); margin-bottom:10px; text-transform:uppercase; font-size:14px; letter-spacing:1px;">📚 Từ vựng / Ngữ pháp:</div>
+                            <ul>${q.vocab}</ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        document.getElementById('questions-container').innerHTML = qHtml;
+
+        const pastelColors = [
+            { bg: '#ffd6a5', text: '#8a4b08' }, // Cam đào pastel
+            { bg: '#caffbf', text: '#2d5a3e' }, // Xanh lá pastel
+            { bg: '#a0c4ff', text: '#1a3b6e' }, // Xanh dương pastel
+            { bg: '#ffadad', text: '#801b1b' }, // Đỏ nhạt pastel
+            { bg: '#e4c1f9', text: '#482063' }, // Tím nhạt pastel
+            { bg: '#fdffb6', text: '#80770b' }, // Vàng pastel
+            { bg: '#9bf6ff', text: '#135459' }  // Xanh ngọc pastel
+        ];
+
+        const colorMap = {};
+        let colorIndex = 0;
+        
+        document.querySelectorAll('.passage-grid .ev-box').forEach((el) => {
+            const evId = el.getAttribute('id');
+            if (evId && !colorMap[evId]) {
+                colorMap[evId] = pastelColors[colorIndex % pastelColors.length];
+                colorIndex++;
+            }
+            const color = evId ? colorMap[evId] : pastelColors[colorIndex % pastelColors.length];
+            el.style.backgroundColor = color.bg;
+            el.style.color = color.text;
+            el.style.padding = '3px 6px';
+            el.style.borderRadius = '8px';
+            el.style.fontWeight = '800';
+            el.style.border = 'none';
+        });
+
+        document.getElementById('btn-prev').disabled = idx === 0;
+        document.getElementById('btn-next').disabled = idx === reviewData.length - 1;
+    }
+
+    function navigate(dir) {
+        let newIdx = currentPassageIdx + dir;
+        if(newIdx >= 0 && newIdx < reviewData.length) {
+            currentPassageIdx = newIdx;
+            renderPassage(currentPassageIdx);
+            document.querySelector('.passage-grid').scrollTop = 0;
+            document.getElementById('questions-container').scrollTop = 0;
+        }
+    }
+
+    function scrollToEvidence(evId) {
+        const evElement = document.getElementById(evId);
+        if(evElement) {
+            evElement.scrollIntoView({behavior: "smooth", block: "center"});
+            evElement.classList.remove("focus-blink");
+            void evElement.offsetWidth; 
+            evElement.classList.add("focus-blink");
+            setTimeout(() => evElement.classList.remove("focus-blink"), 2000);
+        }
+    }
+
+    window.onload = () => { renderPassage(0); };
+</script>
+</body>
+</html>
