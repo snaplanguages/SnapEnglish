@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Listening Test 4 | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0984E3;
+            --primary-dark: #074B83;
+            --secondary: #00CEC9;
+            --success: #00B894;
+            --danger: #D63031;
+            --bg-main: #F5F7FA;
+            --bg-card: #FFFFFF;
+            --text-main: #2D3436;
+            --text-muted: #636E72;
+            --border: #DFE6E9;
+            --header-h: 70px;
+            --footer-h: 90px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito Sans', sans-serif; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* CUSTOM MODAL / POPUP */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(45, 52, 54, 0.8); backdrop-filter: blur(5px);
+            display: none; align-items: center; justify-content: center; z-index: 9999;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .modal-box {
+            background: white; padding: 40px; border-radius: 20px; width: 90%; max-width: 500px;
+            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.show .modal-box { transform: translateY(0); }
+        .modal-title { font-size: 24px; font-weight: 800; color: var(--primary-dark); margin-bottom: 15px; font-family: 'Lora', serif; }
+        .modal-desc { font-size: 16px; color: var(--text-muted); margin-bottom: 25px; line-height: 1.6; }
+        
+        .mode-btn {
+            display: block; width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px;
+            font-size: 16px; font-weight: 700; cursor: pointer; border: 2px solid var(--border);
+            background: white; color: var(--text-muted); transition: all 0.2s;
+        }
+        .mode-btn:hover, .mode-btn.selected { border-color: var(--primary); background: #E1F0FA; color: var(--primary); }
+        
+        .btn {
+            padding: 12px 25px; border-radius: 10px; font-weight: 700; font-size: 16px;
+            cursor: pointer; border: none; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center;
+        }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(9, 132, 227, 0.3); }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .btn-outline { background: white; border: 2px solid var(--border); color: var(--text-main); }
+        .btn-outline:hover { background: #F1F2F6; }
+        .btn-success { background: var(--success); color: white; }
+
+        .modal-actions { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
+
+        /* HEADER */
+        header {
+            height: var(--header-h); background: white; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02); z-index: 100;
+        }
+        .brand { font-size: 22px; font-weight: 800; color: var(--primary-dark); font-family: 'Lora', serif; }
+        .brand span { color: var(--primary); }
+        
+        .audio-controls { display: flex; align-items: center; gap: 15px; background: #F1F2F6; padding: 5px 15px; border-radius: 30px; }
+        audio { height: 35px; outline: none; }
+        .skip-btn {
+            background: white; border: 2px solid var(--border); border-radius: 50%;
+            width: 35px; height: 35px; cursor: pointer; font-weight: bold; color: var(--primary-dark);
+            display: flex; justify-content: center; align-items: center; transition: 0.2s;
+        }
+        .skip-btn:hover { border-color: var(--primary); background: var(--primary); color: white; }
+        .hidden { display: none !important; }
+
+        .tabs { display: flex; gap: 5px; background: #F1F2F6; padding: 5px; border-radius: 12px; margin-left: 20px;}
+        .tab-btn {
+            padding: 8px 20px; border: none; background: transparent; border-radius: 8px;
+            font-weight: 700; color: var(--text-muted); cursor: pointer; transition: 0.2s; font-size: 15px;
+        }
+        .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+
+        .header-right { display: flex; align-items: center; gap: 20px; }
+
+        /* MAIN CONTENT AREA */
+        main {
+            flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth;
+        }
+        .part-container { display: none; width: 100%; animation: fadeIn 0.4s ease; max-width: 1200px; margin: 0 auto; }
+        .part-container.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .part-title { font-size: 28px; font-weight: 800; color: var(--primary-dark); margin-bottom: 5px; font-family: 'Lora', serif;}
+        .part-desc { font-size: 16px; color: var(--text-muted); margin-bottom: 30px; padding: 15px; background: #E1F0FA; border-left: 4px solid var(--primary); border-radius: 4px; font-weight: 600;}
+
+        /* NOTES BOX & INPUTS (IELTS STYLE) */
+        .notes-box {
+            background: #ffffff; padding: 30px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.02); line-height: 2; font-size: 18px; margin-bottom: 30px;
+        }
+        .notes-box h3 { color: var(--primary-dark); text-align: center; margin-top: 0; font-family: 'Lora', serif; font-size: 22px; margin-bottom: 20px;}
+        .notes-box ul { list-style-type: square; margin-left: 20px; color: #555; }
+        .notes-box li { margin-bottom: 10px; }
+        
+        input[type="text"] {
+            border: 2px solid var(--border); border-radius: 8px; padding: 6px 12px;
+            font-family: inherit; font-size: 16px; color: var(--primary-dark);
+            outline: none; background: #F8FAFC; transition: 0.2s; font-weight: 700; width: 200px;
+        }
+        input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(9, 132, 227, 0.15); }
+        input[type="text"].correct-input { border-color: var(--success); color: var(--success); background: #E6F8F3; }
+        input[type="text"].wrong-input { border-color: var(--danger); color: var(--danger); background: #FDEAEA; }
+
+        /* MULTIPLE CHOICE & SPLIT LAYOUT (TOEIC STYLE) */
+        .q-card {
+            background: white; padding: 30px; border-radius: 16px; border: 1px solid var(--border);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02); margin-bottom: 30px; scroll-margin-top: 90px;
+        }
+        .q-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .q-num {
+            background: var(--primary); color: white; width: 35px; height: 35px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 16px; flex-shrink: 0;
+        }
+        .q-text { font-size: 18px; font-weight: 700; color: var(--text-main); }
+
+        .split-layout { display: flex; gap: 30px; align-items: flex-start; }
+        .split-media { 
+            flex: 1; position: sticky; top: 10px; align-self: flex-start; 
+            background: #F8FAFC; padding: 20px; border-radius: 12px; 
+            border: 1px dashed #CBD5E1; text-align: center; max-height: calc(100vh - 120px); overflow-y: auto;
+        }
+        .split-media img { max-width: 100%; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        .split-questions { flex: 1.2; }
+
+        @media (max-width: 900px) { .split-layout { flex-direction: column; } .split-media { position: relative; max-height: none; } }
+
+        .options-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+        .opt-label {
+            display: flex; align-items: center; padding: 12px 20px; border-radius: 12px;
+            border: 2px solid var(--border); cursor: pointer; transition: 0.2s;
+            background: white; font-weight: 600; font-size: 16px;
+        }
+        .opt-label:hover { border-color: #A0C4FF; background: #F4F8FF; }
+        .opt-label input { margin-right: 15px; transform: scale(1.3); accent-color: var(--primary); }
+        .opt-label.selected { border-color: var(--primary); background: #E1F0FA; }
+
+        /* POST-SUBMISSION STYLES */
+        .opt-label.is-correct { border-color: var(--success) !important; background: #E6F8F3 !important; }
+        .opt-label.is-wrong { border-color: var(--danger) !important; background: #FDEAEA !important; opacity: 0.8; }
+        
+        .explanation-box {
+            display: none; margin-top: 20px; padding: 25px; background: #F8FAFC;
+            border-left: 5px solid var(--primary); border-radius: 0 12px 12px 0;
+            font-size: 16px; line-height: 1.6; animation: fadeIn 0.5s; margin-bottom: 20px;
+        }
+        .explanation-box.show { display: block; }
+        .exp-title { font-weight: 800; color: var(--primary-dark); margin-bottom: 15px; font-size: 18px; border-bottom: 1px dashed var(--border); padding-bottom: 10px;}
+        .script-en { font-weight: 700; color: #4834D4; margin-bottom: 5px; }
+        .script-vi { color: var(--text-muted); font-style: italic; margin-bottom: 15px; }
+        .vocab-box { background: white; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-top: 15px; font-size: 15px;}
+        .hl-right { background-color: #D5F5E3; color: #1E8449; font-weight: 700; padding: 2px 6px; border-radius: 6px; }
+
+        /* FOOTER NAVIGATION */
+        footer {
+            height: var(--footer-h); background: white; border-top: 1px solid var(--border);
+            padding: 10px 30px; display: flex; flex-direction: column; justify-content: center; z-index: 100;
+        }
+        .nav-title { font-size: 13px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+        .nav-grid { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; align-items: center;}
+        .nav-grid::-webkit-scrollbar { height: 6px; }
+        .nav-grid::-webkit-scrollbar-thumb { background: #B2BEC3; border-radius: 10px; }
+        .nav-dot {
+            min-width: 35px; height: 35px; border-radius: 8px; border: 2px solid var(--border);
+            display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;
+            cursor: pointer; background: white; color: var(--text-muted); transition: 0.2s; flex-shrink: 0;
+        }
+        .nav-dot:hover { border-color: var(--primary); color: var(--primary); }
+        .nav-dot.answered { background: #E1F0FA; border-color: #74B9FF; color: var(--primary-dark); }
+        .nav-dot.correct { background: var(--success); border-color: var(--success); color: white; }
+        .nav-dot.wrong { background: var(--danger); border-color: var(--danger); color: white; }
+        
+        .inline-exp { color: #D35400; font-size: 15px; font-weight: 600; display: block; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="setupModal" class="modal-overlay show">
+        <div class="modal-box">
+            <div class="modal-title">IELTS Listening Test 4</div>
+            <div class="modal-desc">Chào mừng bạn đến với bài thi thử. Vui lòng chọn chế độ làm bài.</div>
+            <button class="mode-btn" onclick="selectMode('practice')">🌿 Luyện Tập (Tự do nghe & Xem giải thích)</button>
+            <button class="mode-btn" onclick="selectMode('mock')">🔥 Thi Thử (Như thi thật)</button>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 15px; display: none;" id="btnStart" onclick="startTest()">BẮT ĐẦU</button>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-title">Xác nhận nộp bài</div>
+            <div class="modal-desc">Bạn có chắc chắn muốn nộp bài? Các câu chưa làm sẽ bị tính là sai.</div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('confirmModal')">Quay lại</button>
+                <button class="btn btn-primary" onclick="evaluateTest()">Đồng ý nộp bài</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-title">Kết Quả Bài Thi 🎉</div>
+            <div style="font-size: 50px; font-weight: 800; color: var(--primary); margin: 10px 0;" id="scoreDisplay">0/40</div>
+            <div style="font-size: 24px; font-weight: 700; color: var(--secondary); margin-bottom: 15px;" id="bandDisplay">Band: 0.0</div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="location.reload()">Làm lại</button>
+                <button class="btn btn-success" onclick="closeModal('resultModal')">Xem giải thích chi tiết</button>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="brand">Snap<span>English</span> Test 4</div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab(1)">Part 1</button>
+            <button class="tab-btn" onclick="switchTab(2)">Part 2</button>
+            <button class="tab-btn" onclick="switchTab(3)">Part 3</button>
+            <button class="tab-btn" onclick="switchTab(4)">Part 4</button>
+        </div>
+        
+        <div class="audio-controls" id="audioContainer">
+            <button class="skip-btn" onclick="skipAudio(-10)">-10</button>
+            <audio id="testAudio" controls controlsList="nodownload">
+                <source src="https://raw.githubusercontent.com/snaplanguages/SnapEnglish-audioieltslistening01/319bc60025c2d319f4f0febfc7e7d6c780797130/IELTS%20Listening%20Test%204.mp3" type="audio/mpeg">
+            </audio>
+            <button class="skip-btn" onclick="skipAudio(10)">+10</button>
+        </div>
+
+        <div class="header-right">
+            <button class="btn btn-primary" id="btnSubmit" onclick="requestSubmit()">NỘP BÀI</button>
+        </div>
+    </header>
+
+    <main id="mainContainer">
+        <div id="part1" class="part-container active">
+            <div class="part-title">Part 1: Questions 1-10</div>
+            <div class="part-desc">Complete the notes below. Write <b>NO MORE THAN TWO WORDS OR A NUMBER</b>.</div>
+            
+            <div class="notes-box">
+                <h3>WEST BAY HOTEL - DETAILS OF JOB</h3>
+                <ul>
+                    <li>Newspaper advert for temporary staff</li>
+                    <li>Vacancies for <b>(1)</b> <input type="text" id="q1" oninput="markAnswered(1)"></li>
+                    <div id="exp-1" class="explanation-box" style="margin-top: 5px; padding: 15px;">
+                        <span class="inline-exp">💡 Từ cần điền là danh từ chỉ tên công việc khách sạn đang tuyển. Nữ: "We’re looking for waiters at the moment".</span>
+                    </div>
+
+                    <li>Two shifts</li>
+                    <li>Can choose your <b>(2)</b> <input type="text" id="q2" oninput="markAnswered(2)"> (must be the same each week)</li>
+                    <div id="exp-2" class="explanation-box" style="margin-top: 5px; padding: 15px;">
+                        <span class="inline-exp">💡 Từ cần điền chỉ thứ có thể chọn. Nữ: "You get one day off and I think you can negotiate which one you want... But it has to be the same one every week".</span>
+                    </div>
+
+                    <li>Pay: £5.50 per hour including a <b>(3)</b> <input type="text" id="q3" oninput="markAnswered(3)"></li>
+                    <div id="exp-3" class="explanation-box" style="margin-top: 5px; padding: 15px;">
+                        <span class="inline-exp">💡 Đặc quyền kèm theo lương. Nữ: "You get £5.50 an hour, and that includes a break".</span>
+                    </div>
+
+                    <li>A <b>(4)</b> <input type="text" id="q4" oninput="markAnswered(4)"> is provided in the hotel</li>
+                    <div id="exp-4" class="explanation-box" style="margin-top: 5px; padding: 15px;">
+                        <span class="inline-exp">💡 Nữ: "You can get a meal in the hotel if you want to, and there’s no charge for it".</span>
+                    </div>
+
+                    <li>Total weekly pay: £231</li>
+                    <li>Dress: a white shirt and <b>(5)</b> <input type="text" id="q5" oninput="markAnswered(5)"> trousers (not supplied), a <b>(6)</b> <input type="text" id="q6" oninput="markAnswered(6)"> (supplied)</li>
+                    <div id="exp-5" class="explanation-box" style="margin-top: 5px; padding: 15px;">
+                        <span class="inline-exp">💡 Nữ: "You need to wear a white shirt... and dark trousers... You have to wear a jacket, but the hotel lends you that".</span>
+                    </div>
+
+                    <li>Starting date: <b>(7)</b> <input type="text" id="q7" oninput="markAnswered(7)"></li>
+                    <div id="exp-7" class="explanation-box" style="margin-top: 5px; padding: 15px;">
+                        <span class="inline-exp">💡 Nữ: "Yes, the 28th, in time for the summer" (Nhắc đến June trước đó).</span>
+                    </div>
+
+                    <li>Call Jane <b>(8)</b> <input type="text" id="q8" oninput="markAnswered(8)"> (service manager) before <b>(9)</b> <input type="text" id="q9" oninput="markAnswered(9)"> tomorrow (Tel: 832009)</li>
+                    <div id="exp-8" class="explanation-box" style="margin-top: 5px; padding: 15px;">
+                        <span class="inline-exp">💡 Tên quản lý: "Her name’s Jane Urwin, that’s U-R-W-I-N". Thời gian: "she usually starts checking the rooms at midday, so before then if you can".</span>
+                    </div>
+
+                    <li>She will require a <b>(10)</b> <input type="text" id="q10" oninput="markAnswered(10)"></li>
+                    <div id="exp-10" class="explanation-box" style="margin-top: 5px; padding: 15px;">
+                        <span class="inline-exp">💡 Nữ: "she will ask you for a reference, so you might like to be thinking about that".</span>
+                    </div>
+                </ul>
+            </div>
+            
+            <div class="explanation-box" id="transcript-part1">
+                <div class="exp-title">Transcript Song Ngữ Part 1</div>
+                <div class="script-en">Woman: Hello, West Bay Hotel. Can I help you?</div>
+                <div class="script-vi">Người phụ nữ: Xin chào, khách sạn West Bay xin nghe. Tôi có thể giúp được gì ạ?</div>
+                <div class="script-en">Man: Oh, good morning. I’m ringing about your advertisement in the Evening Gazette. Is that the one for temporary staff?</div>
+                <div class="script-vi">Người đàn ông: Ồ, chào buổi sáng. Tôi gọi để hỏi về quảng cáo của khách sạn ở Evening Gazette. Có phải thông báo tuyển nhân viên tạm thời không anh?</div>
+                <div class="script-en">Woman: We’re looking for waiters at the moment.</div>
+                <div class="script-vi">Người phụ nữ: Chúng tôi đang tìm kiếm người phục vụ tại thời điểm này.</div>
+                <div class="script-en">Woman: There are two different shifts... You get one day off and I think you can negotiate which one you want. But it has to be the same one every week.</div>
+                <div class="script-vi">Người phụ nữ: Có hai ca khác nhau... Anh được nghỉ một ngày và có thể thương lượng... Nhưng ngày nghỉ đó sẽ áp dụng cho tất cả các tuần.</div>
+                
+                <div class="vocab-box">
+                    <b>📚 Từ vựng quan trọng:</b><br>
+                    • <span style="color:var(--primary); font-weight:bold;">negotiate</span>: thương lượng<br>
+                    • <span style="color:var(--primary); font-weight:bold;">charge</span>: phí<br>
+                    • <span style="color:var(--primary); font-weight:bold;">vouch for somebody</span>: đảm bảo cho ai đó
+                </div>
+            </div>
+        </div>
+
+        <div id="part2" class="part-container">
+            <div class="part-title">Part 2: Questions 11-20</div>
+            <div class="part-desc">Choose the correct letter A, B or C for Q11-13. Label the map A-H for Q14-20.</div>
+            
+            <div class="split-layout">
+                <div class="split-media">
+                    <img src="https://ieltssongngu.com/ielts/assets/images/red-hill-improvement-plan-9a411d86daa0125a9581c8c41d8e5f68.jpg" alt="Map">
+                    
+                    <div class="explanation-box" id="transcript-part2" style="text-align: left;">
+                        <div class="exp-title">Transcript Song Ngữ Part 2</div>
+                        <div class="script-en">Graham: People we’ve heard from are mainly worried about traffic in the area, and, in particular, the increasing speed of cars near schools. They feel that it is only a matter of time before there is an accident as a lot of the children walk to the school [Q11].</div>
+                        <div class="script-vi">Họ chủ yếu lo lắng về giao thông trong khu vực và đặc biệt là ô tô đi với tốc độ ngày càng cao... tai nạn chỉ là vấn đề thời gian khi rất nhiều trẻ em đi bộ đến trường.</div>
+                        <div class="script-en">Graham: the power company have agreed to move the power lines underground at a cost of $800,000 [Q12].</div>
+                        <div class="script-vi">Công ty điện lực đã đồng ý chuyển các đường dây điện xuống lòng đất với chi phí 800.000 đô la.</div>
+                        <div class="script-en">Graham: the power company have agreed to bear the cost of this themselves [Q13].</div>
+                        <div class="script-vi">Công ty điện lực đã đồng ý tự chịu chi phí này.</div>
+                        <div class="vocab-box">
+                            <b>📚 Từ vựng:</b><br>
+                            • <span style="color:var(--primary); font-weight:bold;">address</span>: giải quyết<br>
+                            • <span style="color:var(--primary); font-weight:bold;">erect</span>: xây dựng<br>
+                            • <span style="color:var(--primary); font-weight:bold;">incorporate</span>: kết hợp
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="split-questions">
+                    <div class="q-card" id="card-11">
+                        <div class="q-header"><div class="q-num">11</div><div class="q-text">Community groups are mainly concerned about</div></div>
+                        <label class="opt-label" onclick="selectAnswer(11, 'A')"><input type="radio" name="q11" value="A"> A. pedestrian safety</label>
+                        <label class="opt-label" onclick="selectAnswer(11, 'B')"><input type="radio" name="q11" value="B"> B. traffic jams</label>
+                        <label class="opt-label" onclick="selectAnswer(11, 'C')"><input type="radio" name="q11" value="C"> C. increased pollution</label>
+                        <div id="exp-11" class="explanation-box"><span class="inline-exp">💡 Quan ngại về an toàn của người đi bộ (trẻ em đi bộ đến trường dễ gặp tai nạn).</span></div>
+                    </div>
+                    
+                    <div class="q-card" id="card-12">
+                        <div class="q-header"><div class="q-num">12</div><div class="q-text">It has been decided that the overhead power lines will be</div></div>
+                        <label class="opt-label" onclick="selectAnswer(12, 'A')"><input type="radio" name="q12" value="A"> A. extended</label>
+                        <label class="opt-label" onclick="selectAnswer(12, 'B')"><input type="radio" name="q12" value="B"> B. buried</label>
+                        <label class="opt-label" onclick="selectAnswer(12, 'C')"><input type="radio" name="q12" value="C"> C. repaired</label>
+                        <div id="exp-12" class="explanation-box"><span class="inline-exp">💡 "Move the power lines underground" tương đương với "buried" (được chôn lấp).</span></div>
+                    </div>
+
+                    <div class="q-card" id="card-13">
+                        <div class="q-header"><div class="q-num">13</div><div class="q-text">The expenses related to the power lines will be paid by</div></div>
+                        <label class="opt-label" onclick="selectAnswer(13, 'A')"><input type="radio" name="q13" value="A"> A. the council</label>
+                        <label class="opt-label" onclick="selectAnswer(13, 'B')"><input type="radio" name="q13" value="B"> B. the power company</label>
+                        <label class="opt-label" onclick="selectAnswer(13, 'C')"><input type="radio" name="q13" value="C"> C. local businesses</label>
+                        <div id="exp-13" class="explanation-box"><span class="inline-exp">💡 "the power company have agreed to bear the cost of this themselves" -> Công ty điện tự chịu.</span></div>
+                    </div>
+
+                    <div class="q-card">
+                        <h3 style="margin-bottom: 15px; color: var(--primary-dark);">Map Labeling (14-20)</h3>
+                        <p style="margin-bottom: 10px;">Write the correct letter <b>A-H</b>:</p>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div>14. Trees <input type="text" id="q14" oninput="markAnswered(14)" style="width: 50px; text-transform: uppercase;" maxlength="1"> <div id="exp-14" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">Đáp án: C</span></div></div>
+                            <div>15. Wider footpaths <input type="text" id="q15" oninput="markAnswered(15)" style="width: 50px; text-transform: uppercase;" maxlength="1"> <div id="exp-15" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">Đáp án: D</span></div></div>
+                            <div>16. Coloured road surface <input type="text" id="q16" oninput="markAnswered(16)" style="width: 50px; text-transform: uppercase;" maxlength="1"> <div id="exp-16" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">Đáp án: G</span></div></div>
+                            <div>17. New sign <input type="text" id="q17" oninput="markAnswered(17)" style="width: 50px; text-transform: uppercase;" maxlength="1"> <div id="exp-17" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">Đáp án: B</span></div></div>
+                            <div>18. Traffic lights <input type="text" id="q18" oninput="markAnswered(18)" style="width: 50px; text-transform: uppercase;" maxlength="1"> <div id="exp-18" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">Đáp án: F</span></div></div>
+                            <div>19. Artwork <input type="text" id="q19" oninput="markAnswered(19)" style="width: 50px; text-transform: uppercase;" maxlength="1"> <div id="exp-19" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">Đáp án: A</span></div></div>
+                            <div>20. Children's playground <input type="text" id="q20" oninput="markAnswered(20)" style="width: 50px; text-transform: uppercase;" maxlength="1"> <div id="exp-20" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">Đáp án: E</span></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="part3" class="part-container">
+            <div class="part-title">Part 3: Questions 21-30</div>
+            
+            <div class="q-card" id="card-21">
+                <div class="q-header"><div class="q-text"><b>Questions 21 and 22:</b> Choose TWO letters A-E. In which TWO ways is Dan financing his course?</div></div>
+                <label class="opt-label"><input type="checkbox" name="q21_22" value="A" onchange="markMulti(21, 22, 'q21_22')"> A. He is receiving money from the government</label>
+                <label class="opt-label"><input type="checkbox" name="q21_22" value="B" onchange="markMulti(21, 22, 'q21_22')"> B. His family are willing to help him</label>
+                <label class="opt-label"><input type="checkbox" name="q21_22" value="C" onchange="markMulti(21, 22, 'q21_22')"> C. The college is giving him a small grant</label>
+                <label class="opt-label"><input type="checkbox" name="q21_22" value="D" onchange="markMulti(21, 22, 'q21_22')"> D. His local council is supporting him for a limited period</label>
+                <label class="opt-label"><input type="checkbox" name="q21_22" value="E" onchange="markMulti(21, 22, 'q21_22')"> E. A former employer is providing partial funding</label>
+                <div id="exp-21" class="explanation-box">
+                    <span class="inline-exp">💡 (B) "My parents... took pity on me". (E) "asked the boss of the company I used to work for... make a contribution".</span>
+                </div>
+            </div>
+
+            <div class="q-card" id="card-23">
+                <div class="q-header"><div class="q-text"><b>Questions 23 and 24:</b> Choose TWO letters A-E. Which TWO reasons does Jeannie give for deciding to leave some college clubs?</div></div>
+                <label class="opt-label"><input type="checkbox" name="q23_24" value="A" onchange="markMulti(23, 24, 'q23_24')"> A. She is not sufficiently challenged</label>
+                <label class="opt-label"><input type="checkbox" name="q23_24" value="B" onchange="markMulti(23, 24, 'q23_24')"> B. The activity interferes with her studies</label>
+                <label class="opt-label"><input type="checkbox" name="q23_24" value="C" onchange="markMulti(23, 24, 'q23_24')"> C. She does not have enough time</label>
+                <label class="opt-label"><input type="checkbox" name="q23_24" value="D" onchange="markMulti(23, 24, 'q23_24')"> D. The activity is too demanding physically</label>
+                <label class="opt-label"><input type="checkbox" name="q23_24" value="E" onchange="markMulti(23, 24, 'q23_24')"> E. She does not think she is any good at the activity</label>
+                <div id="exp-23" class="explanation-box">
+                    <span class="inline-exp">💡 (A) "I don’t think the conductor stretches us enough". (C) "with all the rehearsing I’m doing, something has to go".</span>
+                </div>
+            </div>
+
+            <div class="q-card" id="card-25">
+                <div class="q-header"><div class="q-num">25</div><div class="q-text">What does Dan say about the seminars on the course?</div></div>
+                <label class="opt-label" onclick="selectAnswer(25, 'A')"><input type="radio" name="q25" value="A"> A. The other students do not give him a chance to speak</label>
+                <label class="opt-label" onclick="selectAnswer(25, 'B')"><input type="radio" name="q25" value="B"> B. The seminars make him feel inferior to the other students</label>
+                <label class="opt-label" onclick="selectAnswer(25, 'C')"><input type="radio" name="q25" value="C"> C. The preparation for seminars takes too much time</label>
+                <div id="exp-25" class="explanation-box"><span class="inline-exp">💡 "I wonder if I’m clever enough" -> Cảm thấy kém cỏi hơn (feel inferior).</span></div>
+            </div>
+
+            <div class="q-card" id="card-26">
+                <div class="q-header"><div class="q-num">26</div><div class="q-text">What does Jeannie say about the tutorials on the course?</div></div>
+                <label class="opt-label" onclick="selectAnswer(26, 'A')"><input type="radio" name="q26" value="A"> A. They are an inefficient way of providing guidance</label>
+                <label class="opt-label" onclick="selectAnswer(26, 'B')"><input type="radio" name="q26" value="B"> B. They are more challenging than she had expected</label>
+                <label class="opt-label" onclick="selectAnswer(26, 'C')"><input type="radio" name="q26" value="C"> C. They are helping her to develop her study skills</label>
+                <div id="exp-26" class="explanation-box"><span class="inline-exp">💡 "She gives me lots of feedbacks... exams" -> Giúp phát triển kỹ năng.</span></div>
+            </div>
+
+            <div class="notes-box" style="margin-top: 30px;">
+                <h3>Advice on exam preparations</h3>
+                <p>Step 3: Work out your <b>(27)</b> <input type="text" id="q27" oninput="markAnswered(27)"> for revision and write them on a card.</p>
+                <div id="exp-27" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 "sort out your revision priorities"</span></div>
+                
+                <p>Step 4: Make a <b>(28)</b> <input type="text" id="q28" oninput="markAnswered(28)"> and keep it in view.</p>
+                <div id="exp-28" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 "You also need a timetable... keep it in front of you"</span></div>
+                
+                <p>Step 5: Divide revision into <b>(29)</b> <input type="text" id="q29" oninput="markAnswered(29)"> for each day.</p>
+                <div id="exp-29" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 "break down your revision into small tasks"</span></div>
+                
+                <p>Step 6: Write one <b>(30)</b> <input type="text" id="q30" oninput="markAnswered(30)"> about each topic.</p>
+                <div id="exp-30" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 "I write a single paragraph about it"</span></div>
+            </div>
+            
+            <div class="explanation-box" id="transcript-part3">
+                <div class="exp-title">Transcript Song Ngữ Part 3</div>
+                <div class="script-en">Dan: I asked the boss of the company I used to work for if they would sponsor me, and much to my surprise, he said they’d make a contribution.</div>
+                <div class="script-en">Dan: My parents had been saying... But in the end, they took pity on me, so now I’ve just about got enough.</div>
+                <div class="script-en">Jeannie: I don’t think the conductor stretches us enough... but with all the rehearsing I’m doing, something has to go.</div>
+                <div class="vocab-box">
+                    <b>📚 Từ vựng:</b><br>
+                    • <span style="color:var(--primary); font-weight:bold;">sort out</span>: giải quyết / sắp xếp ổn thỏa<br>
+                    • <span style="color:var(--primary); font-weight:bold;">eligible</span>: đủ điều kiện<br>
+                    • <span style="color:var(--primary); font-weight:bold;">on the same wavelength</span>: cùng quan điểm
+                </div>
+            </div>
+        </div>
+
+        <div id="part4" class="part-container">
+            <div class="part-title">Part 4: Questions 31-40</div>
+            
+            <div class="q-card">
+                <h3 style="margin-bottom: 15px; color: var(--primary-dark);">Painting Styles Matching (31-36)</h3>
+                <p>A. Dynamic | B. Yam | C. Modern</p>
+                <div style="display:grid; grid-template-columns: 1fr; gap: 15px; margin-top: 15px;">
+                    <div>31. figures revealing bones <input type="text" id="q31" oninput="markAnswered(31)" style="width: 50px; text-transform: uppercase;" maxlength="1"> <div id="exp-31" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 Modern ("X-ray... internal skeleton") -> C</span></div></div>
+                    <div>32. rounded figures <input type="text" id="q32" oninput="markAnswered(32)" style="width: 50px; text-transform: uppercase;" maxlength="1"> <div id="exp-32" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 Yam ("much curvier figures") -> B</span></div></div>
+                    <div>33. figures with parts missing <input type="text" id="q33" oninput="markAnswered(33)" style="width: 50px; text-transform: uppercase;" maxlength="1"> <div id="exp-33" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 Modern ("painting the Europeans without any hands") -> C</span></div></div>
+                    <div>34. figures smaller than life size <input type="text" id="q34" oninput="markAnswered(34)" style="width: 50px; text-transform: uppercase;" maxlength="1"> <div id="exp-34" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 Dynamic ("painted in miniature") -> A</span></div></div>
+                    <div>35. sea creatures <input type="text" id="q35" oninput="markAnswered(35)" style="width: 50px; text-transform: uppercase;" maxlength="1"> <div id="exp-35" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 Yam (Answer Key says B, audio mention context related to later questions).</span></div></div>
+                    <div>36. plants <input type="text" id="q36" oninput="markAnswered(36)" style="width: 50px; text-transform: uppercase;" maxlength="1"> <div id="exp-36" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 Yam ("resemble the vegetable called a yam") -> B</span></div></div>
+                </div>
+            </div>
+
+            <div class="notes-box">
+                <h3>RAINBOW SERPENT PROJECT</h3>
+                <p>Aim of project: to identify the <b>(37)</b> <input type="text" id="q37" oninput="markAnswered(37)"> used as the basis for the Rainbow Serpent</p>
+                <div id="exp-37" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 Đáp án: animal / creature</span></div>
+                
+                <p>Yam Period:<br>
+                • Environmental changes led to higher <b>(38)</b> <input type="text" id="q38" oninput="markAnswered(38)"><br>
+                <span id="exp-38" class="inline-exp" style="display:none;">💡 Đáp án: sea / water level</span>
+                <br>• Traditional activities were affected especially <b>(39)</b> <input type="text" id="q39" oninput="markAnswered(39)"></p>
+                <div id="exp-39" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 Đáp án: hunting</span></div>
+                
+                <p>Rainbow Serpent Image:<br>
+                • Symbolises <b>(40)</b> <input type="text" id="q40" oninput="markAnswered(40)"> in Aboriginal culture</p>
+                <div id="exp-40" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 Đáp án: creation</span></div>
+            </div>
+
+            <div class="explanation-box" id="transcript-part4">
+                <div class="exp-title">Transcript Song Ngữ Part 4</div>
+                <div class="script-en">The Yam style of painting got its name from the fact that it featured much curvier figures [Q32] that actually resemble the vegetable called a yam, which is similar to a sweet potato.</div>
+                <div class="script-en">Aborigines managed to convey the idea of the settlers’ clothing by simply painting the Europeans without any hands [Q33].</div>
+                <div class="script-en">The more recent images tend to be life-size or even larger, but the Dynamic figures are painted in miniature [Q34].</div>
+                <div class="vocab-box">
+                    <b>📚 Từ vựng:</b><br>
+                    • <span style="color:var(--primary); font-weight:bold;">depict</span>: mô tả<br>
+                    • <span style="color:var(--primary); font-weight:bold;">in miniature</span>: trong phạm vi nhỏ<br>
+                    • <span style="color:var(--primary); font-weight:bold;">intrigue</span>: thu hút
+                </div>
+            </div>
+            <div style="height: 50px;"></div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="nav-title">Bảng điều hướng nhanh (1 - 40)</div>
+        <div class="nav-grid" id="navGrid"></div>
+    </footer>
+
+    <script>
+        // Answer Key based on the docx
+        const answerKey = {
+            1: ["waiter", "waiters"], 2: ["day off"], 3: ["break"], 4: ["meal", "free meal"], 5: ["dark", "dark colored"], 
+            6: ["jacket"], 7: ["28 june", "28th june", "june 28"], 8: ["urwin"], 9: ["12.00 pm", "noon", "12 noon", "midday"], 10: ["reference"],
+            11: ["a"], 12: ["b"], 13: ["b"], 14: ["c"], 15: ["d"], 16: ["g"], 17: ["b"], 18: ["f"], 19: ["a"], 20: ["e"],
+            // Checkboxes 21-22 & 23-24 handled specially
+            25: ["b"], 26: ["c"], 27: ["priorities"], 28: ["timetable", "timetables"], 29: ["small tasks", "tasks"], 30: ["single paragraph", "paragraph"],
+            31: ["c"], 32: ["b"], 33: ["c"], 34: ["a"], 35: ["b"], 36: ["b"], 37: ["animal", "creature"], 38: ["sea", "water level", "sea level"], 39: ["hunting"], 40: ["creation"]
+        };
+
+        let isSubmitted = false;
+        let mode = '';
+        const audio = document.getElementById('testAudio');
+
+        // Init Nav Grid
+        const navGrid = document.getElementById('navGrid');
+        for (let i = 1; i <= 40; i++) {
+            navGrid.innerHTML += `<div class="nav-dot" id="nav-${i}" onclick="scrollToQ(${i})">${i}</div>`;
+        }
+
+        function selectMode(selectedMode) {
+            mode = selectedMode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            document.getElementById('btnStart').style.display = 'block';
+        }
+
+        function startTest() {
+            document.getElementById('setupModal').classList.remove('show');
+            if (mode === 'mock') {
+                audio.removeAttribute('controls');
+                document.querySelectorAll('.skip-btn').forEach(b => b.classList.add('hidden'));
+                audio.play();
+            }
+        }
+
+        function skipAudio(sec) { audio.currentTime += sec; }
+
+        function switchTab(num) {
+            document.querySelectorAll('.tab-btn').forEach((btn, i) => btn.classList.toggle('active', i+1 === num));
+            document.querySelectorAll('.part-container').forEach((part, i) => part.classList.toggle('active', i+1 === num));
+            document.getElementById('mainContainer').scrollTop = 0;
+        }
+
+        function scrollToQ(i) {
+            let tab = 1;
+            if(i > 10) tab = 2;
+            if(i > 20) tab = 3;
+            if(i > 30) tab = 4;
+            switchTab(tab);
+            setTimeout(() => {
+                let el = document.getElementById('q'+i) || document.getElementById('card-'+i) || document.getElementsByName('q'+i)[0];
+                if(el) {
+                    el.scrollIntoView({behavior: "smooth", block: "center"});
+                    let parent = el.closest('.q-card') || el.closest('.notes-box') || el;
+                    parent.style.transition = "box-shadow 0.5s";
+                    let oldShadow = parent.style.boxShadow;
+                    parent.style.boxShadow = "0 0 0 4px var(--secondary)";
+                    setTimeout(() => parent.style.boxShadow = oldShadow, 1000);
+                }
+            }, 100);
+        }
+
+        function markAnswered(id) {
+            if (isSubmitted) return;
+            let val = document.getElementById('q'+id).value.trim();
+            document.getElementById('nav-'+id).classList.toggle('answered', val !== '');
+        }
+
+        function selectAnswer(id, val) {
+            if (isSubmitted) return;
+            document.querySelectorAll(`input[name="q${id}"]`).forEach(inp => {
+                inp.checked = (inp.value === val);
+                if(inp.checked) inp.parentElement.classList.add('selected');
+                else inp.parentElement.classList.remove('selected');
+            });
+            document.getElementById('nav-'+id).classList.add('answered');
+        }
+
+        function markMulti(id1, id2, groupName) {
+            if(isSubmitted) return;
+            let checked = document.querySelectorAll(`input[name="${groupName}"]:checked`);
+            if(checked.length > 2) { event.target.checked = false; return; }
+            
+            document.getElementById('nav-'+id1).classList.toggle('answered', checked.length > 0);
+            document.getElementById('nav-'+id2).classList.toggle('answered', checked.length > 1);
+        }
+
+        function requestSubmit() { document.getElementById('confirmModal').classList.add('show'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+        function evaluateTest() {
+            isSubmitted = true;
+            closeModal('confirmModal');
+            audio.pause();
+            document.querySelectorAll('input').forEach(i => i.disabled = true);
+            document.getElementById('btnSubmit').style.display = 'none';
+
+            let score = 0;
+
+            for (let i = 1; i <= 40; i++) {
+                if(i >= 21 && i <= 24) continue; // Multi handled below
+
+                let userAns = '';
+                let textInput = document.getElementById('q'+i);
+                if(textInput) {
+                    userAns = textInput.value.trim().toLowerCase();
+                } else {
+                    let checked = document.querySelector(`input[name="q${i}"]:checked`);
+                    if(checked) userAns = checked.value.toLowerCase();
+                }
+
+                let isCorrect = answerKey[i] && answerKey[i].includes(userAns);
+                let navDot = document.getElementById('nav-'+i);
+                navDot.classList.remove('answered');
+                
+                if (isCorrect) {
+                    score++;
+                    navDot.classList.add('correct');
+                    if(textInput) textInput.classList.add('correct-input');
+                } else {
+                    navDot.classList.add('wrong');
+                    if(textInput) {
+                        textInput.classList.add('wrong-input');
+                        textInput.value = (userAns ? userAns + " " : "") + "✓ " + answerKey[i][0].toUpperCase();
+                    } else {
+                        document.querySelectorAll(`input[name="q${i}"]`).forEach(inp => {
+                            let lbl = inp.parentElement;
+                            if(inp.value.toLowerCase() === answerKey[i][0].toLowerCase()) lbl.classList.add('is-correct');
+                            if(inp.checked && !isCorrect) lbl.classList.add('is-wrong');
+                        });
+                    }
+                }
+                
+                let expBox = document.getElementById('exp-'+i);
+                if(expBox) expBox.classList.add('show');
+            }
+
+            // Evaluate Checkboxes Q21-22 & Q23-24
+            const evalMulti = (gName, keys, navIds) => {
+                let answers = Array.from(document.querySelectorAll(`input[name="${gName}"]:checked`)).map(c => c.value.toLowerCase());
+                let correctCount = answers.filter(a => keys.includes(a)).length;
+                
+                document.querySelectorAll(`input[name="${gName}"]`).forEach(inp => {
+                    let v = inp.value.toLowerCase();
+                    if(keys.includes(v)) inp.parentElement.classList.add('is-correct');
+                    else if(inp.checked) inp.parentElement.classList.add('is-wrong');
+                });
+
+                document.getElementById('nav-'+navIds[0]).classList.remove('answered');
+                document.getElementById('nav-'+navIds[1]).classList.remove('answered');
+
+                if(correctCount > 0) { score++; document.getElementById('nav-'+navIds[0]).classList.add('correct'); } else document.getElementById('nav-'+navIds[0]).classList.add('wrong');
+                if(correctCount > 1) { score++; document.getElementById('nav-'+navIds[1]).classList.add('correct'); } else document.getElementById('nav-'+navIds[1]).classList.add('wrong');
+            };
+
+            evalMulti('q21_22', ['b', 'e'], [21, 22]);
+            evalMulti('q23_24', ['a', 'c'], [23, 24]);
+
+            // Show global transcripts
+            for(let i=1; i<=4; i++) {
+                let ts = document.getElementById('transcript-part'+i);
+                if(ts) ts.classList.add('show');
+            }
+
+            // Score Logic
+            document.getElementById('scoreDisplay').innerText = score + "/40";
+            let band = 0;
+            if(score >= 39) band = 9.0; else if(score >= 37) band = 8.5;
+            else if(score >= 35) band = 8.0; else if(score >= 32) band = 7.5;
+            else if(score >= 30) band = 7.0; else if(score >= 26) band = 6.5;
+            else if(score >= 23) band = 6.0; else if(score >= 18) band = 5.5;
+            else if(score >= 16) band = 5.0; else if(score >= 13) band = 4.5;
+            else if(score >= 10) band = 4.0;
+            
+            document.getElementById('bandDisplay').innerText = "Band: " + band.toFixed(1);
+            document.getElementById('resultModal').classList.add('show');
+        }
+    </script>
+  <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+            authDomain: "snapenglish-cb6e2.firebaseapp.com",
+            projectId: "snapenglish-cb6e2",
+            storageBucket: "snapenglish-cb6e2.firebasestorage.app",
+            messagingSenderId: "373152038413",
+            appId: "1:373152038413:web:19284622571390f8585f44"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        function showSyncToast(msg) {
+            let toast = document.createElement("div");
+            toast.innerText = msg;
+            toast.style.cssText = "position:fixed; bottom:20px; right:20px; background:#ff477e; color:white; padding:12px 25px; border-radius:50px; font-weight:bold; font-family:'Quicksand',sans-serif; z-index:99999; box-shadow:0 8px 20px rgba(0,0,0,0.15); transform:translateY(100px); opacity:0; transition:all 0.5s ease;";
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.style.transform = "translateY(0)"; toast.style.opacity = "1"; }, 100);
+            setTimeout(() => { toast.style.transform = "translateY(100px)"; toast.style.opacity = "0"; }, 3500);
+            setTimeout(() => { document.body.removeChild(toast); }, 4000); 
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                window.currentUserUid = user.uid;
+                window.currentUserEmail = user.email;
+            }
+        });
+
+        window.luuDiemIELTSFullTest = async function(diemSo, bandScore, tenBai) {
+            if (!window.currentUserUid) return;
+            let timestamp = Date.now();
+            let docId = window.currentUserUid + "_ielts_" + timestamp; 
+
+            await setDoc(doc(db, "user_ielts_scores", docId), {
+                email: window.currentUserEmail,
+                skill: "Listening",
+                testName: tenBai,
+                partName: "Full Test",
+                correctQ: diemSo,
+                totalQ: 40,
+                bandScore: parseFloat(bandScore),
+                date: new Date().toLocaleDateString("vi-VN"),
+                timeTaken: "", 
+                timestamp: timestamp
+            });
+            showSyncToast("☁️ Đã đồng bộ Band " + bandScore + " lên Tracker!");
+        }
+    </script>
+</body>
+</html>
