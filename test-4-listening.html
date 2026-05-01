@@ -108,7 +108,7 @@
         .part-title { font-size: 28px; font-weight: 800; color: var(--primary-dark); margin-bottom: 5px; font-family: 'Lora', serif;}
         .part-desc { font-size: 16px; color: var(--text-muted); margin-bottom: 30px; padding: 15px; background: #E1F0FA; border-left: 4px solid var(--primary); border-radius: 4px; font-weight: 600;}
 
-        /* NOTES BOX & INPUTS (IELTS STYLE) */
+        /* NOTES BOX & INPUTS */
         .notes-box {
             background: #ffffff; padding: 30px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.02); line-height: 2; font-size: 18px; margin-bottom: 30px;
         }
@@ -125,7 +125,7 @@
         input[type="text"].correct-input { border-color: var(--success); color: var(--success); background: #E6F8F3; }
         input[type="text"].wrong-input { border-color: var(--danger); color: var(--danger); background: #FDEAEA; }
 
-        /* MULTIPLE CHOICE & SPLIT LAYOUT (TOEIC STYLE) */
+        /* MULTIPLE CHOICE & SPLIT LAYOUT */
         .q-card {
             background: white; padding: 30px; border-radius: 16px; border: 1px solid var(--border);
             box-shadow: 0 4px 15px rgba(0,0,0,0.02); margin-bottom: 30px; scroll-margin-top: 90px;
@@ -146,7 +146,6 @@
         }
         .split-media img { max-width: 100%; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 15px; }
         .split-questions { flex: 1.2; }
-
         @media (max-width: 900px) { .split-layout { flex-direction: column; } .split-media { position: relative; max-height: none; } }
 
         .options-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
@@ -173,7 +172,7 @@
         .script-en { font-weight: 700; color: #4834D4; margin-bottom: 5px; }
         .script-vi { color: var(--text-muted); font-style: italic; margin-bottom: 15px; }
         .vocab-box { background: white; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-top: 15px; font-size: 15px;}
-        .hl-right { background-color: #D5F5E3; color: #1E8449; font-weight: 700; padding: 2px 6px; border-radius: 6px; }
+        .inline-exp { color: #D35400; font-size: 15px; font-weight: 600; display: block; margin-top: 5px; }
 
         /* FOOTER NAVIGATION */
         footer {
@@ -193,22 +192,35 @@
         .nav-dot.answered { background: #E1F0FA; border-color: #74B9FF; color: var(--primary-dark); }
         .nav-dot.correct { background: var(--success); border-color: var(--success); color: white; }
         .nav-dot.wrong { background: var(--danger); border-color: var(--danger); color: white; }
-        
-        .inline-exp { color: #D35400; font-size: 15px; font-weight: 600; display: block; margin-top: 5px; }
+
+        /* TOAST NOTIFICATION */
+        #toastNotification {
+            position: fixed; bottom: -100px; right: 30px;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 10px 30px rgba(9, 132, 227, 0.15);
+            padding: 15px 25px; border-radius: 12px; display: flex; align-items: center; gap: 15px;
+            z-index: 10000; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        #toastNotification.show { bottom: 30px; }
+        .toast-icon { font-size: 24px; }
+        .toast-title { font-weight: 800; color: var(--primary-dark); font-size: 16px; }
+        .toast-desc { color: var(--text-muted); font-size: 14px; }
     </style>
 </head>
 <body>
 
+    <!-- START MODAL -->
     <div id="setupModal" class="modal-overlay show">
         <div class="modal-box">
             <div class="modal-title">IELTS Listening Test 4</div>
             <div class="modal-desc">Chào mừng bạn đến với bài thi thử. Vui lòng chọn chế độ làm bài.</div>
-            <button class="mode-btn" onclick="selectMode('practice')">🌿 Luyện Tập </button>
-            <button class="mode-btn" onclick="selectMode('mock')">🔥 Thi Thử </button>
+            <button class="mode-btn" onclick="selectMode('practice')">🌿 Luyện Tập (Tự do nghe & Xem giải thích)</button>
+            <button class="mode-btn" onclick="selectMode('mock')">🔥 Thi Thử (Như thi thật)</button>
             <button class="btn btn-primary" style="width: 100%; margin-top: 15px; display: none;" id="btnStart" onclick="startTest()">BẮT ĐẦU</button>
         </div>
     </div>
 
+    <!-- SUBMIT CONFIRM MODAL -->
     <div id="confirmModal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-title">Xác nhận nộp bài</div>
@@ -220,6 +232,7 @@
         </div>
     </div>
 
+    <!-- RESULT MODAL -->
     <div id="resultModal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-title">Kết Quả Bài Thi 🎉</div>
@@ -255,6 +268,7 @@
     </header>
 
     <main id="mainContainer">
+        <!-- ================= PART 1 ================= -->
         <div id="part1" class="part-container active">
             <div class="part-title">Part 1: Questions 1-10</div>
             <div class="part-desc">Complete the notes below. Write <b>NO MORE THAN TWO WORDS OR A NUMBER</b>.</div>
@@ -292,7 +306,7 @@
 
                     <li>Starting date: <b>(7)</b> <input type="text" id="q7" oninput="markAnswered(7)"></li>
                     <div id="exp-7" class="explanation-box" style="margin-top: 5px; padding: 15px;">
-                        <span class="inline-exp">💡 Nữ: "Yes, the 28th, in time for the summer" (Nhắc đến June trước đó).</span>
+                        <span class="inline-exp">💡 Nữ: "Yes, the 28th, in time for the summer".</span>
                     </div>
 
                     <li>Call Jane <b>(8)</b> <input type="text" id="q8" oninput="markAnswered(8)"> (service manager) before <b>(9)</b> <input type="text" id="q9" oninput="markAnswered(9)"> tomorrow (Tel: 832009)</li>
@@ -308,25 +322,132 @@
             </div>
             
             <div class="explanation-box" id="transcript-part1">
-                <div class="exp-title">Transcript Song Ngữ Part 1</div>
+                <div class="exp-title">Transcript Song Ngữ Đầy Đủ - Part 1</div>
+                
                 <div class="script-en">Woman: Hello, West Bay Hotel. Can I help you?</div>
                 <div class="script-vi">Người phụ nữ: Xin chào, khách sạn West Bay xin nghe. Tôi có thể giúp được gì ạ?</div>
-                <div class="script-en">Man: Oh, good morning. I’m ringing about your advertisement in the Evening Gazette. Is that the one for temporary staff?</div>
-                <div class="script-vi">Người đàn ông: Ồ, chào buổi sáng. Tôi gọi để hỏi về quảng cáo của khách sạn ở Evening Gazette. Có phải thông báo tuyển nhân viên tạm thời không anh?</div>
-                <div class="script-en">Woman: We’re looking for waiters at the moment.</div>
-                <div class="script-vi">Người phụ nữ: Chúng tôi đang tìm kiếm người phục vụ tại thời điểm này.</div>
-                <div class="script-en">Woman: There are two different shifts... You get one day off and I think you can negotiate which one you want. But it has to be the same one every week.</div>
-                <div class="script-vi">Người phụ nữ: Có hai ca khác nhau... Anh được nghỉ một ngày và có thể thương lượng... Nhưng ngày nghỉ đó sẽ áp dụng cho tất cả các tuần.</div>
+                
+                <div class="script-en">Man: Oh, good morning. I’m ringing about your advertisement in the Evening Gazette.</div>
+                <div class="script-vi">Người đàn ông: Ồ, chào buổi sáng. Tôi gọi để hỏi về quảng cáo của khách sạn ở Evening Gazette.</div>
+                
+                <div class="script-en">Woman: Is that the one for temporary staff [Example]?</div>
+                <div class="script-vi">Người phụ nữ: Có phải thông báo tuyển nhân viên tạm thời không anh?</div>
+                
+                <div class="script-en">Man: That’s right.</div>
+                <div class="script-vi">Người đàn ông: Đúng vậy.</div>
+                
+                <div class="script-en">Woman: Yes. I’m afraid the person who’s dealing with that isn’t in today, but I can give you the main details if you like.</div>
+                <div class="script-vi">Người phụ nữ: Vâng. Nhưng người giải quyết vấn đề đó không có ở đây trong ngày hôm nay, nhưng tôi có thể cung cấp cho anh các chi tiết chính nếu anh muốn.</div>
+                
+                <div class="script-en">Man: Yes, please. Could you tell me what kind of staff you are looking for?</div>
+                <div class="script-vi">Người đàn ông: Vâng, giúp tôi nhé. Chị có thể cho tôi biết loại nhân viên nào khách sạn đang tìm kiếm không?</div>
+                
+                <div class="script-en">Woman: We’re looking for waiters at the moment [Q1]. There was one post for a cook, but that’s already been taken.</div>
+                <div class="script-vi">Người phụ nữ: Chúng tôi đang tìm kiếm người phục vụ tại thời điểm này. Trước chúng tôi có một đầu bếp, nhưng đã tuyển được rồi.</div>
+                
+                <div class="script-en">Man: Oh right. Erm, what are the hours of work?</div>
+                <div class="script-vi">Người đàn ông: Ồ vậy hả. Erm, giờ làm việc thế nào nhỉ chị?</div>
+                
+                <div class="script-en">Woman: There are two different shifts – there’s a day shift from 7 to 2 and a late shift from 4 till 11.</div>
+                <div class="script-vi">Người phụ nữ: Có hai ca khác nhau – có ca làm việc từ 7h đến 2h và ca muộn từ 4h đến 11h.</div>
+                
+                <div class="script-en">Man: And can people choose which one they want to do?</div>
+                <div class="script-vi">Người đàn ông: Có thể chọn ca mình muốn làm không?</div>
+                
+                <div class="script-en">Woman: Not normally, because everyone would choose the day shift I suppose. You alternate from one week to another.</div>
+                <div class="script-vi">Người phụ nữ: Theo luật là không, vì ai cũng sẽ chọn ca ngày nếu được phép. Các anh sẽ luân phiên nhau từ tuần này sang tuần khác.</div>
+                
+                <div class="script-en">Man: Okay. I’m just writing all this down. What about time off?</div>
+                <div class="script-vi">Người đàn ông: OK. Để tôi ghi chú lại. Còn thời gian nghỉ thì sao?</div>
+                
+                <div class="script-en">Woman: You get one day off and I think you can negotiate which one you want, it’s more or less up to you. But it has to be the same one every week [Q2].</div>
+                <div class="script-vi">Người phụ nữ: Anh được nghỉ một ngày và tôi nghĩ anh có thể thương lượng xem anh muốn nghỉ ngày nào. Đó là quyền của anh. Nhưng ngày nghỉ đó sẽ áp dụng cho tất cả các tuần.</div>
+                
+                <div class="script-en">Man: Do you know what the rates of pay are?</div>
+                <div class="script-vi">Người đàn ông: Chị có biết mức lương là bao nhiêu không?</div>
+                
+                <div class="script-en">Woman: Yes, I’ve got them here. You get £5.50 an hour, and that includes a break [Q3].</div>
+                <div class="script-vi">Người phụ nữ: Vâng, tôi có thông tin ở đây. Anh nhận được £ 5,50 một giờ bao gồm cả thời gian nghỉ.</div>
+                
+                <div class="script-en">Man: Do I have to go home to eat or …</div>
+                <div class="script-vi">Người đàn ông: Tôi có phải về nhà để ăn hay …</div>
+                
+                <div class="script-en">Woman: You don’t have to. You can get a meal in the hotel if you want to, and there’s no charge for it so you might as well [Q4].</div>
+                <div class="script-vi">Người phụ nữ: Anh không cần phải làm vậy. Anh có thể có một bữa ăn trong khách sạn nếu muốn, và anh cũng không phải trả phí.</div>
+                
+                <div class="script-en">Man: Oh good. Yes, so let’s see. I’d get er, two hundred and twenty-one, no, two hundred and thirty-one pounds a week?</div>
+                <div class="script-vi">Người đàn ông: Ồ tốt quá. Xem nào. Tôi sẽ nhận được, hai trăm hai mươi mốt, không, hai trăm ba mươi mốt một tuần?</div>
+                
+                <div class="script-en">Woman: You’d also get tips – our guests tend to be quite generous.</div>
+                <div class="script-vi">Người phụ nữ: Anh cũng sẽ nhận được tiền bo – khách ở đây khá hào phóng.</div>
+                
+                <div class="script-en">Man: Erm, is there a uniform? What about clothes?</div>
+                <div class="script-vi">Người đàn ông: Erm, có đồng phục không nhỉ? Còn quần áo thì sao?</div>
+                
+                <div class="script-en">Woman: Yes, I forgot to mention that. You need to wear a white shirt, just a plain one, and dark trousers [Q5]. You know, not green or anything like that. And we don’t supply those.</div>
+                <div class="script-vi">Người phụ nữ: Vâng, tôi quên đề cập đến điều đó. Anh cần mặc một chiếc áo sơ mi trắng, quần dài, tối màu. Anh biết đấy, không phải màu xanh lá cây hay bất cứ màu nào như thế. Và chúng tôi không phát đồng phục.</div>
+                
+                <div class="script-en">Man: That’s okay, I’ve got trousers, I’d just have to buy a couple of shirts. What about anything else? Do I need a waistcoat or anything?</div>
+                <div class="script-vi">Người đàn ông: Không sao, tôi đã có quần dài, tôi chỉ cần mua một vài chiếc sơ mi. Còn gì nữa không? Tôi có cần áo ghi lê hay bất cứ thứ gì không?</div>
+                
+                <div class="script-en">Woman: You have to wear a jacket, but the hotel lends you that [Q6].</div>
+                <div class="script-vi">Người phụ nữ: Anh phải mặc áo khoác, nhưng khách sạn có thể cho anh mượn.</div>
+                
+                <div class="script-en">Man: I see. Er, one last thing – I don’t know what the starting date is.</div>
+                <div class="script-vi">Người đàn ông: Tôi hiểu. Er, một điều cuối cùng – tôi không biết ngày bắt đầu làm việc.</div>
+                
+                <div class="script-en">Woman: Just a minute, I think it’s some time around the end of June. Yes, the 28th, in time for the summer [Q7].</div>
+                <div class="script-vi">Người phụ nữ: Chờ tôi chút, tôi nghĩ đâu đấy cuối tháng Sáu. Vâng, ngày 28, đúng vào mùa hè.</div>
+                
+                <div class="script-en">Man: That’s great. I’m available from the 10th.</div>
+                <div class="script-vi">Người đàn ông: Thật tuyệt vời. Tôi rảnh từ ngày 10.</div>
+                
+                <div class="script-en">Woman: Oh good. Well, if you can call again you need to speak to the Service Manager. Her name’s Jane Urwin, that’s U-R-W-I-N [Q8], and she’ll probably arrange to meet you.</div>
+                <div class="script-vi">Người phụ nữ: Ồ tốt. Chà, nếu anh có thể gọi lại, anh cần nói chuyện với Quản lý dịch vụ. Tên cô ấy là Jane Urwin, U-R-W-I-N, và cô ấy có lẽ sẽ sắp xếp lịch gặp bạn.</div>
+                
+                <div class="script-en">Man: Okay. And when’s the best time to ring?</div>
+                <div class="script-vi">Người đàn ông: OK. Khi nào tôi nên gọi cho cô ý nhỉ?</div>
+                
+                <div class="script-en">Woman: Could you call tomorrow? Um, she usually starts checking the rooms at midday, so before then if you can, so she’ll have more time to chat [Q9]. I’ll just give you her number because she’s got a direct line.</div>
+                <div class="script-vi">Người phụ nữ: Anh có thể gọi vào ngày mai? Hmm.. cô ấy thường bắt đầu kiểm tra phòng vào buổi trưa, vì vậy trước thời gian đó anh gọi là tốt nhất vì sẽ có nhiều thời gian hơn để trò chuyện. Tôi sẽ cho anh số điện thoại của cô ấy vì cô ấy có một số liên lạc trực tiếp.</div>
+                
+                <div class="script-en">Man: Thanks.</div>
+                <div class="script-vi">Người đàn ông: Cảm ơn chị.</div>
+                
+                <div class="script-en">Woman: It’s 832 double-0 9.</div>
+                <div class="script-vi">Người phụ nữ: Số cô ấy à 832 00 9.</div>
+                
+                <div class="script-en">Man: 823 double-0 9?</div>
+                <div class="script-vi">Người đàn ông: 823 00 9?</div>
+                
+                <div class="script-en">Woman: 832.</div>
+                <div class="script-vi">Người phụ nữ: 832.</div>
+                
+                <div class="script-en">Man: Oh, okay. Yes, I’ll do that.</div>
+                <div class="script-vi">Người đàn ông: Ồ, được rồi. Vâng, tôi sẽ gọi cho cô ấy.</div>
+                
+                <div class="script-en">Woman: And by the way, she will ask you for a reference [Q10], so you might like to be thinking about that. You know, just someone who knows you and can vouch for you.</div>
+                <div class="script-vi">Người phụ nữ: Nhân tiện, cô ấy sẽ hỏi bạn về người tham chiếu, vì vậy anh nên nghĩ về điều đó trước. Anh biết đấy, chỉ cần một người biết anh và có thể đảm bảo cho anh.</div>
+                
+                <div class="script-en">Man: Yes, no problem. Well, thanks very much for your help.</div>
+                <div class="script-vi">Người đàn ông: Vâng, không vấn đề gì. Cảm ơn rất nhiều vì sự giúp đỡ của chị.</div>
+                
+                <div class="script-en">Woman: You’re welcome. Bye.</div>
+                <div class="script-vi">Người phụ nữ: Không có gì đâu anh. Tạm biệt.</div>
+                
+                <div class="script-en">Man: Bye.</div>
+                <div class="script-vi">Người đàn ông: Tạm biệt.</div>
                 
                 <div class="vocab-box">
                     <b>📚 Từ vựng quan trọng:</b><br>
-                    • <span style="color:var(--primary); font-weight:bold;">negotiate</span>: thương lượng<br>
-                    • <span style="color:var(--primary); font-weight:bold;">charge</span>: phí<br>
-                    • <span style="color:var(--primary); font-weight:bold;">vouch for somebody</span>: đảm bảo cho ai đó
+                    • <span style="color:var(--primary); font-weight:bold;">negotiate</span> (v): thương lượng<br>
+                    • <span style="color:var(--primary); font-weight:bold;">charge</span> (n): phí tổn<br>
+                    • <span style="color:var(--primary); font-weight:bold;">vouch for somebody</span> (phrasal verb): đảm bảo, bảo lãnh cho ai đó
                 </div>
             </div>
         </div>
 
+        <!-- ================= PART 2 ================= -->
         <div id="part2" class="part-container">
             <div class="part-title">Part 2: Questions 11-20</div>
             <div class="part-desc">Choose the correct letter A, B or C for Q11-13. Label the map A-H for Q14-20.</div>
@@ -336,18 +457,30 @@
                     <img src="https://ieltssongngu.com/ielts/assets/images/red-hill-improvement-plan-9a411d86daa0125a9581c8c41d8e5f68.jpg" alt="Map">
                     
                     <div class="explanation-box" id="transcript-part2" style="text-align: left;">
-                        <div class="exp-title">Transcript Song Ngữ Part 2</div>
-                        <div class="script-en">Graham: People we’ve heard from are mainly worried about traffic in the area, and, in particular, the increasing speed of cars near schools. They feel that it is only a matter of time before there is an accident as a lot of the children walk to the school [Q11].</div>
-                        <div class="script-vi">Họ chủ yếu lo lắng về giao thông trong khu vực và đặc biệt là ô tô đi với tốc độ ngày càng cao... tai nạn chỉ là vấn đề thời gian khi rất nhiều trẻ em đi bộ đến trường.</div>
-                        <div class="script-en">Graham: the power company have agreed to move the power lines underground at a cost of $800,000 [Q12].</div>
-                        <div class="script-vi">Công ty điện lực đã đồng ý chuyển các đường dây điện xuống lòng đất với chi phí 800.000 đô la.</div>
-                        <div class="script-en">Graham: the power company have agreed to bear the cost of this themselves [Q13].</div>
-                        <div class="script-vi">Công ty điện lực đã đồng ý tự chịu chi phí này.</div>
+                        <div class="exp-title">Transcript Song Ngữ Đầy Đủ - Part 2</div>
+                        <div class="script-en">Carol: Good morning and welcome again to Your City Today. With me today is Graham Campbell, a councillor from the city council. He will be telling us about the plan to improve the fast-growing suburb of Red Hill. Good morning Graham and welcome to the show.</div>
+                        <div class="script-vi">Carol: Chào buổi sáng. Chào mừng các bạn đã trở lại Your City Today. Đi cùng với tôi hôm nay là Graham Campbell, một ủy viên hội đồng thành phố. Anh ấy sẽ nói với chúng ta về kế hoạch cải thiện vùng ngoại ô đang phát triển nhanh chóng của Red Hill. Chào buổi sáng Graham và chào mừng đến với chương trình.</div>
+                        
+                        <div class="script-en">Graham: Good morning, Carol.</div>
+                        <div class="script-vi">Graham: Chào buổi sáng, Carol.</div>
+                        
+                        <div class="script-en">Carol: Now, Graham, I understand that there has been a lot of community consultation for the new plan?</div>
+                        <div class="script-vi">Carol: Nào, Graham, tôi biết rằng các anh đã tham khảo cộng đồng rất nhiều cho kế hoạch mới?</div>
+                        
+                        <div class="script-en">Graham: Yes, we’ve tried to address some of the concerns that local groups told us about. People we’ve heard from are mainly worried about traffic in the area, and, in particular, the increasing speed of cars near schools. They feel that it is only a matter of time before there is an accident as a lot of the children walk to the school [Q11]. So we’re trying to do something about that. Another area of concern is the overhead power lines. These are very old and a lot of people we spoke to asked if something could be done about them. Well, I’m happy to report that the power company have agreed to move the power lines underground at a cost of $800,000 [Q12]. I think that will really improve the look of the area, as well as being safer.</div>
+                        <div class="script-vi">Graham: Vâng, chúng tôi đã cố gắng giải quyết một số quan ngại mà người dân địa phương nói với chúng tôi. Họ chủ yếu lo lắng về giao thông trong khu vực và đặc biệt là ô tô đi với tốc độ ngày càng cao ở khu vực gần trường học. Họ cảm thấy rằng tai nạn chỉ là vấn đề thời gian khi rất nhiều trẻ em đi bộ đến trường. Vì vậy, chúng tôi đang cố gắng tìm ra phương án giải quyết. Một quan ngại khác là đường dây điện trên không. Những đường dây điện này đã cũ lắm rồi và rất nhiều người muốn chúng tôi giải quyết vấn đề đó. Chà, tôi rất vui khi nói rằng công ty điện lực đã đồng ý chuyển các đường dây điện xuống lòng đất với chi phí 800.000 đô la. Tôi nghĩ rằng điều đó sẽ thực sự cải thiện diện mạo của khu vực, cũng như sự an toàn.</div>
+                        
+                        <div class="script-en">Carol: That’s good to know, but will that mean an increase in rates for the local businesses in that area?</div>
+                        <div class="script-vi">Carol: Tốt quá, nhưng điều đó có nghĩa là các doanh nghiệp địa phương trong khu vực sẽ phải trả thêm tiền?</div>
+                        
+                        <div class="script-en">Graham: Well, the power company have agreed to bear the cost of this themselves [Q13] after a lot of discussion with the council. This is wonderful news as the council now has some extra funds for us to put into other things like tree planting and artwork.</div>
+                        <div class="script-vi">Graham: Chà, công ty điện lực đã đồng ý tự chịu chi phí này sau rất nhiều cuộc thảo luận với hội đồng. Đây là một tin tuyệt vời vì hội đồng bây giờ có thêm vốn để chúng tôi đầu tư vào những việc khác như trồng cây và công trình nghệ thuật.</div>
+
                         <div class="vocab-box">
                             <b>📚 Từ vựng:</b><br>
-                            • <span style="color:var(--primary); font-weight:bold;">address</span>: giải quyết<br>
-                            • <span style="color:var(--primary); font-weight:bold;">erect</span>: xây dựng<br>
-                            • <span style="color:var(--primary); font-weight:bold;">incorporate</span>: kết hợp
+                            • <span style="color:var(--primary); font-weight:bold;">address</span> (v): giải quyết<br>
+                            • <span style="color:var(--primary); font-weight:bold;">erect</span> (v): xây dựng<br>
+                            • <span style="color:var(--primary); font-weight:bold;">incorporate</span> (v): kết hợp
                         </div>
                     </div>
                 </div>
@@ -394,6 +527,7 @@
             </div>
         </div>
 
+        <!-- ================= PART 3 ================= -->
         <div id="part3" class="part-container">
             <div class="part-title">Part 3: Questions 21-30</div>
             
@@ -439,7 +573,7 @@
 
             <div class="notes-box" style="margin-top: 30px;">
                 <h3>Advice on exam preparations</h3>
-                <p>Step 1: Make sure you know the exam requirements</p>
+                <p> Step 1: Make sure you know the exam requirements</p>p>
 <p>Step 2: Find some past papers</p>
                 <p>Step 3: Work out your <b>(27)</b> <input type="text" id="q27" oninput="markAnswered(27)"> for revision and write them on a card.</p>
                 <div id="exp-27" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 "sort out your revision priorities"</span></div>
@@ -452,23 +586,163 @@
                 
                 <p>Step 6: Write one <b>(30)</b> <input type="text" id="q30" oninput="markAnswered(30)"> about each topic.</p>
                 <div id="exp-30" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 "I write a single paragraph about it"</span></div>
-           <p>Step 7: Practice writing some exam answers</p>
             </div>
             
             <div class="explanation-box" id="transcript-part3">
-                <div class="exp-title">Transcript Song Ngữ Part 3</div>
-                <div class="script-en">Dan: I asked the boss of the company I used to work for if they would sponsor me, and much to my surprise, he said they’d make a contribution.</div>
-                <div class="script-en">Dan: My parents had been saying... But in the end, they took pity on me, so now I’ve just about got enough.</div>
-                <div class="script-en">Jeannie: I don’t think the conductor stretches us enough... but with all the rehearsing I’m doing, something has to go.</div>
+                <div class="exp-title">Transcript Song Ngữ Đầy Đủ - Part 3</div>
+                
+                <div class="script-en">Dan: Hi Jeannie. How’s it going?</div>
+                <div class="script-vi">Dan: Chào Jeannie. Khỏe chứ?</div>
+                
+                <div class="script-en">Jeannie: Oh, hello Dan. Pretty well, thanks. Have you managed to get the money for the course yet?</div>
+                <div class="script-vi">Jeannie: Ồ, xin chào Dan. Mình khỏe, cảm ơn cậu. Cậu đã kiếm được đủ tiền cho khóa học chưa?</div>
+                
+                <div class="script-en">Dan: Yes, that’s all sorted out now, thanks. It took long enough, though. It was practically a year ago that I applied to my local council for a grant, and it took them six months to turn me down.</div>
+                <div class="script-vi">Dan: Rồi, mọi chuyện ổn thỏa rồi, cảm ơn cậu. Mặc dù mình đã mất khá nhiều thời gian. Thực tế là một năm trước, tớ đã nộp đơn xin hội đồng địa phương trợ cấp và 6 tháng sau họ gửi thư từ chối.</div>
+                
+                <div class="script-en">Jeannie: That’s really slow.</div>
+                <div class="script-vi">Jeannie: Lâu thế.</div>
+                
+                <div class="script-en">Dan: And I thought I was eligible for government funding, but it seems I was mistaken. So then I asked the boss of the company I used to work for if they would sponsor me, and much to my surprise, he said they’d make a contribution [Q21 & 22].</div>
+                <div class="script-vi">Dan: Và tớ nghĩ rằng tớ đủ điều kiện nhận tài trợ của chính phủ, nhưng có vẻ như tớ đã nhầm. Vì vậy, sau đó tớ đã hỏi ông chủ ở công ty tớ từng làm việc liệu họ có thể tài trợ cho tớ không, và thật ngạc nhiên, ông ấy nói có.</div>
+                
+                <div class="script-en">Jeannie: But what about college grants and scholarships? There must be some you could apply for.</div>
+                <div class="script-vi">Jeannie: Nhưng còn các khoản trợ cấp và học bổng đại học thì sao? Cậu có thể nộp đơn mà.</div>
+                
+                <div class="script-en">Dan: Yes, there are, but they’re all so small that I decided to leave them until was desperate.</div>
+                <div class="script-vi">Dan: Ừ, có, nhưng tất cả đều không đủ nhiều nên tớ không nộp.</div>
+                
+                <div class="script-en">Jeannie: Uhuh.</div>
+                <div class="script-vi">Jeannie: Uhuh.</div>
+                
+                <div class="script-en">Dan: And in fact, I didn’t need to apply. My parents had been saying that as already had a job, I ought to support myself through college. But in the end, they took pity on me, so now I’ve just about got enough [Q21 & 22].</div>
+                <div class="script-vi">Dan: Và trên thực tế, tớ không cần phải nộp đơn xin tài trợ. Bố mẹ tớ đã nói rằng vì tớ có việc làm rồi nên tớ phải tự lo học phí. Nhưng cuối cùng, bố mẹ vẫn cho tớ tiền vì thương tớ, vì vậy bây giờ tớ đã có đủ tiền rồi nè.</div>
+                
+                <div class="script-en">Jeannie: That’s good.</div>
+                <div class="script-vi">Jeannie: Tốt quá.</div>
+                
+                <div class="script-en">Dan: So now I can put a bit of effort into meeting people – I haven’t had time so far. Any suggestions?</div>
+                <div class="script-vi">Dan: Vì vậy, bây giờ tớ nghĩ tớ cần gặp gỡ mọi người nhiều hơn – tớ đã không có nhiều thời gian từ trước. Cậu có gợi ý gì không?</div>
+                
+                <div class="script-en">Jeannie: What about joining some college clubs?</div>
+                <div class="script-vi">Jeannie: Tham gia một số câu lạc bộ đại học?</div>
+                
+                <div class="script-en">Dan: Oh right. You joined several, didn’t you?</div>
+                <div class="script-vi">Dan: Ồ đúng rồi. Cậu đã tham gia một số câu lạc bộ phải không?</div>
+                
+                <div class="script-en">Jeannie: Yes, I’m in the drama club. It’s our first performance next week, so we’re rehearsing frantically, and I’ve got behind with my work, but it’s worth it. I’m hoping to be in the spring production, too.</div>
+                <div class="script-vi">Jeannie: Ừ, tớ đang ở trong câu lạc bộ kịch. Tớ sẽ diễn vở đầu tiên vào tuần tới, vì vậy chúng tớ đang tập luyện điên cuồng, và tớ đã phải trì hoãn một chút với công việc của mình, nhưng vẫn đáng lắm. Tớ cũng hy vọng được tham gia vào vở kịch mùa xuân.</div>
+                
+                <div class="script-en">Dan: I’ve never liked acting. Are you doing anything else?</div>
+                <div class="script-vi">Dan: Tớ chưa bao giờ thích diễn xuất. Còn gì khác không?</div>
+                
+                <div class="script-en">Jeannie: I enjoyed singing when I was at school, so I joined a group when I came to college. I don’t think the conductor stretches us enough [Q23 & 24], though so I’ll give up after the next concert. And I also joined the debating society. It’s fun, but with all the rehearsing I’m doing, something has to go [Q23 & 24], and I’m afraid that’s the one.</div>
+                <div class="script-vi">Jeannie: Tớ thích ca hát khi còn đi học, vì vậy tớ đã tham gia một nhóm ở đại học. Tớ thấy rằng nhạc trưởng không thể thúc đẩy các thành viên đủ nhiều, tớ sẽ rời sau buổi hòa nhạc tiếp theo. Và tớ cũng tham gia vào câu lạc bộ tranh luận. Thú vị lắm, nhưng vì tập kịch mất thời gian nên tớ nghĩ tớ phải bỏ tham gia một câu lạc bộ nào đó, và rất có thể là câu lạc bộ tranh luận này.</div>
+                
+                <div class="script-en">Dan: Do you do any sports?</div>
+                <div class="script-vi">Dan: Cậu có chơi môn thể thao nào không?</div>
+                
+                <div class="script-en">Jeannie: Yes, I’m in one of the hockey teams. I’m not very good, but I’d really miss it if I stopped. I decided to try tennis when I came to college, and I’m finding it pretty tough going. I’m simply not fit enough.</div>
+                <div class="script-vi">Jeannie: Có, tớ tham gia một đội khúc côn cầu. Tớ chơi không tốt lắm, nhưng tớ sẽ thực sự nhớ nó nếu tớ dừng chơi. Tớ đã quyết định thử chơi quần vợt khi tớ vào đại học, và tớ thấy nó khá khó. Tớ đơn giản là không đủ sức khỏe.</div>
+                
+                <div class="script-en">Dan: Nor me. I think I’ll give that a miss!</div>
+                <div class="script-vi">Dan: Tớ cũng vậy. Tớ nghĩ rằng tớ sẽ không chơi quần vợt đâu!</div>
+                
+                <div class="script-en">Jeannie: I’m hoping it’ll help me to build up my stamina, but it’ll probably be a long haul.</div>
+                <div class="script-vi">Jeannie: Tớ đã hy vọng nó sẽ giúp tớ cải thiện thể lực, nhưng có lẽ đó là một quãng đường dài.</div>
+                
+                <div class="script-en">Dan: Good luck.</div>
+                <div class="script-vi">Dan: Chúc may mắn.</div>
+                
+                <div class="script-en">Jeannie: Thanks.</div>
+                <div class="script-vi">Jeannie: Cảm ơn cậu.</div>
+                
+                <div class="script-en">Dan: How are you finding the course?</div>
+                <div class="script-vi">Dan: Cậu thấy thế nào về khóa học?</div>
+                
+                <div class="script-en">Jeannie: I wish we had more seminars.</div>
+                <div class="script-vi">Jeannie: Tớ ước rằng khóa học sẽ có nhiều hội thảo hơn.</div>
+                
+                <div class="script-en">Dan: What? I’d have thought we had more than enough already. All those people saying clever things that I could never think of – it’s quite interesting, but I wonder if I’m clever enough to be doing this course [Q25].</div>
+                <div class="script-vi">Dan: Cái gì? Tớ đã nghĩ rằng chúng ta đã có quá đủ rồi. Mọi người đều thảo luận những kiến thức mới mẻ mà tớ không bao giờ có thể nghĩ ra – khá thú vị, nhưng tớ tự hỏi liệu tớ có đủ thông minh để theo kịp khóa học này không.</div>
+                
+                <div class="script-en">Jeannie: I find it helpful to listen to the other people. I like the way we’re exploring the subject, and working towards getting insight into it.</div>
+                <div class="script-vi">Jeannie: Tớ thấy thật hữu ích khi lắng nghe người khác. Tớ thích cách chúng ta khám phá chủ đề và làm việc để hiểu sâu hơn về nó.</div>
+                
+                <div class="script-en">Dan: How do you get on with your tutor? I don’t think I’m on the same wavelength as mine, so I feel I’m not getting anything out of the tutorials. It would be more productive to read a book instead.</div>
+                <div class="script-vi">Dan: Làm thế nào để cậu có thể hòa đồng được với giảng viên vậy? Tớ không nghĩ rằng tớ và giảng viên của tớ có cùng quan điểm vì thế tớ cảm thấy chẳng học được gì từ những bài giảng cả. Thay vào đó, tớ thấy tự đọc sách còn hiệu quả hơn.</div>
+                
+                <div class="script-en">Jeannie: Oh, mine’s very demanding. She gives me lots of feedback and advice, so I’ve got much better at writing essays. And she’s helping me plan my revision for the end-of-year exams [Q26].</div>
+                <div class="script-vi">Jeannie: Ồ, giảng viên của tớ yêu cầu cao lắm. Cô phản hồi và cho lời khuyên rất nhiều, vì vậy tớ đã khá hơn nhiều trong việc viết bài luận. Và cô cũng giúp tớ lên kế hoạch ôn tập cho kỳ thi cuối năm.</div>
+                
+                <div class="script-en">Dan: Do tell me, I always struggle with revision.</div>
+                <div class="script-vi">Dan: Nói cho tớ biết đi, tớ đang khổ sở ôn tập đây.</div>
+                
+                <div class="script-en">Jeannie: Well, the first thing is to find out exactly what’s required in the exams.</div>
+                <div class="script-vi">Jeannie: Chà, điều đầu tiên là tìm ra chính xác những gì cần thiết trong các kỳ thi.</div>
+                
+                <div class="script-en">Dan: Mm. Would it help to get hold of some past papers?</div>
+                <div class="script-vi">Dan: Ừm. Thế thì tham khảo một số nghiên cứu trước đây sẽ có ích nhỉ?</div>
+                
+                <div class="script-en">Jeannie: Yes. They’ll help to make it clear.</div>
+                <div class="script-vi">Jeannie: Đúng. Chúng sẽ giúp chúng ta hiểu rõ hơn.</div>
+                
+                <div class="script-en">Dan: Right, I’ll do that. Then what?</div>
+                <div class="script-vi">Dan: OK, tớ sẽ làm. Sau đó thì sao?</div>
+                
+                <div class="script-en">Jeannie: Then you can sort out your revision priorities, based on what’s most likely to come up. I put these on a card and read them through regularly [Q27].</div>
+                <div class="script-vi">Jeannie: Sau đó cậu cần phân chia các ưu tiên ôn tập dựa trên những nội dung câu hỏi nào sẽ có khả năng có trong đề thi cao nhất. Tớ viết chúng lên một tờ giấy và đọc đi đọc lại thường xuyên.</div>
+                
+                <div class="script-en">Dan: Uhuh.</div>
+                <div class="script-vi">Dan: Uhuh.</div>
+                
+                <div class="script-en">Jeannie: But that isn’t enough in itself. You also need a timetable, to see how you can fit everything in, in the time available. Then keep it in front of you while you’re studying [Q28].</div>
+                <div class="script-vi">Jeannie: Nhưng như thế là chưa đủ. Cậu cũng cần một thời gian biểu để sắp xếp mọi thứ cho ổn thỏa. Sau đó, để thời gian biết trước mặt khi cậu ôn tập.</div>
+                
+                <div class="script-en">Dan: I’ve done that before, but it hasn’t helped me!</div>
+                <div class="script-vi">Dan: Tớ làm từ trước rồi, nhưng không có tác dụng lắm!</div>
+                
+                <div class="script-en">Jeannie: Maybe you need to do something different every day, so if you break down your revision into small tasks, and allocate them to specific days [Q29], there’s more incentive to tackle them. With big topics, you’re more likely to put off starting.</div>
+                <div class="script-vi">Jeannie: Có lẽ mỗi ngày cậu cần làm những công việc khác nhau đi, vì vậy nếu cậu chia nhỏ nội dung ôn tập thành các nhiệm vụ nhỏ và phân bổ chúng cho những ngày cụ thể, cậu sẽ có thêm động lực để giải quyết chúng. Với các chủ đề lớn, cậu cậu nên để sau đi.</div>
+                
+                <div class="script-en">Dan: Good idea.</div>
+                <div class="script-vi">Dan: Ý tưởng hay đấy.</div>
+                
+                <div class="script-en">Jeannie: And as I revise each topic I write a single paragraph about it [Q30] — then later can read it through quickly, and it helps fix things in my mind.</div>
+                <div class="script-vi">Jeannie: Và khi tớ ôn tập một chủ đề, tớ viết một đoạn văn về chủ đề đó — sau đó tớ có thể xem lại chúng nhanh hơn và tớ nhớ kỹ hơn.</div>
+                
+                <div class="script-en">Dan: That’s brilliant.</div>
+                <div class="script-vi">Dan: Cậu thông minh thật.</div>
+                
+                <div class="script-en">Jeannie: I also write answers to questions for the exam practice. It’s hard to make myself do it, though!</div>
+                <div class="script-vi">Jeannie: Tớ cũng viết đáp án cho các câu hỏi để luyện tập. Mặc dù đôi khi hơi khó.</div>
+                
+                <div class="script-en">Dan: Well, I’ll try. Thanks a lot, Jeannie. That’s a great help.</div>
+                <div class="script-vi">Dan: Ừ, tớ sẽ thử. Cảm ơn cậu nhé Jeannie. Tớ thấy rất hữu ích.</div>
+                
+                <div class="script-en">Jeannie: No problem.</div>
+                <div class="script-vi">Jeannie: Không có vấn đề gì đâu.</div>
+                
+                <div class="script-en">Dan: See you around.</div>
+                <div class="script-vi">Dan: Hẹn gặp lại cậu sau nhé.</div>
+                
+                <div class="script-en">Jeannie: Bye.</div>
+                <div class="script-vi">Jeannie: Tạm biệt.</div>
+                
                 <div class="vocab-box">
                     <b>📚 Từ vựng:</b><br>
-                    • <span style="color:var(--primary); font-weight:bold;">sort out</span>: giải quyết / sắp xếp ổn thỏa<br>
-                    • <span style="color:var(--primary); font-weight:bold;">eligible</span>: đủ điều kiện<br>
-                    • <span style="color:var(--primary); font-weight:bold;">on the same wavelength</span>: cùng quan điểm
+                    • <span style="color:var(--primary); font-weight:bold;">sort something out</span> (phrasal v): sắp xếp ổn thỏa<br>
+                    • <span style="color:var(--primary); font-weight:bold;">eligible</span> (adj): đủ điều kiện<br>
+                    • <span style="color:var(--primary); font-weight:bold;">take pity on somebody</span> (idiom): thương xót ai đó<br>
+                    • <span style="color:var(--primary); font-weight:bold;">frantically</span> (adv): điên cuồng, ráo riết<br>
+                    • <span style="color:var(--primary); font-weight:bold;">a long haul</span> (n): một quá trình khó khăn dài hơi<br>
+                    • <span style="color:var(--primary); font-weight:bold;">on the same wavelength</span> (idiom): cùng quan điểm<br>
+                    • <span style="color:var(--primary); font-weight:bold;">tackle something</span> (v): giải quyết
                 </div>
             </div>
         </div>
 
+        <!-- ================= PART 4 ================= -->
         <div id="part4" class="part-container">
             <div class="part-title">Part 4: Questions 31-40</div>
             
@@ -480,7 +754,7 @@
                     <div>32. rounded figures <input type="text" id="q32" oninput="markAnswered(32)" style="width: 50px; text-transform: uppercase;" maxlength="1"> <div id="exp-32" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 Yam ("much curvier figures") -> B</span></div></div>
                     <div>33. figures with parts missing <input type="text" id="q33" oninput="markAnswered(33)" style="width: 50px; text-transform: uppercase;" maxlength="1"> <div id="exp-33" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 Modern ("painting the Europeans without any hands") -> C</span></div></div>
                     <div>34. figures smaller than life size <input type="text" id="q34" oninput="markAnswered(34)" style="width: 50px; text-transform: uppercase;" maxlength="1"> <div id="exp-34" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 Dynamic ("painted in miniature") -> A</span></div></div>
-                    <div>35. sea creatures <input type="text" id="q35" oninput="markAnswered(35)" style="width: 50px; text-transform: uppercase;" maxlength="1"> <div id="exp-35" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 Yam (Answer Key says B, audio mention context related to later questions).</span></div></div>
+                    <div>35. sea creatures <input type="text" id="q35" oninput="markAnswered(35)" style="width: 50px; text-transform: uppercase;" maxlength="1"> <div id="exp-35" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 Yam (Answer Key là B).</span></div></div>
                     <div>36. plants <input type="text" id="q36" oninput="markAnswered(36)" style="width: 50px; text-transform: uppercase;" maxlength="1"> <div id="exp-36" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 Yam ("resemble the vegetable called a yam") -> B</span></div></div>
                 </div>
             </div>
@@ -497,22 +771,27 @@
                 <div id="exp-39" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 Đáp án: hunting</span></div>
                 
                 <p>Rainbow Serpent Image:<br>
-               <p> • Similar to a sea horse</p>
-<p>• Unusual because it appeared in inland areas<p></p>
-              <p> • Symbolises <b>(40)</b> <input type="text" id="q40" oninput="markAnswered(40)"> in Aboriginal culture</p>
+                   <p> • Similar to a sea horse</p>
+<p>• Unusual because it appeared in inland areas</p>
+                • Symbolises <b>(40)</b> <input type="text" id="q40" oninput="markAnswered(40)"> in Aboriginal culture</p>
                 <div id="exp-40" class="explanation-box" style="padding: 10px; margin-top:5px;"><span class="inline-exp">💡 Đáp án: creation</span></div>
             </div>
 
             <div class="explanation-box" id="transcript-part4">
-                <div class="exp-title">Transcript Song Ngữ Part 4</div>
-                <div class="script-en">The Yam style of painting got its name from the fact that it featured much curvier figures [Q32] that actually resemble the vegetable called a yam, which is similar to a sweet potato.</div>
-                <div class="script-en">Aborigines managed to convey the idea of the settlers’ clothing by simply painting the Europeans without any hands [Q33].</div>
-                <div class="script-en">The more recent images tend to be life-size or even larger, but the Dynamic figures are painted in miniature [Q34].</div>
+                <div class="exp-title">Transcript Song Ngữ Đầy Đủ - Part 4</div>
+                
+                <div class="script-en">Good morning, everyone. I’ve been invited to talk about my research project into Australian Aboriginal rock paintings. The Australian Aborigines have recorded both real and symbolic images of their time on rock walls for many thousands of years. Throughout the long history of this tradition, new images have appeared and new painting styles have developed. And these characteristics can be used to categorise the different artistic styles. Among these are what we call the Dynamic, Yam, and Modern styles of painting. One of the most significant characteristics of the different styles is the way that humans are depicted in the paintings.</div>
+                <div class="script-vi">Chào buổi sáng mọi người. Tôi được mời đến đây để nói về dự án nghiên cứu của tôi về tranh đá thổ dân Úc. Thổ dân Úc đã ghi lại cả những hình ảnh thực và tượng trưng về thời đại của họ trên các bức tường đá trong nhiều ngàn năm. Trong suốt lịch sử lâu dài của truyền thống này, những hình ảnh mới đã xuất hiện và phong cách vẽ mới đã phát triển. Và những đặc điểm này có thể được sử dụng để phân loại các phong cách nghệ thuật khác nhau. Trong số này bao gồm phong cách hội họa năng động, Yam và hiện đại. Một trong những đặc điểm quan trọng nhất của các phong cách khác nhau là cách con người được miêu tả trong các bức tranh.</div>
+                
+                <div class="script-en">The more recent paintings show people in static poses. But the first human images to dominate rock art paintings, over 8,000 years ago, were full of movement. These paintings showed people hunting and cooking food and so they were given the name ‘Dynamic’ to reflect this energy. It’s quite amazing considering they were painted in such a simple stick-like form. In the Yam period, there was a movement away from stick figures to a more naturalistic shape. However, they didn’t go as far as the Modern style, which is known as ‘X-ray’ because it actually makes a feature of the internal skeleton as well as the organs of animals and humans [Q31]. The Yam style of painting got its name from the fact that it featured much curvier figures [Q32] that actually resemble the vegetable called a yam, which is similar to a sweet potato. The Modern paintings are interesting because they include paintings at the time of the first contact with European settlers. Aborigines managed to convey the idea of the settlers’ clothing by simply painting the Europeans without any hands [Q33], indicating the habit of standing with their hands in their pockets! Size is another characteristic. The more recent images tend to be life-size or even larger, but the Dynamic figures are painted in miniature [Q34].</div>
+                <div class="script-vi">Các bức tranh gần đây miêu tả con người trong tư thế tĩnh. Nhưng những hình ảnh đầu tiên của con người xuất hiện rất nhiều trong các bức tranh nghệ thuật trên đá, hơn 8.000 năm trước, lại đầy những chuyển động. Những bức tranh này miêu tả cảnh con người săn bắn và nấu thức ăn và vì vậy chúng được đặt tên là ‘Năng động’ để phản ánh nguồn năng lượng này. Thật tuyệt vời khi chúng được vẽ với hình thức giống như những que gậy rất đơn giản. Trong thời kỳ Yam, đã có một sự biến chuyển từ các hình que sang hình dạng tự nhiên hơn. Tuy nhiên, chúng không thể so sánh được với phong cách Hiện đại, được gọi là ‘Tia X’ bởi vì phong cách này mô tả đặc điểm của bộ xương bên trong cũng như các cơ quan của động vật và con người. Phong cách hội họa Yam có tên như vậy là vì nó có nhiều hình vẽ cong thực sự giống với loại rau được gọi là ‘yam’, tương tự như khoai lang. Các bức tranh hiện đại rất thú vị bởi vì chúng bao gồm các bức tranh tại thời điểm tiếp xúc đầu tiên với những người định cư đến từ châu Âu. Những người thổ dân đã có thể truyền đạt ý tưởng về quần áo của những người định cư này bằng cách đơn giản là vẽ người châu Âu mà không có tay, cho thấy thói quen đứng cho tay vào trong túi của họ! Kích thước là một đặc điểm khác. Các hình ảnh gần đây có xu hướng kích thước thật hoặc thậm chí lớn hơn, nhưng các hình vẽ Năng động được vẽ với kích thước thu nhỏ.</div>
+                
                 <div class="vocab-box">
                     <b>📚 Từ vựng:</b><br>
-                    • <span style="color:var(--primary); font-weight:bold;">depict</span>: mô tả<br>
-                    • <span style="color:var(--primary); font-weight:bold;">in miniature</span>: trong phạm vi nhỏ<br>
-                    • <span style="color:var(--primary); font-weight:bold;">intrigue</span>: thu hút
+                    • <span style="color:var(--primary); font-weight:bold;">depict</span> (v): mô tả<br>
+                    • <span style="color:var(--primary); font-weight:bold;">in miniature</span> (idiom): trong phạm vi nhỏ<br>
+                    • <span style="color:var(--primary); font-weight:bold;">intrigue</span> (v): thu hút, làm ai đó cảm thấy thú vị<br>
+                    • <span style="color:var(--primary); font-weight:bold;">tremendous</span> (adj): to lớn, khủng khiếp
                 </div>
             </div>
             <div style="height: 50px;"></div>
@@ -523,6 +802,15 @@
         <div class="nav-title">Bảng điều hướng nhanh (1 - 40)</div>
         <div class="nav-grid" id="navGrid"></div>
     </footer>
+    
+    <!-- TOAST NOTIFICATION CHO TRACKER -->
+    <div id="toastNotification">
+        <div class="toast-icon">☁️</div>
+        <div class="toast-content">
+            <div class="toast-title">Đồng bộ thành công!</div>
+            <div class="toast-desc" id="toastMsg">Điểm của bạn đã được cập nhật lên hệ thống.</div>
+        </div>
+    </div>
 
     <script>
         // Answer Key based on the docx
@@ -702,9 +990,16 @@
             
             document.getElementById('bandDisplay').innerText = "Band: " + band.toFixed(1);
             document.getElementById('resultModal').classList.add('show');
+            
+            // Đẩy lên Firebase Tracker
+            if(window.luuDiemIELTSFullTest) {
+                window.luuDiemIELTSFullTest(score, band.toFixed(1), "IELTS Listening Test 4");
+            }
         }
     </script>
-  <script type="module">
+    
+    <!-- FIREBASE INTEGRATION FOR SCORE TRACKER -->
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
         import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
@@ -722,16 +1017,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        function showSyncToast(msg) {
-            let toast = document.createElement("div");
-            toast.innerText = msg;
-            toast.style.cssText = "position:fixed; bottom:20px; right:20px; background:#ff477e; color:white; padding:12px 25px; border-radius:50px; font-weight:bold; font-family:'Quicksand',sans-serif; z-index:99999; box-shadow:0 8px 20px rgba(0,0,0,0.15); transform:translateY(100px); opacity:0; transition:all 0.5s ease;";
-            document.body.appendChild(toast);
-            setTimeout(() => { toast.style.transform = "translateY(0)"; toast.style.opacity = "1"; }, 100);
-            setTimeout(() => { toast.style.transform = "translateY(100px)"; toast.style.opacity = "0"; }, 3500);
-            setTimeout(() => { document.body.removeChild(toast); }, 4000); 
-        }
-
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 window.currentUserUid = user.uid;
@@ -744,19 +1029,33 @@
             let timestamp = Date.now();
             let docId = window.currentUserUid + "_ielts_" + timestamp; 
 
-            await setDoc(doc(db, "user_ielts_scores", docId), {
-                email: window.currentUserEmail,
-                skill: "Listening",
-                testName: tenBai,
-                partName: "Full Test",
-                correctQ: diemSo,
-                totalQ: 40,
-                bandScore: parseFloat(bandScore),
-                date: new Date().toLocaleDateString("vi-VN"),
-                timeTaken: "", 
-                timestamp: timestamp
-            });
-            showSyncToast("☁️ Đã đồng bộ Band " + bandScore + " lên Tracker!");
+            try {
+                await setDoc(doc(db, "user_ielts_scores", docId), {
+                    email: window.currentUserEmail,
+                    skill: "Listening",
+                    testName: tenBai,
+                    partName: "Full Test",
+                    correctQ: diemSo,
+                    totalQ: 40,
+                    bandScore: parseFloat(bandScore),
+                    date: new Date().toLocaleDateString("vi-VN"),
+                    timeTaken: "", 
+                    timestamp: timestamp
+                });
+                
+                // Hiện Toast thông báo
+                const toast = document.getElementById('toastNotification');
+                const toastMsg = document.getElementById('toastMsg');
+                if (toast && toastMsg) {
+                    toastMsg.innerText = "Đã đồng bộ Band " + bandScore + " lên Tracker!";
+                    toast.classList.add('show');
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                    }, 4000); // Tự động ẩn sau 4 giây
+                }
+            } catch (error) {
+                console.error("Lỗi khi lưu điểm: ", error);
+            }
         }
     </script>
 </body>
