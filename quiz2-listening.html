@@ -312,6 +312,16 @@
         let mode = '';
         const audio = document.getElementById('testAudio');
         let isSubmitted = false;
+        audio.addEventListener('timeupdate', function() {
+    if (audio.currentTime >= 862 && !isSubmitted) {
+        audio.pause();
+        
+        // Nếu đang ở chế độ mock (thi thử), tự động nộp bài khi hết giờ
+        if (mode === 'mock') {
+            evaluateTest();
+        }
+    }
+});
 
         // Initialize Navigation Drawer Footer (Chỉ cho câu 11 - 20)
         const navPalette = document.getElementById('navPalette');
@@ -356,7 +366,7 @@
         function startTestActual() {
             closeModal('startConfirmOverlay');
             document.getElementById('setupOverlay').style.display = 'none';
-            
+            audio.currentTime = 527;
             if(mode === 'mock') {
                 document.getElementById('btn-backward').classList.add('hidden');
                 document.getElementById('btn-forward').classList.add('hidden');
