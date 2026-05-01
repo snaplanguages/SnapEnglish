@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Listening Test 2 | SnapEnglish</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Muted Mauve & Sand Palette - Cute, Mature, Profound */
+            --primary: #8e7d8f;      
+            --primary-dark: #5c4d5c;
+            --accent: #d4a373;       
+            --bg-body: #fcfafb;      
+            --bg-pane: #ffffff;
+            --text-main: #4a4a4a;
+            --text-light: #888;
+            --border: #e6e1e5;
+            --highlight: #fef0d9;    
+            --correct: #6a994e;
+            --wrong: #bc4749;
+            --exp-bg: #f5eff2;       
+            --header-h: 70px;
+            --footer-h: 80px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Quicksand', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        /* --- OVERLAY & MODAL --- */
+        #setupOverlay, .custom-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        .custom-overlay { display: none; z-index: 99999; }
+        
+        .setup-modal, .custom-modal {
+            background: white; padding: 40px; border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(142, 125, 143, 0.15);
+            width: 90%; max-width: 500px; text-align: center;
+            border: 2px solid var(--border);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .setup-modal h2, .custom-modal h2 { 
+            font-family: 'Lora', serif; color: var(--primary-dark); font-size: 28px; margin-top: 0; 
+        }
+        
+        .mode-btn {
+            display: block; width: 100%; padding: 15px; margin: 15px 0;
+            border-radius: 15px; font-size: 18px; font-weight: 700; cursor: pointer;
+            transition: 0.3s; font-family: inherit;
+        }
+        .mode-practice { background: #fdf6f2; color: #c48b5d; border: 2px solid #f6decb; }
+        .mode-practice:hover, .mode-practice.selected { background: var(--accent); color: white; border-color: var(--accent); }
+        .mode-mock { background: #f5eff2; color: var(--primary-dark); border: 2px solid #e1d5e2; }
+        .mode-mock:hover, .mode-mock.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        
+        .start-btn {
+            background: var(--primary); color: white; border: none; padding: 12px 35px;
+            border-radius: 50px; font-size: 18px; font-weight: 700; cursor: pointer;
+            margin-top: 20px; transition: 0.3s; display: none; box-shadow: 0 5px 15px rgba(142, 125, 143, 0.3);
+        }
+        .start-btn:hover { transform: translateY(-3px); }
+
+        .modal-actions { display: flex; gap: 15px; margin-top: 25px; justify-content: center; }
+        .btn-cancel { background: #f5f5f5; color: #666; border: 2px solid #ddd; padding: 12px 20px; border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; font-family: inherit; flex: 1; }
+        .btn-cancel:hover { background: #e0e0e0; border-color: #ccc; }
+        .btn-confirm { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; font-family: inherit; flex: 1; box-shadow: 0 4px 0 var(--primary-dark); }
+        .btn-confirm:active { transform: translateY(4px); box-shadow: none; }
+
+        /* --- HEADER --- */
+        header {
+            height: var(--header-h); background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 30px; z-index: 100;
+        }
+        
+        .brand { font-size: 24px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        .brand span { background: var(--primary); color: white; padding: 4px 10px; border-radius: 10px; font-size: 16px; }
+
+        .audio-controls { display: flex; align-items: center; gap: 15px; background: #f5eff2; padding: 5px 15px; border-radius: 30px; }
+        audio { height: 35px; outline: none; }
+        .skip-btn {
+            background: white; border: 2px solid var(--border); border-radius: 50%;
+            width: 35px; height: 35px; cursor: pointer; font-weight: bold; color: var(--primary-dark);
+            display: flex; justify-content: center; align-items: center; transition: 0.2s;
+        }
+        .skip-btn:hover { border-color: var(--primary); background: var(--primary); color: white; }
+        .hidden { display: none !important; }
+
+        .btn-submit { 
+            background: var(--primary); color: white; border: none; padding: 10px 25px; 
+            border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s;
+            font-family: inherit; box-shadow: 0 4px 0 var(--primary-dark);
+        }
+        .btn-submit:active { transform: translateY(4px); box-shadow: none; }
+
+        /* --- LAYOUT FULL WIDTH --- */
+        .container { 
+            display: flex; flex-direction: column;
+            height: calc(100vh - var(--header-h) - var(--footer-h)); 
+            width: 100%; max-width: 100%; 
+            margin: 0; padding: 30px 60px;
+            overflow-y: auto; scroll-behavior: smooth;
+        }
+
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-thumb { background: #dcd6db; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        .tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        .tab {
+            padding: 10px 25px; font-size: 18px; font-weight: 700; color: var(--text-light);
+            cursor: pointer; border-radius: 15px; transition: 0.3s; border: 2px solid transparent;
+        }
+        .tab.active { background: #f5eff2; color: var(--primary-dark); border-color: var(--primary); }
+
+        .tab-content { display: none; animation: fadeIn 0.3s; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.03); }
+        .tab-content.active { display: block; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- CONTENT STYLES --- */
+        h2 { color: var(--primary-dark); margin-top: 0; font-size: 28px; font-family: 'Lora', serif; }
+        h3 { color: #555; border-bottom: 2px solid #f5eff2; padding-bottom: 5px; margin-top: 30px; font-size: 22px; }
+        p { margin-bottom: 20px; font-size: 18px; line-height: 1.8; }
+        
+        .instruction {
+            background: #fdf6f2; color: #a6714a; padding: 15px; border-radius: 12px;
+            font-weight: 600; font-size: 16px; margin-bottom: 25px; border: 2px dashed #eecfb6;
+        }
+
+        .custom-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--border); }
+        .custom-table th { background: var(--primary); color: white; padding: 15px; text-align: left; font-size: 18px; }
+        .custom-table td { border-bottom: 1px solid #eee; padding: 15px; font-size: 18px; vertical-align: middle; }
+
+        input[type="text"], select {
+            border: 2px solid #e6e1e5; border-radius: 8px; padding: 8px 15px;
+            font-family: inherit; font-size: 18px; color: var(--primary-dark);
+            outline: none; background: white; transition: 0.2s; font-weight: 600; width: 180px;
+        }
+        input[type="text"]:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(142, 125, 143, 0.15); }
+        input[type="text"].correct-input { border-color: var(--correct); color: var(--correct); background: #f1f8e9; }
+        input[type="text"].wrong-input { border-color: var(--wrong); color: var(--wrong); background: #ffebee; }
+
+        .mc-option { display: block; margin: 10px 0; cursor: pointer; padding: 12px; border-radius: 10px; transition: background 0.2s; font-size: 18px; border: 1px solid transparent; }
+        .mc-option:hover { background: #f5eff2; border-color: #dcd6db; }
+        .mc-option input { margin-right: 12px; transform: scale(1.3); accent-color: var(--primary); }
+
+        /* --- DRAG AND DROP STYLES --- */
+        .drag-palette { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; background: #faf8f9; padding: 20px; border-radius: 15px; border: 2px dashed var(--border); }
+        .drag-item {
+            width: 45px; height: 45px; background: var(--primary); color: white;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 10px; cursor: grab; font-weight: bold; font-size: 20px;
+            box-shadow: 0 4px 10px rgba(142, 125, 143, 0.3); transition: 0.2s;
+        }
+        .drag-item:active { cursor: grabbing; transform: scale(1.1); }
+        .drag-item.dragging { opacity: 0.5; border: 2px dashed var(--primary-dark); background: transparent; color: var(--primary-dark); box-shadow: none; }
+        
+        .drop-zone {
+            display: inline-flex; width: 60px; height: 45px; border: 2px dashed #b8adb9;
+            border-radius: 10px; align-items: center; justify-content: center;
+            background: #ffffff; font-weight: bold; color: var(--primary-dark); vertical-align: middle; transition: 0.3s;
+        }
+        .drop-zone.drag-over { background: var(--highlight); border-color: var(--accent); transform: scale(1.05); }
+        .drop-zone .drag-item { margin: 0; box-shadow: none; cursor: pointer; }
+
+        /* --- EXPLANATION BOX --- */
+        .explanation {
+            background: var(--exp-bg); border-left: 5px solid var(--primary);
+            padding: 15px 20px; margin-top: 15px; border-radius: 0 12px 12px 0;
+            font-size: 17px; color: var(--primary-dark); font-weight: 500;
+            display: none; animation: fadeIn 0.4s; line-height: 1.6;
+        }
+        .explanation strong { color: var(--accent); }
+
+        /* --- FOOTER --- */
+        footer {
+            height: var(--footer-h); background: #fff; border-top: 2px solid var(--border);
+            display: flex; flex-direction: column; justify-content: center; padding: 0 30px;
+            z-index: 100; position: fixed; bottom: 0; width: 100%;
+        }
+        .nav-scroller { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; align-items: center; }
+        .nav-dot {
+            min-width: 40px; height: 40px; border: 2px solid #eee; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600;
+            cursor: pointer; color: #999; background: white; transition: 0.2s; flex-shrink: 0;
+        }
+        .nav-dot:hover { border-color: var(--primary); color: var(--primary); }
+        .nav-dot.done { background: #f5eff2; color: var(--primary-dark); border-color: #dcd6db; }
+        .nav-dot.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .nav-dot.incorrect { background: var(--wrong); color: white; border-color: var(--wrong); }
+    </style>
+</head>
+<body>
+
+    <div id="setupOverlay">
+        <div class="setup-modal">
+            <h2>Chào mừng đến với Listening Library ✨</h2>
+            <p style="font-size: 18px; color: #666; margin-bottom: 25px;">Bạn hãy chọn chế độ:</p>
+            
+            <button class="mode-btn mode-practice" onclick="selectMode('practice')">🎯 Luyện tập</button>
+            <button class="mode-btn mode-mock" onclick="selectMode('mock')">🏆 Thi thử</button>
+            
+            <button class="start-btn" id="startBtn" onclick="askReady()">Sẵn sàng</button>
+        </div>
+    </div>
+
+    <div id="startConfirmOverlay" class="custom-overlay">
+        <div class="custom-modal">
+            <h2>Xác nhận bắt đầu</h2>
+            <p id="startConfirmMsg" style="font-size: 18px; color: #555; margin-bottom: 20px; white-space: pre-line;"></p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal('startConfirmOverlay')">Hủy</button>
+                <button class="btn-confirm" onclick="startTestActual()">Bắt đầu</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="submitModal" class="custom-overlay">
+        <div class="custom-modal">
+            <h2>Xác nhận nộp bài?</h2>
+            <p style="font-size: 18px; color: #555; margin-bottom: 10px;">Bạn có chắc chắn nộp bài không?</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal('submitModal')">Quay lại</button>
+                <button class="btn-confirm" onclick="evaluateTest()">Nộp</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultOverlay" class="custom-overlay">
+        <div class="custom-modal">
+            <h2>🎉 Chúc mừng!</h2>
+            <p style="font-size: 16px; color: #666;">Bạn đã hoàn thành bài.</p>
+            <div id="resultMessage" style="margin: 20px 0; line-height: 1.8;"></div>
+            <button class="btn-confirm" style="width: 100%; margin-top: 10px;" onclick="closeModal('resultOverlay')">Xem chi tiết</button>
+        </div>
+    </div>
+
+    <header>
+        <div class="brand">
+            <span>SnapEnglish</span> Test 2 IELTS Listening
+        </div>
+        
+        <div class="audio-controls" id="audioContainer">
+            <button class="skip-btn" id="btn-backward" onclick="skipAudio(-10)">-10</button>
+            <audio id="testAudio" controls controlsList="nodownload">
+                <source src="https://raw.githubusercontent.com/snaplanguages/SnapEnglish-audioieltslistening01/1f5e120d9f5c3c2598b4ffea2baf89c6a33ba1ae/IELTS%20Listening%20Test%202.mp3" type="audio/mpeg">
+                Trình duyệt của bạn không hỗ trợ audio.
+            </audio>
+            <button class="skip-btn" id="btn-forward" onclick="skipAudio(10)">+10</button>
+        </div>
+
+        <button class="btn-submit" id="topSubmitBtn" onclick="requestSubmit()">NỘP BÀI</button>
+    </header>
+
+    <div class="container" id="mainContainer">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab(1)">Part 1</div>
+            <div class="tab" onclick="switchTab(2)">Part 2</div>
+            <div class="tab" onclick="switchTab(3)">Part 3</div>
+            <div class="tab" onclick="switchTab(4)">Part 4</div>
+        </div>
+
+        <!-- PART 1 -->
+        <div id="part1" class="tab-content active">
+            <h2>Part 1: Questions 1-10</h2>
+            <div class="instruction">Complete the form below. Write <strong>ONE WORD AND/OR A NUMBER</strong>.</div>
+            
+            <h3>ACCOMMODATION FORM - STUDENT INFORMATION</h3>
+            <table class="custom-table">
+                <tbody>
+                    <tr><td style="width: 40%">Type of accommodation:</td><td>hall of residence</td></tr>
+                    <tr><td>Name:</td><td>Anu <strong>(1)</strong> <input type="text" id="q1" oninput="markAnswered(1)"></td></tr>
+                    <tr id="row-e1"><td colspan="2" style="padding:0; border:none;"><div id="e1" class="explanation"></div></td></tr>
+                    
+                    <tr><td>Date of birth:</td><td><strong>(2)</strong> <input type="text" id="q2" oninput="markAnswered(2)"> 1972</td></tr>
+                    <tr id="row-e2"><td colspan="2" style="padding:0; border:none;"><div id="e2" class="explanation"></div></td></tr>
+
+                    <tr><td>Country of origin:</td><td>India</td></tr>
+                    <tr><td>Course of study:</td><td><strong>(3)</strong> <input type="text" id="q3" oninput="markAnswered(3)"></td></tr>
+                    <tr id="row-e3"><td colspan="2" style="padding:0; border:none;"><div id="e3" class="explanation"></div></td></tr>
+
+                    <tr><td>Number of years planned in hall:</td><td><strong>(4)</strong> <input type="text" id="q4" oninput="markAnswered(4)"></td></tr>
+                    <tr id="row-e4"><td colspan="2" style="padding:0; border:none;"><div id="e4" class="explanation"></div></td></tr>
+
+                    <tr><td>Preferred catering arrangement:</td><td>half board</td></tr>
+                    <tr><td>Special dietary requirements:</td><td>no <strong>(5)</strong> <input type="text" id="q5" oninput="markAnswered(5)"> (red)</td></tr>
+                    <tr id="row-e5"><td colspan="2" style="padding:0; border:none;"><div id="e5" class="explanation"></div></td></tr>
+
+                    <tr><td>Preferred room type:</td><td>a single <strong>(6)</strong> <input type="text" id="q6" oninput="markAnswered(6)"></td></tr>
+                    <tr id="row-e6"><td colspan="2" style="padding:0; border:none;"><div id="e6" class="explanation"></div></td></tr>
+
+                    <tr><td>Interests:</td><td>the <strong>(7)</strong> <input type="text" id="q7" oninput="markAnswered(7)"> and badminton</td></tr>
+                    <tr id="row-e7"><td colspan="2" style="padding:0; border:none;"><div id="e7" class="explanation"></div></td></tr>
+
+                    <tr><td>Priorities in choice of hall:</td><td>to be with other students who are <strong>(8)</strong> <input type="text" id="q8" oninput="markAnswered(8)"></td></tr>
+                    <tr id="row-e8"><td colspan="2" style="padding:0; border:none;"><div id="e8" class="explanation"></div></td></tr>
+
+                    <tr><td></td><td>To live outside the <strong>(9)</strong> <input type="text" id="q9" oninput="markAnswered(9)"></td></tr>
+                    <tr id="row-e9"><td colspan="2" style="padding:0; border:none;"><div id="e9" class="explanation"></div></td></tr>
+
+                    <tr><td></td><td>To have a <strong>(10)</strong> <input type="text" id="q10" oninput="markAnswered(10)"> area for socializing</td></tr>
+                    <tr id="row-e10"><td colspan="2" style="padding:0; border:none;"><div id="e10" class="explanation"></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PART 2 -->
+        <div id="part2" class="tab-content">
+            <h2>Part 2: Questions 11-20</h2>
+            <div class="instruction">Questions 11-13: Complete the table below. Write <strong>NO MORE THAN THREE WORDS</strong>.</div>
+            <h3>PARKS AND OPEN SPACES</h3>
+            
+            <table class="custom-table">
+                <thead><tr><th>Name of place</th><th>Of particular interest</th><th>Open</th></tr></thead>
+                <tbody>
+                    <tr><td>Halland Common</td><td>Source of River Ouse</td><td>24 hours</td></tr>
+                    <tr><td>Holt Island</td><td>Many different <strong>(11)</strong> <input type="text" id="q11" oninput="markAnswered(11)"></td><td>Between <strong>(12)</strong> <input type="text" id="q12" oninput="markAnswered(12)"> and Sunday</td></tr>
+                    <tr><td>Longfield Country Park</td><td>Reconstruction of a 2000 year old <strong>(13)</strong> <input type="text" id="q13" oninput="markAnswered(13)"> with activities for children</td><td>Daylight hours</td></tr>
+                </tbody>
+            </table>
+            <div id="e11" class="explanation"></div>
+            <div id="e12" class="explanation"></div>
+            <div id="e13" class="explanation"></div>
+
+            <div class="instruction" style="margin-top:40px;">Questions 14-16: Choose the correct letter, A, B or C.</div>
+            
+            <p><strong>14. As part of Monday's activity, visitors will</strong></p>
+            <label class="mc-option"><input type="radio" name="q14" value="A" onchange="markAnswered(14)"> A. prepare food with herbs</label>
+            <label class="mc-option"><input type="radio" name="q14" value="B" onchange="markAnswered(14)"> B. meet a well-known herbalist</label>
+            <label class="mc-option"><input type="radio" name="q14" value="C" onchange="markAnswered(14)"> C. dye cloth with herbs</label>
+            <div id="e14" class="explanation"></div>
+
+            <p style="margin-top:25px;"><strong>15. For the activity on Wednesday,</strong></p>
+            <label class="mc-option"><input type="radio" name="q15" value="A" onchange="markAnswered(15)"> A. only group bookings are accepted</label>
+            <label class="mc-option"><input type="radio" name="q15" value="B" onchange="markAnswered(15)"> B. visitors should book in advance</label>
+            <label class="mc-option"><input type="radio" name="q15" value="C" onchange="markAnswered(15)"> C. attendance is free</label>
+            <div id="e15" class="explanation"></div>
+
+            <p style="margin-top:25px;"><strong>16. For the activity on Saturday, visitors should</strong></p>
+            <label class="mc-option"><input type="radio" name="q16" value="A" onchange="markAnswered(16)"> A. come in suitable clothing</label>
+            <label class="mc-option"><input type="radio" name="q16" value="B" onchange="markAnswered(16)"> B. make sure they are able to stay for the whole day</label>
+            <label class="mc-option"><input type="radio" name="q16" value="C" onchange="markAnswered(16)"> C. tell the rangers before the event what they wish to do</label>
+            <div id="e16" class="explanation"></div>
+
+            <div class="instruction" style="margin-top:40px;">Questions 17-20: Label the map below. Drag and drop the correct letter A-I into the boxes.</div>
+            
+            <div class="drag-palette">
+                <div class="drag-item" draggable="true" data-val="A">A</div>
+                <div class="drag-item" draggable="true" data-val="B">B</div>
+                <div class="drag-item" draggable="true" data-val="C">C</div>
+                <div class="drag-item" draggable="true" data-val="D">D</div>
+                <div class="drag-item" draggable="true" data-val="E">E</div>
+                <div class="drag-item" draggable="true" data-val="F">F</div>
+                <div class="drag-item" draggable="true" data-val="G">G</div>
+                <div class="drag-item" draggable="true" data-val="H">H</div>
+                <div class="drag-item" draggable="true" data-val="I">I</div>
+            </div>
+
+            <div style="background: white; padding: 25px; border-radius: 12px; border: 2px solid var(--border);">
+                <h3>Hinchingbrooke Park Features</h3>
+                <p><strong>17.</strong> bird hide <div class="drop-zone" data-q="17"></div></p>
+                <div id="e17" class="explanation"></div>
+
+                <p><strong>18.</strong> dog-walking area <div class="drop-zone" data-q="18"></div></p>
+                <div id="e18" class="explanation"></div>
+
+                <p><strong>19.</strong> flower garden <div class="drop-zone" data-q="19"></div></p>
+                <div id="e19" class="explanation"></div>
+
+                <p><strong>20.</strong> wooded area <div class="drop-zone" data-q="20"></div></p>
+                <div id="e20" class="explanation"></div>
+            </div>
+        </div>
+
+        <!-- PART 3 -->
+        <div id="part3" class="tab-content">
+            <h2>Part 3: Questions 21-30</h2>
+            <div class="instruction">Questions 21-24: Choose the correct letter, A, B or C.</div>
+            
+            <h3>Self-Access Centre</h3>
+            <p><strong>21. Students want to keep the Self-Access Centre because</strong></p>
+            <label class="mc-option"><input type="radio" name="q21" value="A" onchange="markAnswered(21)"> A. they enjoy the variety of equipment</label>
+            <label class="mc-option"><input type="radio" name="q21" value="B" onchange="markAnswered(21)"> B. they like being able to work on their own</label>
+            <label class="mc-option"><input type="radio" name="q21" value="C" onchange="markAnswered(21)"> C. it is an important part of their studies</label>
+            <div id="e21" class="explanation"></div>
+
+            <p style="margin-top:25px;"><strong>22. Some teachers would prefer to</strong></p>
+            <label class="mc-option"><input type="radio" name="q22" value="A" onchange="markAnswered(22)"> A. close the Self-Access Centre</label>
+            <label class="mc-option"><input type="radio" name="q22" value="B" onchange="markAnswered(22)"> B. move the Self-Access Centre elsewhere</label>
+            <label class="mc-option"><input type="radio" name="q22" value="C" onchange="markAnswered(22)"> C. restrict access to the Self-Access Centre</label>
+            <div id="e22" class="explanation"></div>
+
+            <p style="margin-top:25px;"><strong>23. The students' main concern about using the library would be</strong></p>
+            <label class="mc-option"><input type="radio" name="q23" value="A" onchange="markAnswered(23)"> A. the size of the library</label>
+            <label class="mc-option"><input type="radio" name="q23" value="B" onchange="markAnswered(23)"> B. difficulty in getting help</label>
+            <label class="mc-option"><input type="radio" name="q23" value="C" onchange="markAnswered(23)"> C. the lack of materials</label>
+            <div id="e23" class="explanation"></div>
+
+            <p style="margin-top:25px;"><strong>24. The Director of Studies is concerned about</strong></p>
+            <label class="mc-option"><input type="radio" name="q24" value="A" onchange="markAnswered(24)"> A. the cost of upgrading the centre</label>
+            <label class="mc-option"><input type="radio" name="q24" value="B" onchange="markAnswered(24)"> B. the lack of space in the centre</label>
+            <label class="mc-option"><input type="radio" name="q24" value="C" onchange="markAnswered(24)"> C. the difficulty in supervising the centre</label>
+            <div id="e24" class="explanation"></div>
+
+            <div class="instruction" style="margin-top:40px;">Questions 25-30: Complete the notes below. Write <strong>NO MORE THAN TWO WORDS</strong>.</div>
+            <div style="background: white; padding: 30px; border-radius: 12px; border: 2px solid var(--border);">
+                <h3 style="margin-top: 0;">Necessary improvements to the existing Self-Access Centre</h3>
+                
+                <p><strong>Equipment</strong><br>Replace computers to create more space</p>
+                
+                <p><strong>Resources</strong><br>
+                The level of the <strong>(25)</strong> <input type="text" id="q25" oninput="markAnswered(25)"> materials, in particular, should be more clearly shown.<br>
+                <div id="e25" class="explanation"></div>
+                Update the <strong>(26)</strong> <input type="text" id="q26" oninput="markAnswered(26)"> collection.<br>
+                <div id="e26" class="explanation"></div>
+                Buy some <strong>(27)</strong> <input type="text" id="q27" oninput="markAnswered(27)"> and divide them up.</p>
+                <div id="e27" class="explanation"></div>
+
+                <p><strong>Use of the room</strong><br>
+                Speak to the teachers and organize a <strong>(28)</strong> <input type="text" id="q28" oninput="markAnswered(28)"> for supervising the centre.<br>
+                <div id="e28" class="explanation"></div>
+                Install an <strong>(29)</strong> <input type="text" id="q29" oninput="markAnswered(29)">.<br>
+                <div id="e29" class="explanation"></div>
+                Restrict personal use of <strong>(30)</strong> <input type="text" id="q30" oninput="markAnswered(30)"> on computers.</p>
+                <div id="e30" class="explanation"></div>
+            </div>
+        </div>
+
+        <!-- PART 4 -->
+        <div id="part4" class="tab-content">
+            <h2>Part 4: Questions 31-40</h2>
+            <div class="instruction">Complete the notes below. Write <strong>ONE WORD ONLY</strong>.</div>
+            
+            <div style="background: white; padding: 30px; border-radius: 12px; border: 2px solid var(--border); line-height:2;">
+                <h3 style="text-align:center; color:var(--primary-dark); margin-top:0;">BUSINESS CULTURE</h3>
+                
+                <h4 style="color: var(--accent);">Power Culture</h4>
+                <ul style="list-style-type: square; margin-left: 20px;">
+                    <li>Characteristics of organization: small</li>
+                    <li><strong>(31)</strong> <input type="text" id="q31" oninput="markAnswered(31)"> power source</li>
+                    <div id="e31" class="explanation"></div>
+                    <li>Few rules and procedures</li>
+                    <li>Communication by <strong>(32)</strong> <input type="text" id="q32" oninput="markAnswered(32)"></li>
+                    <div id="e32" class="explanation"></div>
+                    <li>Advantage: can act quickly</li>
+                    <li>Disadvantage: might not act <strong>(33)</strong> <input type="text" id="q33" oninput="markAnswered(33)"></li>
+                    <div id="e33" class="explanation"></div>
+                    <li>Suitable employee: not afraid of <strong>(34)</strong> <input type="text" id="q34" oninput="markAnswered(34)"></li>
+                    <div id="e34" class="explanation"></div>
+                    <li>Does not need job security</li>
+                </ul>
+
+                <h4 style="color: var(--accent);">Role Culture</h4>
+                <ul style="list-style-type: square; margin-left: 20px;">
+                    <li>Characteristic of organization: large, many <strong>(35)</strong> <input type="text" id="q35" oninput="markAnswered(35)"></li>
+                    <div id="e35" class="explanation"></div>
+                    <li>Specialized departments</li>
+                    <li>Rules and procedures e.g. job <strong>(36)</strong> <input type="text" id="q36" oninput="markAnswered(36)"> and rules for discipline</li>
+                    <div id="e36" class="explanation"></div>
+                    <li>Advantages: economies of scale</li>
+                    <li>Successful when <strong>(37)</strong> <input type="text" id="q37" oninput="markAnswered(37)"> ability is important</li>
+                    <div id="e37" class="explanation"></div>
+                    <li>Disadvantages: slow to see when <strong>(38)</strong> <input type="text" id="q38" oninput="markAnswered(38)"> is needed</li>
+                    <div id="e38" class="explanation"></div>
+                    <li>Slow to react</li>
+                    <li>Suitable employee: values security</li>
+                    <li>Does not want <strong>(39)</strong> <input type="text" id="q39" oninput="markAnswered(39)"></li>
+                    <div id="e39" class="explanation"></div>
+                </ul>
+
+                <h4 style="color: var(--accent);">Task Culture</h4>
+                <ul style="list-style-type: square; margin-left: 20px;">
+                    <li>Characteristic of organization: project oriented</li>
+                    <li>In competitive market or making product with short life</li>
+                    <li>Advantages: <strong>(40)</strong> <input type="text" id="q40" oninput="markAnswered(40)"></li>
+                    <div id="e40" class="explanation"></div>
+                </ul>
+            </div>
+        </div>
+        <div style="height: 100px;"></div>
+    </div>
+
+    <footer>
+        <div style="font-size:14px; font-weight:bold; color:var(--text-light); text-transform:uppercase; margin-bottom:5px;">Navigation Panel</div>
+        <div class="nav-scroller" id="navPalette"></div>
+    </footer>
+
+    <script>
+        const answerKey = {
+            1: ["Bhatt"], 2: ["31 March"], 3: ["nursing"], 4: ["2"], 5: ["meat"],
+            6: ["bedsit"], 7: ["theatre", "theater"], 8: ["mature", "older"], 9: ["town"], 10: ["shared"],
+            11: ["trees"], 12: ["Friday"], 13: ["farm"], 14: ["C"], 15: ["B"], 16: ["A"], 
+            17: ["A"], 18: ["I"], 19: ["F"], 20: ["E"], 
+            21: ["C"], 22: ["B"], 23: ["B"], 24: ["C"], 
+            25: ["reading"], 26: ["cd"], 27: ["workbooks"], 28: ["timetable", "schedule"], 29: ["alarm"], 30: ["email", "emails"], 
+            31: ["central"], 32: ["conversation", "conversations"], 33: ["effectively"], 34: ["risk", "risks"], 35: ["levels"], 
+            36: ["description", "descriptions"], 37: ["technical"], 38: ["change"], 39: ["responsibility"], 40: ["flexible"]
+        };
+
+        const explanationsData = {
+            1: "Người nữ đánh vần tên họ là: A-N-U... <strong>B-H-A double T</strong>.",
+            2: "Người nữ nói: <strong>31-March</strong> 1972. Chỉ điền ngày tháng vì đề bài yêu cầu giới hạn 1 từ/1 số.",
+            3: "I'm doing a course in <strong>nursing</strong>.",
+            4: "Cô ấy nói sẽ học 3 năm nhưng chỉ muốn ở ký túc xá <strong>2</strong> năm (stay in hall for two).",
+            5: "I don't take red <strong>meat</strong>.",
+            6: "Well, actually my grant is quite generous and I think the <strong>bedsit</strong> sounds the best option.",
+            7: "Ummm. Well, I love the <strong>theatre</strong>.",
+            8: "The first thing is I'd prefer a hall where there are other <strong>mature</strong> students.",
+            9: "I'd prefer to be out of <strong>town</strong>.",
+            10: "I would like somewhere with a <strong>shared</strong> area, a TV room for example.",
+            11: "Holt Island, which is noted for its great range of <strong>trees</strong>.",
+            12: "The island is only open to the public from <strong>Friday</strong> to Sunday.",
+            13: "Longfield has a modern replica of a <strong>farm</strong> from over two thousand years ago.",
+            14: "(C) You'll start with a tour... practise the technique of using them as colour dyes for cloth.",
+            15: "(B) We keep to a small number of people... phone the park ranger a few days ahead (book in advance).",
+            16: "(A) Make sure you're wearing something that you don't mind getting dirty or torn (suitable clothing).",
+            17: "(A) As you can see, there's a lake in the north west... with a bird hide to the west of it.",
+            18: "(I) Fairly close to where refreshments are available, there's a dog-walking area in the southern part.",
+            19: "(F) The flower garden: that's the circular area on the map surrounded by paths.",
+            20: "(E) And finally, there's a wooded area in the western section of the park, between two paths.",
+            21: "(C) From the students' point of view... they see it as a pretty major component of their course.",
+            22: "(B) Some of us also think that we could benefit a lot more by relocating the Self-Access Centre to the main University library building.",
+            23: "(B) Our main worry would be not being able to go to a teacher for advice (difficulty in getting help).",
+            24: "(C) It's the problem of timetabling a teacher to be in there outside class hours (difficulty in supervising).",
+            25: "...find it difficult to find materials that are appropriate for their level, especially <strong>reading</strong> resources...",
+            26: "The <strong>CD</strong> section especially needs to be more current.",
+            27: "What do you think of the idea of introducing some <strong>workbooks</strong>?",
+            28: "...make sure we can all reach some agreement on a <strong>timetable</strong> to supervise the centre...",
+            29: "What about putting in an <strong>alarm</strong>? - Good idea.",
+            30: "...see whether we could somehow limit the access to <strong>email</strong>.",
+            31: "It's the type of culture that needs a <strong>central</strong> source of power to be effective.",
+            32: "Another characteristic is that communication usually takes the form of <strong>conversations</strong>.",
+            33: "But on the negative side, this type of organisation doesn't always act <strong>effectively</strong>.",
+            34: "And the kind of person who does well... is one who is happy to take <strong>risks</strong>.",
+            35: "...found in large companies, which have lots of different <strong>levels</strong> in them.",
+            36: "For example, there are specific job <strong>descriptions</strong>, rules for discipline...",
+            37: "It is particularly successful in business markets where <strong>technical</strong> expertise is important.",
+            38: "On the other hand, this culture is often very slow to recognise the need for <strong>change</strong>...",
+            39: "Well it suits employees who value security, and who don't particularly want to have <strong>responsibility</strong>.",
+            40: "Now one of the major benefits of this culture is that it's <strong>flexible</strong>."
+        };
+
+        let mode = '';
+        const audio = document.getElementById('testAudio');
+        let isSubmitted = false;
+
+        // Initialize Navigation Drawer
+        const navPalette = document.getElementById('navPalette');
+        for (let i = 1; i <= 40; i++) {
+            let dot = document.createElement("div");
+            dot.className = "nav-dot"; dot.id = `nav-${i}`; dot.innerText = i;
+            dot.onclick = () => {
+                let part = i <= 10 ? 1 : i <= 20 ? 2 : i <= 30 ? 3 : 4;
+                switchTab(part);
+                setTimeout(() => {
+                    let el = document.getElementById('q'+i);
+                    if(!el && document.getElementsByName('q'+i).length > 0) el = document.getElementsByName('q'+i)[0].parentNode;
+                    if(!el) el = document.querySelector(`.drop-zone[data-q="${i}"]`);
+                    
+                    if(el) {
+                        el.scrollIntoView({behavior: "smooth", block: "center"});
+                        el.style.transition = "background 0.5s";
+                        let originalBg = el.style.background;
+                        el.style.background = "var(--highlight)";
+                        setTimeout(() => el.style.background = originalBg, 1000);
+                    }
+                }, 100);
+            };
+            navPalette.appendChild(dot);
+        }
+
+        // Drag and Drop Logic with Container Scroll
+        const mainContainer = document.getElementById('mainContainer');
+        let draggedItem = null;
+
+        document.querySelectorAll('.drag-item').forEach(item => {
+            item.addEventListener('dragstart', function(e) {
+                if(isSubmitted) { e.preventDefault(); return; }
+                draggedItem = this;
+                setTimeout(() => this.classList.add('dragging'), 0);
+            });
+            item.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+                draggedItem = null;
+            });
+        });
+
+        // Handle auto-scroll when dragging near edge of container
+        mainContainer.addEventListener('dragover', e => {
+            const rect = mainContainer.getBoundingClientRect();
+            const threshold = 80;
+            if (e.clientY < rect.top + threshold) {
+                mainContainer.scrollTop -= 15;
+            } else if (e.clientY > rect.bottom - threshold) {
+                mainContainer.scrollTop += 15;
+            }
+        });
+
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            zone.addEventListener('dragover', e => {
+                if(isSubmitted) return;
+                e.preventDefault();
+                zone.classList.add('drag-over');
+            });
+            zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+            zone.addEventListener('drop', function(e) {
+                if(isSubmitted) return;
+                e.preventDefault();
+                this.classList.remove('drag-over');
+                if (draggedItem) {
+                    // Return existing child back to palette if replacing
+                    if (this.children.length > 0) {
+                        document.querySelector('.drag-palette').appendChild(this.children[0]);
+                    }
+                    this.appendChild(draggedItem);
+                    markAnswered(this.dataset.q);
+                }
+            });
+        });
+
+        function selectMode(selectedMode) {
+            mode = selectedMode;
+            document.querySelector('.mode-practice').classList.toggle('selected', mode === 'practice');
+            document.querySelector('.mode-mock').classList.toggle('selected', mode === 'mock');
+            document.getElementById('startBtn').style.display = 'inline-block';
+        }
+
+        function askReady() {
+            let msg = mode === 'mock' 
+                ? "Bạn đã chọn chế độ Thi Thử.\nAudio sẽ tự động phát.\nBài kiểm tra sẽ kết thúc sau audio kết thúc 1 phút.\nBạn đã sẵn sàng chưa?" 
+                : "Bạn đã chọn chế độ Luyện Tập.\nBạn có thể tự điều chỉnh audio.\nBạn đã sẵn sàng chưa?";
+            document.getElementById('startConfirmMsg').innerText = msg;
+            document.getElementById('startConfirmOverlay').style.display = 'flex';
+        }
+
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function startTestActual() {
+            closeModal('startConfirmOverlay');
+            document.getElementById('setupOverlay').style.display = 'none';
+            
+            if(mode === 'mock') {
+                document.getElementById('btn-backward').classList.add('hidden');
+                document.getElementById('btn-forward').classList.add('hidden');
+                audio.removeAttribute('controls');
+                audio.play();
+                audio.onended = () => { setTimeout(() => { if(!isSubmitted) evaluateTest(); }, 60000); };
+            }
+        }
+
+        function skipAudio(seconds) { audio.currentTime += seconds; }
+
+        function switchTab(tabNum) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('part' + tabNum).classList.add('active');
+            document.querySelectorAll('.tab')[tabNum-1].classList.add('active');
+            mainContainer.scrollTop = 0;
+        }
+
+        function markAnswered(qNum) {
+            if(isSubmitted) return;
+            const navCircle = document.getElementById('nav-' + qNum);
+            let answered = false;
+            
+            const textInput = document.getElementById('q' + qNum);
+            if(textInput && textInput.value.trim() !== '') answered = true;
+            
+            const radios = document.getElementsByName('q' + qNum);
+            for(let r of radios) { if(r.checked) answered = true; }
+
+            const dropZone = document.querySelector(`.drop-zone[data-q="${qNum}"]`);
+            if(dropZone && dropZone.children.length > 0) answered = true;
+
+            if(answered) navCircle.classList.add('done');
+            else navCircle.classList.remove('done');
+        }
+
+        function requestSubmit() {
+            if (mode === 'practice') { document.getElementById('submitModal').style.display = 'flex'; } 
+            else { evaluateTest(); }
+        }
+
+        function evaluateTest() {
+            isSubmitted = true;
+            closeModal('submitModal');
+            document.getElementById('topSubmitBtn').classList.add('hidden');
+            audio.pause();
+            
+            document.querySelectorAll('input').forEach(el => el.disabled = true);
+            document.querySelectorAll('.drag-item').forEach(el => el.setAttribute('draggable', 'false'));
+            
+            let score = 0;
+
+            for(let i = 1; i <= 40; i++) {
+                let userAnswer = '';
+                const textInput = document.getElementById('q' + i);
+                if(textInput) userAnswer = textInput.value.trim().toLowerCase();
+                
+                const radios = document.getElementsByName('q' + i);
+                for(let r of radios) { if(r.checked) userAnswer = r.value.toLowerCase(); }
+
+                const dropZone = document.querySelector(`.drop-zone[data-q="${i}"]`);
+                if(dropZone && dropZone.children.length > 0) userAnswer = dropZone.children[0].dataset.val.toLowerCase();
+
+                const navCircle = document.getElementById('nav-' + i);
+                navCircle.classList.remove('done');
+
+                const correctAnswers = answerKey[i].map(a => a.toLowerCase());
+                
+                if(correctAnswers.includes(userAnswer)) {
+                    score++;
+                    navCircle.classList.add('correct');
+                    if(textInput) textInput.classList.add('correct-input');
+                    if(dropZone) dropZone.style.borderColor = "var(--correct)";
+                } else {
+                    navCircle.classList.add('incorrect');
+                    if(textInput) {
+                        textInput.classList.add('wrong-input');
+                        textInput.value = (userAnswer ? userAnswer + " " : "") + "✓ " + answerKey[i][0];
+                    } else if (radios.length > 0) {
+                        let correctRadio = document.querySelector(`input[name="q${i}"][value="${answerKey[i][0]}"]`);
+                        if(correctRadio) {
+                            correctRadio.parentNode.style.backgroundColor = "var(--exp-bg)";
+                            correctRadio.parentNode.style.border = "2px solid var(--correct)";
+                        }
+                    } else if (dropZone) {
+                        dropZone.style.borderColor = "var(--wrong)";
+                        dropZone.innerHTML = `<span style="color:var(--wrong)">❌</span> <span style="color:var(--correct)">${answerKey[i][0]}</span>`;
+                    }
+                }
+
+                // Show Explanation
+                const expBox = document.getElementById('e' + i);
+                if(expBox && explanationsData[i]) {
+                    expBox.innerHTML = `💡 <strong>Giải thích:</strong> ${explanationsData[i]}`;
+                    expBox.style.display = 'block';
+                }
+            }
+
+            document.getElementById('resultMessage').innerHTML = `
+                <strong style="font-size: 26px; color: var(--accent); display: block; margin-bottom: 10px;">Correct: ${score}/40</strong>
+                <strong style="font-size: 26px; color: var(--primary);">Band Score: ${calculateBand(score)}</strong>
+            `;
+            
+            if(window.luuDiemIELTSFullTest) {
+                window.luuDiemIELTSFullTest(score, calculateBand(score), "Test 2");
+            }
+            
+            setTimeout(() => { document.getElementById('resultOverlay').style.display = 'flex'; }, 500);
+        }
+
+        function calculateBand(score) {
+            if(score >= 39) return "9.0"; if(score >= 37) return "8.5";
+            if(score >= 35) return "8.0"; if(score >= 32) return "7.5";
+            if(score >= 30) return "7.0"; if(score >= 26) return "6.5";
+            if(score >= 23) return "6.0"; if(score >= 18) return "5.5";
+            if(score >= 16) return "5.0"; if(score >= 13) return "4.5";
+            if(score >= 10) return "4.0"; return "< 4.0";
+        }
+    </script>
+</body>
+</html>
