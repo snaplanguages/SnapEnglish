@@ -3,698 +3,578 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 1 - Test 1 | SnapEnglish</title>
     <link rel="icon" type="image/png" href="ảnh.png">
-    <title>Part 1 Test 1 | SnapEnglish</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap');
-
         :root {
-            --primary-color: #6a11cb;
-            --secondary-color: #2575fc;
-            --accent-color: #ff7eb3;
-            --bg-gradient: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --text-main: #2d3436;
+            /* Matcha & Cream Palette */
+            --primary: #88b04b;      
+            --primary-dark: #6a8a3a;
+            --accent: #ff9f89;       
+            --bg-body: #f7f9f4;      
+            --bg-pane: #ffffff;
+            --text-main: #4a4a4a;
+            --text-light: #888;
+            --border: #e0e5df;
+            --highlight: #fff59d;    
+            --correct: #6a994e;
+            --wrong: #bc4749;
+            --exp-bg: #f1f8e9;       
+            --header-h: 70px;
+            --footer-h: 80px;
         }
+
+        * { box-sizing: border-box; }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: var(--bg-gradient);
-            background-attachment: fixed;
+            margin: 0; padding: 0;
+            font-family: 'Quicksand', sans-serif;
+            background: var(--bg-body);
             color: var(--text-main);
-        }
-
-        /* Container full width as requested */
-        .container {
-            width: 100%;
-            box-sizing: border-box;
-            background: var(--glass-bg);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: 0.5s;
-        }
-
-        .blur-content {
-            filter: blur(8px);
-            pointer-events: none;
-            user-select: none;
-        }
-
-        .brand-title {
-            text-align: center;
-            font-size: 2.5em;
-            font-weight: 800;
-            background: -webkit-linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
-        }
-
-        .test-title {
-            text-align: center;
-            color: #636e72;
-            font-weight: 400;
-            margin-top: 0;
-            margin-bottom: 30px;
-        }
-
-        /* Audio Player & Controls */
-        #audio-section {
-            margin-bottom: 30px;
-            background: rgba(255, 255, 255, 0.5);
-            padding: 20px;
-            border-radius: 20px;
-            border: 1px dashed var(--secondary-color);
-        }
-
-        audio {
-            width: 100%;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            outline: none;
-        }
-
-        .custom-audio-controls {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .btn-skip {
-            padding: 8px 20px;
-            border-radius: 20px;
-            border: 2px solid var(--primary-color);
-            background: white;
-            color: var(--primary-color);
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-skip:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(106, 17, 203, 0.2);
-        }
-
-        #mock-msg {
-            display: none;
-            color: var(--primary-color);
-            font-weight: 700;
-            text-align: center;
-            font-size: 1.1em;
-            padding: 10px;
-        }
-
-        /* Data Tables */
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-top: 20px;
-            margin-bottom: 30px;
-            border-radius: 12px;
+            height: 100vh;
+            display: flex; flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            width: 100%;
         }
 
-        th {
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 15px;
-            font-weight: 600;
-            text-align: left;
+        /* --- OVERLAY & MODAL --- */
+        #setupOverlay, .custom-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        .custom-overlay { display: none; z-index: 99999; }
+        
+        .setup-modal, .custom-modal {
+            background: white; padding: 40px; border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(136, 176, 75, 0.15);
+            width: 90%; max-width: 500px; text-align: center;
+            border: 2px solid var(--border);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
-        td {
-            background: white;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            vertical-align: middle;
+        .setup-modal h2, .custom-modal h2 { 
+            font-family: 'Lora', serif; color: var(--primary-dark); font-size: 28px; margin-top: 0; 
+        }
+        
+        .mode-btn {
+            display: block; width: 100%; padding: 15px; margin: 15px 0;
+            border-radius: 15px; font-size: 18px; font-weight: 700; cursor: pointer;
+            transition: 0.3s; font-family: inherit;
+        }
+        .mode-practice { background: #fff0eb; color: #d87059; border: 2px solid #ffccbc; }
+        .mode-practice:hover, .mode-practice.selected { background: var(--accent); color: white; border-color: var(--accent); }
+        .mode-mock { background: #e8f5e9; color: var(--primary-dark); border: 2px solid #c8e6c9; }
+        .mode-mock:hover, .mode-mock.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        
+        .start-btn {
+            background: var(--primary); color: white; border: none; padding: 12px 35px;
+            border-radius: 50px; font-size: 18px; font-weight: 700; cursor: pointer;
+            margin-top: 20px; transition: 0.3s; display: none; box-shadow: 0 5px 15px rgba(136, 176, 75, 0.3);
+        }
+        .start-btn:hover { transform: translateY(-3px); }
+
+        .modal-actions { display: flex; gap: 15px; margin-top: 25px; justify-content: center; }
+        .btn-cancel { background: #f5f5f5; color: #666; border: 2px solid #ddd; padding: 12px 20px; border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; font-family: inherit; flex: 1; }
+        .btn-cancel:hover { background: #e0e0e0; border-color: #ccc; }
+        .btn-confirm { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; font-family: inherit; flex: 1; box-shadow: 0 4px 0 var(--primary-dark); }
+        .btn-confirm:active { transform: translateY(4px); box-shadow: none; }
+
+        /* --- HEADER & CUSTOM AUDIO --- */
+        header {
+            height: var(--header-h); background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 30px; z-index: 100;
+        }
+        
+        .brand { font-size: 24px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        .brand span { background: var(--primary); color: white; padding: 4px 10px; border-radius: 10px; font-size: 16px; }
+
+        .audio-controls { display: flex; align-items: center; gap: 10px; background: #edf2ea; padding: 5px 15px; border-radius: 30px; }
+        
+        .play-pause-btn {
+            background: var(--primary); color: white; border: none; border-radius: 50%;
+            width: 35px; height: 35px; cursor: pointer; display: flex; justify-content: center; align-items: center;
+            font-size: 14px; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .play-pause-btn:hover { background: var(--primary-dark); }
+        
+        .skip-btn {
+            background: white; border: 2px solid var(--border); border-radius: 50%;
+            width: 32px; height: 32px; cursor: pointer; font-weight: bold; color: var(--primary-dark);
+            display: flex; justify-content: center; align-items: center; transition: 0.2s; font-size: 12px;
+        }
+        .skip-btn:hover { border-color: var(--primary); background: var(--primary); color: white; }
+        
+        .progress-bar {
+            -webkit-appearance: none; width: 130px; height: 6px; background: #c1d5a4; 
+            border-radius: 5px; outline: none; cursor: pointer;
+        }
+        .progress-bar::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; 
+            background: var(--primary-dark); cursor: pointer; transition: 0.2s;
+        }
+        .progress-bar::-webkit-slider-thumb:hover { transform: scale(1.2); }
+        
+        .time-display { font-weight: 700; color: var(--primary-dark); font-size: 14px; min-width: 40px; text-align: center; }
+        .hidden { display: none !important; }
+
+        .btn-submit { 
+            background: var(--primary); color: white; border: none; padding: 10px 25px; 
+            border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s;
+            font-family: inherit; box-shadow: 0 4px 0 var(--primary-dark);
+        }
+        .btn-submit:active { transform: translateY(4px); box-shadow: none; }
+
+        /* --- LAYOUT FULL WIDTH --- */
+        .container { 
+            display: flex; flex-direction: column;
+            height: calc(100vh - var(--header-h) - var(--footer-h)); 
+            width: 100%; max-width: 100%; 
+            margin: 0; padding: 20px 50px;
+            overflow-y: auto; scroll-behavior: smooth;
         }
 
-        tr:last-child td { border-bottom: none; }
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-thumb { background: #d0d6cc; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        .tab-content { display: block; animation: fadeIn 0.3s; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.02); }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- CONTENT STYLES --- */
+        h2 { color: var(--primary-dark); margin-top: 0; font-size: 28px; font-family: 'Lora', serif; }
+        h3 { color: #555; border-bottom: 2px solid #edf2ea; padding-bottom: 5px; margin-top: 30px; font-size: 22px; }
+        p { margin-bottom: 20px; font-size: 18px; line-height: 1.8; }
+        
+        .instruction {
+            background: #e8f5e9; color: #2e7d32; padding: 15px; border-radius: 12px;
+            font-weight: 600; font-size: 16px; margin-bottom: 25px; border: 2px dashed #a5d6a7;
+        }
+
+        .custom-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .custom-table th { background: var(--primary); color: white; padding: 15px; text-align: left; font-size: 18px; }
+        .custom-table td { border-bottom: 1px solid #eee; padding: 15px; font-size: 18px; vertical-align: middle; }
 
         input[type="text"] {
-            width: 120px;
-            padding: 8px 12px;
-            border: 2px solid #dfe6e9;
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 14px;
-            transition: 0.3s;
-            outline: none;
-            background: #fafafa;
+            border: 2px solid #dce0dd; border-radius: 8px; padding: 8px 15px;
+            font-family: inherit; font-size: 18px; color: var(--primary-dark);
+            outline: none; background: white; transition: 0.2s; font-weight: 600; width: 160px;
         }
+        input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(136, 176, 75, 0.15); }
+        input[type="text"].correct-input { border-color: var(--correct); color: var(--correct); background: #f1f8e9; }
+        input[type="text"].wrong-input { border-color: var(--wrong); color: var(--wrong); background: #ffebee; }
 
-        input[type="text"]:focus {
-            border-color: var(--secondary-color);
-            background: white;
-            box-shadow: 0 0 8px rgba(37, 117, 252, 0.2);
+        .lightbulb {
+            display: inline-flex; align-items: center; gap: 8px;
+            color: #d87059; font-weight: bold; text-decoration: none;
+            margin-top: 20px; padding: 12px 25px; background: #fff0eb;
+            border-radius: 20px; transition: 0.2s; border: 2px solid #ffccbc;
         }
+        .lightbulb:hover { background: var(--accent); color: white; border-color: var(--accent); }
 
-        .correct-hint {
-            color: #00b894;
-            font-size: 0.9em;
-            margin-left: 8px;
-            font-weight: 600;
-            background: #e8f8f5;
-            padding: 2px 8px;
-            border-radius: 4px;
+        /* --- FOOTER --- */
+        footer {
+            height: var(--footer-h); background: #fff; border-top: 2px solid var(--border);
+            display: flex; flex-direction: column; justify-content: center; padding: 0 30px;
+            z-index: 100; position: fixed; bottom: 0; width: 100%;
         }
-
-        /* Buttons */
-        .btn {
-            padding: 15px 30px;
-            border: none;
-            cursor: pointer;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: 600;
-            color: white;
-            transition: all 0.3s ease;
-            display: inline-block;
+        .nav-scroller { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; align-items: center; justify-content: center; }
+        .nav-dot {
+            min-width: 40px; height: 40px; border: 2px solid #eee; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600;
+            cursor: pointer; color: #999; background: white; transition: 0.2s; flex-shrink: 0;
         }
-
-        .btn-submit {
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            width: 100%;
-            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.3);
-            margin-top: 20px;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(106, 17, 203, 0.4);
-        }
-
-        /* Modals */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            opacity: 0;
-            visibility: hidden;
-            transition: 0.3s ease;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-box {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 450px;
-            width: 90%;
-            transform: scale(0.8);
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-        }
-
-        .modal-overlay.active .modal-box { transform: scale(1); }
-
-        .modal-box h3 { margin-top: 0; color: var(--primary-color); font-size: 1.5em; }
-        .modal-box p { color: #636e72; margin-bottom: 30px; line-height: 1.6; }
-        
-        .modal-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn-primary { background: var(--secondary-color); flex: 1; min-width: 140px;}
-        .btn-secondary { background: #b2bec3; flex: 1; min-width: 140px;}
-        .btn-outline { background: transparent; border: 2px solid var(--secondary-color); color: var(--secondary-color); flex: 1; min-width: 140px; }
-        
-        .btn-primary:hover { background: #0984e3; }
-        .btn-secondary:hover { background: #636e72; }
-        .btn-outline:hover { background: var(--secondary-color); color: white; }
-
-        /* Results Split Screen */
-        #result-section {
-            display: none;
-            margin-top: 40px;
-            animation: fadeIn 0.8s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .score-board {
-            text-align: center;
-            padding: 20px;
-            background: #f1f2f6;
-            border-radius: 15px;
-            font-size: 1.5em;
-            font-weight: 800;
-            color: var(--primary-color);
-            margin-bottom: 30px;
-            border: 2px dashed var(--secondary-color);
-        }
-
-        .split-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            align-items: start;
-        }
-
-        .transcript-box {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
-            max-height: 700px;
-            overflow-y: auto;
-            line-height: 1.8;
-            color: #2d3436;
-            border-left: 5px solid var(--accent-color);
-        }
-
-        .transcript-box strong { color: var(--primary-color); }
-        
-        mark.hl {
-            background-color: #ffeaa7;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: 600;
-            color: #d35400;
-        }
-        
-        .explanation-col {
-            max-height: 700px;
-            overflow-y: auto;
-            padding-right: 10px;
-        }
-
-        .explanation-item {
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-            border: 1px solid #f1f2f6;
-        }
-
-        .explanation-item h4 {
-            margin-top: 0;
-            color: var(--secondary-color);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .explanation-item .quote {
-            font-style: italic;
-            color: #636e72;
-            background: #f8f9fa;
-            padding: 10px 15px;
-            border-left: 3px solid #b2bec3;
-            border-radius: 4px;
-            margin: 10px 0;
-        }
-
-        .explanation-item .reason { font-size: 0.95em; line-height: 1.6; }
-
-        @media (max-width: 900px) {
-            .split-layout { grid-template-columns: 1fr; }
-        }
-
+        .nav-dot:hover { border-color: var(--primary); color: var(--primary); }
+        .nav-dot.done { background: #edf2ea; color: var(--primary-dark); border-color: #c1d5a4; }
+        .nav-dot.correct { background: var(--correct); color: white; border-color: var(--correct); }
+        .nav-dot.incorrect { background: var(--wrong); color: white; border-color: var(--wrong); }
     </style>
 </head>
 <body>
 
-    <div id="startModal" class="modal-overlay active">
-        <div class="modal-box">
-            <h3>✨ Welcome to SnapEnglish! ✨</h3>
-            <p>Sẵn sàng chinh phục IELTS Listening Part 1 chưa? Hãy chọn chế độ bạn muốn bắt đầu nhé!</p>
-            <div class="modal-buttons">
-                <button class="btn btn-outline" onclick="startQuiz('practice')">📘 Luyện Tập</button>
-                <button class="btn btn-primary" onclick="startQuiz('mock')">⏱ Thi Thử Tính Điểm</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="submitModal" class="modal-overlay">
-        <div class="modal-box">
-            <h3>Nộp Bài? 📝</h3>
-            <p>Bạn đã kiểm tra kỹ các đáp án chưa? Đảm bảo không bỏ trống ô nào nhé!</p>
-            <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="closeSubmitModal()">Hủy Bỏ</button>
-                <button class="btn btn-primary" onclick="confirmSubmit()">Chắc chắn Nộp</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="container blur-content" id="mainContainer">
-        <h1 class="brand-title">SnapEnglish</h1>
-        <h2 class="test-title">🎧 Part 1 - Test 1 (0:00 - 8:13)</h2>
-        
-        <div id="audio-section">
-            <div id="mock-msg">
-                ⏳ Đang trong chế độ Thi Thử. Audio đang tự động phát, hãy tập trung lắng nghe!
-            </div>
-            <audio id="testAudio" controls data-start="0" data-end="493">
-                <source src="https://raw.githubusercontent.com/snaplanguages/SnapEnglish-audioieltslistening01/1f5e120d9f5c3c2598b4ffea2baf89c6a33ba1ae/IELTS%20Listening%20Test%201.mp3" type="audio/mpeg">
-                Trình duyệt của bạn không hỗ trợ audio.
-            </audio>
-            <div class="custom-audio-controls" id="customControls">
-                <button class="btn-skip" onclick="skipAudio(-5)">⏪ Lùi 5s</button>
-                <button class="btn-skip" onclick="skipAudio(5)">Tiến 5s ⏩</button>
-            </div>
-        </div>
-
-        <h2>Question 1-5</h2>
-        <p>Complete the table below. Write <strong>ONE WORD OR A NUMBER</strong>.</p>
-        
-        <table>
-            <tr>
-                <th>Apartments</th>
-                <th>Facilities</th>
-                <th>Other Information</th>
-                <th>Cost</th>
-            </tr>
-            <tr>
-                <td>Rose Garden Apartments</td>
-                <td>Studio Flat</td>
-                <td>Entertainment programme: Greek dancing</td>
-                <td>£ 219</td>
-            </tr>
-            <tr>
-                <td>Blue Bay Apartments</td>
-                <td>Large salt water swimming pool</td>
-                <td>- Just <strong>1.</strong> <input type="text" id="answer-1"> meters from beach<br> - Near shops</td>
-                <td>£ 275</td>
-            </tr>
-            <tr>
-                <td><strong>2.</strong> <input type="text" id="answer-2"> Apartments</td>
-                <td>Terrace</td>
-                <td>Watersports</td>
-                <td>£ 490</td>
-            </tr>
-            <tr>
-                <td>The Grand</td>
-                <td>Greek paintings and <strong>3.</strong> <input type="text" id="answer-3"></td>
-                <td>Overlooking <strong>4.</strong> <input type="text" id="answer-4"><br>Near a supermarket and a disco</td>
-                <td>£ <strong>5.</strong> <input type="text" id="answer-5"></td>
-            </tr>
-        </table>
-
-        <h2>Question 6-10</h2>
-        <p>Complete the table below. Write <strong>ONE WORD OR A NUMBER</strong>.</p>
-        <center><strong>GREEK ISLAND HOLIDAYS</strong></center>
-        <table>
-            <tr>
-                <th>Insurance Benefits</th>
-                <th>Maximum Amount</th>
-            </tr>
-            <tr>
-                <td>Cancellation</td>
-                <td>£ <strong>6.</strong> <input type="text" id="answer-6"></td>
-            </tr>
-            <tr>
-                <td>Hospital</td>
-                <td>£ 600 additional benefit allows a <strong>7.</strong> <input type="text" id="answer-7"> to travel to resort</td>
-            </tr>
-            <tr>
-                <td><strong>8.</strong> <input type="text" id="answer-8"> departure</td>
-                <td>Up to £ 1000 depends on reason</td>
-            </tr>
-            <tr>
-                <td>Personal belongings</td>
-                <td>Up to £ 3000 £ 500 for one <strong>9.</strong> <input type="text" id="answer-9"></td>
-            </tr>
-            <tr>
-                <td> </td>
-                <td>Name of assistant manager: Ben <strong>10.</strong> <input type="text" id="answer-10"></td>
-            </tr>
-        </table>
-
-        <button class="btn btn-submit" id="submitBtn" onclick="openSubmitModal()">📩 Nộp Bài (Submit)</button>
-
-        <div id="result-section">
-            <div class="score-board" id="scoreDisplay"></div>
+    <div id="setupOverlay">
+        <div class="setup-modal">
+            <h2> Chào mừng đến với Listening Library ✨</h2>
+            <p style="font-size: 18px; color: #666; margin-bottom: 25px;">Bạn hãy chọn chế độ:</p>
             
-            <div class="split-layout">
-                <div>
-                    <h2 style="color: var(--primary-color);">📖 Tapescript</h2>
-                    <div class="transcript-box">
-                        <p><strong>MAN:</strong> Greek Island Holidays, can I help you?</p>
-                        <p><strong>WOMAN:</strong> Yes, I hope so. I have a friend who's just come back from Corfu and she's recommended some apartments in Arilas. She thought they might be on your list.</p>
-                        <p><strong>MAN:</strong> Arilas, Arilas, let me see. Can you give me the names?</p>
-                        <p><strong>WOMAN:</strong> Yes, the first's Rose Garden Apartments...</p>
-                        <p><em>...[Phần mở đầu]...</em></p>
-                        
-                        <p><strong>MAN:</strong> That's right. And it isn't far from the beach, either - only <mark class="hl">300 metres</mark> (1), and only around half a kilometre to some shops...</p>
-                        
-                        <p><strong>WOMAN:</strong> ...Something to do with sun... Sunshine, is it?</p>
-                        <p><strong>MAN:</strong> I think you meant the <mark class="hl">Sunshade</mark> Apartments. (2) They're on a mountainside.</p>
+            <button class="mode-btn mode-practice" onclick="selectMode('practice')">🎯 Luyện tập</button>
+            <button class="mode-btn mode-mock" onclick="selectMode('mock')">🏆 Thi thử</button>
+            
+            <button class="start-btn" id="startBtn" onclick="askReady()">Sẵn sàng</button>
+        </div>
+    </div>
 
-                        <p><strong>MAN:</strong> Actually it's quite reasonable. It's an older style house with Greek paintings in every room, and a <mark class="hl">balcony</mark> (3) outside.</p>
-                        
-                        <p><strong>WOMAN:</strong> Sound nice. What are the views like?</p>
-                        <p><strong>MAN:</strong> Well, there are <mark class="hl">forests</mark> all round (4) and they hide a supermarket just down the road...</p>
-                        
-                        <p><strong>WOMAN:</strong> And the price?</p>
-                        <p><strong>MAN:</strong> <mark class="hl">￡319</mark> at that time (5), but if you leave it till November it goes down by 40%.</p>
-
-                        <p><strong>MAN:</strong> We can improve on that, Ms Nash. For Greek Island holidays, our maximum is <mark class="hl">￡10,000</mark> (6)</p>
-                        
-                        <p><strong>MAN:</strong> It's still sensible to have good cover. Now, if you go to hospital, we allow ￡600.</p>
-                        <p><strong>WOMAN:</strong> Yes, mine's similar.</p>
-                        <p><strong>MAN:</strong> And we also allow a <mark class="hl">relative</mark> to travel to your holiday resort. (7)</p>
-                        
-                        <p><strong>MAN:</strong> And what happens if you don't get on the plane?</p>
-                        <p><strong>WOMAN:</strong> Nothing, as far as I can see on this form.</p>
-                        <p><strong>MAN:</strong> Don't you have <mark class="hl">missed</mark> departure? (8)</p>
-
-                        <p><strong>MAN:</strong> We pay up to ￡1,000 for that, depending on the reason. And we're particularly generous about loss of personal belongings - up to ￡3,000, but not more than ￡500 for a single <mark class="hl">item</mark>. (9)</p>
-
-                        <p><strong>WOMAN:</strong> OK - thanks very much... Your name is?</p>
-                        <p><strong>MAN:</strong> Ben - <mark class="hl">Ludlow</mark>. That's L-U-D-L-O-W. (10) I'm the Assistant Manager here.</p>
-                    </div>
-                </div>
-
-                <div>
-                    <h2 style="color: var(--primary-color);">💡 Giải thích chi tiết</h2>
-                    <div class="explanation-col">
-                        <div class="explanation-item">
-                            <h4>🎯 Câu 1: 300</h4>
-                            <div class="quote">"And it isn't far from the beach, either - only <mark class="hl">300 metres</mark>..."</div>
-                            <div class="reason"><strong>Giải thích:</strong> Câu hỏi cần tìm thông tin về khoảng cách đến bãi biển (meters from beach). Người đàn ông xác nhận rằng khu căn hộ không xa bãi biển, cụ thể là "chỉ 300 mét". Từ cần điền là <strong>300</strong>.</div>
-                        </div>
-
-                        <div class="explanation-item">
-                            <h4>🎯 Câu 2: sunshade</h4>
-                            <div class="quote">"Something to do with sun... Sunshine, is it? / I think you meant the <mark class="hl">Sunshade</mark> Apartments."</div>
-                            <div class="reason"><strong>Giải thích:</strong> Người phụ nữ quên mất tên chính xác của khu căn hộ và đoán là "Sunshine". Ngay sau đó, người đàn ông đã sửa lại tên chính xác là <strong>Sunshade</strong>.</div>
-                        </div>
-
-                        <div class="explanation-item">
-                            <h4>🎯 Câu 3: balcony</h4>
-                            <div class="quote">"...with Greek paintings in every room, and a <mark class="hl">balcony</mark> outside."</div>
-                            <div class="reason"><strong>Giải thích:</strong> Đề bài hỏi khu The Grand có "Greek paintings and...". Trong audio, người đàn ông mô tả khu này có những bức tranh Hy Lạp ở mỗi phòng và một chiếc <strong>ban công (balcony)</strong> ở bên ngoài.</div>
-                        </div>
-
-                        <div class="explanation-item">
-                            <h4>🎯 Câu 4: forest / forests</h4>
-                            <div class="quote">"What are the views like? / Well, there are <mark class="hl">forests</mark> all round..."</div>
-                            <div class="reason"><strong>Giải thích:</strong> Từ khóa ở đây là "Overlooking" (Nhìn ra hướng). Người phụ nữ hỏi cảnh quan ở đó thế nào, người đàn ông trả lời rằng có <strong>rừng (forests)</strong> bao quanh. Cả dạng số ít hay số nhiều đều được chấp nhận.</div>
-                        </div>
-
-                        <div class="explanation-item">
-                            <h4>🎯 Câu 5: 319</h4>
-                            <div class="quote">"And the price? / <mark class="hl">￡319</mark> at that time"</div>
-                            <div class="reason"><strong>Giải thích:</strong> Khi được hỏi về mức giá (cost), người đàn ông xác nhận mức giá là <strong>319</strong> bảng. Ký hiệu bảng Anh (£) đã có sẵn trên tờ giấy thi, bạn chỉ cần điền con số.</div>
-                        </div>
-
-                        <div class="explanation-item">
-                            <h4>🎯 Câu 6: 10,000 / 10000</h4>
-                            <div class="quote">"If the holiday's cancelled... our maximum is <mark class="hl">￡10,000</mark>"</div>
-                            <div class="reason"><strong>Giải thích:</strong> Trong mục bảo hiểm Hủy bỏ (Cancellation), người đàn ông nói rõ hạn mức bồi thường tối đa cho các kỳ nghỉ ở Đảo Hy Lạp là <strong>10,000</strong> bảng.</div>
-                        </div>
-
-                        <div class="explanation-item">
-                            <h4>🎯 Câu 7: relative</h4>
-                            <div class="quote">"And we also allow a <mark class="hl">relative</mark> to travel to your holiday resort."</div>
-                            <div class="reason"><strong>Giải thích:</strong> Phía bảo hiểm cho phép một <strong>người thân (relative)</strong> di chuyển đến khu nghỉ dưỡng của bạn trong trường hợp bạn phải nhập viện. </div>
-                        </div>
-
-                        <div class="explanation-item">
-                            <h4>🎯 Câu 8: missed</h4>
-                            <div class="quote">"Don't you have <mark class="hl">missed</mark> departure?"</div>
-                            <div class="reason"><strong>Giải thích:</strong> Người đàn ông đặt tình huống "chuyện gì xảy ra nếu bạn không kịp lên máy bay". Thuật ngữ bảo hiểm chính thức mà anh ấy sử dụng cho trường hợp này là <strong>lỡ chuyến bay (missed departure)</strong>.</div>
-                        </div>
-
-                        <div class="explanation-item">
-                            <h4>🎯 Câu 9: item</h4>
-                            <div class="quote">"...up to ￡3,000, but not more than ￡500 for a single <mark class="hl">item</mark>."</div>
-                            <div class="reason"><strong>Giải thích:</strong> Tổng tiền bồi thường cho đồ đạc cá nhân lên tới £3000, nhưng giới hạn tối đa £500 cho <strong>một món đồ (a single item)</strong>. Cụm "one item" trong câu hỏi đồng nghĩa với "a single item" trong audio.</div>
-                        </div>
-
-                        <div class="explanation-item">
-                            <h4>🎯 Câu 10: Ludlow</h4>
-                            <div class="quote">"Ben - <mark class="hl">Ludlow</mark>. That's L-U-D-L-O-W."</div>
-                            <div class="reason"><strong>Giải thích:</strong> Người phụ nữ hỏi tên anh ấy, và trợ lý quản lý trả lời anh là Ben <strong>Ludlow</strong>, sau đó anh đánh vần rất rõ ràng từng chữ cái L-U-D-L-O-W.</div>
-                        </div>
-                    </div>
-                </div>
+    <div id="startConfirmOverlay" class="custom-overlay">
+        <div class="custom-modal">
+            <h2>Confirm Start</h2>
+            <p id="startConfirmMsg" style="font-size: 18px; color: #555; margin-bottom: 20px; white-space: pre-line;"></p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal('startConfirmOverlay')">Hủy</button>
+                <button class="btn-confirm" onclick="startTestActual()">Bắt đầu</button>
             </div>
         </div>
     </div>
+
+    <div id="submitModal" class="custom-overlay">
+        <div class="custom-modal">
+            <h2>Xác nhận nộp bài?</h2>
+            <p style="font-size: 18px; color: #555; margin-bottom: 10px;">Bạn có chắc chắn nộp bài không?</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal('submitModal')">Quay lại </button>
+                <button class="btn-confirm" onclick="evaluateTest()">Nộp</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultOverlay" class="custom-overlay">
+        <div class="custom-modal">
+            <h2>🎉 Chúc mừng!</h2>
+            <p style="font-size: 16px; color: #666;">Bạn đã hoàn thành bài.</p>
+            <div id="resultMessage" style="margin: 20px 0; line-height: 1.8;"></div>
+            <button class="btn-confirm" style="width: 100%; margin-top: 10px;" onclick="closeModal('resultOverlay')">Xem chi tiết</button>
+        </div>
+    </div>
+
+    <header>
+        <div class="brand">
+            <span>SnapEnglish</span> Test 1 IELTS Listening - Part 1
+        </div>
+        
+        <!-- AUDIO CUSTOM PLAYER -->
+        <div class="audio-controls" id="audioContainer">
+            <button class="skip-btn" id="btn-backward" onclick="skipAudio(-10)">-10</button>
+            <button class="play-pause-btn" id="playPauseBtn" onclick="togglePlay()">▶</button>
+            <span class="time-display" id="currentTimeDisplay">0:00</span>
+            <input type="range" class="progress-bar" id="audioProgress" value="0" min="0" max="495" step="1" onchange="seekAudio(this.value)">
+            <span class="time-display">/ 8:15</span>
+            <button class="skip-btn" id="btn-forward" onclick="skipAudio(10)">+10</button>
+            
+            <audio id="testAudio" class="hidden" preload="auto">
+                <source src="https://raw.githubusercontent.com/snaplanguages/SnapEnglish-audioieltslistening01/1f5e120d9f5c3c2598b4ffea2baf89c6a33ba1ae/IELTS%20Listening%20Test%201.mp3" type="audio/mpeg">
+            </audio>
+        </div>
+
+        <button class="btn-submit" id="topSubmitBtn" onclick="requestSubmit()">NỘP BÀI</button>
+    </header>
+
+    <div class="container">
+        <div id="part1" class="tab-content active">
+            <h2>Part 1: Questions 1-10</h2>
+            <div class="instruction">Questions 1-5: Complete the table below. Write <strong>ONE WORD OR A NUMBER</strong>.</div>
+            <table class="custom-table">
+                <thead><tr><th>Apartments</th><th>Facilities</th><th>Other Information</th><th>Cost</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td>Rose Garden Apartments</td>
+                        <td>Studio Flat<br>Entertainment programme: Greek dancing</td>
+                        <td>Just <strong>(1)</strong> <input type="text" id="q1" oninput="markAnswered(1)"> meters from beach<br>Near shops</td>
+                        <td>£ 219</td>
+                    </tr>
+                    <tr>
+                        <td>Blue Bay Apartments</td>
+                        <td>Large salt water swimming pool</td>
+                        <td>Watersports<br>Overlooking <strong>(4)</strong> <input type="text" id="q4" oninput="markAnswered(4)"></td>
+                        <td>£ 275</td>
+                    </tr>
+                    <tr>
+                        <td><strong>(2)</strong> <input type="text" id="q2" oninput="markAnswered(2)"> Apartments</td>
+                        <td>Terrace</td>
+                        <td>Near a supermarket and a disco</td>
+                        <td>£ 490</td>
+                    </tr>
+                    <tr>
+                        <td>The Grand</td>
+                        <td>Greek paintings and <strong>(3)</strong> <input type="text" id="q3" oninput="markAnswered(3)"></td>
+                        <td></td>
+                        <td><strong>(5)</strong> £ <input type="text" id="q5" oninput="markAnswered(5)"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="instruction" style="margin-top:40px;">Questions 6-10: Complete the table below. Write <strong>ONE WORD OR A NUMBER</strong>.</div>
+            <h3>GREEK ISLAND HOLIDAYS</h3>
+            <table class="custom-table">
+                <thead><tr><th>Insurance Benefits</th><th>Maximum Amount</th></tr></thead>
+                <tbody>
+                    <tr><td>Cancellation</td><td><strong>(6)</strong> £ <input type="text" id="q6" oninput="markAnswered(6)"></td></tr>
+                    <tr><td>Hospital</td><td>£ 600 additional benefit allows a <strong>(7)</strong> <input type="text" id="q7" oninput="markAnswered(7)"> to travel to resort</td></tr>
+                    <tr><td><strong>(8)</strong> <input type="text" id="q8" oninput="markAnswered(8)"> departure</td><td>Up to £ 1000 depends on reason</td></tr>
+                    <tr><td>Personal belongings</td><td>Up to £ 3000<br>£ 500 for one <strong>(9)</strong> <input type="text" id="q9" oninput="markAnswered(9)"></td></tr>
+                    <tr><td></td><td><span style="font-weight:bold; display:block; margin-top: 10px;">Name of assistant manager: Ben <strong>(10)</strong> <input type="text" id="q10" oninput="markAnswered(10)"></span></td></tr>
+                </tbody>
+            </table>
+            <a href="quiz1-listening-answers.html" id="lb1" class="lightbulb hidden" target="_blank">💡 Xem giải thích chi tiết Part 1</a>
+        </div>
+        <div style="height: 100px;"></div>
+    </div>
+
+    <footer>
+        <div style="font-size:14px; font-weight:bold; color:var(--text-light); text-transform:uppercase; margin-bottom:5px; text-align:center;">Navigation Panel</div>
+        <div class="nav-scroller" id="navPalette"></div>
+    </footer>
 
     <script>
-        // --- MODAL & MODE LOGIC ---
-        const startModal = document.getElementById('startModal');
-        const submitModal = document.getElementById('submitModal');
-        const mainContainer = document.getElementById('mainContainer');
-        const audio = document.getElementById("testAudio");
-        const customControls = document.getElementById("customControls");
-        const mockMsg = document.getElementById("mock-msg");
+        // Đáp án của Part 1 (Câu 1 - 10)
+        const answerKey = {
+            1: ["300"], 2: ["sunshade"], 3: ["balcony"], 4: ["forest", "forests"], 5: ["319"],
+            6: ["10,000", "10000"], 7: ["relative"], 8: ["missed"], 9: ["item"], 10: ["ludlow"]
+        };
 
-        let currentMode = 'practice';
+        let mode = '';
+        const audio = document.getElementById('testAudio');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const audioProgress = document.getElementById('audioProgress');
+        const currentTimeDisplay = document.getElementById('currentTimeDisplay');
+        let isSubmitted = false;
+        const END_TIME = 495; // 8 phút 15 giây
 
-        function startQuiz(mode) {
-            currentMode = mode;
-            startModal.classList.remove('active');
-            mainContainer.classList.remove('blur-content');
-            
-            if (mode === 'mock') {
-                audio.style.display = 'none'; // Hide native controls
-                customControls.style.display = 'none'; // Hide custom controls
-                mockMsg.style.display = 'block'; // Show mock message
-                // Auto-play audio for mock test
-                audio.play().catch(e => console.log("Trình duyệt chặn Autoplay. Cần người dùng tương tác."));
+        // Custom Player Logic
+        function togglePlay() {
+            if(audio.paused) {
+                audio.play();
+                playPauseBtn.innerHTML = "⏸";
             } else {
-                audio.style.display = 'block'; // Show native controls
-                customControls.style.display = 'flex'; // Show custom skip controls
-                mockMsg.style.display = 'none';
+                audio.pause();
+                playPauseBtn.innerHTML = "▶";
             }
         }
 
-        // --- CUSTOM AUDIO CONTROLS (+/- 5s) ---
+        function seekAudio(value) {
+            audio.currentTime = value;
+        }
+
         function skipAudio(seconds) {
-            const startTime = parseInt(audio.getAttribute("data-start")) || 0;
             let newTime = audio.currentTime + seconds;
-            
-            if (newTime < startTime) {
-                newTime = startTime;
-            }
+            if (newTime < 0) newTime = 0;
+            if (newTime > END_TIME) newTime = END_TIME;
             audio.currentTime = newTime;
         }
 
-        function openSubmitModal() {
-            submitModal.classList.add('active');
-        }
-
-        function closeSubmitModal() {
-            submitModal.classList.remove('active');
-        }
-
-        // --- SMART AUDIO LOGIC ---
-        document.addEventListener("DOMContentLoaded", () => {
-            const startTime = parseInt(audio.getAttribute("data-start")) || 0;
-            const endTime = parseInt(audio.getAttribute("data-end")) || 0;
-
-            audio.addEventListener('loadedmetadata', () => { audio.currentTime = startTime; });
-            audio.addEventListener('play', () => {
-                if (audio.currentTime < startTime) audio.currentTime = startTime;
-            });
-            audio.addEventListener('timeupdate', () => {
-                if (endTime > 0 && audio.currentTime >= endTime) {
-                    audio.pause();
-                    audio.currentTime = startTime; 
+        audio.addEventListener('timeupdate', function() {
+            if (audio.currentTime >= END_TIME && !isSubmitted) {
+                audio.pause();
+                playPauseBtn.innerHTML = "▶";
+                audioProgress.value = END_TIME;
+                
+                if (mode === 'mock') {
+                    evaluateTest();
                 }
-            });
+            } else {
+                audioProgress.value = audio.currentTime;
+            }
+            
+            // Format mm:ss
+            let curTime = Math.min(audio.currentTime, END_TIME);
+            let mins = Math.floor(curTime / 60);
+            let secs = Math.floor(curTime % 60);
+            currentTimeDisplay.innerText = mins + ":" + (secs < 10 ? "0" : "") + secs;
         });
 
-        // --- GRADING & ANSWER LOGIC ---
-        const answers = {
-            "answer-1": ["300"],
-            "answer-2": ["sunshade"],
-            "answer-3": ["balcony"],
-            "answer-4": ["forest", "forests"],
-            "answer-5": ["319"],
-            "answer-6": ["10,000", "10000"],
-            "answer-7": ["relative"],
-            "answer-8": ["missed"],
-            "answer-9": ["item"],
-            "answer-10": ["ludlow"]
-        };
+        // Initialize Navigation Drawer Footer
+        const navPalette = document.getElementById('navPalette');
+        for (let i = 1; i <= 10; i++) {
+            let dot = document.createElement("div");
+            dot.className = "nav-dot"; dot.id = `nav-${i}`; dot.innerText = i;
+            dot.onclick = () => {
+                let el = document.getElementById('q'+i);
+                if(el) {
+                    el.scrollIntoView({behavior: "smooth", block: "center"});
+                    el.style.transition = "background 0.5s";
+                    let originalBg = el.style.background;
+                    el.style.background = "var(--highlight)";
+                    setTimeout(() => el.style.background = originalBg, 1000);
+                }
+            };
+            navPalette.appendChild(dot);
+        }
 
-        function confirmSubmit() {
-            closeSubmitModal(); // Close confirmation popup
-            document.getElementById('submitBtn').style.display = 'none'; // Hide submit button
+        function selectMode(selectedMode) {
+            mode = selectedMode;
+            document.querySelector('.mode-practice').classList.toggle('selected', mode === 'practice');
+            document.querySelector('.mode-mock').classList.toggle('selected', mode === 'mock');
+            document.getElementById('startBtn').style.display = 'inline-block';
+        }
+
+        function askReady() {
+            let msg = mode === 'mock' 
+                ? "Bạn đã chọn chế độ Thi Thử.\nAudio sẽ tự động phát.\nBài kiểm tra sẽ tự động nộp khi hết audio.\nBạn đã sẵn sàng chưa?" 
+                : "Bạn đã chọn chế độ Luyện Tập.\nBạn có thể tự điều chỉnh audio.\nBạn đã sẵn sàng chưa?";
+            document.getElementById('startConfirmMsg').innerText = msg;
+            document.getElementById('startConfirmOverlay').style.display = 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function startTestActual() {
+            closeModal('startConfirmOverlay');
+            document.getElementById('setupOverlay').style.display = 'none';
+            audio.currentTime = 0; 
+
+            if(mode === 'mock') {
+                document.getElementById('btn-backward').classList.add('hidden');
+                document.getElementById('btn-forward').classList.add('hidden');
+                audioProgress.disabled = true; // Không cho tua khi thi thử
+                audio.play();
+                playPauseBtn.innerHTML = "⏸";
+                playPauseBtn.disabled = true; 
+            }
+        }
+
+        function markAnswered(qNum) {
+            if(isSubmitted) return;
+            const navCircle = document.getElementById('nav-' + qNum);
+            const textInput = document.getElementById('q' + qNum);
             
-            // Show audio controls back if they were hidden in mock mode so user can review
-            audio.style.display = 'block';
-            customControls.style.display = 'flex';
-            mockMsg.style.display = 'none';
+            if(textInput && textInput.value.trim() !== '') {
+                navCircle.classList.add('done');
+            } else {
+                navCircle.classList.remove('done');
+            }
+        }
+
+        function requestSubmit() {
+            if (mode === 'practice') {
+                document.getElementById('submitModal').style.display = 'flex';
+            } else {
+                evaluateTest();
+            }
+        }
+
+        function calculateBandPartial(correct, total) {
+            let normalizedCorrect = (correct / total) * 40;
+            if (normalizedCorrect >= 39) return 9.0;
+            if (normalizedCorrect >= 37) return 8.5;
+            if (normalizedCorrect >= 35) return 8.0;
+            if (normalizedCorrect >= 32) return 7.5;
+            if (normalizedCorrect >= 30) return 7.0;
+            if (normalizedCorrect >= 26) return 6.5;
+            if (normalizedCorrect >= 23) return 6.0;
+            if (normalizedCorrect >= 20) return 5.5;
+            if (normalizedCorrect >= 16) return 5.0;
+            if (normalizedCorrect >= 13) return 4.5;
+            if (normalizedCorrect >= 10) return 4.0;
+            if (normalizedCorrect >= 8) return 3.5;
+            if (normalizedCorrect >= 6) return 3.0;
+            return 2.5;
+        }
+
+        function evaluateTest() {
+            isSubmitted = true;
+            closeModal('submitModal');
+            document.getElementById('topSubmitBtn').classList.add('hidden');
+            audio.pause();
+            playPauseBtn.innerHTML = "▶";
+            
+            document.querySelectorAll('input').forEach(el => el.disabled = true);
             
             let score = 0;
-            const keys = Object.keys(answers);
-            document.querySelectorAll(".correct-hint").forEach(el => el.remove());
 
-            keys.forEach(id => {
-                const input = document.getElementById(id);
-                const userAnswer = input.value.trim().toLowerCase();
-                const correctList = answers[id].map(a => a.toLowerCase());
+            for(let i = 1; i <= 10; i++) {
+                let userAnswer = '';
+                const textInput = document.getElementById('q' + i);
+                if(textInput) userAnswer = textInput.value.trim().toLowerCase();
+                
+                const navCircle = document.getElementById('nav-' + i);
+                navCircle.classList.remove('done');
 
-                input.readOnly = true; // Lock inputs after submission
-
-                if (correctList.includes(userAnswer) && userAnswer !== "") {
-                    input.style.borderColor = "#00b894";
-                    input.style.color = "#00b894";
-                    input.style.fontWeight = "bold";
-                    input.style.backgroundColor = "#e8f8f5";
+                const correctAnswers = answerKey[i].map(a => a.toLowerCase());
+                
+                if(correctAnswers.includes(userAnswer)) {
                     score++;
+                    navCircle.classList.add('correct');
+                    if(textInput) textInput.classList.add('correct-input');
                 } else {
-                    input.style.borderColor = "#ff7675";
-                    input.style.color = "#d63031";
-                    input.style.backgroundColor = "#ffeaa7";
-                    
-                    const hint = document.createElement("span");
-                    hint.className = "correct-hint";
-                    hint.innerHTML = `➔ ${answers[id][0]}`;
-                    input.parentNode.insertBefore(hint, input.nextSibling);
+                    navCircle.classList.add('incorrect');
+                    if(textInput) {
+                        textInput.classList.add('wrong-input');
+                        textInput.value = (userAnswer ? userAnswer + " " : "") + "✓ " + answerKey[i][0];
+                    }
                 }
-            });
+            }
 
-            // Display Score
-            const scoreBoard = document.getElementById("scoreDisplay");
-            scoreBoard.innerHTML = `🏆 Hoàn thành! Điểm của bạn: <span style="color:#d63031;">${score}</span> / ${keys.length}`;
-            
-            // Display Transcript and Explanations Spllit Screen
-            const resultSection = document.getElementById("result-section");
-            resultSection.style.display = "block";
-            
-            // Stop audio
-            audio.pause();
+            let calculatedBand = calculateBandPartial(score, 10);
 
-            // Auto-scroll to results
+            document.getElementById('resultMessage').innerHTML = `
+                <strong style="font-size: 26px; color: var(--accent); display: block; margin-bottom: 10px;">Correct: ${score}/10</strong>
+            `;
+            
+            if(window.luuDiemIELTSFullTest) {
+                window.luuDiemIELTSFullTest(score, calculatedBand, "Test 1");
+            }
+            
+            document.getElementById('lb1').classList.remove('hidden');
+            
             setTimeout(() => {
-                scoreBoard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 300);
+                document.getElementById('resultOverlay').style.display = 'flex';
+            }, 500);
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+            authDomain: "snapenglish-cb6e2.firebaseapp.com",
+            projectId: "snapenglish-cb6e2",
+            storageBucket: "snapenglish-cb6e2.firebasestorage.app",
+            messagingSenderId: "373152038413",
+            appId: "1:373152038413:web:19284622571390f8585f44"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        function showSyncToast(msg) {
+            let toast = document.createElement("div");
+            toast.innerText = msg;
+            toast.style.cssText = "position:fixed; bottom:20px; right:20px; background:#ff477e; color:white; padding:12px 25px; border-radius:50px; font-weight:bold; font-family:'Quicksand',sans-serif; z-index:99999; box-shadow:0 8px 20px rgba(0,0,0,0.15); transform:translateY(100px); opacity:0; transition:all 0.5s ease;";
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.style.transform = "translateY(0)"; toast.style.opacity = "1"; }, 100);
+            setTimeout(() => { toast.style.transform = "translateY(100px)"; toast.style.opacity = "0"; }, 3500);
+            setTimeout(() => { document.body.removeChild(toast); }, 4000); 
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                window.currentUserUid = user.uid;
+                window.currentUserEmail = user.email;
+            }
+        });
+
+        window.luuDiemIELTSFullTest = async function(diemSo, bandScore, tenBai) {
+            if (!window.currentUserUid) return;
+            let timestamp = Date.now();
+            let docId = window.currentUserUid + "_ielts_" + timestamp; 
+
+            await setDoc(doc(db, "user_ielts_scores", docId), {
+                email: window.currentUserEmail,
+                skill: "Listening",
+                testName: tenBai,
+                partName: "Part 1",
+                correctQ: diemSo,
+                totalQ: 10,
+                bandScore: parseFloat(bandScore),
+                date: new Date().toLocaleDateString("vi-VN"),
+                timeTaken: "", 
+                timestamp: timestamp
+            });
+            showSyncToast("☁️ Đã đồng bộ điểm (" + diemSo + "/10) lên Tracker!");
         }
     </script>
 </body>
