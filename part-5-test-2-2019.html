@@ -862,6 +862,52 @@
             window.luuDiemTOEICLenFirebase(questionsData.length, score, "ETS 2019 - Test 2", "Reading", "Part 5");
         }
     }
+    // --- KỊCH BẢN TỰ ĐỘNG KHÔI PHỤC BÀI KHI ẤN XEM LẠI ---
+    window.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('mode') === 'review') {
+            const attemptData = JSON.parse(localStorage.getItem('review_attempt'));
+            if (attemptData && attemptData.userAnswers) {
+                // 1. Tắt popup khởi tạo thời gian
+                if(document.getElementById('setupOverlay')) document.getElementById('setupOverlay').style.display = 'none';
+                if(document.getElementById('startConfirmOverlay')) document.getElementById('startConfirmOverlay').style.display = 'none';
+                if(document.getElementById('startConfirmOverlay')) document.getElementById('startConfirmOverlay').classList.remove('active');
+                
+                // 2. Chuyển đổi chuỗi đáp án thành Object/Array
+                let savedAnswers = JSON.parse(attemptData.userAnswers);
+                
+                // Nạp đáp án cho Part 5 & 7
+                if (typeof userAnswers !== 'undefined') {
+                    if (Array.isArray(userAnswers)) userAnswers.splice(0, userAnswers.length, ...savedAnswers);
+                    else for(let k in savedAnswers) userAnswers[k] = savedAnswers[k];
+                }
+                // Nạp đáp án cho Part 6
+                if (typeof selectedAnswers !== 'undefined') {
+                    for(let k in savedAnswers) selectedAnswers[k] = savedAnswers[k];
+                }
+                
+                // 3. Chạy lệnh render giao diện sơ bộ
+                if (typeof initQuiz === 'function') initQuiz();
+                if (typeof renderView === 'function') renderView();
+
+                // 4. Khóa việc gửi điểm mới (vì đây chỉ là chế độ xem lại)
+                window.luuDiemTOEICLenFirebase = function() { console.log("Chế độ xem lại: Dừng tính năng lưu điểm."); };
+                
+                // 5. Tự động chấm điểm và hiển thị toàn bộ đáp án + giải thích
+                if (typeof executeSubmit === 'function') executeSubmit();
+                else if (typeof submitQuiz === 'function') submitQuiz();
+                
+                // 6. Xóa Pop-up "Hoàn thành bài xuất sắc" che màn hình
+                setTimeout(() => {
+                    if(document.getElementById('resultOverlay')) document.getElementById('resultOverlay').style.display = 'none';
+                    if(document.getElementById('result-overlay')) {
+                        document.getElementById('result-overlay').classList.remove('active');
+                        document.getElementById('result-overlay').style.display = 'none';
+                    }
+                }, 100);
+            }
+        }
+    });
 </script>
 
 <script type="module">
@@ -931,6 +977,8 @@
         }
         let timestamp = Date.now();
         let docId = window.currentUserUid + "_toeic_" + timestamp;
+        // Thay thế toàn bộ cụm await setDoc bằng đoạn này:
+        let answersToSave = window.selectedAnswers || window.userAnswers || {};
         
         try {
             await setDoc(doc(db, "user_toeic_scores", docId), {
@@ -943,9 +991,10 @@
                 correctQ: soCauDung,
                 score: diemQuyDoi,
                 date: new Date().toLocaleDateString('vi-VN'),
-                timestamp: timestamp
+                timestamp: timestamp,
+                userAnswers: JSON.stringify(answersToSave) // <--- Lưu chi tiết câu trả lời
             });
-            showInGameToast("☁️ Đã đồng bộ điểm số lên Máy Chủ!");
+            showInGameToast("☁️ Đã đồng bộ điểm số và đáp án lên Máy Chủ!");
         } catch (error) {
             console.error(error);
         }
