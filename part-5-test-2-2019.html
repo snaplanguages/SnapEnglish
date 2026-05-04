@@ -863,37 +863,44 @@
         }
     }
   // --- KỊCH BẢN TỰ ĐỘNG KHÔI PHỤC BÀI KHI ẤN XEM LẠI ---
+    // Mẹo: Tự động đẩy dữ liệu ra Window để Module Firebase lấy được
+    setInterval(() => {
+        window.exportAnswers = typeof userAnswers !== 'undefined' ? userAnswers : (typeof selectedAnswers !== 'undefined' ? selectedAnswers : {});
+    }, 500);
+
     window.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('mode') === 'review') {
             const attemptData = JSON.parse(localStorage.getItem('review_attempt'));
             if (attemptData && attemptData.userAnswers) {
-                // 1. Tắt popup khởi tạo thời gian
+                // Tắt các popup cản màn hình
                 if(document.getElementById('setupOverlay')) document.getElementById('setupOverlay').style.display = 'none';
                 if(document.getElementById('startConfirmOverlay')) {
                     document.getElementById('startConfirmOverlay').style.display = 'none';
                     document.getElementById('startConfirmOverlay').classList.remove('active');
                 }
                 
-                // 2. Chuyển đổi chuỗi đáp án thành Object/Array
                 let savedAnswers = JSON.parse(attemptData.userAnswers);
                 
-                // Nạp đáp án cho Part 5 & 7
-                if (typeof userAnswers !== 'undefined') {
-                    if (Array.isArray(userAnswers)) userAnswers.splice(0, userAnswers.length, ...savedAnswers);
-                    else for(let k in savedAnswers) userAnswers[k] = savedAnswers[k];
-                }
-                // Nạp đáp án cho Part 6
-                if (typeof selectedAnswers !== 'undefined') {
-                    for(let k in savedAnswers) selectedAnswers[k] = savedAnswers[k];
+                // Nạp đáp án an toàn chống crash (Sửa lỗi màn hình trắng)
+                if (savedAnswers) {
+                    if (typeof userAnswers !== 'undefined') {
+                        if (Array.isArray(userAnswers) && Array.isArray(savedAnswers)) {
+                            userAnswers.splice(0, userAnswers.length, ...savedAnswers);
+                        } else {
+                            for(let k in savedAnswers) userAnswers[k] = savedAnswers[k];
+                        }
+                    }
+                    if (typeof selectedAnswers !== 'undefined') {
+                        for(let k in savedAnswers) selectedAnswers[k] = savedAnswers[k];
+                    }
                 }
                 
-                // 3. Chạy lệnh render giao diện sơ bộ
+                // Dựng khung HTML
                 if (typeof initQuiz === 'function') initQuiz();
                 if (typeof renderView === 'function') renderView();
 
-                // *** FIX LỖI TRỐNG MÀN HÌNH & TỐI ƯU UX CHO PART 5 ***
-                // Ép hiển thị TẤT CẢ các câu hỏi thành danh sách cuộn dọc để dễ đọc giải thích
+                // CSS Ép hiển thị toàn bộ câu hỏi thành danh sách dài để dễ đọc
                 const style = document.createElement('style');
                 style.innerHTML = `
                     .question-card { display: block !important; margin-bottom: 40px; } 
@@ -902,17 +909,15 @@
                 `;
                 document.head.appendChild(style);
 
-                // Kích hoạt câu đầu tiên (chống móm cho các hàm phụ thuộc)
                 if (typeof jumpToQuestion === 'function') jumpToQuestion(0);
 
-                // 4. Khóa việc gửi điểm mới (vì đây chỉ là chế độ xem lại)
-                window.luuDiemTOEICLenFirebase = function() { console.log("Chế độ xem lại: Dừng tính năng lưu điểm."); };
+                window.luuDiemTOEICLenFirebase = function() { console.log("Chế độ xem lại"); };
                 
-                // 5. Tự động chấm điểm và hiển thị toàn bộ đáp án + giải thích
+                // Tự động chấm điểm
                 if (typeof executeSubmit === 'function') executeSubmit();
                 else if (typeof submitQuiz === 'function') submitQuiz();
                 
-                // 6. Dọn dẹp giao diện (Ẩn popup kết quả và nút nộp bài)
+                // Dọn dẹp nút nộp bài & bảng điểm
                 setTimeout(() => {
                     if(document.getElementById('resultOverlay')) document.getElementById('resultOverlay').style.display = 'none';
                     if(document.getElementById('result-overlay')) {
@@ -994,8 +999,8 @@
         }
         let timestamp = Date.now();
         let docId = window.currentUserUid + "_toeic_" + timestamp;
-        // Thay thế toàn bộ cụm await setDoc bằng đoạn này:
-        let answersToSave = window.selectedAnswers || window.userAnswers || {};
+      
+        let answersToSave = window.exportAnswers || {};
         
         try {
             await setDoc(doc(db, "user_toeic_scores", docId), {
@@ -1009,7 +1014,7 @@
                 score: diemQuyDoi,
                 date: new Date().toLocaleDateString('vi-VN'),
                 timestamp: timestamp,
-                userAnswers: JSON.stringify(answersToSave) // <--- Lưu chi tiết câu trả lời
+                userAnswers: JSON.stringify(answersToSave) // <--- Lưu chi tiết câu trả lời an toàn
             });
             showInGameToast("☁️ Đã đồng bộ điểm số và đáp án lên Máy Chủ!");
         } catch (error) {
