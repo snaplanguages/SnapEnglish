@@ -862,7 +862,7 @@
             window.luuDiemTOEICLenFirebase(questionsData.length, score, "ETS 2019 - Test 2", "Reading", "Part 5");
         }
     }
-    // --- KỊCH BẢN TỰ ĐỘNG KHÔI PHỤC BÀI KHI ẤN XEM LẠI ---
+  // --- KỊCH BẢN TỰ ĐỘNG KHÔI PHỤC BÀI KHI ẤN XEM LẠI ---
     window.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('mode') === 'review') {
@@ -870,8 +870,10 @@
             if (attemptData && attemptData.userAnswers) {
                 // 1. Tắt popup khởi tạo thời gian
                 if(document.getElementById('setupOverlay')) document.getElementById('setupOverlay').style.display = 'none';
-                if(document.getElementById('startConfirmOverlay')) document.getElementById('startConfirmOverlay').style.display = 'none';
-                if(document.getElementById('startConfirmOverlay')) document.getElementById('startConfirmOverlay').classList.remove('active');
+                if(document.getElementById('startConfirmOverlay')) {
+                    document.getElementById('startConfirmOverlay').style.display = 'none';
+                    document.getElementById('startConfirmOverlay').classList.remove('active');
+                }
                 
                 // 2. Chuyển đổi chuỗi đáp án thành Object/Array
                 let savedAnswers = JSON.parse(attemptData.userAnswers);
@@ -890,6 +892,19 @@
                 if (typeof initQuiz === 'function') initQuiz();
                 if (typeof renderView === 'function') renderView();
 
+                // *** FIX LỖI TRỐNG MÀN HÌNH & TỐI ƯU UX CHO PART 5 ***
+                // Ép hiển thị TẤT CẢ các câu hỏi thành danh sách cuộn dọc để dễ đọc giải thích
+                const style = document.createElement('style');
+                style.innerHTML = `
+                    .question-card { display: block !important; margin-bottom: 40px; } 
+                    .q-nav-buttons { display: none !important; }
+                    .main-area { flex-direction: column; align-items: center; }
+                `;
+                document.head.appendChild(style);
+
+                // Kích hoạt câu đầu tiên (chống móm cho các hàm phụ thuộc)
+                if (typeof jumpToQuestion === 'function') jumpToQuestion(0);
+
                 // 4. Khóa việc gửi điểm mới (vì đây chỉ là chế độ xem lại)
                 window.luuDiemTOEICLenFirebase = function() { console.log("Chế độ xem lại: Dừng tính năng lưu điểm."); };
                 
@@ -897,13 +912,15 @@
                 if (typeof executeSubmit === 'function') executeSubmit();
                 else if (typeof submitQuiz === 'function') submitQuiz();
                 
-                // 6. Xóa Pop-up "Hoàn thành bài xuất sắc" che màn hình
+                // 6. Dọn dẹp giao diện (Ẩn popup kết quả và nút nộp bài)
                 setTimeout(() => {
                     if(document.getElementById('resultOverlay')) document.getElementById('resultOverlay').style.display = 'none';
                     if(document.getElementById('result-overlay')) {
                         document.getElementById('result-overlay').classList.remove('active');
                         document.getElementById('result-overlay').style.display = 'none';
                     }
+                    if(document.getElementById('mainSubmitBtn')) document.getElementById('mainSubmitBtn').style.display = 'none';
+                    if(document.getElementById('btn-submit')) document.getElementById('btn-submit').style.display = 'none';
                 }, 100);
             }
         }
