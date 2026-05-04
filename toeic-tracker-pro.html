@@ -372,9 +372,22 @@
         const maxScores = { 'Listening': 495, 'Reading': 495, 'Speaking': 200, 'Writing': 200 };
         const colors = { 'Listening': '#1E90FF', 'Reading': '#2ED573', 'Speaking': '#9C88FF', 'Writing': '#FFA502' };
 
-        // Hàm tạo link bài học
+        // Hàm tạo link bài học theo format: part-X-test-Y-nam.html
         function createSlug(testName, partName) {
-            let raw = `${testName} ${partName}`;
+            // Trích xuất số Part (VD: "Part 5" -> "5")
+            let partMatch = partName.match(/\d+/);
+            // Trích xuất số Test (VD: "ETS 2019 - Test 2" -> "2")
+            let testMatch = testName.match(/test\s*(\d+)/i);
+            // Trích xuất Năm (VD: "ETS 2019" -> "2019")
+            let yearMatch = testName.match(/\d{4}/);
+            
+            // Nếu trích xuất đủ cả 3 thông số thì ráp thành link chuẩn của bạn
+            if (partMatch && testMatch && yearMatch) {
+                return `part-${partMatch[0]}-test-${testMatch[1]}-${yearMatch[0]}.html`;
+            } 
+            
+            // Fallback: Phương án dự phòng lỡ bạn nhập tên bài không chứa đủ Part/Test/Năm
+            let raw = `${partName} ${testName}`;
             return raw.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]/g, "").trim().replace(/\s+/g, '-') + '.html';
         }
 
