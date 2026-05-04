@@ -87,13 +87,14 @@
             box-shadow: 0 10px 25px rgba(162, 155, 254, 0.2);
         }
 
-        /* --- Grid Container --- */
+        /* --- Grid Container (Phóng to full màn hình) --- */
         .container { 
-            max-width: 1000px; 
+            width: 100%; 
             margin: auto; 
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 20px;
+            box-sizing: border-box;
         }
 
         /* --- Card Unit Style Snap --- */
@@ -114,21 +115,20 @@
         .unit-card:hover {
             transform: translateY(-5px);
             background: #fff;
-            box-shadow: 0 12px 25px rgba(162, 155, 254, 0.15);
-            border-color: var(--primary-eng);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.08);
+            border-color: var(--card-color, var(--primary-eng));
         }
 
         .status-badge {
             width: 6px;
             height: 45px;
             border-radius: 10px;
-            background: var(--primary-eng);
+            background: var(--card-color, var(--primary-eng));
             margin-right: 18px;
             transition: 0.3s;
         }
 
         .unit-card:hover .status-badge {
-            background: var(--accent-eng);
             transform: scaleY(1.1);
         }
 
@@ -164,7 +164,7 @@
         .unit-card:hover .arrow-btn {
             opacity: 1;
             transform: translateX(3px);
-            color: var(--accent-eng);
+            color: var(--card-color, var(--accent-eng));
         }
 
         .hidden { display: none !important; }
@@ -202,31 +202,40 @@
     </div>
 
    <script>
-    // Bọc code trong DOMContentLoaded để đảm bảo HTML load xong mới chạy JS
     document.addEventListener('DOMContentLoaded', function() {
         const container = document.getElementById('unitContainer');
         const noResultsMsg = document.getElementById('noResults');
         const searchInput = document.getElementById('searchInput');
 
-        // Cấu hình dữ liệu
+        // Bảng 10 màu pastel tương ứng với 10 Test
+        const testColors = [
+            '#ffb8b8', // Test 1: Hồng pastel
+            '#a29bfe', // Test 2: Tím pastel
+            '#55efc4', // Test 3: Xanh ngọc
+            '#ffeaa7', // Test 4: Vàng pastel
+            '#fab1a0', // Test 5: Cam pastel
+            '#74b9ff', // Test 6: Xanh dương nhạt
+            '#81ecec', // Test 7: Xanh lam
+            '#ffda79', // Test 8: Cam đào
+            '#fd79a8', // Test 9: Đỏ hồng
+            '#b8e994'  // Test 10: Xanh lá mạ
+        ];
+
         const startYear = 2018;
         const endYear = 2026;
         const lessons = [];
 
-        // Tự động tạo danh sách bài học
+        // Tạo danh sách bài học
         for (let year = startYear; year <= endYear; year++) {
-            // Xác định số test: 2018 có 5 test, các năm khác có 10 test
             const maxTest = (year === 2018) ? 5 : 10;
             
             for (let test = 1; test <= maxTest; test++) {
-                // Part 1, 2, 3, 4 cho Listening
                 [1, 2, 3, 4].forEach(part => {
                     lessons.push({
                         year: year,
                         part: part,
                         test: test,
                         title: `Listening Part ${part} - Test ${test} - ${year}`,
-                        // Link nội bộ .html
                         url: `part-${part}-test-${test}-${year}.html`
                     });
                 });
@@ -238,12 +247,12 @@
                 const card = document.createElement('a');
                 card.className = 'unit-card';
                 card.href = item.url;
-                
-                // Cập nhật data-search để tìm được cả theo test
                 card.setAttribute('data-search', `${item.year} part ${item.part} test ${item.test}`);
-                
-                // Giảm độ trễ animation để không bị đợi lâu khi cuộn trang
                 card.style.animationDelay = `${(index % 20) * 0.02}s`;
+
+                // Áp dụng màu sắc riêng biệt dựa trên số thứ tự Test
+                const color = testColors[(item.test - 1) % testColors.length];
+                card.style.setProperty('--card-color', color);
 
                 card.innerHTML = `
                     <div class="status-badge"></div>
@@ -257,7 +266,6 @@
             });
         }
 
-        // Xử lý tìm kiếm
         searchInput.addEventListener('input', function() {
             const filter = this.value.toLowerCase().trim();
             const cards = document.querySelectorAll('.unit-card');
@@ -273,7 +281,6 @@
                 }
             });
 
-            // Hiển thị thông báo nếu không có kết quả
             if (count === 0) {
                 noResultsMsg.classList.remove('hidden');
             } else {
@@ -281,7 +288,6 @@
             }
         });
 
-        // Khởi tạo
         renderLessons();
     });
    </script>
