@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOEIC Reading | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@1,500&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Bảng màu SnapEnglish - Tươi sáng & Sâu sắc --- */
+        :root {
+            --primary: #81ecec; /* Xanh ngọc nhẹ nhàng */
+            --secondary: #a29bfe; /* Tím pastel mộng mơ */
+            --accent-1: #fab1a0; /* Cam đào */
+            --accent-2: #ffeaa7; /* Vàng nắng */
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.9);
+        }
+
+        body { 
+            font-family: 'Quicksand', sans-serif; 
+            margin: 0;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            min-height: 100vh;
+            color: var(--text-main);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* --- Hoạt ảnh hoa lá & Động vật bay lơ lửng --- */
+        .floating-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .float-item {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.6;
+            animation: floatUp 15s linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(110vh) rotate(0deg) scale(0.8); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) rotate(360deg) scale(1.2); opacity: 0; }
+        }
+
+        /* Gradient Blobs trang trí */
+        .shape {
+            position: fixed;
+            z-index: -2;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: pulse 10s infinite alternate;
+        }
+        .shape-1 { width: 400px; height: 400px; background: var(--accent-1); top: -100px; right: -50px; border-radius: 40% 60% 70% 30%; }
+        .shape-2 { width: 500px; height: 500px; background: var(--secondary); bottom: -150px; left: -100px; border-radius: 30% 70% 50% 50%; }
+        .shape-3 { width: 300px; height: 300px; background: var(--primary); top: 40%; left: 30%; border-radius: 50%; opacity: 0.2; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1) translate(20px, 20px); }
+        }
+
+        /* --- Header --- */
+        .header-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 { 
+            font-size: 38px; 
+            margin-bottom: 5px;
+            color: #6c5ce7;
+            letter-spacing: -0.5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .brand-accent { color: #e17055; }
+
+        /* Câu trích dẫn mang tính trưởng thành, sâu sắc */
+        .quote {
+            font-family: 'Lora', serif;
+            color: var(--text-muted);
+            font-size: 17px;
+            font-style: italic;
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+            line-height: 1.6;
+        }
+
+        /* --- Tabs Navigation --- */
+        .tabs-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--text-muted);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-main);
+        }
+
+        .tab-btn.active {
+            background: #6c5ce7;
+            color: white;
+            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* --- Grid Container --- */
+        .tab-content {
+            display: none;
+            animation: fadeInTab 0.5s ease forwards;
+        }
+
+        .tab-content.active {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @keyframes fadeInTab {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Card Style --- */
+        .unit-card { 
+            background: var(--glass-bg);
+            padding: 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .unit-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), transparent);
+            transform: skewX(-20deg);
+            transition: 0.5s;
+        }
+
+        .unit-card:hover::before { left: 150%; }
+
+        .unit-card:hover {
+            transform: translateY(-8px);
+            background: #fff;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+            border-color: var(--card-color, #6c5ce7);
+        }
+
+        .icon-box {
+            font-size: 28px;
+            margin-right: 15px;
+            background: rgba(255,255,255,0.8);
+            width: 50px; height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: 0.3s;
+        }
+
+        .unit-card:hover .icon-box {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .unit-info { flex-grow: 1; }
+
+        .unit-tag {
+            font-size: 11px;
+            background: var(--card-color, #6c5ce7);
+            color: #fff;
+            padding: 3px 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: inline-block;
+        }
+
+        .unit-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-main);
+        }
+
+        .arrow-btn {
+            background: var(--card-color, #6c5ce7);
+            color: white;
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: 0.3s;
+        }
+
+        .unit-card:hover .arrow-btn {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+
+    <div class="floating-bg" id="floatingBg"></div>
+
+    <div class="header-section">
+        <h1>📖 Snap<span class="brand-accent">Reading</span></h1>
+        <p class="quote">"Ngôn ngữ là tấm bản đồ của một nền văn hóa. Tri thức là một hành trình rực rỡ, không phải là đích đến." 🌿</p>
+    </div>
+
+    <div class="tabs-container">
+        <button class="tab-btn active" data-target="part5">🦊 Part 5: Incomplete Sentences</button>
+        <button class="tab-btn" data-target="part6">🦉 Part 6: Text Completion</button>
+        <button class="tab-btn" data-target="part7">🦋 Part 7: Reading Comprehension</button>
+    </div>
+
+    <div id="part5" class="tab-content active"></div>
+    <div id="part6" class="tab-content"></div>
+    <div id="part7" class="tab-content"></div>
+
+   <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // Cấu hình dữ liệu 3 Part
+        const partConfig = {
+            'part5': { partNum: 5, title: 'Incomplete Sentences', icon: '🦊', color: '#ff7675' },
+            'part6': { partNum: 6, title: 'Text Completion', icon: '🦉', color: '#0984e3' },
+            'part7': { partNum: 7, title: 'Reading Comprehension', icon: '🦋', color: '#00b894' }
+        };
+
+        // Hàm format số (VD: 1 -> 01)
+        function padNumber(num) {
+            return num.toString().padStart(2, '0');
+        }
+
+        // Tạo danh sách bài test từ 01 tới 30 cho mỗi Part
+        for (const [containerId, config] of Object.entries(partConfig)) {
+            const container = document.getElementById(containerId);
+            
+            for (let i = 1; i <= 30; i++) {
+                const testNum = padNumber(i);
+                const card = document.createElement('a');
+                card.className = 'unit-card';
+                // Tạo link: part-5-01-toeic.html
+                card.href = `part-${config.partNum}-${testNum}-toeic.html`;
+                card.style.setProperty('--card-color', config.color);
+                
+                // Hiệu ứng xuất hiện lần lượt
+                card.style.animationDelay = `${(i % 10) * 0.05}s`;
+
+                card.innerHTML = `
+                    <div class="icon-box">${config.icon}</div>
+                    <div class="unit-info">
+                        <span class="unit-tag">Test ${testNum}</span>
+                        <h3 class="unit-title">${config.title}</h3>
+                    </div>
+                    <div class="arrow-btn">→</div>
+                `;
+                container.appendChild(card);
+            }
+        }
+
+        // Logic chuyển Tab
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Xóa active khỏi tất cả các nút và nội dung
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+
+                // Thêm active cho tab hiện tại
+                btn.classList.add('active');
+                const targetId = btn.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+
+        // Tạo hiệu ứng rơi lơ lửng background
+        const floatingItems = ['🌸', '🍃', '✨', '🌼', '🦋', '🍁', '🌱'];
+        const floatingBg = document.getElementById('floatingBg');
+        
+        for(let i = 0; i < 15; i++) {
+            const el = document.createElement('div');
+            el.className = 'float-item';
+            el.innerText = floatingItems[Math.floor(Math.random() * floatingItems.length)];
+            el.style.left = `${Math.random() * 100}vw`;
+            el.style.animationDuration = `${10 + Math.random() * 15}s`;
+            el.style.animationDelay = `${Math.random() * 5}s`;
+            floatingBg.appendChild(el);
+        }
+    });
+   </script>
+</body>
+</html>
