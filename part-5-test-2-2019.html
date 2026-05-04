@@ -862,74 +862,6 @@
             window.luuDiemTOEICLenFirebase(questionsData.length, score, "ETS 2019 - Test 2", "Reading", "Part 5");
         }
     }
-  // --- KỊCH BẢN TỰ ĐỘNG KHÔI PHỤC BÀI KHI ẤN XEM LẠI ---
-    // Mẹo: Tự động đẩy dữ liệu ra Window để Module Firebase lấy được
-    setInterval(() => {
-        window.exportAnswers = typeof userAnswers !== 'undefined' ? userAnswers : (typeof selectedAnswers !== 'undefined' ? selectedAnswers : {});
-    }, 500);
-
-    window.addEventListener('DOMContentLoaded', () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('mode') === 'review') {
-            const attemptData = JSON.parse(localStorage.getItem('review_attempt'));
-            if (attemptData && attemptData.userAnswers) {
-                // Tắt các popup cản màn hình
-                if(document.getElementById('setupOverlay')) document.getElementById('setupOverlay').style.display = 'none';
-                if(document.getElementById('startConfirmOverlay')) {
-                    document.getElementById('startConfirmOverlay').style.display = 'none';
-                    document.getElementById('startConfirmOverlay').classList.remove('active');
-                }
-                
-                let savedAnswers = JSON.parse(attemptData.userAnswers);
-                
-                // Nạp đáp án an toàn chống crash (Sửa lỗi màn hình trắng)
-                if (savedAnswers) {
-                    if (typeof userAnswers !== 'undefined') {
-                        if (Array.isArray(userAnswers) && Array.isArray(savedAnswers)) {
-                            userAnswers.splice(0, userAnswers.length, ...savedAnswers);
-                        } else {
-                            for(let k in savedAnswers) userAnswers[k] = savedAnswers[k];
-                        }
-                    }
-                    if (typeof selectedAnswers !== 'undefined') {
-                        for(let k in savedAnswers) selectedAnswers[k] = savedAnswers[k];
-                    }
-                }
-                
-                // Dựng khung HTML
-                if (typeof initQuiz === 'function') initQuiz();
-                if (typeof renderView === 'function') renderView();
-
-                // CSS Ép hiển thị toàn bộ câu hỏi thành danh sách dài để dễ đọc
-                const style = document.createElement('style');
-                style.innerHTML = `
-                    .question-card { display: block !important; margin-bottom: 40px; } 
-                    .q-nav-buttons { display: none !important; }
-                    .main-area { flex-direction: column; align-items: center; }
-                `;
-                document.head.appendChild(style);
-
-                if (typeof jumpToQuestion === 'function') jumpToQuestion(0);
-
-                window.luuDiemTOEICLenFirebase = function() { console.log("Chế độ xem lại"); };
-                
-                // Tự động chấm điểm
-                if (typeof executeSubmit === 'function') executeSubmit();
-                else if (typeof submitQuiz === 'function') submitQuiz();
-                
-                // Dọn dẹp nút nộp bài & bảng điểm
-                setTimeout(() => {
-                    if(document.getElementById('resultOverlay')) document.getElementById('resultOverlay').style.display = 'none';
-                    if(document.getElementById('result-overlay')) {
-                        document.getElementById('result-overlay').classList.remove('active');
-                        document.getElementById('result-overlay').style.display = 'none';
-                    }
-                    if(document.getElementById('mainSubmitBtn')) document.getElementById('mainSubmitBtn').style.display = 'none';
-                    if(document.getElementById('btn-submit')) document.getElementById('btn-submit').style.display = 'none';
-                }, 100);
-            }
-        }
-    });
 </script>
 
 <script type="module">
@@ -999,8 +931,6 @@
         }
         let timestamp = Date.now();
         let docId = window.currentUserUid + "_toeic_" + timestamp;
-      
-        let answersToSave = window.exportAnswers || {};
         
         try {
             await setDoc(doc(db, "user_toeic_scores", docId), {
@@ -1013,10 +943,9 @@
                 correctQ: soCauDung,
                 score: diemQuyDoi,
                 date: new Date().toLocaleDateString('vi-VN'),
-                timestamp: timestamp,
-                userAnswers: JSON.stringify(answersToSave) // <--- Lưu chi tiết câu trả lời an toàn
+                timestamp: timestamp
             });
-            showInGameToast("☁️ Đã đồng bộ điểm số và đáp án lên Máy Chủ!");
+            showInGameToast("☁️ Đã đồng bộ điểm số lên Máy Chủ!");
         } catch (error) {
             console.error(error);
         }
