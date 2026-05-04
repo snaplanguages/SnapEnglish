@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mục Tiêu TOEIC | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #FF9A9E;     /* Hồng pastel hoa anh đào */
+            --secondary: #FECFEF;   /* Hồng nhạt mộng mơ */
+            --listening: #A18CD1;   /* Tím mây trời */
+            --reading: #84FAB0;     /* Xanh lá thảo mộc */
+            --text-main: #2f3542;
+            --bg-color: #f7f9fc;
+        }
+        
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            /* Nền gradient hoa lá nhiệt đới nhưng dịu mắt */
+            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 50%, #fccb90 100%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Container chính chứa kết quả */
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            padding: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            display: none; /* Ẩn lúc ban đầu */
+            animation: fadeIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .header { text-align: center; margin-bottom: 40px; position: relative; }
+        .header h1 {
+            font-size: 2.8em;
+            background: linear-gradient(45deg, #ff758c, #ff7eb3);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin: 0 0 10px 0;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(255, 117, 140, 0.1); 
+        }
+        .header p { color: #57606f; font-weight: 700; font-size: 1.2em; margin: 0;}
+        .target-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            color: #2d3436;
+            padding: 8px 25px;
+            border-radius: 20px;
+            font-size: 1.5em;
+            font-weight: 800;
+            margin-top: 15px;
+            box-shadow: 0 5px 15px rgba(132, 250, 176, 0.4);
+            border: 2px solid white;
+        }
+
+        /* Bố cục chia 2 cột cho Listening và Reading */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media(max-width: 768px) {
+            .skills-grid { grid-template-columns: 1fr; }
+            .container { padding: 25px; }
+        }
+
+        .skill-card {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        .skill-card:hover { transform: translateY(-5px); }
+
+        .listening-card { border-color: var(--secondary); }
+        .reading-card { border-color: #dff9fb; }
+
+        .skill-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px dashed #dfe4ea;
+        }
+        .skill-icon { font-size: 45px; }
+        .skill-title h2 { margin: 0; font-size: 1.8em; color: var(--listening); }
+        .reading-card .skill-title h2 { color: #10ac84; }
+        .skill-title p { margin: 5px 0 0 0; color: #747d8c; font-weight: 700; font-size: 1em; }
+        .percent-badge {
+            position: absolute; top: 20px; right: 20px;
+            background: var(--primary); color: white;
+            font-weight: 800; padding: 6px 15px; border-radius: 12px; font-size: 1.1em;
+            box-shadow: 0 4px 10px rgba(255, 154, 158, 0.4);
+        }
+        .reading-card .percent-badge { background: var(--reading); color: #2d3436; box-shadow: 0 4px 10px rgba(132, 250, 176, 0.4);}
+
+        /* Danh sách các part */
+        .part-list { list-style: none; padding: 0; margin: 0; }
+        .part-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #f1f2f6; padding: 15px 20px; border-radius: 16px; margin-bottom: 15px;
+            font-weight: 700; color: #2f3542; transition: all 0.2s;
+            border-left: 5px solid #a4b0be;
+        }
+        .part-item:hover { background: #eccc68; color: #2f3542; transform: scale(1.02); }
+        .listening-card .part-item { border-left-color: var(--listening); }
+        .reading-card .part-item { border-left-color: #10ac84; }
+        .part-name { font-size: 1.1em; }
+        .part-target { font-size: 1.25em; font-weight: 800; color: #ff4757; background: white; padding: 5px 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
+
+        /* =========================================
+           POPUP UI NHẬP ĐIỂM (Custom Modal) 🦊🌸
+           ========================================= */
+        #inputOverlay, #guideOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 234, 238, 0.85); backdrop-filter: blur(15px);
+            display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 20px;
+            transition: opacity 0.3s;
+        }
+        .popup-box {
+            background: white; padding: 40px; border-radius: 35px; width: 100%; max-width: 450px;
+            text-align: center; box-shadow: 0 25px 50px rgba(255, 154, 158, 0.3);
+            border: 4px solid #fff200; position: relative;
+            animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        
+        .popup-icon { font-size: 60px; margin-bottom: 10px; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        
+        .popup-title { font-size: 26px; color: #ff4757; font-weight: 800; margin-bottom: 10px; }
+        .popup-desc { color: #57606f; font-weight: 600; margin-bottom: 25px; line-height: 1.5; font-size: 15px;}
+        
+        .popup-input {
+            width: 100%; padding: 15px; border: 3px solid #dfe4ea; border-radius: 15px;
+            font-family: inherit; font-size: 22px; font-weight: 800; text-align: center; color: var(--listening);
+            transition: all 0.3s; margin-bottom: 20px; outline: none;
+        }
+        .popup-input:focus { border-color: #ff4757; box-shadow: 0 0 0 5px rgba(255, 71, 87, 0.2); }
+        .popup-input::placeholder { color: #ced6e0; font-weight: 600; font-size: 18px;}
+
+        .btn-ok {
+            background: linear-gradient(135deg, #ff6a88, #ff99ac); color: white;
+            padding: 16px; border: none; border-radius: 18px; width: 100%;
+            font-size: 20px; font-weight: 800; cursor: pointer; font-family: inherit;
+            box-shadow: 0 8px 20px rgba(255, 106, 136, 0.4); transition: all 0.3s;
+        }
+        .btn-ok:hover { transform: translateY(-4px); box-shadow: 0 12px 25px rgba(255, 106, 136, 0.5); }
+
+        /* =========================================
+           POPUP HƯỚNG DẪN CÁCH TÍNH (Bóng đèn) 💡🦉
+           ========================================= */
+        #guideOverlay { display: none; z-index: 2500; background: rgba(223, 249, 251, 0.85); }
+        .guide-box { max-width: 550px; border-color: #1DD1A1; text-align: left; }
+        .guide-box .popup-title { color: #10ac84; text-align: center;}
+        .math-rule {
+            background: #f1f2f6; padding: 20px; border-radius: 20px; margin-bottom: 15px;
+            border-left: 6px solid #ff4757;
+        }
+        .math-rule h3 { margin: 0 0 10px 0; color: #2f3542; font-size: 18px; display: flex; align-items: center; gap: 8px;}
+        .math-rule p { margin: 0; color: #57606f; line-height: 1.6; font-size: 15px; font-weight: 600;}
+        .math-highlight { color: #ff4757; font-weight: 800; background: white; padding: 2px 8px; border-radius: 8px;}
+        
+        .btn-close-guide {
+            background: #10ac84; color: white; padding: 15px; border: none; border-radius: 15px;
+            width: 100%; font-size: 18px; font-weight: 800; cursor: pointer; font-family: inherit; margin-top: 10px;
+            box-shadow: 0 8px 20px rgba(16, 172, 132, 0.3); transition: all 0.3s;
+        }
+        .btn-close-guide:hover { transform: translateY(-3px); }
+
+        /* =========================================
+           CÁC NÚT CỐ ĐỊNH (FIXED BUTTONS)
+           ========================================= */
+        .fixed-btn-group {
+            position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 1500;
+        }
+        
+        .fixed-btn {
+            width: 65px; height: 65px; border-radius: 50%; border: 4px solid white;
+            display: flex; justify-content: center; align-items: center; font-size: 30px;
+            cursor: pointer; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        .fixed-btn:hover { transform: scale(1.15) rotate(10deg); }
+        
+        /* Nút tính lại điểm */
+        .btn-recalc { background: linear-gradient(135deg, #a1c4fd, #c2e9fb); box-shadow: 0 10px 25px rgba(161, 196, 253, 0.5); }
+        
+        /* Bóng đèn hướng dẫn */
+        .btn-bulb { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); box-shadow: 0 10px 25px rgba(253, 203, 110, 0.5); animation: pulseGlow 2s infinite; }
+        
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(253, 203, 110, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(253, 203, 110, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(253, 203, 110, 0); }
+        }
+        
+        .back-home {
+            position: absolute; top: 30px; left: 30px;
+            background: white; color: #ff4757; padding: 10px 20px; border-radius: 20px;
+            font-weight: 800; text-decoration: none; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s; z-index: 100;
+        }
+        .back-home:hover { transform: translateX(-5px); background: #ff4757; color: white;}
+
+    </style>
+</head>
+<body>
+
+    <a href="TOEIC-tracker.html" class="back-home">⬅ Về Trang Chủ</a>
+
+    <!-- Giao diện nhập điểm mục tiêu -->
+    <div id="inputOverlay">
+        <div class="popup-box">
+            <div class="popup-icon">🦊🎯</div>
+            <div class="popup-title">Mục tiêu của bạn là gì?</div>
+            <div class="popup-desc">Hãy nhập con số bạn khao khát (vd: 300, 610, 780, 990...). SnapEnglish sẽ tính toán chiến lược cho từng Part giúp bạn! 🌸</div>
+            <input type="number" id="aimScoreInput" class="popup-input" placeholder="Nhập điểm TOEIC..." min="10" max="990">
+            <button class="btn-ok" onclick="processAim()">Lên Chiến Lược Nào! 🚀</button>
+        </div>
+    </div>
+
+    <!-- Giao diện hướng dẫn cách tính (Bóng đèn) -->
+    <div id="guideOverlay">
+        <div class="popup-box guide-box">
+            <div class="popup-icon" style="animation: none;">🦉💡</div>
+            <div class="popup-title">Bí Kíp Phân Bổ Số Câu</div>
+            <div class="popup-desc">Hiểu cách SnapEnglish tính toán mục tiêu cho bạn nhé! Lấy 2 chữ số đầu của mức điểm mục tiêu làm chuẩn:</div>
+            
+            <div class="math-rule" style="border-left-color: var(--listening);">
+                <h3>🎧 Đối với Listening (Nghe)</h3>
+                <p>Số % cần đạt = <span class="math-highlight">2 số đầu + 10</span></p>
+                <p style="margin-top: 8px; font-size: 14px;"><i>Ví dụ: Aim 800 ➔ Lấy 80 + 10 = 90%.<br> Part 1 có 6 câu ➔ Cần đúng: 6 x 90% = 5 đến 6 câu.</i></p>
+            </div>
+
+            <div class="math-rule" style="border-left-color: var(--reading);">
+                <h3>📖 Đối với Reading (Đọc)</h3>
+                <p>Số % cần đạt = <span class="math-highlight">2 số đầu - 5</span></p>
+                <p style="margin-top: 8px; font-size: 14px;"><i>Ví dụ: Aim 700 ➔ Lấy 70 - 5 = 65%.<br> Part 5 có 30 câu ➔ Cần đúng: 30 x 65% = 19 đến 20 câu.</i></p>
+            </div>
+
+            <button class="btn-close-guide" onclick="closeGuide()">Đã thông suốt! 🌿</button>
+        </div>
+    </div>
+
+    <!-- Cụm nút cố định góc phải -->
+    <div class="fixed-btn-group">
+        <div class="fixed-btn btn-recalc" onclick="openInputModal()" title="Nhập lại điểm mục tiêu">🧮</div>
+        <div class="fixed-btn btn-bulb" onclick="openGuide()" title="Hướng dẫn cách tính điểm">💡</div>
+    </div>
+
+    <!-- Nội dung chính (Sẽ hiện ra sau khi nhập điểm) -->
+    <div class="container" id="mainContainer">
+        <div class="header">
+            <h1>Chiến Lược Chinh Phục TOEIC 🌸</h1>
+            <p>Để đạt được mục tiêu, đây là số câu bạn cần đúng ở mỗi phần thi!</p>
+            <div class="target-badge" id="displayAimBadge">Mục tiêu: 0 đ</div>
+        </div>
+
+        <div class="skills-grid">
+            <!-- Cột Listening -->
+            <div class="skill-card listening-card">
+                <div class="percent-badge" id="listPercentBadge">0%</div>
+                <div class="skill-header">
+                    <div class="skill-icon">🎧</div>
+                    <div class="skill-title">
+                        <h2>Listening</h2>
+                        <p>100 câu - 45 Phút</p>
+                    </div>
+                </div>
+                <ul class="part-list">
+                    <li class="part-item">
+                        <span class="part-name">Part 1 (6 câu)</span>
+                        <span class="part-target" id="p1-target">0 câu</span>
+                    </li>
+                    <li class="part-item">
+                        <span class="part-name">Part 2 (25 câu)</span>
+                        <span class="part-target" id="p2-target">0 câu</span>
+                    </li>
+                    <li class="part-item">
+                        <span class="part-name">Part 3 (39 câu)</span>
+                        <span class="part-target" id="p3-target">0 câu</span>
+                    </li>
+                    <li class="part-item">
+                        <span class="part-name">Part 4 (30 câu)</span>
+                        <span class="part-target" id="p4-target">0 câu</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Cột Reading -->
+            <div class="skill-card reading-card">
+                <div class="percent-badge" id="readPercentBadge">0%</div>
+                <div class="skill-header">
+                    <div class="skill-icon">📖</div>
+                    <div class="skill-title">
+                        <h2>Reading</h2>
+                        <p>100 câu - 75 Phút</p>
+                    </div>
+                </div>
+                <ul class="part-list">
+                    <li class="part-item">
+                        <span class="part-name">Part 5 (30 câu)</span>
+                        <span class="part-target" id="p5-target">0 câu</span>
+                    </li>
+                    <li class="part-item">
+                        <span class="part-name">Part 6 (16 câu)</span>
+                        <span class="part-target" id="p6-target">0 câu</span>
+                    </li>
+                    <li class="part-item">
+                        <span class="part-name">Part 7 (54 câu)</span>
+                        <span class="part-target" id="p7-target">0 câu</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Các hàm mở/đóng Modal UI
+        function openInputModal() {
+            document.getElementById('inputOverlay').style.display = 'flex';
+            setTimeout(() => document.getElementById('inputOverlay').style.opacity = '1', 10);
+            document.getElementById('aimScoreInput').focus();
+        }
+
+        function closeInputModal() {
+            document.getElementById('inputOverlay').style.opacity = '0';
+            setTimeout(() => document.getElementById('inputOverlay').style.display = 'none', 300);
+        }
+
+        function openGuide() {
+            document.getElementById('guideOverlay').style.display = 'flex';
+            setTimeout(() => document.getElementById('guideOverlay').style.opacity = '1', 10);
+        }
+
+        function closeGuide() {
+            document.getElementById('guideOverlay').style.opacity = '0';
+            setTimeout(() => document.getElementById('guideOverlay').style.display = 'none', 300);
+        }
+
+        // Bắt sự kiện Enter trong ô input
+        document.getElementById('aimScoreInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                processAim();
+            }
+        });
+
+        // Hàm tính toán khoảng câu hỏi (ví dụ: 5.4 -> 5-6 câu)
+        function calculateRange(totalQuestions, percent) {
+            let exactValue = (totalQuestions * percent) / 100;
+            let min = Math.floor(exactValue);
+            let max = Math.ceil(exactValue);
+            
+            // Giới hạn không vượt quá tổng số câu của part đó
+            if(min > totalQuestions) min = totalQuestions;
+            if(max > totalQuestions) max = totalQuestions;
+            if(min < 0) min = 0;
+            if(max < 0) max = 0;
+
+            if (min === max) {
+                // Nếu tròn số, cộng thêm 1 khoảng nhỏ hoặc giữ nguyên tùy cấu trúc
+                // Để an toàn và theo ví dụ của bạn, nếu tròn quá thì hiện chính xác số đó.
+                return min === totalQuestions ? `${min}` : `${min}-${min+1}`;
+            }
+            return `${min}-${max}`;
+        }
+
+        // Logic xử lý khi bấm nút "Lên Chiến Lược"
+        function processAim() {
+            const inputVal = document.getElementById('aimScoreInput').value;
+            if (!inputVal || inputVal <= 0) {
+                // Rung lắc ô input nếu để trống
+                const inputEl = document.getElementById('aimScoreInput');
+                inputEl.style.transform = "translateX(-10px)";
+                setTimeout(() => inputEl.style.transform = "translateX(10px)", 100);
+                setTimeout(() => inputEl.style.transform = "translateX(0)", 200);
+                return;
+            }
+
+            const aimScore = parseInt(inputVal);
+            
+            // Lấy 2 số đầu bằng cách chia 10 và làm tròn xuống
+            const base = Math.floor(aimScore / 10);
+
+            // Công thức tính %
+            let listPercent = base + 10;
+            let readPercent = base - 5;
+
+            // Giới hạn phần trăm hợp lý (0% - 100%)
+            if (listPercent > 100) listPercent = 100;
+            if (listPercent < 0) listPercent = 0;
+            
+            if (readPercent > 100) readPercent = 100;
+            if (readPercent < 0) readPercent = 0;
+
+            // Cập nhật giao diện tổng quan
+            document.getElementById('displayAimBadge').innerText = `Mục tiêu: ${aimScore} đ`;
+            document.getElementById('listPercentBadge').innerText = `Aim: ${listPercent}%`;
+            document.getElementById('readPercentBadge').innerText = `Aim: ${readPercent}%`;
+
+            // Tính và in ra giao diện cho Listening (Tổng 100 câu)
+            // Part 1: 6, Part 2: 25, Part 3: 39, Part 4: 30
+            document.getElementById('p1-target').innerText = calculateRange(6, listPercent) + ' câu';
+            document.getElementById('p2-target').innerText = calculateRange(25, listPercent) + ' câu';
+            document.getElementById('p3-target').innerText = calculateRange(39, listPercent) + ' câu';
+            document.getElementById('p4-target').innerText = calculateRange(30, listPercent) + ' câu';
+
+            // Tính và in ra giao diện cho Reading (Tổng 100 câu)
+            // Part 5: 30, Part 6: 16, Part 7: 54
+            document.getElementById('p5-target').innerText = calculateRange(30, readPercent) + ' câu';
+            document.getElementById('p6-target').innerText = calculateRange(16, readPercent) + ' câu';
+            document.getElementById('p7-target').innerText = calculateRange(54, readPercent) + ' câu';
+
+            // Đóng popup và hiển thị container chính
+            closeInputModal();
+            document.getElementById('mainContainer').style.display = 'block';
+        }
+
+        // Tự động focus vào ô input khi trang load xong
+        window.onload = () => {
+            document.getElementById('aimScoreInput').focus();
+        };
+    </script>
+</body>
+</html>
