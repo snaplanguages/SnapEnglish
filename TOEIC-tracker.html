@@ -197,7 +197,7 @@
 
         #progressChart { max-height: 350px; width: 100%; }
 
-        /* UI Popups */
+        /* UI Popups Cũ */
         #authOverlay { position: fixed; top:0; left:0; width: 100%; height: 100%; background: var(--modal-bg); backdrop-filter: blur(8px); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; }
         #authOverlay h2 { color: var(--primary); font-size: 24px; margin-bottom: 20px; text-align: center; padding: 0 20px;}
         .btn-auth { background: var(--primary); color: white; padding: 12px 30px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 16px; }
@@ -218,6 +218,62 @@
         
         input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
+
+        /* =========================================
+           THÊM MỚI: CSS CHO SPACED REPETITION POPUP
+           ========================================= */
+        #srOverlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(247, 249, 252, 0.5); /* Nền sáng nhẹ */
+            backdrop-filter: blur(12px); 
+            display: none; justify-content: center; align-items: center; 
+            z-index: 2500; padding: 20px; 
+            opacity: 0; transition: opacity 0.4s ease; 
+        }
+        #srOverlay.active { display: flex; opacity: 1; }
+        .sr-box { 
+            background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(25px); 
+            padding: 40px 30px; border-radius: 28px; width: 100%; max-width: 420px; 
+            text-align: center; 
+            box-shadow: 0 25px 50px rgba(156, 136, 255, 0.15); 
+            border: 2px solid rgba(255, 255, 255, 0.9); 
+            animation: floatUp 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
+        }
+        @keyframes floatUp { 
+            0% { transform: translateY(50px) scale(0.9); opacity: 0; } 
+            100% { transform: translateY(0) scale(1); opacity: 1; } 
+        }
+        .sr-icon { 
+            font-size: 55px; margin-bottom: 15px; display: inline-block; 
+            animation: heartbeat 1.5s infinite; 
+        }
+        @keyframes heartbeat { 
+            0%, 100% { transform: scale(1); } 
+            50% { transform: scale(1.1) rotate(5deg); } 
+        }
+        .sr-title { font-size: 24px; color: var(--speaking); font-weight: 800; margin-bottom: 15px; letter-spacing: -0.5px;}
+        .sr-text { color: #555; font-size: 15.5px; line-height: 1.6; margin-bottom: 25px; }
+        .sr-highlight { 
+            color: var(--primary); font-weight: bold; 
+            background: rgba(255, 71, 87, 0.1); 
+            padding: 3px 10px; border-radius: 8px; 
+        }
+        .sr-actions { display: flex; gap: 15px; justify-content: center; }
+        .btn-sr-later { 
+            background: white; color: #636e72; padding: 14px 20px; 
+            border: 2px solid #dfe6e9; border-radius: 14px; cursor: pointer; 
+            font-weight: bold; flex: 1; transition: all 0.3s; font-family: 'Quicksand'; font-size: 15px;
+        }
+        .btn-sr-later:hover { background: #f5f6fa; border-color: #b2bec3; }
+        .btn-sr-now { 
+            background: linear-gradient(135deg, var(--speaking), #b9a8ff); 
+            color: white; padding: 14px 20px; border: none; border-radius: 14px; 
+            cursor: pointer; font-weight: bold; flex: 1; 
+            box-shadow: 0 8px 20px rgba(156, 136, 255, 0.3); 
+            transition: all 0.3s; font-family: 'Quicksand'; font-size: 15px;
+        }
+        .btn-sr-now:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(156, 136, 255, 0.4); }
     </style>
 </head>
 <body>
@@ -227,6 +283,24 @@
         <a href="index.html" class="btn-auth">Quay về Trang chủ</a>
     </div>
 
+    <!-- =========================================
+         THÊM MỚI: HTML CHO SPACED REPETITION POPUP
+         ========================================= -->
+    <div id="srOverlay">
+        <div class="sr-box">
+            <div class="sr-icon">🧠✨</div>
+            <div class="sr-title">Đến giờ ôn bài rồi!</div>
+            <div class="sr-text" id="srMessage">
+                <!-- Nội dung sẽ được JS tự động chèn vào đây -->
+            </div>
+            <div class="sr-actions">
+                <button class="btn-sr-later" onclick="closeSRPopup()">Để sau nhé</button>
+                <button class="btn-sr-now" onclick="closeSRPopup(); showToast('Tuyệt vời! 🎉', 'Hãy mở lại tài liệu và phân tích thật kỹ các lỗi sai nhé!')">Ôn ngay 🚀</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Giữ nguyên modal cũ -->
     <div id="customModal">
         <div class="modal-box">
             <div class="modal-title" id="modalTitle">Xác nhận</div>
@@ -393,7 +467,6 @@
         let chartInstance = null;
         let userContext = {};
         const maxScores = { 'Listening': 495, 'Reading': 495, 'Speaking': 200, 'Writing': 200 };
-        // MÀU JS ĐỒNG BỘ VỚI MÀU CSS MỚI
         const colors = { 'Listening': '#1E90FF', 'Reading': '#2ED573', 'Speaking': '#9C88FF', 'Writing': '#FFA502' };
 
         window.showToast = function(title, message, isError = false) {
@@ -414,6 +487,51 @@
 
         window.closeModal = function() { document.getElementById('customModal').style.display = 'none'; }
         
+        /* =========================================
+           THÊM MỚI: JS ĐÓNG POPUP SPACED REPETITION
+           ========================================= */
+        window.closeSRPopup = function() {
+            const popup = document.getElementById('srOverlay');
+            popup.classList.remove('active');
+            setTimeout(() => popup.style.display = 'none', 400); // Đợi CSS transition chạy xong
+        }
+
+        /* =========================================
+           THÊM MỚI: LOGIC TÍNH TOÁN SPACED REPETITION
+           ========================================= */
+        function checkSpacedRepetition() {
+            // Chỉ hiện 1 lần mỗi ngày để không gây phiền phức
+            const lastShown = localStorage.getItem('lastSRPopupDate');
+            const today = new Date().toDateString();
+            if (lastShown === today) return;
+
+            if (!records || records.length === 0) return;
+
+            // Lọc các bài đã làm cách đây hơn 7 ngày (có thể thay đổi số 7)
+            const daysThreshold = 7;
+            const thresholdMs = daysThreshold * 24 * 60 * 60 * 1000;
+            const now = Date.now();
+            
+            const oldRecords = records.filter(r => (now - r.timestamp) > thresholdMs);
+            
+            if (oldRecords.length > 0) {
+                // Chọn ngẫu nhiên 1 bài cũ để nhắc nhở
+                const randomRec = oldRecords[Math.floor(Math.random() * oldRecords.length)];
+                const daysAgo = Math.floor((now - randomRec.timestamp) / (24 * 60 * 60 * 1000));
+
+                const srMessage = document.getElementById('srMessage');
+                srMessage.innerHTML = `Bạn đã làm bộ đề <span class="sr-highlight">${randomRec.testName} (${randomRec.partName})</span> cách đây <strong>${daysAgo} ngày</strong>.<br><br>Đã đủ lâu để não bộ bắt đầu quên rồi đấy. Hãy xem lại các câu sai ngay để củng cố trí nhớ dài hạn nhé!`;
+                
+                // Đợi 2.5 giây sau khi tải trang xong mới hiện popup mượt mà
+                setTimeout(() => {
+                    const popup = document.getElementById('srOverlay');
+                    popup.style.display = 'flex';
+                    setTimeout(() => popup.classList.add('active'), 10);
+                    localStorage.setItem('lastSRPopupDate', today);
+                }, 2500); 
+            }
+        }
+
         window.renderTable = function(data) {
             const tbody = document.getElementById('historyTableBody');
             tbody.innerHTML = data.length === 0 ? `<tr><td colspan="8" style="text-align:center; color: #999; padding: 20px;">Không tìm thấy dữ liệu. 🕵️‍♂️</td></tr>` : "";
@@ -518,7 +636,6 @@
             const labels = [...new Set(records.map(r => r.date))].reverse(); 
             if (chartInstance) chartInstance.destroy();
             
-            // Cấu hình lại biểu đồ để nét căng hơn, mượt hơn
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -530,12 +647,12 @@
                             return dr.length ? (dr.reduce((a,c)=>a+c.score,0)/dr.length).toFixed(0) : null;
                         }), 
                         borderColor: colors[s], 
-                        backgroundColor: colors[s] + '33', /* Thêm độ trong suốt nhẹ khi trỏ chuột */
-                        tension: 0.4, /* Làm đường cong mượt mà hơn */
+                        backgroundColor: colors[s] + '33',
+                        tension: 0.4, 
                         spanGaps: true, 
-                        pointRadius: 5, /* Dấu chấm to hơn xíu */
+                        pointRadius: 5,
                         pointHoverRadius: 8,
-                        borderWidth: 4 /* Nét dày hơn */
+                        borderWidth: 4
                     }))
                 },
                 options: { 
@@ -549,6 +666,9 @@
                     } 
                 }
             });
+
+            /* GỌI HÀM KIỂM TRA SAU KHI RENDER XONG DỮ LIỆU */
+            checkSpacedRepetition();
         }
 
         window.deleteRecord = id => openModal("Xóa", "Bạn chắc chắn chứ?", async () => {
