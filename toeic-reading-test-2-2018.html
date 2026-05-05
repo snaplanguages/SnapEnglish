@@ -327,59 +327,83 @@ header {
 /* Do đã bỏ Footer, ta kéo dài màn hình làm bài ra mức tối đa */
 .container { height: calc(100vh - var(--header-h)); }
       
+/* =======================================================
+   GIAO DIỆN ĐÁP ỨNG CHO ĐIỆN THOẠI & TABLET (SPLIT-SCREEN)
+======================================================= */
 @media (max-width: 1024px) {
-  
-    body { overflow-y: auto; height: auto; }
+    /* Khóa chết màn hình giống như một App gốc */
+    body { overflow: hidden; height: 100vh; }
+    
+    /* Container tự động chiếm phần không gian còn lại dưới Header */
     .container, .container.show-translation { 
         flex-direction: column; 
         height: auto; 
+        flex: 1;
+        overflow: hidden;
     }
     
-    /* Cấu trúc lại Header gọn gàng hơn */
+    /* Tối ưu Header cho gọn gàng */
     header { 
         height: auto; 
         flex-direction: column; 
-        padding: 15px; 
-        gap: 12px; 
+        padding: 10px 15px; 
+        gap: 10px; 
+        flex-shrink: 0;
     }
-    .tab-container { flex-wrap: wrap; justify-content: center; width: 100%; }
-    .controls { width: 100%; justify-content: space-between; flex-wrap: wrap; }
-  
-    .pane-left, .pane-middle { 
-        width: 100%; 
-        border-right: none; 
-        border-bottom: 4px solid var(--primary);
-        padding: 20px 15px; 
-        height: 40vh; /* Chiếm 40% màn hình để đọc */
-        flex: none;
-    }
-    .show-translation .pane-left, .show-translation .pane-middle {
-        height: 35vh; /* Khi hiện cả 2 khung Anh-Việt thì thu ngắn lại chút xíu */
-    }
+    .brand { font-size: 20px; }
+    .tab-container { flex-wrap: wrap; justify-content: center; width: 100%; gap: 5px; }
+    .controls { width: 100%; justify-content: space-between; flex-wrap: nowrap; }
+    .timer-box { font-size: 16px; padding: 5px 10px; }
+    .btn-submit, .btn-toggle-nav { font-size: 14px; padding: 6px 12px; }
 
- 
-    .pane-right {
+    /* --- CHIA MÀN HÌNH (SPLIT-SCREEN) ĐỂ CUỘN ĐỘC LẬP --- */
+    
+    /* 1. Phần Bài Đọc (Nửa trên) */
+    .pane-left {
+        flex: 1; /* Chiếm khoảng 40% màn hình dọc */
         width: 100%;
-        padding: 20px 15px;
-        height: auto;
-        flex: none;
-        overflow: visible;
+        border-right: none;
+        border-bottom: 4px solid var(--primary);
+        padding: 15px;
+        overflow-y: auto; /* Cho phép cuộn bài đọc riêng */
     }
 
-  
+    /* 2. Cột Tiếng Việt khi nộp bài (Nửa trên, chia đều không gian với tiếng Anh) */
+    .container.show-translation .pane-left,
+    .container.show-translation .pane-middle {
+        flex: 1; 
+        width: 100%;
+        border-right: none;
+        border-bottom: 2px solid var(--border);
+        padding: 15px;
+        overflow-y: auto; /* Cuộn bản dịch riêng */
+    }
+
+    /* 3. Phần Câu Hỏi (Nửa dưới) */
+    .pane-right {
+        flex: 1.5; /* Chiếm không gian rộng hơn (khoảng 60%) để dễ bấm đáp án */
+        width: 100%;
+        padding: 15px;
+        overflow-y: auto; /* Cuộn câu hỏi riêng */
+    }
+
+    /* Căn chỉnh lại khung giải thích cho vừa màn hình điện thoại */
     .exp-box, .show-translation #q-group-1 .exp-box {
         width: 100%;
         margin-left: 0;
         border-radius: 12px;
         padding: 15px;
-        max-height: none; 
     }
     
-   
+    /* Gỡ bỏ dàn hàng ngang của Part 5 khi xem đáp án trên Mobile */
     .show-translation #q-group-1 .q-text {
         flex-direction: column;
         gap: 15px;
     }
+
+    /* Thu nhỏ chữ một chút để hiển thị được nhiều thông tin hơn */
+    .q-text, .mc-option { font-size: 16px; }
+    .pane-left, .pane-middle { font-size: 17px; }
 }
     </style>
 </head>
