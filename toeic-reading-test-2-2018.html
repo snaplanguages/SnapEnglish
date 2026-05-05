@@ -411,7 +411,7 @@ header {
 
     <header>
         <div class="brand">
-            <span>SnapEnglish</span> TOEIC Reading Test 2
+            <span>SnapEnglish</span> Test 2 - 2018
         </div>
         
         <div class="tab-container">
@@ -460,6 +460,7 @@ header {
     </div>
     <div class="nav-scroller" id="navPalette"></div>
 </div>
+<!-- TÌM ĐOẠN NÀY VÀ THÊM NÚT XEM LỊCH SỬ VÀO -->
 <div id="setupOverlay" class="custom-overlay">
     <div class="custom-modal">
         <h2 style="color: var(--primary-dark); font-family: 'Lora', serif; font-size:28px;">Cài đặt bài làm ✨</h2>
@@ -469,9 +470,43 @@ header {
             <label style="font-weight: bold; color: #555; font-size:18px;">Thời gian (phút): </label>
             <input type="number" id="timeInput" value="75" min="5" max="180">
         </div>
-        <button class="start-btn" id="startBtn" style="display: none; width: 100%; margin-top:10px;" onclick="askReady()">Bắt đầu</button>
+        
+        <!-- Sửa lại khu vực nút bấm ở đây -->
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button class="btn-cancel" style="flex: 1;" onclick="openHistoryModal()">🕒 Xem lịch sử</button>
+            <button class="start-btn" id="startBtn" style="display: none; flex: 1;" onclick="askReady()">Bắt đầu</button>
+        </div>
     </div>
 </div>
+
+<!-- DÁN THÊM BẢNG LỊCH SỬ NÀY NGAY BÊN DƯỚI -->
+<div id="historyOverlay" class="custom-overlay">
+    <div class="custom-modal" style="max-width: 500px;">
+        <h2 style="color: var(--primary-dark); font-family: 'Lora', serif; margin-bottom: 15px;">🕒 Lịch sử làm bài</h2>
+        <div id="historyList" style="max-height: 300px; overflow-y: auto; text-align: left; margin-bottom: 15px; padding-right: 5px;">
+            <!-- Lịch sử sẽ được render bằng JS vào đây -->
+        </div>
+        <button class="btn-cancel" style="width: 100%;" onclick="closeHistoryModal()">Quay lại</button>
+    </div>
+</div>
+
+<!-- Chèn thêm CSS làm đẹp cho danh sách lịch sử -->
+<style>
+    .history-item {
+        background: var(--bg-body); border: 1px solid var(--border);
+        padding: 12px 15px; border-radius: 10px; margin-bottom: 10px;
+        display: flex; justify-content: space-between; align-items: center;
+        transition: 0.2s;
+    }
+    .history-item:hover { border-color: var(--primary); background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .history-info { display: flex; flex-direction: column; gap: 5px; }
+    .history-date { font-weight: bold; color: var(--text-main); font-size: 15px; }
+    .history-score { color: var(--primary-dark); font-size: 14px; font-weight: 600; }
+    .btn-review { background: var(--exp-bg); color: var(--primary-dark); border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    .btn-review:hover { background: var(--primary); color: white; }
+    #historyList::-webkit-scrollbar { width: 6px; }
+    #historyList::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+</style>
 
 <div id="startConfirmOverlay" class="custom-overlay">
     <div class="custom-modal">
@@ -508,6 +543,9 @@ header {
     <button onclick="removeHighlight()" style="display:block; width:100%; padding:12px 20px; border:none; background:none; cursor:pointer; text-align:left; font-weight:600; color:#e06666; font-family:inherit;">🗑 Xóa Highlight</button>
 </div>
     <script>
+        window.openHistoryModal = openHistoryModal;
+window.closeHistoryModal = closeHistoryModal;
+window.restoreAttempt = restoreAttempt;
   const toeicData = {
     part5: [
   { id: 101, q: "The travel ------ will be processed as soon as they are received.", options: ["document", "documents", "documented", "documenting"], a: "documents" },
@@ -2088,6 +2126,7 @@ function startTestActual() {
     
     document.getElementById('setupOverlay').style.display = 'none';
     startTimer();
+    
 }
 
 // --- HÀM TÔ MÀU DẪN CHỨNG HIỆN SẴN ---
@@ -2360,8 +2399,82 @@ function startTimer() {
         }
     }, 1000);
 }
-// --- HÀM CUỘN VÀ TẠO HIỆU ỨNG NHẤN MẠNH ---
-// --- HÀM CUỘN VÀ TẠO HIỆU ỨNG NHẤN MẠNH (NHÁY VÀNG) ---
+// --- QUẢN LÝ LỊCH SỬ LÀM BÀI BẰNG LOCALSTORAGE ---
+const HISTORY_KEY = "snapenglish_test2_2018_history";
+let isReviewingMode = false; // Biến cờ hiệu để biết đang xem lại hay làm thật
+
+function saveAttemptToHistory(score, total, userAnswersMap) {
+    let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+    let now = new Date();
+    
+    let attempt = {
+        id: Date.now(),
+        date: now.toLocaleDateString('vi-VN'),
+        time: now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+        score: score,
+        total: total,
+        toeicScore: calculateToeicReading(score, total),
+        answers: userAnswersMap // Lưu lại toàn bộ ABCD đã chọn
+    };
+    
+    history.unshift(attempt); // Đẩy bài mới nhất lên đầu
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+}
+
+function openHistoryModal() {
+    let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+    let listEl = document.getElementById("historyList");
+    
+    if (history.length === 0) {
+        listEl.innerHTML = `<div style="text-align:center; color:#888; padding: 20px;">Bạn chưa làm bài lần nào trên thiết bị này.</div>`;
+    } else {
+        listEl.innerHTML = history.map((item, index) => `
+            <div class="history-item">
+                <div class="history-info">
+                    <span class="history-date">Lần ${history.length - index}: ${item.time} - ${item.date}</span>
+                    <span class="history-score">Điểm: ${item.toeicScore}/495 (${item.score}/${item.total} câu)</span>
+                </div>
+                <button class="btn-review" onclick="restoreAttempt(${item.id})">Xem lại</button>
+            </div>
+        `).join("");
+    }
+    
+    document.getElementById('setupOverlay').style.display = 'none';
+    document.getElementById('historyOverlay').style.display = 'flex';
+}
+
+function closeHistoryModal() {
+    document.getElementById('historyOverlay').style.display = 'none';
+    document.getElementById('setupOverlay').style.display = 'flex';
+}
+
+function restoreAttempt(attemptId) {
+    let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+    let attempt = history.find(h => h.id === attemptId);
+    
+    if(!attempt) return;
+
+    isReviewingMode = true; // Bật cờ hiệu "Đang xem lại"
+    document.getElementById('historyOverlay').style.display = 'none';
+    
+    // Tự động đánh dấu lại các Radio button đáp án học viên đã chọn
+    for (let qId in attempt.answers) {
+        let val = attempt.answers[qId];
+        if (val) {
+            let radio = document.querySelector(`input[name="q${qId}"][value="${val}"]`);
+            if (radio) radio.checked = true;
+        }
+    }
+    
+    // Đổi chữ nút Nộp bài thành "Đang xem lại" cho ngầu
+    let btnSubmit = document.querySelector('.btn-submit');
+    if(btnSubmit) {
+        btnSubmit.innerText = "ĐANG XEM LẠI";
+        btnSubmit.style.background = "#888";
+        btnSubmit.style.boxShadow = "none";
+    }
+
+}
 function scrollToEvidence(evId) {
     const evElement = document.getElementById(evId);
     if(evElement) {
@@ -2395,34 +2508,35 @@ function executeSubmit() {
     clearInterval(timerInterval);
     document.querySelectorAll('input, select').forEach(el => el.disabled = true);
     
-    // THÊM DÒNG NÀY ĐỂ HIỆN CỘT TIẾNG VIỆT SAU KHI NỘP BÀI
     document.getElementById('mainContainer').classList.add('show-translation');
     
-    // ---- THÊM MỚI TỪ ĐÂY ----
-    // Refresh lại Tab hiện tại để nó hiển thị đúng số cột sau khi nộp bài
     let activeTabIndex = 1;
     document.querySelectorAll('.tab-btn').forEach((b, i) => {
         if (b.classList.contains('active')) activeTabIndex = i + 1;
     });
     switchTab(activeTabIndex);
-    // ---- ĐẾN ĐÂY ----
     
     let score = 0;
     let totalQuestions = allQuestionIds.length;
+    let userAnswersMap = {}; // Thêm cái này để hứng đáp án học viên
 
     allQuestionIds.forEach(id => {
         let userAns = "";
         let radios = document.getElementsByName(`q${id}`);
         for (let r of radios) if (r.checked) userAns = r.value;
+        
+        userAnswersMap[id] = userAns; // Ghi nhận đáp án câu này
 
         let correctAns = answerKey[id];
         let isCorrect = (userAns === correctAns);
-        if (isCorrect) score++;
+        if (isCorrect && userAns !== "") score++; // Có chọn mới tính điểm
 
         let feedbackEl = document.getElementById(`fb-${id}`);
         if(feedbackEl) {
-            if(isCorrect) {
+            if(isCorrect && userAns !== "") {
                 feedbackEl.innerHTML = `<span style="color:var(--correct);">✓ Đúng</span>`;
+            } else if (userAns === "") {
+                feedbackEl.innerHTML = `<span style="color:#888;">Trống (Đáp án: <span style="background:#dce775; color:#333; padding:2px 5px; border-radius:4px;">${correctAns}</span>)</span>`;
             } else {
                 feedbackEl.innerHTML = `<span style="color:var(--wrong);">✗ Sai (Đáp án: <span style="background:#dce775; color:#333; padding:2px 5px; border-radius:4px;">${correctAns}</span>)</span>`;
             }
@@ -2430,19 +2544,20 @@ function executeSubmit() {
         
         let nav = document.getElementById(`nav-${id}`);
         if(nav) {
-            nav.style.background = isCorrect ? "#c8e6c9" : "#ffcdd2";
-            nav.style.color = isCorrect ? "#2e7d32" : "#c62828";
-            nav.style.borderColor = isCorrect ? "#81c784" : "#ef9a9a";
+            if (isCorrect && userAns !== "") {
+                nav.style.background = "#c8e6c9"; nav.style.color = "#2e7d32"; nav.style.borderColor = "#81c784";
+            } else {
+                nav.style.background = "#ffcdd2"; nav.style.color = "#c62828"; nav.style.borderColor = "#ef9a9a";
+            }
         }
 
-        
         let expContainer = document.getElementById(`exp-${id}`);
         if(expContainer && explanations[id]) {
             let expData = explanations[id];
             let quoteHtml = expData.quote ? `<div class="exp-quote">"${expData.quote}"</div>` : '';
             let vocabHtml = expData.vocab ? `<div class="exp-vocab">${expData.vocab}</div>` : '';
-            let tipHtml = expData.tip ? `<div style="margin-top:8px; color:#d87059; font-weight:600;">📌 Mẹo: ${expData.tip}</div>` : '';
-            let evHtml = expData.evId ? `<button onclick="scrollToEvidence('${expData.evId}')" style="margin-top:12px; background:#fff9c4; border:1px solid #fbc02d; color:#f57f17; padding:8px 15px; border-radius:8px; cursor:pointer; font-weight:700; font-family:inherit; font-size:15px; transition:0.2s;" onmouseover="this.style.background='#fff59d'" onmouseout="this.style.background='#fff9c4'">🔍 Xem dẫn chứng trong bài</button>` : '';
+            let tipHtml = expData.tip ? `<div style="margin-top:8px; color:var(--primary-dark); font-weight:600;">📌 Mẹo: ${expData.tip}</div>` : '';
+            let evHtml = expData.evId ? `<button onclick="scrollToEvidence('${expData.evId}')" style="margin-top:12px; background:var(--highlight); border:1px solid #fbc02d; color:#f57f17; padding:8px 15px; border-radius:8px; cursor:pointer; font-weight:700; font-family:inherit; font-size:15px; transition:0.2s;" onmouseover="this.style.background='#fff59d'" onmouseout="this.style.background='var(--highlight)'">🔍 Xem dẫn chứng trong bài</button>` : '';
             
             expContainer.innerHTML = `
                 <div class="exp-box show">
@@ -2457,16 +2572,29 @@ function executeSubmit() {
     });
 
     let toeicScore = calculateToeicReading(score, totalQuestions);
-    document.getElementById('resultMessage').innerHTML = `
-        <strong style="font-size: 20px; color: #555; display: block; margin-bottom: 10px;">Số câu đúng: ${score}/${totalQuestions}</strong>
-        <strong style="font-size: 32px; color: var(--primary);">Điểm Reading ước lượng: ${toeicScore}/495</strong>
-    `;
-    if(window.luuDiemTOEICReadingFull) {
+   
+    if (!isReviewingMode) {
+        saveAttemptToHistory(score, totalQuestions, userAnswersMap);
+        
+        if(window.luuDiemTOEICReadingFull) {
+            window.luuDiemTOEICReadingFull(score, totalQuestions, "ETS 2018 - Test 2");
+        }
+        
+        document.getElementById('resultMessage').innerHTML = `
+            <strong style="font-size: 20px; color: #555; display: block; margin-bottom: 10px;">Số câu đúng: ${score}/${totalQuestions}</strong>
+            <strong style="font-size: 32px; color: var(--primary-dark);">Điểm Reading ước lượng: ${toeicScore}/495</strong>
+        `;
+        setTimeout(() => { document.getElementById('resultOverlay').style.display = 'flex'; }, 500);
+    } else {
        
-        window.luuDiemTOEICReadingFull(score, totalQuestions, "Reading Test 2 - 2018");
+        let toastMsg = document.createElement("div");
+        toastMsg.innerText = "Đã khôi phục bài làm ngày cũ!";
+        toastMsg.style.cssText = "position:fixed; top:20px; right:20px; background:var(--primary); color:white; padding:15px 20px; border-radius:12px; font-weight:bold; font-family:'Quicksand',sans-serif; z-index:99999; box-shadow:0 10px 30px rgba(0,0,0,0.2);";
+        document.body.appendChild(toastMsg);
+        setTimeout(() => toastMsg.remove(), 3000);
     }
-    setTimeout(() => { document.getElementById('resultOverlay').style.display = 'flex'; }, 500);
 }
+
 
 function calculateToeicReading(raw, total) {
     if (raw === 0) return 5;
