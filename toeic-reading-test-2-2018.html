@@ -2123,7 +2123,9 @@ function selectMode(mode) {
     document.querySelector('.mode-mock').classList.toggle('selected', mode === 'mock');
     
     document.getElementById('timeInputBox').style.display = (mode === 'practice') ? 'block' : 'none';
-    document.getElementById('startBtn').style.display = 'inline-block';
+    
+    // Đổi 'inline-block' thành 'block'
+    document.getElementById('startBtn').style.display = 'block';
 }
 
 function askReady() {
@@ -2658,7 +2660,13 @@ function executeSubmit() {
         saveAttemptToHistory(score, totalQuestions, userAnswersMap);
         
         if(window.luuDiemTOEICReadingFull) {
-            window.luuDiemTOEICReadingFull(score, totalQuestions, "ETS 2018 - Test 2");
+            // Tính toán thời gian thực tế đã làm (số phút ban đầu trừ đi số phút còn lại)
+            let minutesAssigned = (currentMode === 'mock') ? 75 : parseInt(document.getElementById('timeInput').value);
+            if(isNaN(minutesAssigned) || minutesAssigned < 1) minutesAssigned = 75;
+            let timeTaken = Math.round(minutesAssigned - (testDuration / 60));
+            
+            // Truyền thêm timeTaken vào hàm
+            window.luuDiemTOEICReadingFull(score, totalQuestions, "ETS 2018 - Test 2", timeTaken);
         }
         
       else {
@@ -2791,20 +2799,18 @@ function removeHighlight() {
         }
     });
 
-   // Hàm nộp điểm Full Reading (Quy đổi ra thang 495)
-    window.luuDiemTOEICReadingFull = async function(correct, total, testTitle) {
+   // Thêm timeTaken vào tham số của hàm
+    window.luuDiemTOEICReadingFull = async function(correct, total, testTitle, timeTaken) {
         if (!window.currentUserUid) return;
         
-        // Tính điểm quy đổi chuẩn TOEIC (Thang 495)
         let scoreConverted = Math.round(((correct / total) * 495) / 5) * 5;
         let timestamp = Date.now();
         let docId = window.currentUserUid + "_toeic_" + timestamp;
 
-        // Xử lý thời gian thủ công cực kỳ chuẩn xác, chống lỗi undefined
         let now = new Date();
         let hours = now.getHours().toString().padStart(2, '0');
         let minutes = now.getMinutes().toString().padStart(2, '0');
-        let timeString = hours + ":" + minutes; // Ra đúng định dạng VD: "14:30"
+        let timeString = hours + ":" + minutes; 
 
         try {
             await setDoc(doc(db, "user_toeic_scores", docId), {
@@ -2816,8 +2822,9 @@ function removeHighlight() {
                 totalQ: total,
                 score: scoreConverted,
                 date: now.toLocaleDateString('vi-VN'),
-                time: timeString, // Lưu giờ chuẩn xác
-                Time: timeString, // Dự phòng thêm biến viết hoa chữ T cho Tracker
+                time: timeString, 
+                Time: timeString, 
+                timeTaken: timeTaken, // Thêm dòng này để fix lỗi undefined
                 timestamp: timestamp
             });
             showInGameToast("☁️ Đã đồng bộ điểm Reading lên Tracker!");
