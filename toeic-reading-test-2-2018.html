@@ -326,6 +326,61 @@ header {
 }
 /* Do đã bỏ Footer, ta kéo dài màn hình làm bài ra mức tối đa */
 .container { height: calc(100vh - var(--header-h)); }
+      
+@media (max-width: 1024px) {
+  
+    body { overflow-y: auto; height: auto; }
+    .container, .container.show-translation { 
+        flex-direction: column; 
+        height: auto; 
+    }
+    
+    /* Cấu trúc lại Header gọn gàng hơn */
+    header { 
+        height: auto; 
+        flex-direction: column; 
+        padding: 15px; 
+        gap: 12px; 
+    }
+    .tab-container { flex-wrap: wrap; justify-content: center; width: 100%; }
+    .controls { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+  
+    .pane-left, .pane-middle { 
+        width: 100%; 
+        border-right: none; 
+        border-bottom: 4px solid var(--primary);
+        padding: 20px 15px; 
+        height: 40vh; /* Chiếm 40% màn hình để đọc */
+        flex: none;
+    }
+    .show-translation .pane-left, .show-translation .pane-middle {
+        height: 35vh; /* Khi hiện cả 2 khung Anh-Việt thì thu ngắn lại chút xíu */
+    }
+
+ 
+    .pane-right {
+        width: 100%;
+        padding: 20px 15px;
+        height: auto;
+        flex: none;
+        overflow: visible;
+    }
+
+  
+    .exp-box, .show-translation #q-group-1 .exp-box {
+        width: 100%;
+        margin-left: 0;
+        border-radius: 12px;
+        padding: 15px;
+        max-height: none; 
+    }
+    
+   
+    .show-translation #q-group-1 .q-text {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
     </style>
 </head>
 <body>
@@ -2509,12 +2564,20 @@ function removeHighlight() {
         }
     });
 
-   window.luuDiemTOEICReadingFull = async function(correct, total, testTitle) {
+   // Hàm nộp điểm Full Reading (Quy đổi ra thang 495)
+    window.luuDiemTOEICReadingFull = async function(correct, total, testTitle) {
         if (!window.currentUserUid) return;
         
+        // Tính điểm quy đổi chuẩn TOEIC (Thang 495)
         let scoreConverted = Math.round(((correct / total) * 495) / 5) * 5;
         let timestamp = Date.now();
         let docId = window.currentUserUid + "_toeic_" + timestamp;
+
+        // Xử lý thời gian thủ công cực kỳ chuẩn xác, chống lỗi undefined
+        let now = new Date();
+        let hours = now.getHours().toString().padStart(2, '0');
+        let minutes = now.getMinutes().toString().padStart(2, '0');
+        let timeString = hours + ":" + minutes; // Ra đúng định dạng VD: "14:30"
 
         try {
             await setDoc(doc(db, "user_toeic_scores", docId), {
@@ -2525,15 +2588,15 @@ function removeHighlight() {
                 correctQ: correct,
                 totalQ: total,
                 score: scoreConverted,
-                date: new Date().toLocaleDateString('vi-VN'),
-                time: new Date().toLocaleTimeString('vi-VN'), // THÊM DÒNG NÀY VÀO ĐÂY
+                date: now.toLocaleDateString('vi-VN'),
+                time: timeString, // Lưu giờ chuẩn xác
+                Time: timeString, // Dự phòng thêm biến viết hoa chữ T cho Tracker
                 timestamp: timestamp
             });
             showInGameToast("☁️ Đã đồng bộ điểm Reading lên Tracker!");
         } catch (e) {
             console.error(e);
         }
-    
     }
 </script>
 </body>
