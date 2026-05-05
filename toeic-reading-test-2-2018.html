@@ -146,12 +146,14 @@ header {
     width: 100%; /* Trả lại kích thước bình thường */
     margin-left: 0; 
     margin-top: 0;
-    border-radius: 12px; /* Bo tròn đều các góc vì đứng độc lập */
+    border-radius: 12px; 
+    max-height: 350px; 
+    overflow-y: auto;
 }
-
+.exp-box::-webkit-scrollbar { width: 6px; }
+.exp-box::-webkit-scrollbar-thumb { background: #c1d5a4; border-radius: 3px; }
 @keyframes slideIn { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-/* --- HIỆU ỨNG NHẤP NHÁY DẪN CHỨNG --- */
-/* --- TRẠNG THÁI MẶC ĐỊNH (KHI ĐANG LÀM BÀI): ẨN DẤU HIỆU DẪN CHỨNG --- */
+
 .ev-box {
     border-radius: 0;
     padding: 0;
@@ -350,7 +352,7 @@ header {
         
         <div class="pane pane-left" id="passagePane">
             <div id="passage-content-container">
-                <h2 style="color: #6a8a3a; text-align: center; margin-top: 50px;" id="left-title">Hãy chọn Part bạn muốn làm ở Header nhé!</h2>
+                <h2 style="color: #6a8a3a; text-align: center;" id="left-title"></h2>
             </div>
         </div>
 
@@ -2137,8 +2139,7 @@ function createTOEICQuestion(qObj) {
     let optsHTML = "";
 
     let inputStyle = `margin-right:12px; transform:scale(1.3); cursor:pointer;`;
-    let labelStyle = `display:block; margin:10px 0; padding:12px; border-radius:10px; cursor:pointer; border:1px solid transparent; transition:0.2s; font-size:18px;`;
-
+    let labelStyle = `display:block; margin:5px 0 5px -10px; padding:8px 12px; border-radius:10px; cursor:pointer; border:1px solid transparent; transition:0.2s; font-size:18px;`;
     if (Array.isArray(opts)) {
         let labels = ["A", "B", "C", "D"];
         opts.forEach((opt, i) => {
@@ -2195,21 +2196,21 @@ function switchTab(n) {
 
     let paneLeft = document.getElementById('passagePane');
     let paneMiddle = document.getElementById('vietnamesePane');
-    let introText = document.getElementById('passage-content-container').querySelector('h2');
+    let introText = document.getElementById('left-title');
     
     if(n === 1) {
-        // Part 5: Ẩn hoàn toàn cột tiếng Anh và tiếng Việt để cột Câu hỏi chiếm 100% chiều rộng
         if(paneLeft) paneLeft.style.display = 'none';
         if(paneMiddle) paneMiddle.style.display = 'none';
-        
-        if(introText) introText.innerHTML = `Part 5: Incomplete Sentences<br><br><span style="font-size:18px; color:#555; font-weight:normal;">👉 Hãy đọc kỹ và chọn đáp án đúng bên cột phải nhé!</span>`;
+        // Ẩn luôn tiêu đề ở Part 5 vì không cần thiết
+        if(introText) introText.style.display = 'none'; 
     } else {
-        // Part 6 & 7: Luôn hiện cột tiếng Anh
         if(paneLeft) paneLeft.style.display = 'block';
-        // Chỉ hiện cột tiếng Việt (cột thứ 3) nếu trạng thái bài là "Đã nộp"
         if(paneMiddle) paneMiddle.style.display = isSubmitted ? 'block' : 'none';
-
-        if(introText) introText.innerHTML = `Passage<br><span style="font-size:18px; color:#888; font-weight:normal;">(Cuộn chuột vào nhóm câu hỏi bên phải để xem đoạn văn tương ứng)</span>`;
+        // Hiện lại tiêu đề ở dạng ghi chú nhỏ, sát mép trên
+        if(introText) {
+            introText.style.display = 'block';
+            introText.innerHTML = `<span style="font-size:16px; color:#888; font-weight:normal; display:block; padding-bottom: 10px;">(Cuộn chuột vào nhóm câu hỏi bên phải để xem đoạn văn tương ứng)</span>`;
+        }
     }
     
     document.querySelector('.pane-right').scrollTop = 0;
@@ -2508,11 +2509,9 @@ function removeHighlight() {
         }
     });
 
-    // Hàm nộp điểm Full Reading (Quy đổi ra thang 495)
-    window.luuDiemTOEICReadingFull = async function(correct, total, testTitle) {
+   window.luuDiemTOEICReadingFull = async function(correct, total, testTitle) {
         if (!window.currentUserUid) return;
         
-        // Tính điểm quy đổi chuẩn TOEIC (Thang 495)
         let scoreConverted = Math.round(((correct / total) * 495) / 5) * 5;
         let timestamp = Date.now();
         let docId = window.currentUserUid + "_toeic_" + timestamp;
@@ -2527,12 +2526,14 @@ function removeHighlight() {
                 totalQ: total,
                 score: scoreConverted,
                 date: new Date().toLocaleDateString('vi-VN'),
+                time: new Date().toLocaleTimeString('vi-VN'), // THÊM DÒNG NÀY VÀO ĐÂY
                 timestamp: timestamp
             });
             showInGameToast("☁️ Đã đồng bộ điểm Reading lên Tracker!");
         } catch (e) {
             console.error(e);
         }
+    
     }
 </script>
 </body>
