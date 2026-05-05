@@ -113,13 +113,14 @@ header {
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb { background: #d0d6cc; border-radius: 5px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
-        /* --- GIẢI THÍCH CHI TIẾT (EXPLANATION BOX) --- */
+
 .exp-box {
     display: none; background: var(--exp-bg); border-left: 5px solid var(--primary);
     padding: 25px 30px; 
     margin-top: 15px; 
     border-radius: 0 15px 15px 0; 
-    width: calc(100% + 50px); 
+    /* Đã tăng từ 50px lên 100px để khung mở rộng sang mép phải */
+    width: calc(100% + 100px); 
     margin-left: -70px; 
     font-size: 17px; line-height: 1.8; color: #333; animation: slideIn 0.4s;
 }
@@ -129,6 +130,24 @@ header {
 .exp-text { margin-bottom: 10px; }
 .exp-vocab { font-size: 16px; color: #6a8a3a; background: #e8f5e9; padding: 10px; border-radius: 8px; }
 .exp-vocab b { color: #2e7d32; }
+
+.show-translation #q-group-1 .q-text {
+    display: flex; /* Kích hoạt Flexbox để dàn hàng ngang */
+    gap: 30px; /* Khoảng cách giữa Câu hỏi và Giải thích */
+    align-items: flex-start;
+}
+.show-translation #q-group-1 .q-content-wrapper {
+    flex: 1; /* Cột chứa Đề và Đáp án */
+}
+.show-translation #q-group-1 .exp-container {
+    flex: 1.2; /* Cột chứa Giải thích (cho rộng hơn đề 1 chút) */
+}
+.show-translation #q-group-1 .exp-box {
+    width: 100%; /* Trả lại kích thước bình thường */
+    margin-left: 0; 
+    margin-top: 0;
+    border-radius: 12px; /* Bo tròn đều các góc vì đứng độc lập */
+}
 
 @keyframes slideIn { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 /* --- HIỆU ỨNG NHẤP NHÁY DẪN CHỨNG --- */
@@ -2113,7 +2132,6 @@ function formatAnswer(options, answer) {
 
 function createTOEICQuestion(qObj) {
     if(!qObj || !qObj.id) return ""; 
-    // Sửa lỗi 1: Hỗ trợ cả q, text và qEng của Part 7
     let text = qObj.q || qObj.text || qObj.qEng || "";
     let opts = qObj.options;
     let optsHTML = "";
@@ -2124,10 +2142,8 @@ function createTOEICQuestion(qObj) {
     if (Array.isArray(opts)) {
         let labels = ["A", "B", "C", "D"];
         opts.forEach((opt, i) => {
-            // Sửa lỗi 2: Tách riêng xử lý object (Part 7) và string (Part 5)
             let optText = typeof opt === 'object' ? opt.en : opt;
             let optValue = typeof opt === 'object' ? opt.key : labels[i];
-            
             optsHTML += `<label class="mc-option" style="${labelStyle}" onmouseover="this.style.background='#edf2ea'" onmouseout="this.style.background='transparent'"><input type="radio" name="q${qObj.id}" value="${optValue}" style="${inputStyle}" onclick="checkNav(${qObj.id})"> <b>${labels[i]}.</b> ${optText}</label>`;
         });
     } else {
@@ -2139,9 +2155,11 @@ function createTOEICQuestion(qObj) {
     return `<div class="q-row" id="q-row-${qObj.id}" style="margin-bottom:25px; display:flex;">
                 <div class="q-num" style="min-width:35px; height:35px; background:#7FA99B; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; margin-right:15px; flex-shrink:0;">${qObj.id}</div>
                 <div class="q-text" style="flex:1; font-size:18px; line-height:1.8;">
-                    <b>${text}</b><br>${optsHTML}
-                    <span id="fb-${qObj.id}" class="feedback" style="font-weight:bold; margin-left:10px;"></span>
-                    <div id="exp-${qObj.id}"></div>
+                    <div class="q-content-wrapper"> <!-- Bọc nội dung câu hỏi lại -->
+                        <b>${text}</b><br>${optsHTML}
+                        <span id="fb-${qObj.id}" class="feedback" style="font-weight:bold; margin-left:10px;"></span>
+                    </div>
+                    <div id="exp-${qObj.id}" class="exp-container"></div> <!-- Hộp giải thích đứng ngang hàng -->
                 </div>
             </div>`;
 }
@@ -2169,27 +2187,34 @@ function createQuestionsBlock(passageObj) {
     return html;
 }
 
-// --- LOGIC GIAO DIỆN & ĐIỀU HƯỚNG ---
 function switchTab(n) {
     document.querySelectorAll('.tab-btn').forEach((b, i) => { b.classList.toggle('active', i + 1 === n); });
     document.querySelectorAll('.question-group').forEach((q, i) => { q.style.display = (i + 1 === n) ? 'block' : 'none'; });
     
-    // Ẩn tất cả đoạn văn
     document.querySelectorAll('.passage-text-content').forEach(p => p.style.display = 'none');
 
-    let passagePane = document.getElementById('passagePane');
+    let paneLeft = document.getElementById('passagePane');
+    let paneMiddle = document.getElementById('vietnamesePane');
     let introText = document.getElementById('passage-content-container').querySelector('h2');
     
     if(n === 1) {
+        // Part 5: Ẩn hoàn toàn cột tiếng Anh và tiếng Việt để cột Câu hỏi chiếm 100% chiều rộng
+        if(paneLeft) paneLeft.style.display = 'none';
+        if(paneMiddle) paneMiddle.style.display = 'none';
+        
         if(introText) introText.innerHTML = `Part 5: Incomplete Sentences<br><br><span style="font-size:18px; color:#555; font-weight:normal;">👉 Hãy đọc kỹ và chọn đáp án đúng bên cột phải nhé!</span>`;
     } else {
+        // Part 6 & 7: Luôn hiện cột tiếng Anh
+        if(paneLeft) paneLeft.style.display = 'block';
+        // Chỉ hiện cột tiếng Việt (cột thứ 3) nếu trạng thái bài là "Đã nộp"
+        if(paneMiddle) paneMiddle.style.display = isSubmitted ? 'block' : 'none';
+
         if(introText) introText.innerHTML = `Passage<br><span style="font-size:18px; color:#888; font-weight:normal;">(Cuộn chuột vào nhóm câu hỏi bên phải để xem đoạn văn tương ứng)</span>`;
     }
     
-    document.querySelector('.pane-left').scrollTop = 0;
     document.querySelector('.pane-right').scrollTop = 0;
+    if(paneLeft) paneLeft.scrollTop = 0;
 }
-
 function showPassage(passageId) {
     document.querySelectorAll('.passage-text-content').forEach(p => p.style.display = 'none');
     
@@ -2292,6 +2317,15 @@ function executeSubmit() {
     
     // THÊM DÒNG NÀY ĐỂ HIỆN CỘT TIẾNG VIỆT SAU KHI NỘP BÀI
     document.getElementById('mainContainer').classList.add('show-translation');
+    
+    // ---- THÊM MỚI TỪ ĐÂY ----
+    // Refresh lại Tab hiện tại để nó hiển thị đúng số cột sau khi nộp bài
+    let activeTabIndex = 1;
+    document.querySelectorAll('.tab-btn').forEach((b, i) => {
+        if (b.classList.contains('active')) activeTabIndex = i + 1;
+    });
+    switchTab(activeTabIndex);
+    // ---- ĐẾN ĐÂY ----
     
     let score = 0;
     let totalQuestions = allQuestionIds.length;
