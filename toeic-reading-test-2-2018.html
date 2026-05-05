@@ -326,10 +326,7 @@ header {
 }
 /* Do đã bỏ Footer, ta kéo dài màn hình làm bài ra mức tối đa */
 .container { height: calc(100vh - var(--header-h)); }
-      
-/* =======================================================
-   GIAO DIỆN ĐÁP ỨNG CHO ĐIỆN THOẠI & TABLET (SPLIT-SCREEN)
-======================================================= */
+ 
 @media (max-width: 1024px) {
     /* Khóa chết màn hình giống như một App gốc */
     body { overflow: hidden; height: 100vh; }
@@ -460,7 +457,28 @@ header {
     </div>
     <div class="nav-scroller" id="navPalette"></div>
 </div>
-<!-- TÌM ĐOẠN NÀY VÀ THÊM NÚT XEM LỊCH SỬ VÀO -->
+<!-- Popup Thông báo (Alert) -->
+<div id="genericAlertOverlay" class="custom-overlay">
+    <div class="custom-modal" style="border-top: 6px solid var(--primary); background-image: radial-gradient(#fff5f7 20%, transparent 20%), radial-gradient(#fff5f7 20%, transparent 20%); background-position: 0 0, 10px 10px; background-size: 20px 20px;">
+        <h2 style="color: var(--primary-dark); font-family: 'Lora', serif; font-size: 24px;">🌸 Thông báo</h2>
+        <p id="genericAlertMsg" style="font-size: 17px; line-height: 1.6; color:#5a4a4d; margin: 20px 0;"></p>
+        <div class="modal-actions">
+            <button class="btn-confirm" style="width: 100%; border-radius: 20px;" onclick="closeGenericAlert()">Đã hiểu</button>
+        </div>
+    </div>
+</div>
+
+<!-- Popup Xác nhận (Confirm) -->
+<div id="genericConfirmOverlay" class="custom-overlay">
+    <div class="custom-modal" style="border-top: 6px solid var(--primary); background-image: radial-gradient(#fff5f7 20%, transparent 20%), radial-gradient(#fff5f7 20%, transparent 20%); background-position: 0 0, 10px 10px; background-size: 20px 20px;">
+        <h2 style="color: var(--primary-dark); font-family: 'Lora', serif; font-size: 24px;">🐾 Xác nhận</h2>
+        <p id="genericConfirmMsg" style="font-size: 17px; line-height: 1.6; color:#5a4a4d; margin: 20px 0;"></p>
+        <div class="modal-actions">
+            <button class="btn-cancel" style="border-radius: 20px; width: 45%;" onclick="closeGenericConfirm()">Hủy</button>
+            <button class="btn-confirm" id="genericConfirmBtn" style="border-radius: 20px; width: 45%; background: var(--wrong);">Đồng ý</button>
+        </div>
+    </div>
+</div>
 <div id="setupOverlay" class="custom-overlay">
     <div class="custom-modal">
         <h2 style="color: var(--primary-dark); font-family: 'Lora', serif; font-size:28px;">Cài đặt bài làm ✨</h2>
@@ -2389,7 +2407,37 @@ function scrollToQuestion(id) {
         }
     }, 100);
 }
+// --- HỆ THỐNG POPUP TÙY CHỈNH ---
+function showCustomAlert(msg) {
+    document.getElementById('genericAlertMsg').innerText = msg;
+    document.getElementById('genericAlertOverlay').style.display = 'flex';
+}
 
+function closeGenericAlert() {
+    document.getElementById('genericAlertOverlay').style.display = 'none';
+}
+
+function showCustomConfirm(msg, onConfirmCallback) {
+    document.getElementById('genericConfirmMsg').innerText = msg;
+    let confirmBtn = document.getElementById('genericConfirmBtn');
+    
+    // Gỡ bỏ các sự kiện click cũ để tránh bị lặp hành động
+    let newBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+    
+    newBtn.addEventListener('click', function() {
+        document.getElementById('genericConfirmOverlay').style.display = 'none';
+        if (typeof onConfirmCallback === 'function') {
+            onConfirmCallback();
+        }
+    });
+
+    document.getElementById('genericConfirmOverlay').style.display = 'flex';
+}
+
+function closeGenericConfirm() {
+    document.getElementById('genericConfirmOverlay').style.display = 'none';
+}
 // --- TIMER ---
 function startTimer() {
     let display = document.getElementById("timer");
@@ -2463,12 +2511,12 @@ function closeHistoryModal() {
 
 // Hàm xử lý Xóa lịch sử có xác nhận
 function deleteAttempt(attemptId) {
-    if(confirm("Bạn có chắc chắn muốn xóa bài làm này khỏi lịch sử không?")) {
+    showCustomConfirm("Bạn có chắc chắn muốn xóa bài làm này khỏi lịch sử không?", function() {
         let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
-        history = history.filter(h => h.id !== attemptId); // Lọc bỏ bài đã chọn
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); // Lưu lại vào máy
-        openHistoryModal(); // Tải lại danh sách ngay lập tức
-    }
+        history = history.filter(h => h.id !== attemptId); 
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); 
+        openHistoryModal(); 
+    });
 }
 
 function restoreAttempt(attemptId) {
@@ -2523,7 +2571,7 @@ function scrollToEvidence(evId) {
             evElement.classList.remove("focus-blink");
         }, 1500);
     } else {
-        alert("Chưa được gắn ID dẫn chứng trong bài đọc!");
+        showCustomAlert("Chưa được gắn ID dẫn chứng trong bài đọc!");
     }
 }
 // --- GRADING ---
@@ -2689,8 +2737,7 @@ function doHighlight() {
             span.className = "highlight";
             selectedRange.surroundContents(span); 
         } catch(e) {
-            // Cảnh báo nếu người dùng bôi đen vắt ngang qua 2 đoạn văn (xuống dòng)
-            alert("Lưu ý: Chỉ có thể bôi vàng các cụm từ nằm trong cùng một đoạn văn. Vui lòng không bôi đen vắt ngang qua các khoảng ngắt dòng nhé!");
+            showCustomAlert("Lưu ý: Chỉ có thể bôi vàng các cụm từ nằm trong cùng một đoạn văn. Vui lòng không bôi đen vắt ngang qua các khoảng ngắt dòng nhé!");
         }
         window.getSelection().removeAllRanges();
     }
