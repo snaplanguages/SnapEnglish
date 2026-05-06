@@ -1668,7 +1668,7 @@
 
     let currentPassageIdx = 0;
     let userAnswers = {};
-
+let savedAnswersJSON = null;
     // ĐOẠN MÃ LẤY ĐÁP ÁN THÔNG MINH
     const urlParams = new URLSearchParams(window.location.search);
     const attemptId = urlParams.get('attemptId');
@@ -1681,11 +1681,10 @@
             userAnswers = attempt.answers;
         }
     } else {
-        // NẾU LÀ BẤM SAU KHI VỪA NỘP BÀI: Lấy đáp án mới nhất
-        const savedAnswersJSON = localStorage.getItem('snapEnglish_userAnswers');
-        if (savedAnswersJSON) {
-            userAnswers = JSON.parse(savedAnswersJSON);
-        }
+        savedAnswersJSON = localStorage.getItem('snapEnglish_userAnswers');
+    if (savedAnswersJSON) {
+        userAnswers = JSON.parse(savedAnswersJSON);
+    }
     }
 
     function renderPassage(idx) {
@@ -1713,9 +1712,9 @@
                 `;
             });
 
-            let resultHtml = '';
-            if (savedAnswersJSON) { 
-                let userAnswer = userAnswers[q.id];
+           let resultHtml = '';
+if (Object.keys(userAnswers).length > 0) { 
+    let userAnswer = userAnswers[q.id];
                 let bg, text, border, msg;
                 if (!userAnswer) {
                     bg = '#f5f5f5'; text = '#7a7a7a'; border = '#e0e0e0'; msg = 'Bạn chưa chọn đáp án ⚪';
