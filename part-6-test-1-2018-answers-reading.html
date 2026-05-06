@@ -694,12 +694,24 @@
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Lấy dữ liệu người dùng đã lưu
-        const savedAnswersJSON = localStorage.getItem('snapEnglish_userAnswers');
-        
-        if (savedAnswersJSON) {
-            const userAnswers = JSON.parse(savedAnswersJSON);
-            // Lấy tất cả các hộp giải thích của Part 6
+    const HISTORY_KEY = "snapenglish_p6_test1_2018_history";
+    const urlParams = new URLSearchParams(window.location.search);
+    const attemptId = urlParams.get('attemptId');
+    let savedAnswersJSON = null;
+
+    if (attemptId) {
+        const history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+        const attempt = history.find(h => h.id == attemptId);
+        if (attempt) {
+            savedAnswersJSON = JSON.stringify(attempt.answers);
+        }
+    } else {
+        savedAnswersJSON = localStorage.getItem('snapEnglish_userAnswers');
+    }
+    
+    if (savedAnswersJSON) {
+        const userAnswers = JSON.parse(savedAnswersJSON);
+
             const expBoxes = document.querySelectorAll('.exp-box');
             
             // Bộ đáp án chuẩn cho 16 câu Part 6 - Test 1 2018
