@@ -197,7 +197,42 @@
         .split-media audio { width: 100%; outline: none; }
         .split-questions { flex: 1.2; }
 
-        @media (max-width: 800px) { .split-layout { flex-direction: column; } .split-media { position: relative; } }
+        /* --- TỐI ƯU GIAO DIỆN ĐA THIẾT BỊ --- */
+@media (max-width: 1024px) {
+    .split-layout { 
+        flex-direction: column; 
+    }
+    .split-media { 
+        position: relative !important; /* Hủy bám dính trên mobile */
+        max-height: none; 
+        top: 0; 
+        width: 100%;
+    }
+    .resizer { 
+        display: none; /* Ẩn thanh kéo trên điện thoại */
+    }
+    main { 
+        padding: 15px; /* Giảm khoảng cách thừa */
+    }
+    .q-card { 
+        padding: 15px; 
+    }
+    header { 
+        height: auto; 
+        flex-direction: column; 
+        padding: 10px 15px; 
+        gap: 15px; 
+    }
+    .tabs { 
+        flex-wrap: wrap; 
+        justify-content: center; 
+        width: 100%; 
+    }
+    .header-right { 
+        width: 100%; 
+        justify-content: space-between; 
+    }
+}
 
         /* OPTIONS */
         .options-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
@@ -282,9 +317,39 @@
             <label style="font-weight: 700; color: var(--text-main);">Thời gian (phút): </label>
             <input type="number" id="inputTime" class="input-time" value="45" min="5" max="120">
         </div>
-
-        <button class="btn btn-primary" style="width: 100%; margin-top: 10px; display: none;" id="btnStart" onclick="startTest()">BẮT ĐẦU LÀM BÀI</button>
+<!-- Thay thế nút btnStart cũ bằng cụm nút này trong #setupModal -->
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button class="btn btn-outline" style="flex: 1;" onclick="openHistoryModal()">🕒 Xem lịch sử</button>
+            <button class="btn btn-primary" style="flex: 1; display: none;" id="btnStart" onclick="startTest()">Bắt đầu</button>
+        </div>
     </div>
+</div>
+
+<!-- Modal Lịch Sử Làm Bài -->
+<div id="historyOverlay" class="modal-overlay">
+    <div class="modal-box" style="max-width: 500px; width: 100%; text-align: left;">
+        <div class="modal-title" style="text-align: center;">🕒 Lịch sử làm bài</div>
+        <div id="historyList" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px;">
+            <!-- Lịch sử sẽ được render vào đây -->
+        </div>
+        <button class="btn btn-outline" style="width: 100%;" onclick="closeModal('historyOverlay')">Quay lại</button>
+    </div>
+</div>
+
+<style>
+    .history-item { background: var(--bg-main); border: 1px solid var(--border); padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+    .history-item:hover { border-color: var(--primary); background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .history-info { display: flex; flex-direction: column; gap: 5px; }
+    .history-date { font-weight: bold; color: var(--text-main); font-size: 15px; }
+    .history-score { color: var(--primary-dark); font-size: 14px; font-weight: 600; }
+    .btn-review { background: #E1F0FA; color: var(--primary-dark); border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    .btn-review:hover { background: var(--primary); color: white; }
+    .btn-delete-history { background: #FDEAEA; color: var(--danger); border: none; padding: 0 10px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 20px; }
+    .btn-delete-history:hover { background: var(--danger); color: white; }
+    #historyList::-webkit-scrollbar { width: 6px; }
+    #historyList::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+</style>
+</div>
 </div>
 
 <div id="confirmModal" class="modal-overlay">
@@ -1880,7 +1945,101 @@ part4: [
     let timerInterval = null;
     let isMockMode = false;
     let isSubmitted = false;
+// --- QUẢN LÝ LỊCH SỬ LÀM BÀI ---
+    const HISTORY_KEY = "snapenglish_listening_test2_history";
+    let isReviewingMode = false;
 
+    function openHistoryModal() {
+        let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+        let historyListEl = document.getElementById('historyList');
+        let listHtml = '';
+
+        if (history.length === 0) {
+            listHtml = '<p style="text-align: center; color: var(--text-muted); margin-top: 20px;">Chưa có dữ liệu làm bài.</p>';
+        } else {
+            history.forEach(attempt => {
+                listHtml += `
+                    <div class="history-item">
+                        <div class="history-info">
+                            <span class="history-date">📅 ${attempt.date} - ⏰ ${attempt.time}</span>
+                            <span class="history-score">🏆 Điểm: ${attempt.score}/${attempt.total}</span>
+                        </div>
+                        <div style="display: flex; gap: 5px;">
+                            <button class="btn-review" onclick="restoreAttempt(${attempt.id})">Xem lại</button>
+                            <button class="btn-delete-history" onclick="deleteAttempt(${attempt.id})" title="Xóa bài làm này">✖</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        historyListEl.innerHTML = listHtml;
+        document.getElementById('historyOverlay').classList.add('show');
+    }
+
+    function saveAttemptToHistory(score, total, answersArray) {
+        let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+        let now = new Date();
+        
+        let attempt = {
+            id: Date.now(),
+            date: now.toLocaleDateString('vi-VN'),
+            time: now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+            score: score,
+            total: total,
+            answers: answersArray
+        };
+        
+        history.unshift(attempt);
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+
+        if (window.syncHistoryToCloud) {
+            window.syncHistoryToCloud(history);
+        }
+    }
+
+    function deleteAttempt(attemptId) {
+        if (confirm("Bạn có chắc chắn muốn xóa bài làm này khỏi lịch sử không?")) {
+            let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+            history = history.filter(h => h.id !== attemptId); 
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); 
+            
+            if (window.syncHistoryToCloud) window.syncHistoryToCloud(history);
+            openHistoryModal(); 
+        }
+    }
+
+    function restoreAttempt(attemptId) {
+        let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+        let attempt = history.find(h => h.id === attemptId);
+        if(!attempt) return;
+
+        isReviewingMode = true; 
+        closeModal('historyOverlay');
+        closeModal('setupModal');
+        
+        // Khôi phục đáp án đã chọn
+        document.querySelectorAll('input[type="radio"]').forEach(el => {
+            el.disabled = false;
+            el.checked = false; 
+        });
+        
+        userAnswers = attempt.answers; 
+        attempt.answers.forEach((val, qId) => {
+            if (val && qId > 0) {
+                let radio = document.querySelector(`input[name="q${qId}"][value="${val}"]`);
+                if (radio) radio.checked = true;
+            }
+        });
+
+        let btnSubmit = document.getElementById('headerSubmitBtn');
+        if(btnSubmit) {
+            btnSubmit.innerText = "Đang xem lại";
+            btnSubmit.style.background = "var(--text-muted)";
+        }
+
+        isSubmitted = false; 
+        executeSubmit();
+    }
     // --- INIT APP ---
     function selectMode(mode) {
         document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('selected'));
@@ -2282,16 +2441,26 @@ part4: [
         document.querySelectorAll('input[type="radio"]').forEach(el => el.disabled = true);
         document.getElementById('headerSubmitBtn').style.display = 'none';
 
-        document.getElementById('scoreDisplay').innerText = `${correctCount}/${totalRendered}`; 
-        document.getElementById('resultModal').classList.add('show');
-let totalTimeInSeconds = parseInt(document.getElementById('inputTime').value) * 60;
+    document.getElementById('scoreDisplay').innerText = `${correctCount}/${totalRendered}`; 
+    document.getElementById('resultModal').classList.add('show');
+
+    if (!isReviewingMode) {
+        saveAttemptToHistory(correctCount, totalRendered, [...userAnswers]);
+        let totalTimeInSeconds = parseInt(document.getElementById('inputTime').value) * 60;
         let timeSpentInSeconds = totalTimeInSeconds - timerDuration;
         let min = Math.floor(timeSpentInSeconds / 60);
         let sec = timeSpentInSeconds % 60;
         let timeString = `${min} phút ${sec} giây`;
-        // 👇 ĐOẠN MÃ ĐƯỢC THÊM VÀO ĐỂ ĐẨY ĐIỂM LÊN TRACKER 👇
+        
         if(window.luuDiemTOEICFull) {
-            window.luuDiemTOEICFull(correctCount, totalRendered, "TOEIC Listening Test 1 - 2018", timeString);
+            window.luuDiemTOEICFull(correctCount, totalRendered, "ETS 2018 - Test 1", timeString);
+        }
+    } else {
+        let toast = document.getElementById('toastNotification');
+        if (toast) {
+            document.querySelector('.toast-desc').innerText = "Đã khôi phục bài làm ngày cũ!";
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 4000);
         }
     }
         
@@ -2329,7 +2498,7 @@ let totalTimeInSeconds = parseInt(document.getElementById('inputTime').value) * 
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
@@ -2343,11 +2512,37 @@ let totalTimeInSeconds = parseInt(document.getElementById('inputTime').value) * 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-
+window.syncHistoryToCloud = async function(historyData) {
+        if (!window.currentUserUid) return;
+        try {
+            let docId = window.currentUserUid + "_history_listening_test1_2018";
+            await setDoc(doc(db, "user_test_histories", docId), {
+                savedHistory: historyData,
+                lastUpdated: Date.now()
+            }, { merge: true });
+        } catch (error) {
+            console.error("Lỗi đồng bộ lịch sử: ", error);
+        }
+    }
     onAuthStateChanged(auth, (user) => {
         if (user) {
             window.currentUserUid = user.uid;
             window.currentUserEmail = user.email;
+        let docId = user.uid + "_history_listening_test1_2018";
+            const docRef = doc(db, "user_test_histories", docId);
+            
+            onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    let cloudData = docSnap.data().savedHistory;
+                    if (cloudData) {
+                        localStorage.setItem("snapenglish_listening_test1_2018_history", JSON.stringify(cloudData));
+                        let historyModal = document.getElementById('historyOverlay');
+                        if (historyModal && historyModal.classList.contains('show')) {
+                            openHistoryModal();
+                        }
+                    }
+                }
+            });
         }
     });
 
