@@ -332,7 +332,16 @@
         </div>
     </div>
 </div>
-
+<div id="customConfirmDeleteOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2>Xác nhận xóa 🦋</h2>
+        <p style="font-size: 17px; color: #475569; margin-top: 15px; line-height: 1.5;">Cậu có chắc chắn muốn xóa bài làm này khỏi lịch sử không?</p>
+        <div class="modal-actions">
+            <button class="btn-modal btn-cancel" onclick="closeConfirmDelete()">Hủy 🐢</button>
+            <button class="btn-modal btn-confirm-start" onclick="executeDelete()" style="background: linear-gradient(135deg, var(--secondary-dark), var(--secondary)); box-shadow: 0 6px 15px rgba(190, 24, 93, 0.3);">Xóa nhé 🗑️</button>
+        </div>
+    </div>
+</div>
 <div id="resultOverlay" class="custom-overlay">
     <div class="custom-modal">
         <h2>🎉 Tuyệt vời quá! 🦊</h2>
@@ -999,15 +1008,33 @@ function closeCustomAlert() {
         document.getElementById('setupOverlay').style.display = 'flex';
     }
 
-    function deleteAttempt(attemptId) {
-        let confirmDelete = confirm("Cậu có chắc chắn muốn xóa bài làm này khỏi lịch sử không? 🦋");
-        if(confirmDelete) {
-            let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
-            history = history.filter(h => h.id !== attemptId); 
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); 
-            openHistoryModal(); 
-        }
+    // Biến tạm để nhớ xem cậu đang muốn xóa bài nào
+let pendingDeleteId = null; 
+
+// 1. Hàm được gọi khi bấm nút [x] ở danh sách lịch sử
+function deleteAttempt(attemptId) {
+    pendingDeleteId = attemptId; // Lưu lại ID bài cần xóa
+    document.getElementById('customConfirmDeleteOverlay').style.display = 'flex'; // Bật popup
+}
+
+// 2. Hàm đóng popup khi đổi ý bấm "Hủy"
+function closeConfirmDelete() {
+    pendingDeleteId = null; // Xóa trí nhớ
+    document.getElementById('customConfirmDeleteOverlay').style.display = 'none'; // Tắt popup
+}
+
+// 3. Hàm thực hiện xóa thật sự khi bấm "Xóa nhé"
+function executeDelete() {
+    if (pendingDeleteId !== null) {
+        let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+        // Lọc bỏ bài làm có ID trùng với ID đang chờ xóa
+        history = history.filter(h => h.id !== pendingDeleteId); 
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); 
+        
+        closeConfirmDelete(); // Tắt popup xác nhận
+        openHistoryModal();   // Render lại danh sách lịch sử mới
     }
+}
 
     function restoreAttempt(attemptId) {
         let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
