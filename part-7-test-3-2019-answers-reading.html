@@ -1627,7 +1627,154 @@
                 {
                     id: 199,
                     qEng: "What company was chosen by Mr. Simler?",
-                    qVie: "Công ty phần mềm nào đã ĐƯỢC CHỌN bởi ông Simler?",
+                    qVie: "Công ty nào đã được ông Simler chọn?",
                     options: [
                         { key: "A", en: "The company that Ms. Baral's contact works for", vi: "Công ty của người quen cô Baral", isCorrect: false },
-                        { key: "B", en: "The company with the most reliable customer-service representatives", vi: "Công ty CSKH đáng tin c
+                        { key: "B", en: "The company with the most reliable customer-service representatives", vi: "Công ty CSKH đáng tin cậy nhất", isCorrect: false },
+                        { key: "C", en: "The company that has lower rates than a competitor", vi: "Công ty có giá thấp hơn đối thủ", isCorrect: true },
+                        { key: "D", en: "The company with an overnight call center", vi: "Công ty có trung tâm gọi qua đêm", isCorrect: false }
+                    ],
+                    evidenceId: "ev-199",
+                    expText: "Dựa vào việc tin nhắn thông báo tự động được gửi từ hệ thống \"Raven Notifications\", ta thấy ông Simler đã chọn công ty này. Trước đó, cô Baral có giới thiệu: \"Raven Notifications also looks good, and their rates are lower\" (Raven Notifications cũng rất ổn mà giá lại rẻ hơn). Vậy công ty được chọn là công ty có giá thấp hơn.",
+                    vocab: "<li><b>Rates</b>: Mức giá, cước phí</li><li><b>Competitor</b>: Đối thủ cạnh tranh</li>"
+                },
+                {
+                    id: 200,
+                    qEng: "What does the text message ask employees who want additional work to do?",
+                    qVie: "Tin nhắn yêu cầu nhân viên muốn làm thêm việc phải làm gì?",
+                    options: [
+                        { key: "A", en: "Arrive on Tuesday night", vi: "Đến vào tối thứ Ba", isCorrect: false },
+                        { key: "B", en: "Contact the personnel office", vi: "Liên hệ với phòng nhân sự", isCorrect: true },
+                        { key: "C", en: "Reply to the message with the hours they can work", vi: "Trả lời tin nhắn kèm số giờ làm", isCorrect: false },
+                        { key: "D", en: "Go to a different distribution center", vi: "Đến một trung tâm phân phối khác", isCorrect: false }
+                    ],
+                    evidenceId: "ev-200",
+                    expText: "Tin nhắn yêu cầu nhân viên muốn làm thêm ca đêm liên lạc với người ở phòng nhân sự: \"If you are interested in working additional hours at that time, please contact Becca Johnston in Human Resources\". Cụm từ \"personnel office\" đồng nghĩa với \"Human Resources\" (Phòng nhân sự).",
+                    vocab: "<li><b>Personnel office = Human Resources</b>: Phòng nhân sự</li><li><b>Additional work</b>: Làm thêm (việc/giờ)</li>"
+                }
+            ]
+        }
+    ];
+
+    let currentPassageIdx = 0;
+    const savedAnswersJSON = localStorage.getItem('snapEnglish_userAnswers');
+    const userAnswers = savedAnswersJSON ? JSON.parse(savedAnswersJSON) : {};
+
+    function renderPassage(idx) {
+        const data = reviewData[idx];
+        
+        document.getElementById('progress-text').innerText = `Đoạn ${idx + 1} / ${reviewData.length}`;
+        document.getElementById('eng-content').innerHTML = data.engHtml;
+        document.getElementById('vie-content').innerHTML = data.vieHtml;
+
+        let qHtml = '';
+        data.questions.forEach(q => {
+            let optsHtml = '';
+            let correctAnswer = ''; 
+
+            q.options.forEach(opt => {
+                if(opt.isCorrect) correctAnswer = opt.key; 
+                let statusClass = opt.isCorrect ? 'is-correct' : '';
+                let checkIcon = opt.isCorrect ? '✨' : '';
+                
+                optsHtml += `
+                    <div class="option ${statusClass}">
+                        <div class="opt-en"><strong>${opt.key}.</strong> ${opt.en} ${checkIcon}</div>
+                        <div class="opt-vi">${opt.vi}</div>
+                    </div>
+                `;
+            });
+
+            let resultHtml = '';
+            if (savedAnswersJSON) { 
+                let userAnswer = userAnswers[q.id];
+                let bg, text, border, msg;
+                if (!userAnswer) {
+                    bg = '#f5f5f5'; text = '#7a7a7a'; border = '#e0e0e0'; msg = 'Bạn chưa chọn đáp án ⚪';
+                } else if (userAnswer === correctAnswer) {
+                    bg = '#eaf2eb'; text = '#2d5a3e'; border = '#bcd9c4'; msg = `Bạn đã chọn: <strong>(${userAnswer})</strong> <span style="margin-left: 8px;">✔️ Đúng</span>`;
+                } else {
+                    bg = '#fae8e8'; text = '#c96b6b'; border = '#f5c6c6'; msg = `Bạn đã chọn: <strong>(${userAnswer})</strong> <span style="margin-left: 8px;">❌ Sai</span>`;
+                }
+                resultHtml = `<div style="margin: 15px 0 10px 0; font-weight: 800; padding: 12px 18px; border-radius: 12px; font-size: 15px; display: inline-block; background-color: ${bg}; color: ${text}; border: 1px solid ${border}; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">${msg}</div>`;
+            }
+
+            qHtml += `
+                <div class="q-card">
+                    <div class="q-text">Câu ${q.id}: ${q.qEng}</div>
+                    <div class="q-text-vi">${q.qVie}</div>
+                    <div class="options-container">${optsHtml}</div>
+                    
+                    ${resultHtml} <div class="exp-box">
+                        <div class="exp-header">
+                            <div class="exp-title">💡 Giải thích Câu ${q.id}</div>
+                            <button class="btn-locate" onclick="scrollToEvidence('${q.evidenceId}')">📍 Xem dẫn chứng</button>
+                        </div>
+                        <div class="exp-content">${q.expText}</div>
+                        <div class="exp-vocab">
+                            <div style="font-weight:800; color:var(--primary-dark); margin-bottom:10px; text-transform:uppercase; font-size:14px; letter-spacing:1px;">📚 Từ vựng / Ngữ pháp:</div>
+                            <ul>${q.vocab}</ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        document.getElementById('questions-container').innerHTML = qHtml;
+
+        const pastelColors = [
+            { bg: '#ffd6a5', text: '#8a4b08' }, // Cam đào pastel
+            { bg: '#caffbf', text: '#2d5a3e' }, // Xanh lá pastel
+            { bg: '#a0c4ff', text: '#1a3b6e' }, // Xanh dương pastel
+            { bg: '#ffadad', text: '#801b1b' }, // Đỏ nhạt pastel
+            { bg: '#e4c1f9', text: '#482063' }, // Tím nhạt pastel
+            { bg: '#fdffb6', text: '#80770b' }, // Vàng pastel
+            { bg: '#9bf6ff', text: '#135459' }  // Xanh ngọc pastel
+        ];
+
+        const colorMap = {};
+        let colorIndex = 0;
+        
+        document.querySelectorAll('.passage-grid .ev-box').forEach((el) => {
+            const evId = el.getAttribute('id');
+            if (evId && !colorMap[evId]) {
+                colorMap[evId] = pastelColors[colorIndex % pastelColors.length];
+                colorIndex++;
+            }
+            const color = evId ? colorMap[evId] : pastelColors[colorIndex % pastelColors.length];
+            el.style.backgroundColor = color.bg;
+            el.style.color = color.text;
+            el.style.padding = '3px 6px';
+            el.style.borderRadius = '8px';
+            el.style.fontWeight = '800';
+            el.style.border = 'none';
+        });
+
+        document.getElementById('btn-prev').disabled = idx === 0;
+        document.getElementById('btn-next').disabled = idx === reviewData.length - 1;
+    }
+
+    function navigate(dir) {
+        let newIdx = currentPassageIdx + dir;
+        if(newIdx >= 0 && newIdx < reviewData.length) {
+            currentPassageIdx = newIdx;
+            renderPassage(currentPassageIdx);
+            document.querySelector('.passage-grid').scrollTop = 0;
+            document.getElementById('questions-container').scrollTop = 0;
+        }
+    }
+
+    function scrollToEvidence(evId) {
+        const evElement = document.getElementById(evId);
+        if(evElement) {
+            evElement.scrollIntoView({behavior: "smooth", block: "center"});
+            evElement.classList.remove("focus-blink");
+            void evElement.offsetWidth; 
+            evElement.classList.add("focus-blink");
+            setTimeout(() => evElement.classList.remove("focus-blink"), 2000);
+        }
+    }
+
+    window.onload = () => { renderPassage(0); };
+</script>
+</body>
+</html>
