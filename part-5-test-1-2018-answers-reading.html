@@ -928,11 +928,24 @@
 </div>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Lấy dữ liệu người dùng đã lưu
-        const savedAnswersJSON = localStorage.getItem('snapEnglish_userAnswers');
-        
-        if (savedAnswersJSON) {
-            const userAnswers = JSON.parse(savedAnswersJSON);
+    const HISTORY_KEY = "snapenglish_p5_test1_2018_history"; //
+    const urlParams = new URLSearchParams(window.location.search);
+    const attemptId = urlParams.get('attemptId');
+    let savedAnswersJSON = null;
+
+    if (attemptId) {
+        const history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+        const attempt = history.find(h => h.id == attemptId);
+        if (attempt) {
+            savedAnswersJSON = JSON.stringify(attempt.answers);
+        }
+    } else {
+        savedAnswersJSON = localStorage.getItem('snapEnglish_userAnswers');
+    }
+    
+    if (savedAnswersJSON) {
+        const userAnswers = JSON.parse(savedAnswersJSON);
+    
             const answerCards = document.querySelectorAll('.answer-card');
             
             // Mảng đáp án đúng để đối chiếu
