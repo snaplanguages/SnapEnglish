@@ -1816,11 +1816,26 @@ Sole Assortment will serve women who work in the surrounding area.</span> Becaus
     ];
     // LƯU TRỮ TRẠNG THÁI
     let currentPassageIdx = 0;
+const HISTORY_KEY = "snapenglish_p7_test2_2018_history"; 
+const urlParams = new URLSearchParams(window.location.search);
+const attemptId = urlParams.get('attemptId');
 
-    // Lấy dữ liệu user từ localStorage ngay tại đây
-    const savedAnswersJSON = localStorage.getItem('snapEnglish_userAnswers');
-    const userAnswers = savedAnswersJSON ? JSON.parse(savedAnswersJSON) : {};
+let userAnswers = {};
+let savedAnswersJSON = null;
 
+if (attemptId) {
+    const history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+    const attempt = history.find(h => h.id == attemptId);
+    if (attempt) {
+        userAnswers = attempt.answers;
+        savedAnswersJSON = JSON.stringify(userAnswers); 
+    }
+} else {
+    savedAnswersJSON = localStorage.getItem('snapEnglish_userAnswers');
+    if (savedAnswersJSON) {
+        userAnswers = JSON.parse(savedAnswersJSON);
+    }
+}
     // HÀM RENDER (TẠO GIAO DIỆN HTML) TỪ DỮ LIỆU
     function renderPassage(idx) {
         const data = reviewData[idx];
