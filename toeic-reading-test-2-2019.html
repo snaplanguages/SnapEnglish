@@ -2262,8 +2262,8 @@ function restoreAttempt(attemptId) {
 
     isReviewingMode = true; // Bật cờ hiệu "Đang xem lại"
     document.getElementById('historyOverlay').style.display = 'none';
+    document.getElementById('setupOverlay').style.display = 'none';
     
-    // Mở khóa & làm sạch toàn bộ các nút radio (phòng trường hợp người học xem bài A rồi chuyển sang bài B)
     document.querySelectorAll('input[type="radio"]').forEach(el => {
         el.disabled = false;
         el.checked = false; 
@@ -2391,7 +2391,8 @@ function executeSubmit() {
    
     if (!isReviewingMode) {
         saveAttemptToHistory(score, totalQuestions, userAnswersMap);
-        
+        document.getElementById('resultMessage').innerHTML = `Bạn đã làm đúng <b style="color: var(--primary); font-size: 22px;">${score}/${totalQuestions}</b> câu.<br>Điểm TOEIC Reading quy đổi: <b>${calculateToeicReading(score, totalQuestions)}</b>`;
+        document.getElementById('resultOverlay').style.display = 'flex';
         if(window.luuDiemTOEICReadingFull) {
             // Tính toán thời gian thực tế đã làm (số phút ban đầu trừ đi số phút còn lại)
             let minutesAssigned = (currentMode === 'mock') ? 75 : parseInt(document.getElementById('timeInput').value);
@@ -2497,8 +2498,7 @@ function removeHighlight() {
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
     // Đã import thêm getDoc
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-
+   import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
     const firebaseConfig = {
         apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
         authDomain: "snapenglish-cb6e2.firebaseapp.com",
@@ -2540,28 +2540,37 @@ function removeHighlight() {
     }
 
     // 2. LẮNG NGHE ĐĂNG NHẬP VÀ KÉO LỊCH SỬ VỀ
-    onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, (user) => {
         if (user) {
             window.currentUserUid = user.uid;
             window.currentUserEmail = user.email;
             
-            // Kéo dữ liệu từ Firestore xuống mỗi khi vào trang
-            try {
-                let docId = user.uid + "_history_test2_2019";
-                const docRef = doc(db, "user_test_histories", docId);
-                const docSnap = await getDoc(docRef);
-                
+            // Tự động nhận diện ID file hiện tại (2018 hay 2019)
+            let is2019 = document.title.includes("2019");
+            let docSuffix = is2019 ? "_history_test2_2019" : "_history_test2_2018";
+            let localKey = is2019 ? "snapenglish_test2_2019_history" : "snapenglish_test2_2018_history";
+            
+            let docId = user.uid + docSuffix;
+            const docRef = doc(db, "user_test_histories", docId);
+            
+            // SỬ DỤNG ONSNAPSHOT ĐỂ ĐỒNG BỘ REAL-TIME
+            onSnapshot(docRef, (docSnap) => {
                 if (docSnap.exists()) {
                     let cloudData = docSnap.data().savedHistory;
-                    if (cloudData && cloudData.length > 0) {
+                    if (cloudData) {
                         // Nạp vào máy tính/điện thoại hiện tại
-                        localStorage.setItem("snapenglish_test2_2019_history", JSON.stringify(cloudData));
-                        showInGameToast("🔄 Lịch sử làm bài đã được đồng bộ!");
+                        localStorage.setItem(localKey, JSON.stringify(cloudData));
+                        
+                        // Tự động làm mới bảng lịch sử nếu người dùng đang mở nó
+                        let historyModal = document.getElementById('historyOverlay');
+                        if (historyModal && historyModal.style.display === 'flex') {
+                            openHistoryModal();
+                        }
                     }
                 }
-            } catch(e) {
-                console.error("Lỗi tải lịch sử từ Cloud: ", e);
-            }
+            }, (error) => {
+                console.error("Lỗi đồng bộ Realtime: ", error);
+            });
 
         } else {
             showInGameToast("⚠️ Chưa đăng nhập! Lịch sử và Điểm sẽ không được đồng bộ.");
