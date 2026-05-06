@@ -25,7 +25,35 @@
         .center-text { text-align: center; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Be Vietnam Pro', sans-serif; }
         ::selection { background: #e9d5ff; color: #312e81; }
-        
+        .controls { display: flex; align-items: center; gap: 15px; }
+.btn-nav-toggle {
+    background: #fff; color: var(--primary-btn); border: 2px solid var(--primary-btn);
+    padding: 8px 20px; border-radius: 10px; font-weight: 600; font-size: 15px; 
+    cursor: pointer; transition: 0.3s;
+}
+.btn-nav-toggle:hover { background: var(--primary-btn); color: white; }
+
+.nav-dropdown {
+    position: absolute; top: 75px; right: 20px;
+    background: rgba(255, 255, 255, 0.98); border-radius: 16px; border: 2px solid #e2e8f0;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.1); width: 340px;
+    max-height: 400px; overflow-y: auto; z-index: 999; backdrop-filter: blur(10px);
+    padding: 20px; display: none; grid-template-columns: repeat(5, 1fr); gap: 10px;
+}
+.nav-dropdown.show { display: grid; }
+.nav-dot {
+    height: 40px; border: 2px solid #cbd5e1; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;
+    cursor: pointer; color: #475569; background: #f8fafc; transition: 0.2s;
+}
+.nav-dot.done { background: #faf5ff; border-color: var(--primary-btn); color: var(--primary-btn); }
+.nav-dot.correct { background: #f0fdf4; border-color: #4ade80; color: #166534; }
+.nav-dot.wrong { background: #fff1f2; border-color: #fb7185; color: #9f1239; }
+
+/* Highlight đáp án đúng/sai sau khi nộp bài */
+.option-label.correct-opt { background: #f0fdf4; border-color: #4ade80; font-weight: bold; color: #166534; }
+.option-label.wrong-opt { background: #fff1f2; border-color: #fb7185; color: #9f1239; }
+.option-label.disabled { pointer-events: none; }
         body {
             background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%);
             color: var(--text-dark);
@@ -203,12 +231,17 @@
 
 <div class="glass-container">
     <div class="header">
-        <div style="display: flex; align-items: center;">
-            <h2 class="title" style="color: var(--text-dark);">Part 7 Practice (2019 Test 3)</h2>
-            <div class="timer-box">⏱ <span id="timer">00:00</span></div>
-        </div>
-        <div class="progress-indicator" id="progress-text">Passage 1 / 15</div>
+    <div style="display: flex; align-items: center;">
+        <h2 class="title" style="color: var(--text-dark);">Part 7 Practice (2019 Test 3)</h2>
+        <div class="timer-box">⏱ <span id="timer">00:00</span></div>
     </div>
+   
+    <div class="controls" style="position: relative;">
+        <button class="btn-nav-toggle" onclick="toggleNavDropdown()">📑 Danh sách câu</button>
+        <div class="nav-dropdown" id="navDropdown"></div>
+        <div class="progress-indicator" id="progress-text" style="margin-left: 15px;">Passage 1 / 15</div>
+    </div>
+</div>
 
     <div class="main-content">
         <div class="passage-col" id="passage-container"></div>
@@ -852,52 +885,100 @@ function closeConfirmModal() {
 document.getElementById('confirmOverlay').style.display = 'none';
 }
 
+function toggleNavDropdown() {
+    document.getElementById('navDropdown').classList.toggle('show');
+}
+
+// Khởi tạo các ô bấm điều hướng
+function initNavDots() {
+    let html = '';
+    quizData.forEach((passage, pIndex) => {
+        passage.questions.forEach(q => {
+            html += `<div class="nav-dot" id="dot-${q.id}" onclick="jumpToPassage(${pIndex}, ${q.id})">${q.id}</div>`;
+        });
+    });
+    document.getElementById('navDropdown').innerHTML = html;
+}
+
+// Nhảy đến bài đọc chứa câu hỏi được click
+function jumpToPassage(pIndex, qId) {
+    currentIndex = pIndex;
+    renderView();
+    document.getElementById('navDropdown').classList.remove('show');
+    // Tự động cuộn đến câu hỏi
+    setTimeout(() => {
+        const qBlock = document.getElementById(`qb-${qId}`);
+        if(qBlock) qBlock.scrollIntoView({behavior: 'smooth', block: 'center'});
+    }, 100);
+}
+
+// Sửa lại hàm renderView để show đáp án đúng/sai nếu đã nộp bài
 function renderView() {
-const data = quizData[currentIndex];
-document.getElementById('passage-container').innerHTML = data.passage;
+    const data = quizData[currentIndex];
+    document.getElementById('passage-container').innerHTML = data.passage;
 
-let qHtml = '';
-data.questions.forEach(q => {
-    qHtml += `<div class="question-block" id="qb-${q.id}">
-        <div class="q-text">Câu ${q.id}: ${q.text}</div>
-        <div class="options">`;
-    for(let opt in q.options) {
-        const isSelected = userAnswers[q.id] === opt;
-        qHtml += `<label class="option-label ${isSelected ? 'selected' : ''}">
-            <input type="radio" name="q${q.id}" value="${opt}" ${isSelected ? 'checked' : ''} onchange="selectOpt(${q.id}, '${opt}')">
-            <b>${opt}.</b> &nbsp; ${q.options[opt]}
-        </label>`;
+    let qHtml = '';
+    data.questions.forEach(q => {
+        qHtml += `<div class="question-block" id="qb-${q.id}">
+            <div class="q-text">Câu ${q.id}: ${q.text}</div>
+            <div class="options">`;
+        for(let opt in q.options) {
+            const isSelected = userAnswers[q.id] === opt;
+            let extraClass = '';
+            
+            // Xử lý logic hiển thị màu sau khi nộp bài
+            if (isSubmitted) {
+                extraClass += ' disabled '; // Khóa không cho chọn lại
+                if (opt === q.correct) {
+                    extraClass += ' correct-opt ';
+                } else if (isSelected && opt !== q.correct) {
+                    extraClass += ' wrong-opt ';
+                }
+            } else {
+                if (isSelected) extraClass += ' selected ';
+            }
+
+            qHtml += `<label class="option-label ${extraClass}">
+                <input type="radio" name="q${q.id}" value="${opt}" ${isSelected ? 'checked' : ''} onchange="selectOpt(${q.id}, '${opt}')" ${isSubmitted ? 'disabled' : ''}>
+                <b>${opt}.</b> &nbsp; ${q.options[opt]}
+            </label>`;
+        }
+        qHtml += `</div></div>`;
+    });
+
+    document.getElementById('questions-container').innerHTML = qHtml;
+    document.getElementById('progress-text').innerText = `Cụm bài ${currentIndex + 1} / ${quizData.length}`;
+
+    document.getElementById('btn-prev').style.display = currentIndex === 0 ? 'none' : 'block';
+
+    if (currentIndex === quizData.length - 1) {
+        document.getElementById('btn-next').style.display = 'none';
+        document.getElementById('btn-submit').style.display = 'block';
+    } else {
+        document.getElementById('btn-next').style.display = 'block';
+        document.getElementById('btn-submit').style.display = 'none';
     }
-    qHtml += `</div></div>`;
-});
 
-document.getElementById('questions-container').innerHTML = qHtml;
-document.getElementById('progress-text').innerText = `Cụm bài đọc ${currentIndex + 1} / ${quizData.length}`;
-
-document.getElementById('btn-prev').style.display = currentIndex === 0 ? 'none' : 'block';
-
-if (currentIndex === quizData.length - 1) {
-    document.getElementById('btn-next').style.display = 'none';
-    document.getElementById('btn-submit').style.display = 'block';
-} else {
-    document.getElementById('btn-next').style.display = 'block';
-    document.getElementById('btn-submit').style.display = 'none';
+    document.getElementById('passage-container').scrollTop = 0;
+    document.getElementById('questions-container').scrollTop = 0;
 }
 
-document.getElementById('passage-container').scrollTop = 0;
-document.getElementById('questions-container').scrollTop = 0;
-}
-
+// Sửa lại hàm selectOpt để nó tô màu ô điều hướng khi người dùng đánh dấu
 function selectOpt(qid, opt) {
-userAnswers[qid] = opt;
-const block = document.getElementById(`qb-${qid}`);
-const labels = block.querySelectorAll('.option-label');
-labels.forEach(label => label.classList.remove('selected'));
+    if(isSubmitted) return;
+    userAnswers[qid] = opt;
+    const block = document.getElementById(`qb-${qid}`);
+    const labels = block.querySelectorAll('.option-label');
+    labels.forEach(label => label.classList.remove('selected'));
 
-const selectedInput = block.querySelector(`input[value="${opt}"]`);
-if(selectedInput) {
-    selectedInput.closest('.option-label').classList.add('selected');
-}
+    const selectedInput = block.querySelector(`input[value="${opt}"]`);
+    if(selectedInput) {
+        selectedInput.closest('.option-label').classList.add('selected');
+    }
+    
+    // Đánh dấu ô nav-dot là đã làm
+    const dot = document.getElementById(`dot-${qid}`);
+    if(dot) dot.classList.add('done');
 }
 
 function changePassage(dir) {
@@ -906,29 +987,60 @@ renderView();
 }
 
 function submitQuiz() {
-document.getElementById('confirmOverlay').style.display = 'none';
-isSubmitted = true;
-clearInterval(timerInterval);
+    document.getElementById('confirmOverlay').style.display = 'none';
+    isSubmitted = true;
+    clearInterval(timerInterval);
+    document.getElementById('btn-submit').style.display = 'none'; // Ẩn nút nộp bài
 
-let correctCount = 0;
-quizData.forEach(passage => {
-    passage.questions.forEach(q => {
-        if (userAnswers[q.id] === q.correct) {
-            correctCount++;
-        }
+    let correctCount = 0;
+    quizData.forEach(passage => {
+        passage.questions.forEach(q => {
+            const uAns = userAnswers[q.id];
+            const dot = document.getElementById(`dot-${q.id}`);
+            
+            if (uAns === q.correct) {
+                correctCount++;
+                if(dot) { dot.classList.remove('done'); dot.classList.add('correct'); }
+            } else {
+                if(dot) { dot.classList.remove('done'); dot.classList.add('wrong'); }
+            }
+        });
     });
-});
 
-localStorage.setItem('snapEnglish_userAnswers', JSON.stringify(userAnswers));
+    localStorage.setItem('snapEnglish_userAnswers', JSON.stringify(userAnswers));
 
-const totalQs = quizData.reduce((acc, curr) => acc + curr.questions.length, 0); 
-document.getElementById('score-display').innerText = correctCount + " / " + totalQs;
-document.getElementById('result-overlay').style.display = 'flex';
+    // Render lại passage hiện tại để hiển thị ngay đáp án đúng/sai
+    renderView();
 
-if (window.luuDiemTOEICLenFirebase) {
-    window.luuDiemTOEICLenFirebase(totalQs, correctCount, "ETS 2019 - Test 3", "Reading", "Part 7");
+    const totalQs = quizData.reduce((acc, curr) => acc + curr.questions.length, 0); 
+    
+    // Biến result-overlay thành dạng modal (popup nhỏ)
+    const resultBox = document.getElementById('result-overlay');
+    resultBox.style.background = 'rgba(255,255,255,0.85)';
+    resultBox.style.backdropFilter = 'blur(10px)';
+    resultBox.innerHTML = `
+        <div class="custom-modal">
+            <h2 style="font-size:2rem; color:var(--primary-btn); margin-bottom: 15px;">Kết Quả Của Cậu ✨</h2>
+            <div style="font-size:3.5rem; font-weight:700; margin:15px 0; color: var(--text-dark);">${correctCount} / ${totalQs}</div>
+            <p style="color: #64748b; margin-bottom: 20px;">Giờ cậu có thể đóng bảng này lại và kiểm tra lịch sử đáp án từng câu nhé!</p>
+            <div class="modal-actions" style="flex-direction: column;">
+                <button class="btn-confirm" onclick="document.getElementById('result-overlay').style.display='none'; document.getElementById('navDropdown').classList.add('show');">Xem Lịch Sử Làm Bài 👀</button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-cancel" onclick="location.reload()">Làm Lại</button>
+                    <a href="part-7-test-3-2019-answers-reading.html" class="btn-confirm" style="background: var(--accent-btn); text-decoration: none;">Giải Thích Chi Tiết</a>
+                </div>
+            </div>
+        </div>
+    `;
+    resultBox.style.display = 'flex';
+
+    if (window.luuDiemTOEICLenFirebase) {
+        window.luuDiemTOEICLenFirebase(totalQs, correctCount, "ETS 2019 - Test 3", "Reading", "Part 7");
+    }
 }
-}
+
+initNavDots();
+renderView();
 
 renderView();
   </script>
