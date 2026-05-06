@@ -1062,7 +1062,8 @@ function openHistoryModal() {
                     <span class="history-score">Đúng: ${item.score}/${item.total} câu</span>
                 </div>
                 <div style="display: flex; gap: 8px;">
-                    <button class="btn-review" onclick="restoreAttempt(${item.id})">Xem lại</button>
+                    <!-- SỬA NÚT XEM LẠI Ở ĐÂY: Chuyển thẳng sang trang Giải thích kèm ID lịch sử -->
+                    <button class="btn-review" onclick="window.location.href='part-7-test-3-2019-answers-reading.html?attemptId=${item.id}'">Xem lại & Giải thích</button>
                     <button class="btn-delete-history" onclick="deleteAttempt(${item.id})" title="Xóa">&times;</button>
                 </div>
             </div>
@@ -1141,7 +1142,6 @@ function submitQuiz(isRestoring = false) {
         passage.questions.forEach(q => {
             const uAns = userAnswers[q.id];
             const dot = document.getElementById(`dot-${q.id}`);
-            
             if (uAns === q.correct) {
                 correctCount++;
                 if(dot) { dot.classList.remove('done'); dot.classList.add('correct'); }
@@ -1151,43 +1151,37 @@ function submitQuiz(isRestoring = false) {
         });
     });
 
-    // Đã fix lỗi: Xóa dòng lưu localStorage vô dụng ở đây
+    // KHÔI PHỤC LẠI DÒNG NÀY ĐỂ TRUYỀN ĐÁP ÁN SANG FILE 2
+    localStorage.setItem('snapEnglish_userAnswers', JSON.stringify(userAnswers));
     
     const totalQs = quizData.reduce((acc, curr) => acc + curr.questions.length, 0); 
     if (!isRestoring) {
         saveAttemptToHistory(correctCount, totalQs, userAnswers);
-        
-        // Gọi lưu Firebase nếu có
         if (window.luuDiemTOEICLenFirebase) {
             window.luuDiemTOEICLenFirebase(totalQs, correctCount, "ETS 2019 - Test 3", "Reading", "Part 7");
         }
     }
 
-    renderView(); // Render lại giao diện hiển thị đúng/sai
+    renderView();
     
-    // Hiển thị Overlay Kết Quả
     const resultBox = document.getElementById('result-overlay');
     resultBox.style.background = 'rgba(255,255,255,0.85)';
     resultBox.style.backdropFilter = 'blur(10px)';
     
-    // Đã fix UX: Đổi nhãn nút từ "Xem Lịch Sử Làm Bài" thành "Xem Chi Tiết Bài Làm"
+    // GIAO DIỆN MỚI CHỈ CÒN 2 NÚT (Bỏ nút Xem Chi Tiết dư thừa)
     resultBox.innerHTML = `
         <div class="custom-modal">
             <h2 style="font-size:2rem; color:var(--primary-btn); margin-bottom: 15px;">Kết Quả Của Bạn ✨</h2>
             <div style="font-size:3.5rem; font-weight:700; margin:15px 0; color: var(--text-dark);">${correctCount} / ${totalQs}</div>
-            <p style="color: #64748b; margin-bottom: 20px;">Giờ bạn có thể đóng bảng này lại và kiểm tra lịch sử đáp án từng câu nhé!</p>
-            <div class="modal-actions" style="flex-direction: column;">
-                <button class="btn-confirm" onclick="document.getElementById('result-overlay').style.display='none'; document.getElementById('navDropdown').classList.add('show');">Xem Chi Tiết Bài Làm 👀</button>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-cancel" onclick="location.reload()">Làm Lại</button>
-                    <a href="part-7-test-3-2019-answers-reading.html" class="btn-confirm" style="background: var(--accent-btn); text-decoration: none; justify-content: center; display: flex; align-items: center;">Giải Thích Chi Tiết</a>
-                </div>
+            <p style="color: #64748b; margin-bottom: 25px;">Tuyệt vời! Giờ hãy xem chi tiết lỗi sai và từ vựng nhé.</p>
+            <div class="modal-actions" style="display: flex; gap: 15px;">
+                <button class="btn-cancel" onclick="location.reload()" style="flex: 1;">Làm Lại</button>
+                <a href="part-7-test-3-2019-answers-reading.html" class="btn-confirm" style="flex: 2; background: var(--accent-btn); text-decoration: none; justify-content: center; display: flex; align-items: center;">Đọc Giải Thích Chi Tiết 👀</a>
             </div>
         </div>
     `;
     resultBox.style.display = 'flex';
 }
-
 initNavDots();
 renderView();
 </script>
