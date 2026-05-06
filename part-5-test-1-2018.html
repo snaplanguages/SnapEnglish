@@ -583,29 +583,32 @@ function closeCustomAlert() {
     clearInterval(timerInterval);
     
     let correctCount = 0;
-    quizData.forEach(passage => {
-        passage.questions.forEach(q => {
-            if (q.correct && userAnswers[q.id] === q.correct) {
-                correctCount++;
-            }
-        });
+
+    // SỬA LỖI 1: Dùng đúng mảng 'questions' và thuộc tính 'a' để chấm điểm
+    questions.forEach((q, index) => {
+        if (userAnswers[index] === q.a) {
+            correctCount++;
+        }
     });
 
     localStorage.setItem('snapEnglish_userAnswers', JSON.stringify(userAnswers));
     
-    const totalQs = quizData.reduce((acc, curr) => acc + curr.questions.length, 0); 
+    // Tính tổng số câu dựa trên độ dài mảng questions
+    const totalQs = questions.length; 
     
     if (!isRestoring) {
-        saveAttemptToHistory(correctCount, totalQs, userAnswers); // <-- Dòng này được thêm vào
+        saveAttemptToHistory(correctCount, totalQs, userAnswers); 
         
         if (window.luuDiemTOEICLenFirebase) {
-            // Thay đổi "ETS 2019 - Test 1" tùy theo file
             window.luuDiemTOEICLenFirebase(totalQs, correctCount, "ETS 2018 - Test 1", "Reading", "Part 5");
         }
     }
 
     document.getElementById('score-display').innerText = correctCount + " / " + totalQs;
-    document.getElementById('result-overlay').style.display = 'flex';
+    
+    // SỬA LỖI 2: Ẩn khung câu hỏi và hiện đúng 'result-container'
+    document.getElementById('question-container').style.display = 'none'; 
+    document.getElementById('result-container').style.display = 'block'; 
 }
         
     
