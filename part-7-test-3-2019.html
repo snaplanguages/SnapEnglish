@@ -1025,116 +1025,10 @@ function selectOpt(qid, opt) {
 }
 
 function changePassage(dir) {
-currentIndex += dir;
-renderView();
+    currentIndex += dir;
+    renderView();
 }
 
-// Đổi dòng function submitQuiz() thành:
-function submitQuiz(isRestoring = false) {
-    document.getElementById('confirmOverlay').style.display = 'none';
-    isSubmitted = true;
-    clearInterval(timerInterval);
-    document.getElementById('btn-submit').style.display = 'none';
-
-    let correctCount = 0;
-    quizData.forEach(passage => {
-        passage.questions.forEach(q => {
-            const uAns = userAnswers[q.id];
-            const dot = document.getElementById(`dot-${q.id}`);
-            
-            if (uAns === q.correct) {
-                correctCount++;
-                if(dot) { dot.classList.remove('done'); dot.classList.add('correct'); }
-            } else {
-                if(dot) { dot.classList.remove('done'); dot.classList.add('wrong'); }
-            }
-        });
-    });
-
-    localStorage.setItem('snapEnglish_userAnswers', JSON.stringify(userAnswers));
-    
-    // *** THÊM KHỐI LƯU LỊCH SỬ Ở ĐÂY ***
-    const totalQs = quizData.reduce((acc, curr) => acc + curr.questions.length, 0); 
-    if (!isRestoring) {
-        saveAttemptToHistory(correctCount, totalQs, userAnswers);
-        
-        // Gọi lưu Firebase nếu có
-        if (window.luuDiemTOEICLenFirebase) {
-            window.luuDiemTOEICLenFirebase(totalQs, correctCount, "ETS 2019 - Test 3", "Reading", "Part 7");
-        }
-    }
-
-    renderView(); // Render lại giao diện hiển thị đúng/sai
-    
-    // Hiển thị Overlay Kết Quả
-    const resultBox = document.getElementById('result-overlay');
-    resultBox.style.background = 'rgba(255,255,255,0.85)';
-    resultBox.style.backdropFilter = 'blur(10px)';
-    resultBox.innerHTML = `
-        <div class="custom-modal">
-            <h2 style="font-size:2rem; color:var(--primary-btn); margin-bottom: 15px;">Kết Quả Của Bạn ✨</h2>
-            <div style="font-size:3.5rem; font-weight:700; margin:15px 0; color: var(--text-dark);">${correctCount} / ${totalQs}</div>
-            <p style="color: #64748b; margin-bottom: 20px;">Giờ bạn có thể đóng bảng này lại và kiểm tra lịch sử đáp án từng câu nhé!</p>
-            <div class="modal-actions" style="flex-direction: column;">
-                <button class="btn-confirm" onclick="document.getElementById('result-overlay').style.display='none'; document.getElementById('navDropdown').classList.add('show');">Xem Lịch Sử Làm Bài 👀</button>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-cancel" onclick="location.reload()">Làm Lại</button>
-                    <a href="part-7-test-3-2019-answers-reading.html" class="btn-confirm" style="background: var(--accent-btn); text-decoration: none; justify-content: center; display: flex; align-items: center;">Giải Thích Chi Tiết</a>
-                </div>
-            </div>
-        </div>
-    `;
-    resultBox.style.display = 'flex';
-}
-
-    const totalQs = quizData.reduce((acc, curr) => acc + curr.questions.length, 0); 
-    
-    // Biến result-overlay thành dạng modal (popup nhỏ)
-    const resultBox = document.getElementById('result-overlay');
-    resultBox.style.background = 'rgba(255,255,255,0.85)';
-    resultBox.style.backdropFilter = 'blur(10px)';
-    resultBox.innerHTML = `
-        <div class="custom-modal">
-            <h2 style="font-size:2rem; color:var(--primary-btn); margin-bottom: 15px;">Kết Quả Của Cậu ✨</h2>
-            <div style="font-size:3.5rem; font-weight:700; margin:15px 0; color: var(--text-dark);">${correctCount} / ${totalQs}</div>
-            <p style="color: #64748b; margin-bottom: 20px;">Giờ cậu có thể đóng bảng này lại và kiểm tra lịch sử đáp án từng câu nhé!</p>
-            <div class="modal-actions" style="flex-direction: column;">
-                <button class="btn-confirm" onclick="document.getElementById('result-overlay').style.display='none'; document.getElementById('navDropdown').classList.add('show');">Xem Lịch Sử Làm Bài 👀</button>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-cancel" onclick="location.reload()">Làm Lại</button>
-                    <a href="part-7-test-3-2019-answers-reading.html" class="btn-confirm" style="background: var(--accent-btn); text-decoration: none;">Giải Thích Chi Tiết</a>
-                </div>
-            </div>
-        </div>
-    `;
-    resultBox.style.display = 'flex';
-
-    if (window.luuDiemTOEICLenFirebase) {
-        window.luuDiemTOEICLenFirebase(totalQs, correctCount, "ETS 2019 - Test 3", "Reading", "Part 7");
-    }
-}
-
-initNavDots();
-renderView();
-  </script>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
-        authDomain: "snapenglish-cb6e2.firebaseapp.com",
-        projectId: "snapenglish-cb6e2",
-        storageBucket: "snapenglish-cb6e2.firebasestorage.app",
-        messagingSenderId: "373152038413",
-        appId: "1:373152038413:web:19284622571390f8585f44"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
 // --- LOGIC LỊCH SỬ LÀM BÀI ---
 const HISTORY_KEY = "snapenglish_p7_test3_history";
 let pendingDeleteId = null;
@@ -1230,6 +1124,85 @@ function restoreAttempt(attemptId) {
     
     showCustomAlert("✨ Đã khôi phục bài làm trong lịch sử!");
 }
+
+function submitQuiz(isRestoring = false) {
+    document.getElementById('confirmOverlay').style.display = 'none';
+    isSubmitted = true;
+    clearInterval(timerInterval);
+    document.getElementById('btn-submit').style.display = 'none';
+
+    let correctCount = 0;
+    quizData.forEach(passage => {
+        passage.questions.forEach(q => {
+            const uAns = userAnswers[q.id];
+            const dot = document.getElementById(`dot-${q.id}`);
+            
+            if (uAns === q.correct) {
+                correctCount++;
+                if(dot) { dot.classList.remove('done'); dot.classList.add('correct'); }
+            } else {
+                if(dot) { dot.classList.remove('done'); dot.classList.add('wrong'); }
+            }
+        });
+    });
+
+    localStorage.setItem('snapEnglish_userAnswers', JSON.stringify(userAnswers));
+    
+    const totalQs = quizData.reduce((acc, curr) => acc + curr.questions.length, 0); 
+    if (!isRestoring) {
+        saveAttemptToHistory(correctCount, totalQs, userAnswers);
+        
+        // Gọi lưu Firebase nếu có
+        if (window.luuDiemTOEICLenFirebase) {
+            window.luuDiemTOEICLenFirebase(totalQs, correctCount, "ETS 2019 - Test 3", "Reading", "Part 7");
+        }
+    }
+
+    renderView(); // Render lại giao diện hiển thị đúng/sai
+    
+    // Hiển thị Overlay Kết Quả
+    const resultBox = document.getElementById('result-overlay');
+    resultBox.style.background = 'rgba(255,255,255,0.85)';
+    resultBox.style.backdropFilter = 'blur(10px)';
+    resultBox.innerHTML = `
+        <div class="custom-modal">
+            <h2 style="font-size:2rem; color:var(--primary-btn); margin-bottom: 15px;">Kết Quả Của Bạn ✨</h2>
+            <div style="font-size:3.5rem; font-weight:700; margin:15px 0; color: var(--text-dark);">${correctCount} / ${totalQs}</div>
+            <p style="color: #64748b; margin-bottom: 20px;">Giờ bạn có thể đóng bảng này lại và kiểm tra lịch sử đáp án từng câu nhé!</p>
+            <div class="modal-actions" style="flex-direction: column;">
+                <button class="btn-confirm" onclick="document.getElementById('result-overlay').style.display='none'; document.getElementById('navDropdown').classList.add('show');">Xem Lịch Sử Làm Bài 👀</button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-cancel" onclick="location.reload()">Làm Lại</button>
+                    <a href="part-7-test-3-2019-answers-reading.html" class="btn-confirm" style="background: var(--accent-btn); text-decoration: none; justify-content: center; display: flex; align-items: center;">Giải Thích Chi Tiết</a>
+                </div>
+            </div>
+        </div>
+    `;
+    resultBox.style.display = 'flex';
+}
+
+initNavDots();
+renderView();
+</script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+        authDomain: "snapenglish-cb6e2.firebaseapp.com",
+        projectId: "snapenglish-cb6e2",
+        storageBucket: "snapenglish-cb6e2.firebasestorage.app",
+        messagingSenderId: "373152038413",
+        appId: "1:373152038413:web:19284622571390f8585f44"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
     function showInGameToast(msg) {
         let toast = document.createElement("div");
         toast.innerText = msg;
