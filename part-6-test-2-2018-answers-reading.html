@@ -623,11 +623,23 @@
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Lấy dữ liệu đáp án người dùng đã lưu từ trang Test
-        const savedAnswersJSON = localStorage.getItem('snapEnglish_userAnswers');
-        
-        if (savedAnswersJSON) {
-            const userAnswers = JSON.parse(savedAnswersJSON);
+    const HISTORY_KEY = "snapenglish_p7_test1_history"; // Đổi thành test2 tương ứng
+    const urlParams = new URLSearchParams(window.location.search);
+    const attemptId = urlParams.get('attemptId');
+    let savedAnswersJSON = null;
+
+    if (attemptId) {
+        const history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+        const attempt = history.find(h => h.id == attemptId);
+        if (attempt) {
+            savedAnswersJSON = JSON.stringify(attempt.answers);
+        }
+    } else {
+        savedAnswersJSON = localStorage.getItem('snapEnglish_userAnswers');
+    }
+    
+    if (savedAnswersJSON) {
+        const userAnswers = JSON.parse(savedAnswersJSON);
             const expBoxes = document.querySelectorAll('.exp-box');
 
             expBoxes.forEach((box) => {
