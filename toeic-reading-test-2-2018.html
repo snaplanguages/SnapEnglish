@@ -2461,7 +2461,42 @@ window.deleteAttempt = deleteAttempt; // Thêm kết nối cho hàm Xóa
 // --- QUẢN LÝ LỊCH SỬ LÀM BÀI ---
 const HISTORY_KEY = "snapenglish_test2_2018_history";
 let isReviewingMode = false;
+function openHistoryModal() {
+    // Lấy dữ liệu lịch sử từ localStorage
+    let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+    let historyListEl = document.getElementById('historyList');
+    let listHtml = '';
 
+    // Kiểm tra nếu chưa có lịch sử
+    if (history.length === 0) {
+        listHtml = '<p style="text-align: center; color: #888; margin-top: 20px;">Chưa có dữ liệu làm bài.</p>';
+    } else {
+        // Duyệt qua từng bài làm và tạo giao diện hiển thị
+        history.forEach(attempt => {
+            listHtml += `
+                <div class="history-item">
+                    <div class="history-info">
+                        <span class="history-date">📅 ${attempt.date} - ⏰ ${attempt.time}</span>
+                        <span class="history-score">🏆 Điểm: ${attempt.score}/${attempt.total} (${attempt.toeicScore} TOEIC)</span>
+                    </div>
+                    <div style="display: flex; gap: 5px;">
+                        <button class="btn-review" onclick="restoreAttempt(${attempt.id})">Xem lại</button>
+                        <button class="btn-delete-history" onclick="deleteAttempt(${attempt.id})" title="Xóa bài làm này">✖</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    // Đổ dữ liệu vào danh sách và hiển thị bảng Modal
+    historyListEl.innerHTML = listHtml;
+    document.getElementById('historyOverlay').style.display = 'flex';
+}
+
+function closeHistoryModal() {
+    // Ẩn bảng Modal lịch sử
+    document.getElementById('historyOverlay').style.display = 'none';
+}
 function saveAttemptToHistory(score, total, userAnswersMap) {
     let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
     let now = new Date();
