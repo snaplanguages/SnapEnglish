@@ -46,7 +46,7 @@
             overflow: hidden; 
         }
 
-        .hide-cite { display: none !important; } /* Ẩn citation để không gây rối mắt theo yêu cầu */
+        .hide-cite { display: none !important; }
 
         /* --- HEADER CHÍNH --- */
         header {
@@ -116,7 +116,7 @@
         .nav-dot.wrong { background: var(--wrong-bg); color: var(--wrong-text); border-color: var(--wrong-border); }
         .nav-dot.active { box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.3); border-color: var(--primary-dark); color: var(--primary-dark); }
 
-        /* --- MAIN KHU VỰC CÂU HỎI (Thiết kế Full-width) --- */
+        /* --- MAIN KHU VỰC CÂU HỎI --- */
         .main-area {
             flex: 1; width: 100vw; max-width: 100%; overflow-y: auto; padding: 40px 5%; 
             display: flex; justify-content: center; align-items: flex-start; scroll-behavior: smooth;
@@ -312,7 +312,6 @@
 <header>
     <div class="brand"><span>SnapEnglish</span> Incomplete Sentences 01 🦊🌿</div>
     <div class="controls">
-        <!-- Chuyển hướng theo yêu cầu của user data -->
         <a href="reading-toeic.html" class="btn-nav-local">🐾 Trang chủ</a>
         <button class="btn-nav-toggle" onclick="toggleNavDropdown()">📑 Danh sách câu</button>
         <button class="btn-submit" id="mainSubmitBtn" onclick="askSubmit()">NỘP BÀI 🦉</button>
@@ -356,7 +355,6 @@
 </div>
 
 <script>
-    // Dữ liệu câu hỏi với toàn bộ giải thích chi tiết, không cắt xén.
     const questionsData = [
         {
             id: 101, q: "The coordinator concluded that Thursday's workshop will need _______- tables.",
@@ -689,7 +687,6 @@
             }
         }
     ];
-
     let currentQIndex = 0;
     let userAnswers = new Array(questionsData.length).fill(null);
     let isSubmitted = false;
@@ -806,7 +803,6 @@
         let minutes = parseInt(document.getElementById('timeInput').value) || 20;
         testDuration = minutes * 60;
         
-        // Reset state nếu xem từ Lịch sử xong qua
         isSubmitted = false;
         userAnswers = new Array(questionsData.length).fill(null);
         document.getElementById("mainSubmitBtn").style.display = 'inline-block';
@@ -878,14 +874,16 @@
         document.getElementById('confirmOverlay').style.display = 'none';
         executeSubmit();
     }
-function showCustomAlert(message) {
-    document.getElementById('customAlertMessage').innerText = message;
-    document.getElementById('customAlertOverlay').style.display = 'flex';
-}
 
-function closeCustomAlert() {
-    document.getElementById('customAlertOverlay').style.display = 'none';
-}
+    function showCustomAlert(message) {
+        document.getElementById('customAlertMessage').innerText = message;
+        document.getElementById('customAlertOverlay').style.display = 'flex';
+    }
+
+    function closeCustomAlert() {
+        document.getElementById('customAlertOverlay').style.display = 'none';
+    }
+
     function executeSubmit(isRestoring = false) {
         if(isSubmitted) return;
         isSubmitted = true;
@@ -952,6 +950,7 @@ function closeCustomAlert() {
             
             saveAttemptToHistory(score, questionsData.length, userAnswers);
 
+            // GỌI HÀM LƯU ĐIỂM Ở ĐÂY
             if (window.luuDiemTOEICLenFirebase) {
                 window.luuDiemTOEICLenFirebase(questionsData.length, score, "Incomplete Sentences 01", "Reading", "Part 5");
             }
@@ -1008,33 +1007,28 @@ function closeCustomAlert() {
         document.getElementById('setupOverlay').style.display = 'flex';
     }
 
-    // Biến tạm để nhớ xem cậu đang muốn xóa bài nào
-let pendingDeleteId = null; 
+    let pendingDeleteId = null; 
 
-// 1. Hàm được gọi khi bấm nút [x] ở danh sách lịch sử
-function deleteAttempt(attemptId) {
-    pendingDeleteId = attemptId; // Lưu lại ID bài cần xóa
-    document.getElementById('customConfirmDeleteOverlay').style.display = 'flex'; // Bật popup
-}
-
-// 2. Hàm đóng popup khi đổi ý bấm "Hủy"
-function closeConfirmDelete() {
-    pendingDeleteId = null; // Xóa trí nhớ
-    document.getElementById('customConfirmDeleteOverlay').style.display = 'none'; // Tắt popup
-}
-
-// 3. Hàm thực hiện xóa thật sự khi bấm "Xóa nhé"
-function executeDelete() {
-    if (pendingDeleteId !== null) {
-        let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
-        // Lọc bỏ bài làm có ID trùng với ID đang chờ xóa
-        history = history.filter(h => h.id !== pendingDeleteId); 
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); 
-        
-        closeConfirmDelete(); // Tắt popup xác nhận
-        openHistoryModal();   // Render lại danh sách lịch sử mới
+    function deleteAttempt(attemptId) {
+        pendingDeleteId = attemptId; 
+        document.getElementById('customConfirmDeleteOverlay').style.display = 'flex'; 
     }
-}
+
+    function closeConfirmDelete() {
+        pendingDeleteId = null; 
+        document.getElementById('customConfirmDeleteOverlay').style.display = 'none'; 
+    }
+
+    function executeDelete() {
+        if (pendingDeleteId !== null) {
+            let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+            history = history.filter(h => h.id !== pendingDeleteId); 
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); 
+            
+            closeConfirmDelete(); 
+            openHistoryModal();   
+        }
+    }
 
     function restoreAttempt(attemptId) {
         let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
@@ -1044,13 +1038,11 @@ function executeDelete() {
 
         document.getElementById('historyOverlay').style.display = 'none';
         
-        // Cần render lại UI sạch
         initQuiz();
         jumpToQuestion(0);
         
         userAnswers = attempt.answers || [];
         
-        // Tự động gán style "selected"
         userAnswers.forEach((ans, qIndex) => {
             if (ans !== null && ans !== undefined) {
                 let optIndex = questionsData[qIndex].options.indexOf(ans);
@@ -1071,13 +1063,12 @@ function executeDelete() {
         setTimeout(() => toastMsg.remove(), 3000);
     }
 
-    // --- HIGHLIGHT CHUỘT PHẢI ---
     const menu = document.getElementById("ctxMenu");
     let targetElement = null;
     let selectedRange = null;
 
     document.addEventListener("contextmenu", (e) => {
-        if (!e.target.closest('.main-area')) return; // Chỉ áp dụng vùng main-area
+        if (!e.target.closest('.main-area')) return; 
         e.preventDefault();
         targetElement = null; selectedRange = null;
         
@@ -1116,19 +1107,18 @@ function executeDelete() {
     }
 
    function doHighlight() {
-    if (selectedRange) {
-        try { 
-            let span = document.createElement("span");
-            span.className = "highlight";
-            selectedRange.surroundContents(span); 
-        } catch(e) {
-            // Đổi alert mặc định thành popup UI
-            showCustomAlert("🌸 Cậu chỉ có thể highlight trong cùng một dòng thui nhé!");
+        if (selectedRange) {
+            try { 
+                let span = document.createElement("span");
+                span.className = "highlight";
+                selectedRange.surroundContents(span); 
+            } catch(e) {
+                showCustomAlert("🌸 Cậu chỉ có thể highlight trong cùng một dòng thui nhé!");
+            }
+            window.getSelection().removeAllRanges();
         }
-        window.getSelection().removeAllRanges();
+        menu.style.display = "none";
     }
-    menu.style.display = "none";
-}
 
     function removeHighlight() {
         if (targetElement) {
@@ -1138,8 +1128,95 @@ function executeDelete() {
         }
         menu.style.display = "none";
     }
-
 </script>
 
+<!-- KHỐI SCRIPT FIREBASE ĐƯỢC THÊM VÀO ĐỂ ĐỒNG BỘ ĐIỂM -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+        authDomain: "snapenglish-cb6e2.firebaseapp.com",
+        projectId: "snapenglish-cb6e2",
+        storageBucket: "snapenglish-cb6e2.firebasestorage.app",
+        messagingSenderId: "373152038413",
+        appId: "1:373152038413:web:19284622571390f8585f44"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    function showInGameToast(msg) {
+        let toast = document.createElement("div");
+        toast.innerText = msg;
+        toast.style.cssText = "position:fixed; bottom:30px; right:30px; background:linear-gradient(135deg, var(--primary-dark), var(--primary)); color:white; padding:16px 24px; border-radius:14px; font-weight:700; font-family:'Be Vietnam Pro',sans-serif; z-index:99999; box-shadow:0 10px 30px rgba(91, 33, 182, 0.4); transform:translateY(100px) scale(0.9); opacity:0; transition:all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); border: 2px solid #fff;";
+        document.body.appendChild(toast);
+        
+        setTimeout(() => { toast.style.transform = "translateY(0) scale(1)"; toast.style.opacity = "1"; }, 100);
+        setTimeout(() => { toast.style.transform = "translateY(100px) scale(0.9)"; toast.style.opacity = "0"; }, 3500);
+        setTimeout(() => { toast.remove(); }, 4000);
+    }
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            window.currentUserUid = user.uid;
+            window.currentUserEmail = user.email;
+        } else {
+            showInGameToast("⚠️ Cậu đang học dưới dạng Khách, điểm sẽ không lưu lên kho nhé!");
+        }
+    });
+
+    function calculateToeicScore(skill, correct, total) {
+        let percentage = correct / total;
+        let maxScore = (skill === 'Listening' || skill === 'Reading') ? 495 : 200;
+        let step = (skill === 'Listening' || skill === 'Reading') ? 5 : 10;
+        let estimated = Math.round((percentage * maxScore) / step) * step;
+        if (estimated > maxScore) return maxScore;
+        if (estimated < 5 && (skill === 'Listening' || skill === 'Reading')) return 5;
+        if (estimated < 0) return 0;
+        return estimated;
+    }
+
+    window.luuDiemTOEICLenFirebase = async function(tongSoCau, soCauDung, tenBai, kyNang, tenPart) {
+        if (!window.currentUserUid) return; 
+
+        let diemQuyDoi = calculateToeicScore(kyNang, soCauDung, tongSoCau);
+        let thoiGianHienTai = "--";
+        let inputPhut = parseInt(document.getElementById('timeInput').value) || 20; 
+        let tongThoiGianGoc = inputPhut * 60;
+
+        if (typeof testDuration !== 'undefined') {
+            let thoiGianDaLam = tongThoiGianGoc - testDuration;
+            if (thoiGianDaLam < 0) thoiGianDaLam = 0; 
+            
+            let m = Math.floor(thoiGianDaLam / 60);
+            let s = thoiGianDaLam % 60;
+            thoiGianHienTai = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+        let timestamp = Date.now();
+        let docId = window.currentUserUid + "_toeic_" + timestamp;
+        
+        try {
+            await setDoc(doc(db, "user_toeic_scores", docId), {
+                email: window.currentUserEmail,
+                skill: kyNang,
+                testName: tenBai,
+                partName: tenPart,
+                timeTaken: thoiGianHienTai,
+                totalQ: tongSoCau,
+                correctQ: soCauDung,
+                score: diemQuyDoi,
+                date: new Date().toLocaleDateString('vi-VN'),
+                timestamp: timestamp
+            });
+            showInGameToast("☁️ Tuyệt vời! Đã đồng bộ điểm số lên Máy Chủ thành công! 🐾");
+        } catch (error) {
+            console.error("Lỗi đồng bộ:", error);
+        }
+    }
+</script>
 </body>
 </html>
