@@ -1657,8 +1657,26 @@
     ];
 
     let currentPassageIdx = 0;
-    const savedAnswersJSON = localStorage.getItem('snapEnglish_userAnswers');
-    const userAnswers = savedAnswersJSON ? JSON.parse(savedAnswersJSON) : {};
+    let userAnswers = {};
+
+    // ĐOẠN MÃ LẤY ĐÁP ÁN THÔNG MINH
+    const urlParams = new URLSearchParams(window.location.search);
+    const attemptId = urlParams.get('attemptId');
+
+    if (attemptId) {
+        // NẾU LÀ BẤM TỪ "LỊCH SỬ": Tìm lại đúng đáp án của ngày hôm đó
+        const history = JSON.parse(localStorage.getItem("snapenglish_p7_test3_history")) || [];
+        const attempt = history.find(h => h.id == attemptId);
+        if (attempt) {
+            userAnswers = attempt.answers;
+        }
+    } else {
+        // NẾU LÀ BẤM SAU KHI VỪA NỘP BÀI: Lấy đáp án mới nhất
+        const savedAnswersJSON = localStorage.getItem('snapEnglish_userAnswers');
+        if (savedAnswersJSON) {
+            userAnswers = JSON.parse(savedAnswersJSON);
+        }
+    }
 
     function renderPassage(idx) {
         const data = reviewData[idx];
