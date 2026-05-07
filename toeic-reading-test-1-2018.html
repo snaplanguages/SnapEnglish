@@ -1492,8 +1492,9 @@ let timerInterval = null;
 let isSubmitted = false;
 const answerKey = {}; // Sẽ được tự động điền từ toeicData
 let allQuestionIds = []; // Lưu trữ ID để làm bảng điều hướng
-        const HISTORY_KEY = "snapenglish_test1_2018_history";
+const HISTORY_KEY = "snapenglish_test1_2018_history";
 let isReviewingMode = false;
+
 // --- TOGGLE NAVIGATION MENU ---
 function toggleNav() {
     document.getElementById('navPanel').classList.toggle('show');
@@ -1507,6 +1508,7 @@ document.addEventListener('click', function(e) {
         panel.classList.remove('show');
     }
 });
+
 // --- SETUP MODAL LOGIC ---
 function selectMode(mode) {
     currentMode = mode;
@@ -1591,7 +1593,10 @@ function renderDynamicContent() {
     let part5Html = '';
     let part6Html = '';
     let part7Html = '';
-    let leftPaneHtml = ''; // Biến lưu toàn bộ bài đọc để nhét sang cột trái
+    let leftPaneHtml = ''; 
+    
+    // SỬA LỖI: Khởi tạo lại mảng rỗng để tránh trùng lặp khi Load lại dữ liệu
+    allQuestionIds = []; 
 
     // 1. Render Part 5
     if(toeicData.part5) {
@@ -1624,14 +1629,16 @@ function renderDynamicContent() {
         document.getElementById('render-part7').innerHTML = part7Html;
     }
 
-    // Đổ nội dung bài đọc vào cột trái
     document.getElementById('passage-content-container').innerHTML += leftPaneHtml;
 
     // 4. Khởi tạo Footer Navigation Dots
     const nav = document.getElementById("navPalette");
-    // Lọc bỏ undefined nếu mảng bị lỗi
     allQuestionIds = allQuestionIds.filter(id => id); 
     allQuestionIds.sort((a, b) => a - b);
+    
+    // SỬA LỖI: Làm sạch bảng điều hướng trước khi render dot mới
+    nav.innerHTML = '';
+    
     allQuestionIds.forEach(id => {
         let dot = document.createElement("div");
         dot.className = "nav-dot"; 
@@ -1641,11 +1648,9 @@ function renderDynamicContent() {
         nav.appendChild(dot);
     });
 
-    // --- GỌI HÀM TÔ MÀU DẪN CHỨNG Ở ĐÂY ---
     applyEvidenceColors(); 
 }
 
-// Helper: Chuyển đáp án Text thành A, B, C, D
 function formatAnswer(options, answer) {
     if(!options) return answer;
     if(Array.isArray(options)) {
@@ -1656,9 +1661,8 @@ function formatAnswer(options, answer) {
     return answer; 
 }
 
-// Helper: Tạo HTML cho 1 câu hỏi trắc nghiệm
 function createTOEICQuestion(qObj) {
-    if(!qObj || !qObj.id) return ""; // Bypass lỗi nếu cấu trúc data sai
+    if(!qObj || !qObj.id) return ""; 
     let text = qObj.q || qObj.text || "";
     let opts = qObj.options;
     let optsHTML = "";
@@ -1687,13 +1691,10 @@ function createTOEICQuestion(qObj) {
             </div>`;
 }
 
-// Helper: Gom nhóm câu hỏi cho Part 6 & 7 (Cột phải)
 function createQuestionsBlock(passageObj) {
-    // Thêm onmouseenter để tự động hiện đoạn văn tương ứng bên cột trái khi cuộn chuột vào câu hỏi
     let html = `<div class="questions-block" style="margin-bottom: 40px; background: white; padding: 25px; border-radius: 12px; border: 2px solid var(--border); box-shadow:0 4px 10px rgba(0,0,0,0.02);" onmouseenter="showPassage('${passageObj.passageId}')">`;
     html += `<div style="color:var(--primary); font-weight:bold; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">📝 Questions for Passage: ${passageObj.passageId}</div>`;
     
-    // Fix lỗi cú pháp cho passage p7-13 & p7-14 của bạn
     let validQuestions = passageObj.questions.filter(q => q && q.id); 
 
     validQuestions.forEach(q => {
@@ -1710,23 +1711,24 @@ function switchTab(n) {
     document.querySelectorAll('.tab-btn').forEach((b, i) => { b.classList.toggle('active', i + 1 === n); });
     document.querySelectorAll('.question-group').forEach((q, i) => { q.style.display = (i + 1 === n) ? 'block' : 'none'; });
     
-    // Ẩn tất cả đoạn văn
     document.querySelectorAll('.passage-text-content').forEach(p => p.style.display = 'none');
 
-    let passagePane = document.getElementById('passagePane');
     let introText = document.getElementById('passage-content-container').querySelector('h2');
     
     if(n === 1) {
         if(introText) introText.innerHTML = `Part 5: Incomplete Sentences<br><br><span style="font-size:18px; color:#555; font-weight:normal;">👉 Hãy đọc kỹ và chọn đáp án đúng bên cột phải nhé!</span>`;
     } else {
         if(introText) introText.innerHTML = `Passage<br><span style="font-size:18px; color:#888; font-weight:normal;">(Cuộn chuột vào nhóm câu hỏi bên phải để xem đoạn văn tương ứng)</span>`;
+        
+        // SỬA LỖI: Tự động hiển thị Passage đầu tiên của Part 6/7 thay vì trang trắng
+        let firstPassageId = n === 2 ? toeicData.part6[0].passageId : toeicData.part7[0].passageId;
+        showPassage(firstPassageId);
     }
     
     document.querySelector('.pane-left').scrollTop = 0;
     document.querySelector('.pane-right').scrollTop = 0;
 }
 
-// Hiển thị đoạn văn tương ứng bên cột trái
 function showPassage(passageId) {
     document.querySelectorAll('.passage-text-content').forEach(p => p.style.display = 'none');
     let p = document.getElementById(`passage-${passageId}`);
@@ -1747,7 +1749,7 @@ function checkNav(id) {
 }
 
 function scrollToQuestion(id) {
-    document.getElementById('navPanel').classList.remove('show'); // Dòng chèn thêm
+    document.getElementById('navPanel').classList.remove('show');
     let group = 1;
     if (toeicData.part6.some(p => p.questions.some(q => q.id == id))) group = 2;
     if (toeicData.part7.some(p => p.questions.some(q => q.id == id))) group = 3;
@@ -1762,10 +1764,8 @@ function scrollToQuestion(id) {
             el.style.background = "#fff9c4";
             setTimeout(() => el.style.background = "transparent", 1000);
             
-            // Kích hoạt hiển thị đoạn văn luôn
             let parentBlock = el.closest('.questions-block');
             if(parentBlock) {
-                // Kích hoạt event onmouseenter bằng code
                 let mouseEvent = new MouseEvent('mouseenter');
                 parentBlock.dispatchEvent(mouseEvent);
             }
@@ -1786,22 +1786,25 @@ function startTimer() {
         }
     }, 1000);
 }
+
 // --- HÀM CUỘN VÀ TẠO HIỆU ỨNG NHẤN MẠNH ---
 function scrollToEvidence(evId) {
     const evElement = document.getElementById(evId);
     if(evElement) {
-        // Cuộn đoạn văn chứa dẫn chứng vào giữa màn hình
+        // SỬA LỖI: Đảm bảo đoạn văn chứa dẫn chứng đang được hiển thị (display: block)
+        let parentPassage = evElement.closest('.passage-text-content');
+        if (parentPassage && parentPassage.style.display === 'none') {
+            document.querySelectorAll('.passage-text-content').forEach(p => p.style.display = 'none');
+            parentPassage.style.display = 'block';
+        }
+
         evElement.scrollIntoView({behavior: "smooth", block: "center"});
         
-        // Tạo hiệu ứng phát sáng viền để thu hút sự chú ý mà không đè mất màu pastel
         let originalBoxShadow = evElement.style.boxShadow || "none";
-        
-        // Làm nổi bật bằng shadow viền xám đậm
         evElement.style.boxShadow = "0 0 0 3px rgba(0,0,0,0.4), 0 4px 10px rgba(0,0,0,0.2)";
         evElement.style.transform = "scale(1.02)";
         evElement.style.display = "inline-block";
         
-        // Tắt nổi bật sau 1.5 giây
         setTimeout(() => {
             evElement.style.boxShadow = originalBoxShadow;
             evElement.style.transform = "scale(1)";
@@ -1810,6 +1813,7 @@ function scrollToEvidence(evId) {
         alert("Chưa được gắn ID dẫn chứng trong bài đọc!");
     }
 }
+
 // --- GRADING ---
 function submitTest(manual) {
     if (isSubmitted) return;
@@ -1822,19 +1826,24 @@ function closeResultModal() { document.getElementById('resultOverlay').style.dis
 
 function executeSubmit() {
     document.getElementById('confirmOverlay').style.display = 'none';
+    
+    // Mở Bảng kết quả tổng quan ngay khi nộp bài
+    document.getElementById('resultOverlay').style.display = 'flex';
+    
     isSubmitted = true;
     clearInterval(timerInterval);
     document.querySelectorAll('input, select').forEach(el => el.disabled = true);
     
     let score = 0;
     let totalQuestions = allQuestionIds.length;
-let userAnswersMap = {};
+    let userAnswersMap = {};
+
+    // SỬA LỖI CÚ PHÁP: Đã bỏ vòng lặp forEach lồng nhau bị lỗi
     allQuestionIds.forEach(id => {
-        allQuestionIds.forEach(id => {
         let userAns = "";
         let radios = document.getElementsByName(`q${id}`);
         for (let r of radios) if (r.checked) userAns = r.value;
-        userAnswersMap[id] = userAns; // Thu thập đáp án
+        userAnswersMap[id] = userAns; 
 
         let correctAns = answerKey[id];
         let isCorrect = (userAns === correctAns);
@@ -1856,7 +1865,6 @@ let userAnswersMap = {};
             nav.style.borderColor = isCorrect ? "#81c784" : "#ef9a9a";
         }
 
-        
         let expContainer = document.getElementById(`exp-${id}`);
         if(expContainer && explanations[id]) {
             let expData = explanations[id];
@@ -1872,7 +1880,8 @@ let userAnswersMap = {};
                     <div class="exp-text">${expData.exp}</div>
                     ${vocabHtml}
                     ${tipHtml}
-                    ${evHtml} </div>
+                    ${evHtml} 
+                </div>
             `;
         }
     });
@@ -1882,7 +1891,8 @@ let userAnswersMap = {};
         <strong style="font-size: 20px; color: #555; display: block; margin-bottom: 10px;">Số câu đúng: ${score}/${totalQuestions}</strong>
         <strong style="font-size: 32px; color: var(--primary);">Điểm Reading ước lượng: ${toeicScore}/495</strong>
     `;
-   if (!isReviewingMode) {
+
+    if (!isReviewingMode) {
         saveAttemptToHistory(score, totalQuestions, userAnswersMap);
         if(window.luuDiemTOEICReadingFull) {
             let minutesAssigned = (currentMode === 'mock') ? 75 : parseInt(document.getElementById('timeInput').value);
@@ -1898,14 +1908,18 @@ let userAnswersMap = {};
         document.body.appendChild(toastMsg);
         setTimeout(() => toastMsg.remove(), 3000);
     }
+}
+
 function calculateToeicReading(raw, total) {
     if (raw === 0) return 5;
     let percent = raw / total;
     let score = Math.round((percent * 495) / 5) * 5; 
     return score > 495 ? 495 : (score < 5 ? 5 : score);
 }
+
 function showCustomAlert(msg) { document.getElementById('genericAlertMsg').innerText = msg; document.getElementById('genericAlertOverlay').style.display = 'flex'; }
 function closeGenericAlert() { document.getElementById('genericAlertOverlay').style.display = 'none'; }
+
 function showCustomConfirm(msg, onConfirmCallback) {
     document.getElementById('genericConfirmMsg').innerText = msg;
     let confirmBtn = document.getElementById('genericConfirmBtn');
@@ -1917,11 +1931,12 @@ function showCustomConfirm(msg, onConfirmCallback) {
     });
     document.getElementById('genericConfirmOverlay').style.display = 'flex';
 }
+
 function closeGenericConfirm() { document.getElementById('genericConfirmOverlay').style.display = 'none'; }
 
-// Các hàm History cơ bản (Sẽ bị ghi đè bởi Firebase ở Phần 5, nhưng cần thiết để code chạy mượt)
+// --- HISTORY LOGIC ---
 function saveAttemptToHistory(score, total, userAnswersMap) {
-    if(window.saveHistoryToCloud) { window.saveHistoryToCloud(score, total, userAnswersMap); return; } // Hook cho Firebase
+    if(window.saveHistoryToCloud) { window.saveHistoryToCloud(score, total, userAnswersMap); return; } 
     let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
     let now = new Date();
     history.unshift({ id: Date.now(), date: now.toLocaleDateString('vi-VN'), time: now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }), score: score, total: total, toeicScore: calculateToeicReading(score, total), answers: userAnswersMap });
@@ -1930,7 +1945,7 @@ function saveAttemptToHistory(score, total, userAnswersMap) {
 
 async function openHistoryModal() {
     let history = [];
-    if(window.getHistoryFromCloud) history = await window.getHistoryFromCloud(); // Hook cho Firebase
+    if(window.getHistoryFromCloud) history = await window.getHistoryFromCloud(); 
     else history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
     
     let listEl = document.getElementById("historyList");
@@ -1948,10 +1963,15 @@ async function openHistoryModal() {
     document.getElementById('setupOverlay').style.display = 'none';
     document.getElementById('historyOverlay').style.display = 'flex';
 }
-function closeHistoryModal() { document.getElementById('historyOverlay').style.display = 'none'; document.getElementById('setupOverlay').style.display = 'flex'; }
+
+function closeHistoryModal() { 
+    document.getElementById('historyOverlay').style.display = 'none'; 
+    document.getElementById('setupOverlay').style.display = 'flex'; 
+}
+
 function deleteAttempt(attemptId) {
     showCustomConfirm("Bạn có chắc chắn muốn xóa bài làm này không?", function() {
-        if(window.deleteHistoryFromCloud) window.deleteHistoryFromCloud(attemptId); // Hook Firebase
+        if(window.deleteHistoryFromCloud) window.deleteHistoryFromCloud(attemptId); 
         else {
             let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
             localStorage.setItem(HISTORY_KEY, JSON.stringify(history.filter(h => h.id !== attemptId))); 
@@ -1959,6 +1979,7 @@ function deleteAttempt(attemptId) {
         openHistoryModal(); 
     });
 }
+
 async function restoreAttempt(attemptId) {
     let history = [];
     if(window.getHistoryFromCloud) history = await window.getHistoryFromCloud();
@@ -1980,27 +2001,25 @@ async function restoreAttempt(attemptId) {
     isSubmitted = false; 
     executeSubmit();
 }
+
 // --- HIGHLIGHT SYSTEM ---
 const mainContainer = document.getElementById("mainContainer");
 const menu = document.getElementById("ctxMenu");
 let targetElement = null;
 let selectedRange = null;
 
-// Chuyển menu sang fixed để bám đúng con trỏ chuột dù đang cuộn ở cột nào
 menu.style.position = "fixed";
 
 mainContainer.addEventListener("contextmenu", (e) => {
     e.preventDefault();
     targetElement = null; selectedRange = null;
     
-    // Nếu click chuột phải vào vùng đã highlight -> Hiện nút Xóa
     if (e.target.classList.contains("highlight")) {
         targetElement = e.target;
         showMenu(e.clientX, e.clientY, "remove");
         return;
     }
     
-    // Nếu bôi đen văn bản mới -> Hiện nút Thêm
     let sel = window.getSelection();
     if (sel.toString().trim().length > 0 && mainContainer.contains(sel.anchorNode)) {
         selectedRange = sel.getRangeAt(0);
@@ -2010,7 +2029,6 @@ mainContainer.addEventListener("contextmenu", (e) => {
     }
 });
 
-// Bấm chuột trái ra ngoài thì ẩn menu
 document.addEventListener("click", (e) => { 
     if (menu && !menu.contains(e.target)) menu.style.display = "none"; 
 });
@@ -2020,7 +2038,6 @@ function showMenu(x, y, mode) {
     let mw = menu.offsetWidth;
     let mh = menu.offsetHeight;
     
-    // Chống tràn màn hình
     let left = x + mw > window.innerWidth ? window.innerWidth - mw - 10 : x;
     let top = y + mh > window.innerHeight ? window.innerHeight - mh - 10 : y;
     
@@ -2038,7 +2055,6 @@ function doHighlight() {
             span.className = "highlight";
             selectedRange.surroundContents(span); 
         } catch(e) {
-            // Cảnh báo nếu người dùng bôi đen vắt ngang qua 2 đoạn văn (xuống dòng)
             alert("Lưu ý: Chỉ có thể bôi vàng các cụm từ nằm trong cùng một đoạn văn. Vui lòng không bôi đen vắt ngang qua các khoảng ngắt dòng nhé!");
         }
         window.getSelection().removeAllRanges();
@@ -2050,11 +2066,12 @@ function removeHighlight() {
     if (targetElement) {
         let text = document.createTextNode(targetElement.textContent);
         targetElement.parentNode.replaceChild(text, targetElement);
-        mainContainer.normalize(); // Nối lại văn bản liền mạch
+        mainContainer.normalize(); 
     }
     menu.style.display = "none";
 }
 </script>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
@@ -2072,8 +2089,12 @@ function removeHighlight() {
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-const TEST_ID = "test1_2018";
-    // Thông báo Toast trượt góc
+    const TEST_ID = "test1_2018";
+    
+    // SỬA LỖI GLOBAL SCOPE: Khai báo ngay biến trong module để sử dụng chung
+    window.currentUserUid = null;
+    window.currentUserEmail = null;
+
     function showInGameToast(msg) {
         let toast = document.createElement("div");
         toast.innerText = msg;
@@ -2083,7 +2104,7 @@ const TEST_ID = "test1_2018";
         setTimeout(() => { toast.style.transform = "translateY(100px)"; toast.style.opacity = "0"; }, 3500);
         setTimeout(() => { toast.remove(); }, 4000);
     }
-// 1. HÀM LƯU LỊCH SỬ LÊN CLOUD
+
     window.saveHistoryToCloud = async function(score, total, userAnswersMap) {
         if (!window.currentUserUid) {
             showInGameToast("⚠️ Hãy đăng nhập để lưu lịch sử làm bài!");
@@ -2094,7 +2115,6 @@ const TEST_ID = "test1_2018";
         let toeicScore = Math.round(((score / total) * 495) / 5) * 5;
         
         try {
-            // Tạo Collection "user_test_histories"
             await setDoc(doc(db, "user_test_histories", window.currentUserUid + "_" + TEST_ID + "_" + attemptId), {
                 id: attemptId,
                 uid: window.currentUserUid,
@@ -2111,7 +2131,6 @@ const TEST_ID = "test1_2018";
         } catch (e) { console.error("Lỗi lưu lịch sử:", e); }
     };
 
-    // 2. HÀM TẢI LỊCH SỬ TỪ CLOUD
     window.getHistoryFromCloud = async function() {
         if (!window.currentUserUid) return [];
         let history = [];
@@ -2123,13 +2142,11 @@ const TEST_ID = "test1_2018";
             querySnapshot.forEach((doc) => {
                 history.push(doc.data());
             });
-            // Sắp xếp mới nhất lên đầu
             history.sort((a, b) => b.timestamp - a.timestamp);
         } catch (e) { console.error("Lỗi tải lịch sử:", e); }
         return history;
     };
 
-    // 3. HÀM XÓA LỊCH SỬ TRÊN CLOUD
     window.deleteHistoryFromCloud = async function(attemptId) {
         if (!window.currentUserUid) return;
         try {
@@ -2137,6 +2154,7 @@ const TEST_ID = "test1_2018";
             showInGameToast("🗑 Đã xóa bài làm khỏi Cloud!");
         } catch (e) { console.error("Lỗi xóa lịch sử:", e); }
     };
+
     onAuthStateChanged(auth, (user) => {
         if (user) {
             window.currentUserUid = user.uid;
@@ -2146,11 +2164,9 @@ const TEST_ID = "test1_2018";
         }
     });
 
-    // Hàm nộp điểm Full Reading (Quy đổi ra thang 495)
-    window.luuDiemTOEICReadingFull = async function(correct, total, testTitle) {
+    window.luuDiemTOEICReadingFull = async function(correct, total, testTitle, timeTaken) {
         if (!window.currentUserUid) return;
         
-        // Tính điểm quy đổi chuẩn TOEIC (Thang 495)
         let scoreConverted = Math.round(((correct / total) * 495) / 5) * 5;
         let timestamp = Date.now();
         let docId = window.currentUserUid + "_toeic_" + timestamp;
@@ -2164,6 +2180,7 @@ const TEST_ID = "test1_2018";
                 correctQ: correct,
                 totalQ: total,
                 score: scoreConverted,
+                timeTaken: timeTaken, // Được cập nhật truyền thêm biến này để theo dõi time
                 date: new Date().toLocaleDateString('vi-VN'),
                 timestamp: timestamp
             });
