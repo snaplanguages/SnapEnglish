@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Mẫu Bar Chart | SnapEnglish</title>
+     <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Bảng màu SnapEnglish Pastel */
+            --primary: #a29bfe;            
+            --primary-dark: #6c5ce7;       
+            --accent-orange: #e7a87c;      
+            --accent-orange-dark: #d68958; 
+            --accent-green: #55efc4;       
+            --accent-green-dark: #00b894;  
+            
+            --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #f4f2ff 100%);
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.9);
+            --glass-shadow: 0 10px 30px rgba(162, 155, 254, 0.15);
+
+            --hl-purple: rgba(162, 155, 254, 0.35); 
+        }
+
+        /* Khóa cuộn trang tổng thể, thiết lập chiều cao 100vh */
+        body { 
+            font-family: 'Nunito', sans-serif; 
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            margin: 0; 
+            padding: 0; 
+            height: 100vh; 
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; 
+        }
+
+        /* --- Background Blobs --- */
+        .shape {
+            position: fixed;
+            z-index: -1;
+            filter: blur(90px);
+            opacity: 0.5;
+            border-radius: 50%;
+            animation: pulse 8s infinite alternate ease-in-out;
+        }
+        .shape-1 { width: 400px; height: 400px; background: var(--primary); top: -100px; left: -100px; }
+        .shape-2 { width: 350px; height: 350px; background: var(--accent-orange); bottom: -100px; right: -50px; }
+        .shape-3 { width: 300px; height: 300px; background: var(--accent-green); top: 30%; left: 40%; filter: blur(120px); opacity: 0.2; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        /* --- Header --- */
+        header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 15px 5%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--glass-border);
+            flex-shrink: 0; /* Header không bị bóp méo */
+        }
+
+        header h1 {
+            font-family: 'Quicksand', sans-serif;
+            margin: 0;
+            font-size: 24px;
+            color: var(--primary-dark);
+            font-weight: 700;
+        }
+        
+        .brand-text { color: var(--accent-orange); }
+
+        .header-tag {
+            background: #f4f2ff;
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 14px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid #e0dbff;
+            white-space: nowrap;
+        }
+
+        /* --- Layout Grid --- */
+        .main-container {
+            display: flex;
+            flex-direction: row; /* Trải ngang trên desktop */
+            gap: 25px;
+            padding: 20px 5%;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            flex-grow: 1; /* Chiếm phần không gian còn lại dưới header */
+            box-sizing: border-box;
+            min-height: 0; /* Quan trọng để flex child có thể scroll */
+        }
+
+        /* --- Cards --- */
+        .card {
+            flex: 1 1 0; /* Chia đều không gian 3 cột */
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            
+            /* Thiết lập cuộn dọc */
+            overflow-y: auto; 
+            min-height: 0;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 15px 35px rgba(162, 155, 254, 0.25);
+        }
+
+        /* Tuỳ chỉnh thanh cuộn Glassmorphism cho Card */
+        .card::-webkit-scrollbar {
+            width: 6px;
+        }
+        .card::-webkit-scrollbar-track {
+            background: transparent;
+            margin: 15px 0; /* Cách xa hai đầu viền bo tròn */
+        }
+        .card::-webkit-scrollbar-thumb {
+            background: var(--hl-purple);
+            border-radius: 10px;
+        }
+        .card::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* --- Typography --- */
+        h2 {
+            font-family: 'Quicksand', sans-serif;
+            color: var(--primary-dark);
+            font-size: 22px;
+            margin-top: 0;
+            padding-bottom: 15px;
+            border-bottom: 2px dashed #dfe6e9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3 {
+            font-family: 'Quicksand', sans-serif;
+            color: var(--text-main);
+            font-size: 18px;
+            margin: 20px 0 10px 0;
+        }
+
+        p, li {
+            line-height: 1.8;
+            margin-bottom: 16px;
+            font-size: 16px;
+            color: var(--text-main);
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        img {
+            width: 100%;
+            height: auto;
+            border-radius: 16px;
+            border: 4px solid #fff;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            margin: 20px 0;
+            transition: 0.3s;
+        }
+        img:hover { transform: scale(1.02); }
+
+        /* --- Điểm nhấn Text --- */
+        strong { font-weight: 700; color: #2d3436; }
+        .text-purple { color: var(--primary-dark); font-weight: 700; }
+        .text-orange { color: var(--accent-orange-dark); font-weight: 700; }
+        .text-mint { color: var(--accent-green-dark); font-weight: 700; }
+
+        .tip-box {
+            background: #fff8f3;
+            padding: 15px 20px;
+            border-radius: 16px;
+            margin: 20px 0;
+            border-left: 4px solid var(--accent-orange);
+            box-shadow: 0 4px 10px rgba(231, 168, 124, 0.1);
+        }
+        
+        .tip-box p { margin: 0; padding: 0; font-size: 15px; }
+
+        .warning-box {
+            background: #ffeaa7;
+            padding: 15px 20px;
+            border-radius: 16px;
+            margin: 20px 0;
+            border-left: 4px solid #fdcb6e;
+            box-shadow: 0 4px 10px rgba(253, 203, 110, 0.2);
+        }
+
+        .warning-box p { margin: 0; font-size: 15px; }
+
+        hr {
+            border: 0; 
+            border-top: 1px dashed #b2bec3; 
+            margin: 25px 0;
+        }
+
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 900px) {
+            header { 
+                flex-direction: column; 
+                gap: 10px; 
+                padding: 15px 20px; 
+                text-align: center; 
+            }
+            .main-container {
+                flex-direction: column; /* Xếp dọc trên mobile */
+                gap: 15px;
+                padding: 15px;
+            }
+            .card { 
+                /* Mỗi card vẫn tự cuộn và chia đều chiều dọc màn hình thay vì trôi mất */
+                padding: 20px; 
+            }
+            h2 { 
+                font-size: 20px; 
+                padding-bottom: 10px;
+                margin-bottom: 10px;
+            }
+            p, li { 
+                font-size: 15px; 
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+
+    <header>
+        <h1>✨ Snap<span class="brand-text">English</span> Review</h1>
+        <span class="header-tag">Task 1: Bar Chart</span>
+    </header>
+
+    <div class="main-container">
+        <div class="card">
+            <h2>📌 Đề bài & Phân tích</h2>
+            <p>
+                <span class="text-purple">The chart below shows the number of trips made by children in one country in 1990 and 2020 to travel to and from school using different modes of transport.</span>
+            </p>
+            <p>Summarise the information by selecting and reporting the main features, and make comparisons where relevant.</p>
+            
+            <img src="https://raw.githubusercontent.com/snaplanguages/Snap/6d994a5b2393e54705885b236f58758f04d73062/bar-1.jpg" alt="Biểu đồ Bar Chart Travel to school" onerror="this.src='https://via.placeholder.com/600x400?text=Bar+Chart+Placeholder'">
+            
+            <hr>
+            
+            <h3>🔍 Idea cho overview</h3>
+            <p>Overview của bar chart, ở trên có thời gian (2 năm), và mỗi năm lại có các loại phương tiện khác nhau. Vậy nên tương ứng theo đó, mình tìm thông tin chính theo:</p>
+            <ul>
+                <li><strong>1. Thời gian:</strong> Có trend chung nào giữa các cột không?
+                    <ul>
+                        <li><em class="text-orange">Cách 1 (cơ bản):</em> Ngoại trừ 'car usage' tăng lên, số lượng chuyến đi bằng các phương tiện còn lại đều giảm xuống.</li>
+                        <li><em class="text-mint">Cách 2 (hay hơn):</em> Car là phương tiện thụ động (passive), còn các phương tiện còn lại nó active hơn ➔ Vậy nói là <strong class="text-purple">passive means of transport</strong> phổ biến hơn, còn <strong class="text-purple">active means</strong> thì trở nên ít phổ biến hơn.</li>
+                    </ul>
+                </li>
+                <li><strong>2. Các loại phương tiện khác nhau:</strong> Mình sẽ tìm loại phương tiện nào có số liệu lớn nhất/nhỏ nhất.
+                    <ul>
+                        <li>Trong bài này, năm 1990 thì <strong>'walking'</strong> là phổ biến nhất còn ở năm 2020 <strong>'car usage'</strong> là phổ biến nhất.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>📖 Chiến lược viết bài</h2>
+            
+            <h3>📊 Cách phân 2 Body</h3>
+            <p>Do bài này là 5 loại phương tiện và có số liệu cho 2 năm, hiển nhiên mình sẽ có 2 cách phân là:</p>
+            <ul>
+                <li><strong>1. Phân theo năm:</strong> Tả hết 5 loại phương tiện trong năm 1990 cho body 1, và tả cả 5 loại trong năm 2020 ở body 2.</li>
+                <li><strong>2. Phân theo đối tượng:</strong> Body 1 mình gom 2-3 loại phương tiện lại, tả trong cả 2 năm luôn; body 2 thì tả các loại còn lại trong cả 2 năm. ➔ <em>Đây là cách chúng mình chọn.</em></li>
+            </ul>
+            
+            <div class="warning-box">
+                <p>⚠️ <strong>Lỗi dễ mắc:</strong> <br>
+                Nếu tả data theo cách số 2, mọi người sẽ rất dễ viết kiểu <strong>'liệt kê'</strong> (Ví dụ: 'car passenger' năm 1990 là 4 triệu, rồi tăng lên 11.5 triệu; rồi qua 'walking' là 12.5 triệu rồi giảm...). <br><br>
+                Lý do vì tả vậy thì mình <em>mới nói được trend thôi</em>. Mình phải cho thấy được <strong>thứ tự lớn nhất/nhỏ nhất</strong> của các phương tiện trong từng năm nữa nhen!</p>
+            </div>
+
+            <hr>
+
+            <h3>🔄 Paraphrasing & Vocabulary</h3>
+            <p>Mình sẽ dễ bị lặp từ 'phương tiện giao thông', và lặp từ để tả các loại phương tiện mà đề cho:</p>
+            <ul>
+                <li><strong>mode of transport:</strong> means of transport / method.</li>
+                <li><strong>car passenger:</strong> car usage / the use of cars / use cars for daily commutes.</li>
+                <li><strong>walking:</strong> on foot.</li>
+                <li><strong>bus:</strong> take a bus / bus usage.</li>
+            </ul>
+            
+            <div class="tip-box">
+                <p>💡 <strong>Cấu trúc so sánh lớn nhất/nhỏ nhất:</strong><br>
+                • <em>Schoolchildren used cars the least</em> for their daily commutes in 1990.<br>
+                • <em>Car use was the most popular method</em> in 2020.<br>
+                • <em>Cars were the most widely used means of transport</em> in 2020.</p>
+            </div>
+            
+            <div class="tip-box" style="background: #eef2ff; border-left-color: var(--primary);">
+                 <p>💡 <strong>Cấu trúc câu so sánh (Complex sentences):</strong><br>
+                • Although Data 1, so sánh...<br>
+                • Data 1, but / while / whereas + so sánh với data 2.</p>
+            </div>
+        </div> 
+
+        <div class="card" style="background: rgba(255, 255, 255, 0.95);">
+            <h2>📝 Bài mẫu Band 8.0+</h2>
+
+            <div id="sample-essay">
+                <p>The graph provides information about the number of trips to school made by different modes of transportation by children aged 5 to 12 in a particular country in 1990 and 2020.</p>
+                
+                <p>Overall, there was a shift from <span class="text-purple">active means of transport towards more passive ones</span>, with walking being <span class="text-orange">the most popular method</span> in the former year, whereas car use became <span class="text-orange">more preferred</span> 30 years later.</p>
+                
+                <p>Initially, in 1990, over 12 million trips to school were made on foot, but this figure had reduced by half to around 6 million by 2020. In contrast, in 1990, although schoolchildren in this country <span class="text-orange">used cars the least</span> for their daily commutes, at about 4 million times. The use of cars surged, <span class="text-purple">surpassing that of walking</span>, making it by far <span class="text-orange">the most widely used means</span> with about 11.5 million trips in 2020.</p> 
+                
+                <p>Despite journey numbers decreasing from 7 to 5 million over 30 years, taking the bus remained <span class="text-orange">the second and third most common means of transport</span> in 1990 and 2020 respectively.</p>
+                
+                <p>Meanwhile, <span class="text-orange">the least chosen modes</span> were cycling and a combination of walking and bus usage, with their figures standing at the same level of 6 million in the first year before undergoing a decline of 4 million and 3 million trips, respectively in 2020.</p>
+
+                <p style="text-align: right; color: var(--text-muted); font-style: italic;">(212 words)</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
