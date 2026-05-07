@@ -262,6 +262,51 @@ header {
 }
 /* Do đã bỏ Footer, ta kéo dài màn hình làm bài ra mức tối đa */
 .container { height: calc(100vh - var(--header-h)); }
+        /* --- TỐI ƯU GIAO DIỆN MOBILE (Tương tự 2019) --- */
+@media (max-width: 1024px) {
+    body { overflow: hidden; height: 100vh; }
+    .container { 
+        flex-direction: column; 
+        height: auto; 
+        flex: 1;
+        overflow: hidden;
+    }
+    header { 
+        height: auto; 
+        flex-direction: column; 
+        padding: 10px 15px; 
+        gap: 10px; 
+        flex-shrink: 0;
+    }
+    .brand { font-size: 20px; }
+    .tab-container { flex-wrap: wrap; justify-content: center; width: 100%; gap: 5px; }
+    .controls { width: 100%; justify-content: space-between; flex-wrap: nowrap; }
+    .timer-box { font-size: 16px; padding: 5px 10px; }
+    .btn-submit, .btn-toggle-nav { font-size: 14px; padding: 6px 12px; }
+
+    .pane-left {
+        flex: 1; 
+        width: 100%;
+        border-right: none;
+        border-bottom: 4px solid var(--primary);
+        padding: 15px;
+        overflow-y: auto; 
+    }
+    .pane-right {
+        flex: 1.5; 
+        width: 100%;
+        padding: 15px;
+        overflow-y: auto; 
+    }
+    .exp-box {
+        width: 100%;
+        margin-left: 0;
+        border-radius: 12px;
+        padding: 15px;
+    }
+    .q-text, .mc-option { font-size: 16px; }
+    .pane-left { font-size: 17px; }
+}
     </style>
 </head>
 <body>
@@ -314,6 +359,27 @@ header {
     </div>
     <div class="nav-scroller" id="navPalette"></div>
 </div>
+<div id="genericAlertOverlay" class="custom-overlay">
+    <div class="custom-modal" style="border-top: 6px solid var(--primary);">
+        <h2 style="color: var(--primary-dark); font-family: 'Lora', serif; font-size: 24px;">🌸 Thông báo</h2>
+        <p id="genericAlertMsg" style="font-size: 17px; line-height: 1.6; color:#5a4a4d; margin: 20px 0;"></p>
+        <div class="modal-actions">
+            <button class="btn-confirm" style="width: 100%; border-radius: 20px;" onclick="closeGenericAlert()">Đã hiểu</button>
+        </div>
+    </div>
+</div>
+
+<div id="genericConfirmOverlay" class="custom-overlay" style="z-index: 10000;">
+    <div class="custom-modal" style="border-top: 6px solid var(--primary);">
+        <h2 style="color: var(--primary-dark); font-family: 'Lora', serif; font-size: 24px;">🐾 Xác nhận</h2>
+        <p id="genericConfirmMsg" style="font-size: 17px; line-height: 1.6; color:#5a4a4d; margin: 20px 0;"></p>
+        <div class="modal-actions">
+            <button class="btn-cancel" style="border-radius: 20px; width: 45%;" onclick="closeGenericConfirm()">Hủy</button>
+            <button class="btn-confirm" id="genericConfirmBtn" style="border-radius: 20px; width: 45%; background: var(--wrong);">Đồng ý</button>
+        </div>
+    </div>
+</div>
+
 <div id="setupOverlay" class="custom-overlay">
     <div class="custom-modal">
         <h2 style="color: var(--primary-dark); font-family: 'Lora', serif; font-size:28px;">Cài đặt bài làm ✨</h2>
@@ -323,39 +389,33 @@ header {
             <label style="font-weight: bold; color: #555; font-size:18px;">Thời gian (phút): </label>
             <input type="number" id="timeInput" value="75" min="5" max="180">
         </div>
-        <button class="start-btn" id="startBtn" style="display: none; width: 100%; margin-top:10px;" onclick="askReady()">Bắt đầu</button>
-    </div>
-</div>
-
-<div id="startConfirmOverlay" class="custom-overlay">
-    <div class="custom-modal">
-        <h2 style="color: var(--primary-dark); font-family: 'Lora', serif;">Xác nhận</h2>
-        <p id="startConfirmMsg" style="font-size: 18px; line-height: 1.6; color:#555;"></p>
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeStartConfirmModal()">Huỷ</button>
-            <button class="btn-confirm" onclick="startTestActual()">OK</button>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button class="btn-cancel" style="flex: 1;" onclick="openHistoryModal()">🕒 Xem lịch sử</button>
+            <button class="start-btn" id="startBtn" style="display: none; flex: 1;" onclick="askReady()">Bắt đầu</button>
         </div>
     </div>
 </div>
 
-<div id="confirmOverlay" class="custom-overlay">
-    <div class="custom-modal">
-        <h2 style="color: var(--primary-dark); font-family: 'Lora', serif;">Nộp bài</h2>
-        <p style="font-size: 18px; color:#555;">Bạn có chắc chắn muốn nộp bài?</p>
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeConfirmModal()">Quay lại</button>
-            <button class="btn-confirm" onclick="executeSubmit()">Nộp bài</button>
-        </div>
+<div id="historyOverlay" class="custom-overlay">
+    <div class="custom-modal" style="max-width: 500px;">
+        <h2 style="color: var(--primary-dark); font-family: 'Lora', serif; margin-bottom: 15px;">🕒 Lịch sử làm bài</h2>
+        <div id="historyList" style="max-height: 300px; overflow-y: auto; text-align: left; margin-bottom: 15px; padding-right: 5px;"></div>
+        <button class="btn-cancel" style="width: 100%;" onclick="closeHistoryModal()">Quay lại</button>
     </div>
 </div>
 
-<div id="resultOverlay" class="custom-overlay">
-    <div class="custom-modal">
-        <h2 style="color: var(--primary-dark); font-family: 'Lora', serif;">🎉 Hoàn thành!</h2>
-        <div id="resultMessage" style="margin: 20px 0; line-height:1.6;"></div>
-        <button class="btn-confirm" style="width: 100%;" onclick="closeResultModal()">Xem đáp án & Giải thích</button>
-    </div>
-</div>
+<style>
+    .history-item { background: var(--bg-body); border: 1px solid var(--border); padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+    .history-info { display: flex; flex-direction: column; gap: 5px; }
+    .history-date { font-weight: bold; color: var(--text-main); font-size: 15px; }
+    .history-score { color: var(--primary-dark); font-size: 14px; font-weight: 600; }
+    .btn-review { background: var(--exp-bg); color: var(--primary-dark); border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    .btn-delete-history { background: #ffebee; color: var(--wrong); border: none; padding: 0 10px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 20px; }
+</style>
+
+<div id="startConfirmOverlay" class="custom-overlay"><div class="custom-modal"><h2 style="color: var(--primary-dark); font-family: 'Lora', serif;">Xác nhận</h2><p id="startConfirmMsg" style="font-size: 18px; color:#555;"></p><div class="modal-actions"><button class="btn-cancel" onclick="closeStartConfirmModal()">Huỷ</button><button class="btn-confirm" onclick="startTestActual()">OK</button></div></div></div>
+<div id="confirmOverlay" class="custom-overlay"><div class="custom-modal"><h2 style="color: var(--primary-dark); font-family: 'Lora', serif;">Nộp bài</h2><p style="font-size: 18px; color:#555;">Bạn có chắc chắn muốn nộp bài?</p><div class="modal-actions"><button class="btn-cancel" onclick="closeConfirmModal()">Quay lại</button><button class="btn-confirm" onclick="executeSubmit()">Nộp bài</button></div></div></div>
+<div id="resultOverlay" class="custom-overlay"><div class="custom-modal"><h2 style="color: var(--primary-dark); font-family: 'Lora', serif;">🎉 Hoàn thành!</h2><div id="resultMessage" style="margin: 20px 0; line-height:1.6;"></div><button class="btn-confirm" style="width: 100%;" onclick="closeResultModal()">Xem đáp án & Giải thích</button></div></div>
 
 <div id="ctxMenu" style="position: absolute; display: none; background: white; box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-radius: 12px; z-index: 99999; overflow:hidden;">
     <button onclick="doHighlight()" style="display:block; width:100%; padding:12px 20px; border:none; background:none; cursor:pointer; text-align:left; font-weight:600; color:#555; font-family:inherit;">🖍 Highlight (Vàng)</button>
@@ -1432,6 +1492,8 @@ let timerInterval = null;
 let isSubmitted = false;
 const answerKey = {}; // Sẽ được tự động điền từ toeicData
 let allQuestionIds = []; // Lưu trữ ID để làm bảng điều hướng
+        const HISTORY_KEY = "snapenglish_test1_2018_history";
+let isReviewingMode = false;
 // --- TOGGLE NAVIGATION MENU ---
 function toggleNav() {
     document.getElementById('navPanel').classList.toggle('show');
@@ -1766,15 +1828,17 @@ function executeSubmit() {
     
     let score = 0;
     let totalQuestions = allQuestionIds.length;
-
+let userAnswersMap = {};
     allQuestionIds.forEach(id => {
+        allQuestionIds.forEach(id => {
         let userAns = "";
         let radios = document.getElementsByName(`q${id}`);
         for (let r of radios) if (r.checked) userAns = r.value;
+        userAnswersMap[id] = userAns; // Thu thập đáp án
 
         let correctAns = answerKey[id];
         let isCorrect = (userAns === correctAns);
-        if (isCorrect) score++;
+        if (isCorrect && userAns !== "") score++;
 
         let feedbackEl = document.getElementById(`fb-${id}`);
         if(feedbackEl) {
@@ -1818,19 +1882,104 @@ function executeSubmit() {
         <strong style="font-size: 20px; color: #555; display: block; margin-bottom: 10px;">Số câu đúng: ${score}/${totalQuestions}</strong>
         <strong style="font-size: 32px; color: var(--primary);">Điểm Reading ước lượng: ${toeicScore}/495</strong>
     `;
-    if(window.luuDiemTOEICReadingFull) {
-    window.luuDiemTOEICReadingFull(score, totalQuestions, "Reading Test 1 - 2018");
-}
-    setTimeout(() => { document.getElementById('resultOverlay').style.display = 'flex'; }, 500);
-}
-
+   if (!isReviewingMode) {
+        saveAttemptToHistory(score, totalQuestions, userAnswersMap);
+        if(window.luuDiemTOEICReadingFull) {
+            let minutesAssigned = (currentMode === 'mock') ? 75 : parseInt(document.getElementById('timeInput').value);
+            if(isNaN(minutesAssigned) || minutesAssigned < 1) minutesAssigned = 75;
+            let timeTaken = Math.round(minutesAssigned - (testDuration / 60));
+            
+            window.luuDiemTOEICReadingFull(score, totalQuestions, "Reading Test 1 - 2018", timeTaken);
+        }
+    } else {
+        let toastMsg = document.createElement("div");
+        toastMsg.innerText = "Đã khôi phục bài làm ngày cũ!";
+        toastMsg.style.cssText = "position:fixed; top:20px; right:20px; background:var(--primary); color:white; padding:15px 20px; border-radius:12px; font-weight:bold; z-index:99999;";
+        document.body.appendChild(toastMsg);
+        setTimeout(() => toastMsg.remove(), 3000);
+    }
 function calculateToeicReading(raw, total) {
     if (raw === 0) return 5;
     let percent = raw / total;
     let score = Math.round((percent * 495) / 5) * 5; 
     return score > 495 ? 495 : (score < 5 ? 5 : score);
 }
+function showCustomAlert(msg) { document.getElementById('genericAlertMsg').innerText = msg; document.getElementById('genericAlertOverlay').style.display = 'flex'; }
+function closeGenericAlert() { document.getElementById('genericAlertOverlay').style.display = 'none'; }
+function showCustomConfirm(msg, onConfirmCallback) {
+    document.getElementById('genericConfirmMsg').innerText = msg;
+    let confirmBtn = document.getElementById('genericConfirmBtn');
+    let newBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+    newBtn.addEventListener('click', function() {
+        document.getElementById('genericConfirmOverlay').style.display = 'none';
+        if (typeof onConfirmCallback === 'function') onConfirmCallback();
+    });
+    document.getElementById('genericConfirmOverlay').style.display = 'flex';
+}
+function closeGenericConfirm() { document.getElementById('genericConfirmOverlay').style.display = 'none'; }
 
+// Các hàm History cơ bản (Sẽ bị ghi đè bởi Firebase ở Phần 5, nhưng cần thiết để code chạy mượt)
+function saveAttemptToHistory(score, total, userAnswersMap) {
+    if(window.saveHistoryToCloud) { window.saveHistoryToCloud(score, total, userAnswersMap); return; } // Hook cho Firebase
+    let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+    let now = new Date();
+    history.unshift({ id: Date.now(), date: now.toLocaleDateString('vi-VN'), time: now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }), score: score, total: total, toeicScore: calculateToeicReading(score, total), answers: userAnswersMap });
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+}
+
+async function openHistoryModal() {
+    let history = [];
+    if(window.getHistoryFromCloud) history = await window.getHistoryFromCloud(); // Hook cho Firebase
+    else history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+    
+    let listEl = document.getElementById("historyList");
+    if (history.length === 0) listEl.innerHTML = `<div style="text-align:center; color:#888; padding: 20px;">Chưa có dữ liệu.</div>`;
+    else {
+        listEl.innerHTML = history.map((item, index) => `
+            <div class="history-item">
+                <div class="history-info"><span class="history-date">Lần ${history.length - index}: ${item.time} - ${item.date}</span><span class="history-score">Điểm: ${item.toeicScore}/495 (${item.score}/${item.total})</span></div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-review" onclick="restoreAttempt(${item.id})">Xem lại</button>
+                    <button class="btn-delete-history" onclick="deleteAttempt(${item.id})">&times;</button>
+                </div>
+            </div>`).join("");
+    }
+    document.getElementById('setupOverlay').style.display = 'none';
+    document.getElementById('historyOverlay').style.display = 'flex';
+}
+function closeHistoryModal() { document.getElementById('historyOverlay').style.display = 'none'; document.getElementById('setupOverlay').style.display = 'flex'; }
+function deleteAttempt(attemptId) {
+    showCustomConfirm("Bạn có chắc chắn muốn xóa bài làm này không?", function() {
+        if(window.deleteHistoryFromCloud) window.deleteHistoryFromCloud(attemptId); // Hook Firebase
+        else {
+            let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history.filter(h => h.id !== attemptId))); 
+        }
+        openHistoryModal(); 
+    });
+}
+async function restoreAttempt(attemptId) {
+    let history = [];
+    if(window.getHistoryFromCloud) history = await window.getHistoryFromCloud();
+    else history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+    let attempt = history.find(h => h.id === attemptId);
+    if(!attempt) return;
+
+    isReviewingMode = true;
+    document.getElementById('historyOverlay').style.display = 'none';
+    document.querySelectorAll('input[type="radio"]').forEach(el => { el.disabled = false; el.checked = false; });
+    
+    for (let qId in attempt.answers) {
+        let val = attempt.answers[qId];
+        if (val) { let radio = document.querySelector(`input[name="q${qId}"][value="${val}"]`); if (radio) radio.checked = true; }
+    }
+    
+    let btnSubmit = document.querySelector('.btn-submit');
+    if(btnSubmit) { btnSubmit.innerText = "ĐANG XEM LẠI"; btnSubmit.style.background = "#888"; btnSubmit.style.boxShadow = "none"; }
+    isSubmitted = false; 
+    executeSubmit();
+}
 // --- HIGHLIGHT SYSTEM ---
 const mainContainer = document.getElementById("mainContainer");
 const menu = document.getElementById("ctxMenu");
@@ -1909,7 +2058,7 @@ function removeHighlight() {
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, collection, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
@@ -1923,7 +2072,7 @@ function removeHighlight() {
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-
+const TEST_ID = "test1_2018";
     // Thông báo Toast trượt góc
     function showInGameToast(msg) {
         let toast = document.createElement("div");
@@ -1934,7 +2083,60 @@ function removeHighlight() {
         setTimeout(() => { toast.style.transform = "translateY(100px)"; toast.style.opacity = "0"; }, 3500);
         setTimeout(() => { toast.remove(); }, 4000);
     }
+// 1. HÀM LƯU LỊCH SỬ LÊN CLOUD
+    window.saveHistoryToCloud = async function(score, total, userAnswersMap) {
+        if (!window.currentUserUid) {
+            showInGameToast("⚠️ Hãy đăng nhập để lưu lịch sử làm bài!");
+            return;
+        }
+        let now = new Date();
+        let attemptId = Date.now();
+        let toeicScore = Math.round(((score / total) * 495) / 5) * 5;
+        
+        try {
+            // Tạo Collection "user_test_histories"
+            await setDoc(doc(db, "user_test_histories", window.currentUserUid + "_" + TEST_ID + "_" + attemptId), {
+                id: attemptId,
+                uid: window.currentUserUid,
+                testId: TEST_ID,
+                date: now.toLocaleDateString('vi-VN'),
+                time: now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+                score: score,
+                total: total,
+                toeicScore: toeicScore,
+                answers: userAnswersMap,
+                timestamp: attemptId
+            });
+            showInGameToast("☁️ Đã lưu lịch sử chi tiết lên Cloud!");
+        } catch (e) { console.error("Lỗi lưu lịch sử:", e); }
+    };
 
+    // 2. HÀM TẢI LỊCH SỬ TỪ CLOUD
+    window.getHistoryFromCloud = async function() {
+        if (!window.currentUserUid) return [];
+        let history = [];
+        try {
+            const q = query(collection(db, "user_test_histories"), 
+                            where("uid", "==", window.currentUserUid),
+                            where("testId", "==", TEST_ID));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                history.push(doc.data());
+            });
+            // Sắp xếp mới nhất lên đầu
+            history.sort((a, b) => b.timestamp - a.timestamp);
+        } catch (e) { console.error("Lỗi tải lịch sử:", e); }
+        return history;
+    };
+
+    // 3. HÀM XÓA LỊCH SỬ TRÊN CLOUD
+    window.deleteHistoryFromCloud = async function(attemptId) {
+        if (!window.currentUserUid) return;
+        try {
+            await deleteDoc(doc(db, "user_test_histories", window.currentUserUid + "_" + TEST_ID + "_" + attemptId));
+            showInGameToast("🗑 Đã xóa bài làm khỏi Cloud!");
+        } catch (e) { console.error("Lỗi xóa lịch sử:", e); }
+    };
     onAuthStateChanged(auth, (user) => {
         if (user) {
             window.currentUserUid = user.uid;
