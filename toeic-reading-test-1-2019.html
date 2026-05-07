@@ -2099,6 +2099,7 @@ function applyEvidenceColors() {
 window.onload = function() {
     renderDynamicContent();
     switchTab(1); 
+    applyEvidenceColors();
     document.getElementById('setupOverlay').style.display = 'flex';
 }
 
@@ -2574,19 +2575,21 @@ function executeSubmit() {
 
    
     if (!isReviewingMode) {
-        saveAttemptToHistory(score, totalQuestions, userAnswersMap);
-        
-        if(window.luuDiemTOEICReadingFull) {
-            // Tính toán thời gian thực tế đã làm (số phút ban đầu trừ đi số phút còn lại)
-            let minutesAssigned = (currentMode === 'mock') ? 75 : parseInt(document.getElementById('timeInput').value);
-            if(isNaN(minutesAssigned) || minutesAssigned < 1) minutesAssigned = 75;
-            let timeTaken = Math.round(minutesAssigned - (testDuration / 60));
-            
-            // Truyền thêm timeTaken vào hàm
-            window.luuDiemTOEICReadingFull(score, totalQuestions, "ETS 2019 - Test 1", timeTaken);
-        }
-    } else {
-        // Đưa khối else này ra đúng vị trí của nó
+        if (!isReviewingMode) {
+    saveAttemptToHistory(score, totalQuestions, userAnswersMap);
+    
+    if(window.luuDiemTOEICReadingFull) {
+        let minutesAssigned = (currentMode === 'mock') ? 75 : parseInt(document.getElementById('timeInput').value);
+        if(isNaN(minutesAssigned) || minutesAssigned < 1) minutesAssigned = 75;
+        let timeTaken = Math.round(minutesAssigned - (testDuration / 60));
+        window.luuDiemTOEICReadingFull(score, totalQuestions, "ETS 2019 - Test 1", timeTaken);
+    }
+
+    // THÊM 2 DÒNG NÀY VÀO ĐÂY ĐỂ HIỆN ĐIỂM NHÉ:
+    document.getElementById('resultMessage').innerHTML = `Bạn đã trả lời đúng <b>${score}/${totalQuestions}</b> câu.<br>Điểm TOEIC Reading dự kiến: <b style="color:var(--accent); font-size: 22px;">${calculateToeicReading(score, totalQuestions)}/495</b>`;
+    document.getElementById('resultOverlay').style.display = 'flex';
+
+} else {
         let toastMsg = document.createElement("div");
         toastMsg.innerText = "Đã khôi phục bài làm ngày cũ!";
         toastMsg.style.cssText = "position:fixed; top:20px; right:20px; background:var(--primary); color:white; padding:15px 20px; border-radius:12px; font-weight:bold; font-family:'Quicksand',sans-serif; z-index:99999; box-shadow:0 10px 30px rgba(0,0,0,0.2);";
