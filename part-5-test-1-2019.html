@@ -1040,6 +1040,7 @@ const HISTORY_KEY = "snapenglish_p5_test_1_2019_history"; // <-- Đổi tên key
         isSubmitted = true;
         clearInterval(timerInterval);
         document.getElementById("mainSubmitBtn").style.display = 'none';
+
         let score = 0;
         
         questionsData.forEach((q, index) => {
@@ -1047,7 +1048,6 @@ const HISTORY_KEY = "snapenglish_p5_test_1_2019_history"; // <-- Đổi tên key
             let isCorrect = uAns === q.a;
             if(isCorrect) score++;
 
-            // Xử lý cảnh báo nếu học sinh chưa chọn đáp án cho câu này
             let unAnsweredWarning = "";
             if (!uAns) {
                 unAnsweredWarning = `<div style="background: #fffbeb; color: #b45309; padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; font-weight: 700; border: 1px solid #fde68a;">⚠️ Bạn đã bỏ trống câu này!</div>`;
@@ -1056,6 +1056,7 @@ const HISTORY_KEY = "snapenglish_p5_test_1_2019_history"; // <-- Đổi tên key
             for(let i=0; i<4; i++) {
                 let optEl = document.getElementById(`opt-${index}-${i}`);
                 let badgeEl = document.getElementById(`badge-${index}-${i}`);
+                if (!optEl) continue;
                 optEl.classList.add('disabled');
                 
                 let optText = q.options[i];
@@ -1076,35 +1077,178 @@ const HISTORY_KEY = "snapenglish_p5_test_1_2019_history"; // <-- Đổi tên key
             }
 
             let expBox = document.getElementById(`exp-${index}`);
-            expBox.classList.add('show');
-            if(unAnsweredWarning) {
-                expBox.insertAdjacentHTML('afterbegin', unAnsweredWarning);
+            if (expBox) {
+                expBox.classList.add('show');
+                if(unAnsweredWarning && !isRestoring) {
+                    expBox.insertAdjacentHTML('afterbegin', unAnsweredWarning);
+                }
             }
 
             let dot = document.getElementById(`nav-${index}`);
-            dot.classList.remove('done', 'active');
-            if (isCorrect) dot.classList.add('correct');
-            else dot.classList.add('wrong');
+            if (dot) {
+                dot.classList.remove('done', 'active');
+                if (isCorrect) dot.classList.add('correct');
+                else dot.classList.add('wrong');
+            }
         });
 
-        document.getElementById('resultMessage').innerHTML = `
-            <strong style="font-size: 38px; color: var(--primary); display: block; margin-bottom: 15px;">${score} / ${questionsData.length}</strong>
-            <p style="font-size: 16px; color: #64748b; font-weight: 500;">Bạn đã hoàn thành bài kiểm tra!<br>Hãy xem danh sách câu hỏi để đọc phần Giải Thích siêu chi tiết nhé.</p>
-        `;
-        saveAttemptToHistory(score, questionsData.length, userAnswers);
-        document.getElementById('resultOverlay').style.display = 'flex';
+        if (!isRestoring) {
+            document.getElementById('resultMessage').innerHTML = `
+                <strong style="font-size: 38px; color: var(--primary); display: block; margin-bottom: 15px;">${score} / ${questionsData.length}</strong>
+                <p style="font-size: 16px; color: #64748b; font-weight: 500;">Bạn đã hoàn thành bài kiểm tra!<br>Hãy xem danh sách câu hỏi để đọc phần Giải Thích siêu chi tiết nhé.</p>
+            `;
+            document.getElementById('resultOverlay').style.display = 'flex';
 
-        // Đồng bộ điểm Firebase
-        if (window.luuDiemTOEICLenFirebase) {
-            window.luuDiemTOEICLenFirebase(questionsData.length, score, "ETS 2019 - Test 1", "Reading", "Part 5");
+            // Gọi hàm lưu lịch sử
+            saveAttemptToHistory(score, questionsData.length, userAnswers);
+
+            // Đồng bộ điểm Firebase
+            if (window.luuDiemTOEICLenFirebase) {
+                window.luuDiemTOEICLenFirebase(questionsData.length, score, "ETS 2019 - Test 1", "Reading", "Part 5");
+            }
         }
+    }
+    const TEST_ID = "p5_test_1_2019"; 
+    const HISTORY_KEY = "snapenglish_" + TEST_ID + "_history";
+    let currentHistoryList = []; // Chứa danh sách lịch sử hiện tại
+
+    async function saveAttemptToHistory(score, total, answersArray) {
+        let now = new Date();
+        let timestamp = Date.now();
+        let attempt = {
+            id: timestamp, // ID nội bộ local
+            timestamp: timestamp, // Dùng để sort mới nhất lên đầu
+            date: now.toLocaleDateString('vi-VN'),
+            time: now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+            score: score,
+            total: total,
+            answers: answersArray
+        };
+
+        // Lưu local dự phòng (dùng khi rớt mạng hoặc là Guest)
+        let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+        history.unshift(attempt);
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+
+        // Bắn thẳng lên Firebase (Đồng bộ mọi thiết bị)
+        if (window.syncHistoryToFirebase) {
+            await window.syncHistoryToFirebase(attempt, TEST_ID);
+        }
+    }
+
+    async function openHistoryModal() {
+        document.getElementById('setupOverlay').style.display = 'none';
+        document.getElementById('historyOverlay').style.display = 'flex';
+        let listEl = document.getElementById("historyList");
+
+        // Hiện trạng thái loading cho ngầu
+        listEl.innerHTML = `<div style="text-align:center; color:#64748b; padding: 20px; font-weight: bold;">Đang lấy dữ liệu từ Máy chủ... ☁️⏳</div>`;
+
+        // Ưu tiên tải từ Firebase nếu tài khoản đã đăng nhập
+        if (window.currentUserUid && window.getHistoryFromFirebase) {
+            currentHistoryList = await window.getHistoryFromFirebase(TEST_ID);
+            // Nếu trên mây chưa có thì lôi local ra
+            if (!currentHistoryList || currentHistoryList.length === 0) {
+                currentHistoryList = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+            }
+        } else {
+            currentHistoryList = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+        }
+
+        if (currentHistoryList.length === 0) {
+            listEl.innerHTML = `<div style="text-align:center; color:#888; padding: 20px;">Cậu chưa làm bài lần nào trên tài khoản này. 🐾</div>`;
+        } else {
+            listEl.innerHTML = currentHistoryList.map((item, index) => {
+                let docId = item.docId || item.id;
+                return `
+                <div class="history-item">
+                    <div class="history-info">
+                        <span class="history-date">Lần ${currentHistoryList.length - index}: ${item.time} - ${item.date}</span>
+                        <span class="history-score">Đúng: ${item.score}/${item.total} câu</span>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-review" onclick="restoreAttempt(${index})">Xem lại</button>
+                        <button class="btn-delete-history" onclick="deleteAttempt('${docId}')" title="Xóa bài này">&times;</button>
+                    </div>
+                </div>
+                `;
+            }).join("");
+        }
+    }
+
+    function closeHistoryModal() {
+        document.getElementById('historyOverlay').style.display = 'none';
+        document.getElementById('setupOverlay').style.display = 'flex';
+    }
+
+    let pendingDeleteId = null;
+    function deleteAttempt(attemptId) {
+        pendingDeleteId = attemptId;
+        document.getElementById('customConfirmDeleteOverlay').style.display = 'flex';
+    }
+    
+    function closeConfirmDelete() {
+        pendingDeleteId = null;
+        document.getElementById('customConfirmDeleteOverlay').style.display = 'none';
+    }
+
+    async function executeDelete() {
+        if (pendingDeleteId !== null) {
+            document.getElementById('customConfirmDeleteOverlay').style.display = 'none';
+            let listEl = document.getElementById("historyList");
+            listEl.innerHTML = `<div style="text-align:center; color:#64748b; padding: 20px; font-weight: bold;">Đang dọn dẹp trên Đám mây... 🗑️☁️</div>`;
+
+            // Xóa rễ trên Firebase
+            if (window.currentUserUid && window.deleteHistoryDocFirebase && typeof pendingDeleteId === 'string') {
+                await window.deleteHistoryDocFirebase(pendingDeleteId);
+            }
+
+            // Xóa luôn phần local cho sạch
+            let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+            history = history.filter(h => h.id != pendingDeleteId && h.docId != pendingDeleteId);
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+
+            pendingDeleteId = null;
+            openHistoryModal(); // Load lại mượt mà
+        }
+    }
+
+    function restoreAttempt(index) {
+        let attempt = currentHistoryList[index];
+        if(!attempt) return;
+
+        document.getElementById('historyOverlay').style.display = 'none';
+        
+        initQuiz();
+        jumpToQuestion(0);
+        
+        userAnswers = attempt.answers || [];
+        userAnswers.forEach((ans, qIndex) => {
+            if (ans !== null && ans !== undefined) {
+                let optIndex = questionsData[qIndex].options.indexOf(ans);
+                if(optIndex > -1) {
+                    let optEl = document.getElementById(`opt-${qIndex}-${optIndex}`);
+                    if(optEl) optEl.classList.add('selected');
+                }
+            }
+        });
+
+        isSubmitted = false; 
+        executeSubmit(true); // Truyền true để báo là đang khôi phục
+        
+        let toastMsg = document.createElement("div");
+        toastMsg.innerText = "✨ Đã khôi phục bài làm từ Đám mây!";
+        toastMsg.style.cssText = "position:fixed; top:20px; right:20px; background:var(--primary); color:white; padding:15px 20px; border-radius:12px; font-weight:bold; z-index:99999; box-shadow:0 10px 30px rgba(0,0,0,0.2);";
+        document.body.appendChild(toastMsg);
+        setTimeout(() => toastMsg.remove(), 3000);
     }
 </script>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    // Đã import thêm các hàm lấy collection, query, xóa doc...
+    import { getFirestore, doc, setDoc, collection, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
@@ -1135,10 +1279,50 @@ const HISTORY_KEY = "snapenglish_p5_test_1_2019_history"; // <-- Đổi tên key
             window.currentUserUid = user.uid;
             window.currentUserEmail = user.email;
         } else {
-            showInGameToast("⚠️ Bạn đang chơi dưới dạng Khách, điểm sẽ không lưu lên kho!");
+            showInGameToast("⚠️ Bạn đang chơi dưới dạng Khách, dữ liệu không được đồng bộ!");
         }
     });
+window.syncHistoryToFirebase = async function(attempt, testId) {
+        if (!window.currentUserUid) return attempt;
+        // Tạo docId duy nhất cho từng bài làm
+        let docId = window.currentUserUid + "_" + testId + "_" + attempt.timestamp;
+        attempt.docId = docId;
+        attempt.uid = window.currentUserUid;
+        attempt.testId = testId;
+        try {
+            await setDoc(doc(db, "snapenglish_history", docId), attempt);
+            return attempt;
+        } catch (e) { console.error("Lỗi đồng bộ lịch sử đám mây:", e); return attempt; }
+    };
 
+    // 2. Kéo danh sách lịch sử về (Lọc cẩn thận để không bị dính của bài khác)
+    window.getHistoryFromFirebase = async function(testId) {
+        if (!window.currentUserUid) return null;
+        try {
+            // Lấy tất cả lịch sử của tài khoản này
+            const q = query(collection(db, "snapenglish_history"), where("uid", "==", window.currentUserUid));
+            const querySnapshot = await getDocs(q);
+            let history = [];
+            querySnapshot.forEach((docSnap) => {
+                let data = docSnap.data();
+                // Chỉ lấy lịch sử của bài tập Test hiện tại
+                if (data.testId === testId) {
+                    history.push(data);
+                }
+            });
+            // Sắp xếp bài mới nhất lên trên cùng
+            history.sort((a, b) => b.timestamp - a.timestamp);
+            return history;
+        } catch (e) { console.error("Lỗi tải lịch sử từ đám mây:", e); return null; }
+    };
+
+    // 3. Xóa tận gốc document trên Firebase
+    window.deleteHistoryDocFirebase = async function(docId) {
+        if (!window.currentUserUid || !docId) return;
+        try {
+            await deleteDoc(doc(db, "snapenglish_history", docId));
+        } catch (e) { console.error("Lỗi xóa lịch sử:", e); }
+    };
     function calculateToeicScore(skill, correct, total) {
         let percentage = correct / total;
         let maxScore = (skill === 'Listening' || skill === 'Reading') ? 495 : 200;
