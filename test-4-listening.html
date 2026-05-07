@@ -201,10 +201,81 @@
             padding: 15px 25px; border-radius: 12px; display: flex; align-items: center; gap: 15px;
             z-index: 10000; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
+        /* Nút mở lịch sử */
+.history-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.history-btn:hover { background: var(--primary-dark); }
+
+/* Modal Background Toàn màn hình */
+.custom-modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0; top: 0; 
+    width: 100vw; height: 100vh; 
+    background-color: rgba(0,0,0,0.3); 
+    align-items: center; justify-content: center;
+}
+
+/* Khung nội dung Glassmorphism rộng rãi */
+.glass-effect {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+}
+
+.modal-content {
+    padding: 30px;
+    width: 95%; /* Mở rộng tối đa theo yêu cầu UI */
+    max-width: 1200px; 
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.close-modal {
+    position: absolute; top: 15px; right: 25px;
+    font-size: 32px; color: var(--text-light);
+    cursor: pointer; transition: 0.2s;
+}
+.close-modal:hover { color: var(--wrong); }
+
+/* Bảng lịch sử Full-width */
+.table-container { width: 100%; overflow-x: auto; }
+#historyTable { width: 100%; border-collapse: collapse; text-align: left; }
+#historyTable th { background: var(--exp-bg); color: var(--primary-dark); padding: 15px; font-weight: 700; }
+#historyTable td { padding: 15px; border-bottom: 1px solid var(--border); color: var(--text-main); }
+#historyTable tr:hover { background: var(--highlight); }
         #toastNotification.show { bottom: 30px; }
         .toast-icon { font-size: 24px; }
         .toast-title { font-weight: 800; color: var(--primary-dark); font-size: 16px; }
         .toast-desc { color: var(--text-muted); font-size: 14px; }
+        .delete-btn {
+    background: transparent;
+    color: var(--wrong, #ff6b6b);
+    border: 1px solid var(--wrong, #ff6b6b);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+.delete-btn:hover {
+    background: var(--wrong, #ff6b6b);
+    color: white;
+}
     </style>
 </head>
 <body>
@@ -219,7 +290,30 @@
             <button class="btn btn-primary" style="width: 100%; margin-top: 15px; display: none;" id="btnStart" onclick="startTest()">BẮT ĐẦU</button>
         </div>
     </div>
+<button id="btnOpenHistory" class="history-btn">🕒 Lịch sử làm bài</button>
 
+<div id="historyModal" class="custom-modal">
+    <div class="modal-content glass-effect">
+        <span class="close-modal">&times;</span>
+        <h2 style="color: var(--primary-dark); margin-bottom: 15px;">Lịch sử thi IELTS Listening</h2>
+        <div id="historyLoading" style="display:none; text-align: center; color: var(--text-light);">Đang tải dữ liệu...</div>
+        
+        <div class="table-container">
+            <table id="historyTable">
+                <thead>
+                    <tr>
+                        <th>Ngày làm</th>
+                        <th>Tên bài test</th>
+                        <th>Câu đúng</th>
+                        <th>Band Score</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
     <!-- SUBMIT CONFIRM MODAL -->
     <div id="confirmModal" class="modal-overlay">
         <div class="modal-box">
@@ -826,7 +920,123 @@
         let isSubmitted = false;
         let mode = '';
         const audio = document.getElementById('testAudio');
+// Xử lý đóng/mở UI
+const historyModal = document.getElementById("historyModal");
+const btnHistory = document.getElementById("btnOpenHistory");
+const closeHistoryBtn = document.getElementsByClassName("close-modal")[0];
 
+btnHistory.onclick = function() {
+    historyModal.style.display = "flex";
+    taiLichSuIELTS();
+}
+
+closeHistoryBtn.onclick = function() {
+    historyModal.style.display = "none";
+}
+
+window.addEventListener("click", function(event) {
+    if (event.target == historyModal) {
+        historyModal.style.display = "none";
+    }
+});
+
+// Cập nhật lại hàm tải lịch sử
+async function taiLichSuIELTS() {
+    const tbody = document.getElementById("historyBody");
+    const loading = document.getElementById("historyLoading");
+    
+    // Cập nhật thêm thẻ <th> cho bảng nếu chưa có cột Thao tác
+    const theadTr = document.querySelector("#historyTable thead tr");
+    if(theadTr.cells.length === 4) {
+        let th = document.createElement("th");
+        th.innerText = "Thao tác";
+        theadTr.appendChild(th);
+    }
+
+    if (!window.currentUserUid) {
+        tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>Vui lòng đăng nhập để xem lịch sử.</td></tr>";
+        return;
+    }
+
+    loading.style.display = "block";
+    tbody.innerHTML = "";
+
+    try {
+        const q = query(
+            collection(db, "user_ielts_scores"),
+            where("email", "==", window.currentUserEmail),
+            where("skill", "==", "Listening")
+        );
+
+        const querySnapshot = await getDocs(q);
+        let html = "";
+        
+        if (querySnapshot.empty) {
+            html = "<tr><td colspan='5' style='text-align:center;'>Bạn chưa làm bài test nào.</td></tr>";
+        } else {
+            let histories = [];
+            querySnapshot.forEach((doc) => { 
+                let data = doc.data();
+                data.id = doc.id; // Lấy ID thực tế trên Firebase để phục vụ việc xóa
+                histories.push(data); 
+            });
+            
+            // Sắp xếp ngày mới nhất lên đầu
+            histories.sort((a, b) => b.timestamp - a.timestamp);
+
+            histories.forEach((data) => {
+                html += `
+                    <tr>
+                        <td>${data.date}</td>
+                        <td><strong>${data.testName}</strong></td>
+                        <td>${data.correctQ} / 40</td>
+                        <td><strong style="color: var(--primary); font-size: 1.1em;">${data.bandScore}</strong></td>
+                        <td><button onclick="xoaLichSu('${data.id}', this)" class="delete-btn">Xóa</button></td>
+                    </tr>
+                `;
+            });
+        }
+        tbody.innerHTML = html;
+    } catch (error) {
+        console.error("Lỗi fetch lịch sử: ", error);
+        tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; color: var(--wrong);'>Đã xảy ra lỗi khi tải dữ liệu.</td></tr>";
+    } finally {
+        loading.style.display = "none";
+    }
+}
+
+// Thêm hàm Xóa lịch sử (Gắn vào window để gọi từ inline HTML)
+window.xoaLichSu = async function(docId, btnElement) {
+    // Đổi chữ trên nút để báo hiệu đang xử lý (thay thế cho alert loading)
+    let originalText = btnElement.innerText;
+    btnElement.innerText = "Đang xóa...";
+    btnElement.style.opacity = "0.7";
+    btnElement.disabled = true;
+
+    try {
+        await deleteDoc(doc(db, "user_ielts_scores", docId));
+        
+        // Hiện Toast thông báo xóa thành công (Tận dụng Toast có sẵn của bạn)
+        const toast = document.getElementById('toastNotification');
+        const toastMsg = document.getElementById('toastMsg');
+        if (toast && toastMsg) {
+            toastMsg.innerText = "Đã xóa lịch sử làm bài!";
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        // Tải lại danh sách lịch sử để cập nhật UI
+        taiLichSuIELTS();
+    } catch (error) {
+        console.error("Lỗi khi xóa lịch sử: ", error);
+        btnElement.innerText = "Lỗi!";
+        setTimeout(() => {
+            btnElement.innerText = originalText;
+            btnElement.style.opacity = "1";
+            btnElement.disabled = false;
+        }, 2000);
+    }
+}
         // Init Nav Grid
         const navGrid = document.getElementById('navGrid');
         for (let i = 1; i <= 40; i++) {
@@ -1002,8 +1212,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-
+        import { getFirestore, doc, setDoc, collection, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
             authDomain: "snapenglish-cb6e2.firebaseapp.com",
