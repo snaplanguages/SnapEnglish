@@ -25,21 +25,20 @@
             --glass-border: rgba(255, 255, 255, 0.9);
             --glass-shadow: 0 10px 30px rgba(162, 155, 254, 0.15);
 
-            /* Màu highlight bút nhớ */
             --hl-purple: rgba(162, 155, 254, 0.35); 
-            --hl-orange: rgba(231, 168, 124, 0.4);
         }
 
+        /* Khóa cuộn trang tổng thể, thiết lập chiều cao 100vh */
         body { 
             font-family: 'Nunito', sans-serif; 
             background: var(--bg-gradient);
             color: var(--text-main);
             margin: 0; 
             padding: 0; 
-            min-height: 100vh; 
+            height: 100vh; 
             display: flex;
             flex-direction: column;
-            overflow-x: hidden;
+            overflow: hidden; 
         }
 
         /* --- Background Blobs --- */
@@ -72,8 +71,7 @@
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid var(--glass-border);
-            position: sticky;
-            top: 0;
+            flex-shrink: 0; /* Header không bị bóp méo */
         }
 
         header h1 {
@@ -97,21 +95,23 @@
             white-space: nowrap;
         }
 
-        /* --- Layout Grid (Responsive) --- */
+        /* --- Layout Grid --- */
         .main-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            display: flex;
+            flex-direction: row; /* Trải ngang trên desktop */
             gap: 25px;
-            padding: 25px 5%;
+            padding: 20px 5%;
             max-width: 1600px;
             margin: 0 auto;
             width: 100%;
+            flex-grow: 1; /* Chiếm phần không gian còn lại dưới header */
             box-sizing: border-box;
-            align-items: start;
+            min-height: 0; /* Quan trọng để flex child có thể scroll */
         }
 
         /* --- Cards --- */
         .card {
+            flex: 1 1 0; /* Chia đều không gian 3 cột */
             background: var(--glass-bg);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
@@ -120,13 +120,32 @@
             box-shadow: var(--glass-shadow);
             border: 1px solid var(--glass-border);
             transition: all 0.3s ease;
-            height: 100%;
             box-sizing: border-box;
+            
+            /* Thiết lập cuộn dọc */
+            overflow-y: auto; 
+            min-height: 0;
         }
 
         .card:hover {
             border-color: var(--primary);
             box-shadow: 0 15px 35px rgba(162, 155, 254, 0.25);
+        }
+
+        /* Tuỳ chỉnh thanh cuộn Glassmorphism cho Card */
+        .card::-webkit-scrollbar {
+            width: 6px;
+        }
+        .card::-webkit-scrollbar-track {
+            background: transparent;
+            margin: 15px 0; /* Cách xa hai đầu viền bo tròn */
+        }
+        .card::-webkit-scrollbar-thumb {
+            background: var(--hl-purple);
+            border-radius: 10px;
+        }
+        .card::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
         }
 
         /* --- Typography --- */
@@ -158,19 +177,6 @@
 
         ul {
             padding-left: 20px;
-        }
-
-        .interactive-paragraph {
-            border-radius: 8px;
-            padding: 6px 10px;
-            transition: background 0.3s ease, transform 0.2s ease;
-            cursor: pointer;
-            user-select: none; /* Tránh bôi đen text khi click nhiều */
-        }
-
-        .interactive-paragraph:hover { 
-            background: rgba(255, 255, 255, 0.8); 
-            transform: translateX(3px); 
         }
 
         img {
@@ -212,33 +218,6 @@
 
         .warning-box p { margin: 0; font-size: 15px; }
 
-        /* --- Hiệu ứng Bút nhớ (Highlight) --- */
-        .highlight-purple { 
-            background-color: var(--hl-purple); 
-            box-shadow: -4px 0 0 var(--hl-purple), 4px 0 0 var(--hl-purple);
-            border-radius: 4px;
-        }
-        .highlight-orange { 
-            background-color: var(--hl-orange); 
-            box-shadow: -4px 0 0 var(--hl-orange), 4px 0 0 var(--hl-orange);
-            border-radius: 4px;
-        }
-
-        .instruction-text {
-            color: var(--text-muted);
-            font-size: 14px;
-            text-align: center;
-            margin-bottom: 20px;
-            background: rgba(255,255,255,0.7);
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px dashed #b2bec3;
-        }
-
-        .instruction-text strong {
-            color: var(--primary-dark);
-        }
-
         hr {
             border: 0; 
             border-top: 1px dashed #b2bec3; 
@@ -246,12 +225,31 @@
         }
 
         /* --- Responsive Adjustments --- */
-        @media (max-width: 768px) {
-            header { flex-direction: column; gap: 10px; padding: 15px 20px; text-align: center; }
-            .main-container { padding: 20px; gap: 20px; }
-            .card { padding: 20px; }
-            h2 { font-size: 20px; }
-            p, li { font-size: 15px; }
+        @media (max-width: 900px) {
+            header { 
+                flex-direction: column; 
+                gap: 10px; 
+                padding: 15px 20px; 
+                text-align: center; 
+            }
+            .main-container {
+                flex-direction: column; /* Xếp dọc trên mobile */
+                gap: 15px;
+                padding: 15px;
+            }
+            .card { 
+                /* Mỗi card vẫn tự cuộn và chia đều chiều dọc màn hình thay vì trôi mất */
+                padding: 20px; 
+            }
+            h2 { 
+                font-size: 20px; 
+                padding-bottom: 10px;
+                margin-bottom: 10px;
+            }
+            p, li { 
+                font-size: 15px; 
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
@@ -333,56 +331,22 @@
 
         <div class="card" style="background: rgba(255, 255, 255, 0.95);">
             <h2>📝 Bài mẫu Band 8.0+</h2>
-            
-            <div class="instruction-text">
-                🖱️ <strong>Tương tác thông minh:</strong> <br>
-                - Click <strong>Chuột Trái</strong> để Highlight Tím (Cấu trúc hay) <br>
-                - Click <strong>Chuột Phải</strong> để Highlight Cam (Từ vựng/Số liệu) <br>
-                - Click lần nữa để xóa Highlight.
-            </div>
 
             <div id="sample-essay">
-                <p class="interactive-paragraph">The line graph presents data on the number of foreign visitors to the UK from 1989 to 2009, categorized into the three purposes of their visits.</p>
+                <p>The line graph presents data on the number of foreign visitors to the UK from 1989 to 2009, categorized into the three purposes of their visits.</p>
                 
-                <p class="interactive-paragraph">Overall, all three reasons experienced a rise in visitor numbers. Additionally, for the most part, holiday was the most common reason for people going to the UK, while meeting friends and relatives was the least common one.</p>
+                <p>Overall, all three reasons experienced a rise in visitor numbers. Additionally, for the most part, holiday was the most common reason for people going to the UK, while meeting friends and relatives was the least common one.</p>
                 
-                <p class="interactive-paragraph">At the beginning of the period, 5 million people traveled to the UK for their business trips, which was much higher than the figure for meeting friends and relatives, which was only about 3.5 million. Thereafter, the former purpose witnessed a decline to around 4 million people in 1991, before markedly recovering to a peak of 8 million in 2008, finally falling by 1 million in 2009.</p> 
+                <p>At the beginning of the period, 5 million people traveled to the UK for their business trips, which was much higher than the figure for meeting friends and relatives, which was only about 3.5 million. Thereafter, the former purpose witnessed a decline to around 4 million people in 1991, before markedly recovering to a peak of 8 million in 2008, finally falling by 1 million in 2009.</p> 
                 
-                <p class="interactive-paragraph">An upward trend was also witnessed in visits for meeting friends and relatives, as its figures underwent gradual growth, increasing twofold from 1989 to 7 million in 2008, before receding to just under 6 million people at the end of the given period.</p>
+                <p>An upward trend was also witnessed in visits for meeting friends and relatives, as its figures underwent gradual growth, increasing twofold from 1989 to 7 million in 2008, before receding to just under 6 million people at the end of the given period.</p>
                 
-                <p class="interactive-paragraph">On the other hand, a more volatile pattern was observed in holiday trips. The number of people traveling to the UK for this purpose started at 6.5 million, followed by a rise of nearly 2.5 million people in 1995, before falling back by the same amount in 2004. Subsequently, this category saw a recovery in numbers, reclaiming its lead and reaching a high of 9 million again in the final year.</p>
+                <p>On the other hand, a more volatile pattern was observed in holiday trips. The number of people traveling to the UK for this purpose started at 6.5 million, followed by a rise of nearly 2.5 million people in 1995, before falling back by the same amount in 2004. Subsequently, this category saw a recovery in numbers, reclaiming its lead and reaching a high of 9 million again in the final year.</p>
 
                 <p style="text-align: right; color: var(--text-muted); font-style: italic;">(244 words)</p>
             </div>
         </div>
     </div>
-
-    <script>
-        // Tính năng tương tác: Chuột trái (Tím) - Chuột phải (Cam)
-        document.querySelectorAll('.interactive-paragraph').forEach(paragraph => {
-            
-            // Xử lý click chuột trái
-            paragraph.addEventListener('click', function(e) {
-                if (this.classList.contains('highlight-purple')) {
-                    this.classList.remove('highlight-purple');
-                } else {
-                    this.classList.add('highlight-purple');
-                    this.classList.remove('highlight-orange');
-                }
-            });
-
-            // Xử lý click chuột phải (ngăn menu mặc định hiện lên)
-            paragraph.addEventListener('contextmenu', function(e) {
-                e.preventDefault(); // Ngăn context menu của trình duyệt
-                if (this.classList.contains('highlight-orange')) {
-                    this.classList.remove('highlight-orange');
-                } else {
-                    this.classList.add('highlight-orange');
-                    this.classList.remove('highlight-purple');
-                }
-            });
-        });
-    </script>
 
 </body>
 </html>
