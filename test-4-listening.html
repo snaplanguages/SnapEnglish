@@ -1221,7 +1221,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, collection, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        // FIX: Đã đồng bộ lên phiên bản 10.11.0
+        import { getFirestore, doc, setDoc, collection, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        
         const firebaseConfig = {
             apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
             authDomain: "snapenglish-cb6e2.firebaseapp.com",
@@ -1242,6 +1244,7 @@
             }
         });
 
+        // TẢI LỊCH SỬ
         window.taiLichSuIELTS = async function() {
             const tbody = document.getElementById("historyBody");
             const loading = document.getElementById("historyLoading");
@@ -1260,7 +1263,7 @@
                     collection(db, "user_ielts_scores"),
                     where("email", "==", window.currentUserEmail),
                     where("skill", "==", "Listening"),
-                    where("testName", "==", "Test 4")
+                    where("testName", "==", "Test 4") // Chỉ lấy lịch sử của bài này
                 );
 
                 const querySnapshot = await getDocs(q);
@@ -1306,8 +1309,24 @@
             }
         }
 
+        // LƯU ĐIỂM + ĐÁP ÁN
         window.luuDiemIELTSFullTest = async function(diemSo, bandScore, tenBai, userAnswersDict) {
-            if (!window.currentUserUid) return;
+            const toast = document.getElementById('toastNotification');
+            const toastMsg = document.getElementById('toastMsg');
+            const toastTitle = document.querySelector('.toast-title');
+
+            // FIX: Thông báo rõ ràng nếu chưa đăng nhập thay vì im lặng
+            if (!window.currentUserUid) {
+                if (toast && toastMsg && toastTitle) {
+                    toastTitle.innerText = "Lưu điểm thất bại!";
+                    toastTitle.style.color = "var(--danger)";
+                    toastMsg.innerText = "Bạn chưa đăng nhập! Vui lòng đăng nhập ở trang chủ để đồng bộ điểm.";
+                    toast.classList.add('show');
+                    setTimeout(() => { toast.classList.remove('show'); }, 5000); 
+                }
+                return;
+            }
+
             let timestamp = Date.now();
             let docId = window.currentUserUid + "_ielts_t4_" + timestamp; 
 
@@ -1325,9 +1344,9 @@
                     timestamp: timestamp
                 });
                 
-                const toast = document.getElementById('toastNotification');
-                const toastMsg = document.getElementById('toastMsg');
-                if (toast && toastMsg) {
+                if (toast && toastMsg && toastTitle) {
+                    toastTitle.innerText = "Đồng bộ thành công!";
+                    toastTitle.style.color = "var(--primary-dark)";
                     toastMsg.innerText = "Đã lưu kết quả Band " + bandScore + " và Đáp án của bạn!";
                     toast.classList.add('show');
                     setTimeout(() => { toast.classList.remove('show'); }, 4000); 
@@ -1337,6 +1356,7 @@
             }
         }
 
+        // XÓA LỊCH SỬ
         window.xoaLichSu = async function(docId, btnElement) {
             let originalText = btnElement.innerText;
             btnElement.innerText = "...";
@@ -1347,7 +1367,10 @@
                 
                 const toast = document.getElementById('toastNotification');
                 const toastMsg = document.getElementById('toastMsg');
-                if (toast && toastMsg) {
+                const toastTitle = document.querySelector('.toast-title');
+                if (toast && toastMsg && toastTitle) {
+                    toastTitle.innerText = "Đã xóa!";
+                    toastTitle.style.color = "var(--primary-dark)";
                     toastMsg.innerText = "Đã xóa lịch sử làm bài!";
                     toast.classList.add('show');
                     setTimeout(() => { toast.classList.remove('show'); }, 3000);
