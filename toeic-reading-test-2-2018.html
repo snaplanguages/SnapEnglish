@@ -2093,6 +2093,7 @@ Sole Assortment will serve women who work in the surrounding area.</span> Becaus
     }
        
 };
+};
 // --- MODE & TIMER STATE ---
 let currentMode = '';
 let testDuration = 0; // seconds
@@ -2192,6 +2193,7 @@ function applyEvidenceColors() {
 window.onload = function() {
     renderDynamicContent();
     switchTab(1); 
+    applyEvidenceColors();
     document.getElementById('setupOverlay').style.display = 'flex';
 }
 
@@ -2455,46 +2457,15 @@ window.closeHistoryModal = closeHistoryModal;
 window.restoreAttempt = restoreAttempt;
 window.deleteAttempt = deleteAttempt; // Thêm kết nối cho hàm Xóa
 
-// --- QUẢN LÝ LỊCH SỬ LÀM BÀI ---
+// --- QUẢN LÝ LỊCH SỬ LÀM BÀI BẰNG LOCALSTORAGE ---
 const HISTORY_KEY = "snapenglish_test2_2018_history";
-let isReviewingMode = false;
-function openHistoryModal() {
-    // Lấy dữ liệu lịch sử từ localStorage
-    let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
-    let historyListEl = document.getElementById('historyList');
-    let listHtml = '';
+let isReviewingMode = false; 
 
-    // Kiểm tra nếu chưa có lịch sử
-    if (history.length === 0) {
-        listHtml = '<p style="text-align: center; color: #888; margin-top: 20px;">Chưa có dữ liệu làm bài.</p>';
-    } else {
-        // Duyệt qua từng bài làm và tạo giao diện hiển thị
-        history.forEach(attempt => {
-            listHtml += `
-                <div class="history-item">
-                    <div class="history-info">
-                        <span class="history-date">📅 ${attempt.date} - ⏰ ${attempt.time}</span>
-                        <span class="history-score">🏆 Điểm: ${attempt.score}/${attempt.total} (${attempt.toeicScore} điểm)</span>
-                    </div>
-                    <div style="display: flex; gap: 5px;">
-                        <button class="btn-review" onclick="restoreAttempt(${attempt.id})">Xem lại</button>
-                        <button class="btn-delete-history" onclick="deleteAttempt(${attempt.id})" title="Xóa bài làm này">✖</button>
-                    </div>
-                </div>
-            `;
-        });
-    }
-    
-    // Đổ dữ liệu vào danh sách và hiển thị bảng Modal
-    historyListEl.innerHTML = listHtml;
-    document.getElementById('historyOverlay').style.display = 'flex';
-}
-
-function closeHistoryModal() {
-    // Ẩn bảng Modal lịch sử
-    document.getElementById('historyOverlay').style.display = 'none';
-}
 function saveAttemptToHistory(score, total, userAnswersMap) {
+    if (window.saveHistoryToCloud) { 
+        window.saveHistoryToCloud(score, total, userAnswersMap); 
+        return; 
+    }
     let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
     let now = new Date();
     
@@ -2510,44 +2481,77 @@ function saveAttemptToHistory(score, total, userAnswersMap) {
     
     history.unshift(attempt); // Đẩy bài mới nhất lên đầu
     localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+}
 
-    // ĐỒNG BỘ LÊN CLOUD NGAY SAU KHI LƯU
-    if (window.syncHistoryToCloud) {
-        window.syncHistoryToCloud(history);
+async function openHistoryModal() {
+    let history = [];
+    // Kéo dữ liệu từ Cloud về
+    if (window.getHistoryFromCloud) {
+        history = await window.getHistoryFromCloud(); 
+    } else {
+        history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
     }
+    
+    let listEl = document.getElementById("historyList");
+    
+    if (history.length === 0) {
+        listEl.innerHTML = `<div style="text-align:center; color:#888; padding: 20px;">Bạn chưa làm bài lần nào trên thiết bị này.</div>`;
+    } else {
+        listEl.innerHTML = history.map((item, index) => `
+            <div class="history-item">
+                <div class="history-info">
+                    <span class="history-date">Lần ${history.length - index}: ${item.time} - ${item.date}</span>
+                    <span class="history-score">Điểm: ${item.toeicScore}/495 (${item.score}/${item.total} câu)</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-review" onclick="restoreAttempt(${item.id})">Xem lại</button>
+                    <button class="btn-delete-history" onclick="deleteAttempt(${item.id})" title="Xóa bài này">&times;</button>
+                </div>
+            </div>
+        `).join("");
+    }
+    
+    document.getElementById('setupOverlay').style.display = 'none';
+    document.getElementById('historyOverlay').style.display = 'flex';
+}
+
+function closeHistoryModal() {
+    document.getElementById('historyOverlay').style.display = 'none';
+    document.getElementById('setupOverlay').style.display = 'flex';
 }
 
 function deleteAttempt(attemptId) {
     showCustomConfirm("Bạn có chắc chắn muốn xóa bài làm này khỏi lịch sử không?", function() {
-        let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
-        history = history.filter(h => h.id !== attemptId); 
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); 
-        
-        // ĐỒNG BỘ THAO TÁC XÓA LÊN CLOUD
-        if (window.syncHistoryToCloud) {
-            window.syncHistoryToCloud(history);
+        if (window.deleteHistoryFromCloud) {
+            window.deleteHistoryFromCloud(attemptId); 
+        } else {
+            let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+            history = history.filter(h => h.id !== attemptId); 
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); 
         }
-        
         openHistoryModal(); 
     });
 }
 
-function restoreAttempt(attemptId) {
-    let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
-    let attempt = history.find(h => h.id === attemptId);
+async function restoreAttempt(attemptId) {
+    let history = [];
+    if (window.getHistoryFromCloud) {
+        history = await window.getHistoryFromCloud();
+    } else {
+        history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+    }
     
+    let attempt = history.find(h => h.id === attemptId);
     if(!attempt) return;
 
-    isReviewingMode = true; // Bật cờ hiệu "Đang xem lại"
+    isReviewingMode = true; 
     document.getElementById('historyOverlay').style.display = 'none';
-    document.getElementById('setupOverlay').style.display = 'none';
-    // Mở khóa & làm sạch toàn bộ các nút radio (phòng trường hợp người học xem bài A rồi chuyển sang bài B)
+    
     document.querySelectorAll('input[type="radio"]').forEach(el => {
         el.disabled = false;
         el.checked = false; 
     });
     
-    // Tự động đánh dấu lại các Radio button đáp án học viên đã chọn trong lịch sử
     for (let qId in attempt.answers) {
         let val = attempt.answers[qId];
         if (val) {
@@ -2556,7 +2560,6 @@ function restoreAttempt(attemptId) {
         }
     }
     
-   // Đổi chữ nút Nộp bài thành "Đang xem lại" cho ngầu
     let btnSubmit = document.querySelector('.btn-submit');
     if(btnSubmit) {
         btnSubmit.innerText = "ĐANG XEM LẠI";
@@ -2564,11 +2567,9 @@ function restoreAttempt(attemptId) {
         btnSubmit.style.boxShadow = "none";
     }
 
-    // --- THÊM 2 DÒNG NÀY VÀO TRƯỚC DẤU NGOẶC NHỌN ĐÓNG HÀM ---
     isSubmitted = false; 
     executeSubmit();
 }
-
 
 function scrollToEvidence(evId) {
     const evElement = document.getElementById(evId);
@@ -2666,22 +2667,21 @@ function executeSubmit() {
         }
     });
 
-   
-    if (!isReviewingMode) {
-        saveAttemptToHistory(score, totalQuestions, userAnswersMap);
-        document.getElementById('resultMessage').innerHTML = `Bạn đã làm đúng <b style="color: var(--primary); font-size: 22px;">${score}/${totalQuestions}</b> câu.<br>Điểm TOEIC Reading quy đổi: <b>${calculateToeicReading(score, totalQuestions)}</b>`;
-        document.getElementById('resultOverlay').style.display = 'flex';
-        if(window.luuDiemTOEICReadingFull) {
-            // Tính toán thời gian thực tế đã làm (số phút ban đầu trừ đi số phút còn lại)
-            let minutesAssigned = (currentMode === 'mock') ? 75 : parseInt(document.getElementById('timeInput').value);
-            if(isNaN(minutesAssigned) || minutesAssigned < 1) minutesAssigned = 75;
-            let timeTaken = Math.round(minutesAssigned - (testDuration / 60));
-            
-            // Truyền thêm timeTaken vào hàm
-            window.luuDiemTOEICReadingFull(score, totalQuestions, "ETS 2018 - Test 2", timeTaken);
-        }
-    } else {
-        // Đưa khối else này ra đúng vị trí của nó
+        if (!isReviewingMode) {
+    saveAttemptToHistory(score, totalQuestions, userAnswersMap);
+    
+    if(window.luuDiemTOEICReadingFull) {
+        let minutesAssigned = (currentMode === 'mock') ? 75 : parseInt(document.getElementById('timeInput').value);
+        if(isNaN(minutesAssigned) || minutesAssigned < 1) minutesAssigned = 75;
+        let timeTaken = Math.round(minutesAssigned - (testDuration / 60));
+        window.luuDiemTOEICReadingFull(score, totalQuestions, "ETS 2018 - Test 2", timeTaken);
+    }
+
+    // THÊM 2 DÒNG NÀY VÀO ĐÂY ĐỂ HIỆN ĐIỂM NHÉ:
+    document.getElementById('resultMessage').innerHTML = `Bạn đã trả lời đúng <b>${score}/${totalQuestions}</b> câu.<br>Điểm TOEIC Reading dự kiến: <b style="color:var(--accent); font-size: 22px;">${calculateToeicReading(score, totalQuestions)}/495</b>`;
+    document.getElementById('resultOverlay').style.display = 'flex';
+
+} else {
         let toastMsg = document.createElement("div");
         toastMsg.innerText = "Đã khôi phục bài làm ngày cũ!";
         toastMsg.style.cssText = "position:fixed; top:20px; right:20px; background:var(--primary); color:white; padding:15px 20px; border-radius:12px; font-weight:bold; font-family:'Quicksand',sans-serif; z-index:99999; box-shadow:0 10px 30px rgba(0,0,0,0.2);";
@@ -2775,8 +2775,8 @@ function removeHighlight() {
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    // Đã import thêm getDoc
-    import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, collection, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
     const firebaseConfig = {
         apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
         authDomain: "snapenglish-cb6e2.firebaseapp.com",
@@ -2789,69 +2789,77 @@ function removeHighlight() {
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+const TEST_ID = "test2_2018";
 
-    // Thông báo Toast trượt góc
+    window.currentUserUid = null;
+    window.currentUserEmail = null;
+    
     function showInGameToast(msg) {
         let toast = document.createElement("div");
         toast.innerText = msg;
-        toast.style.cssText = "position:fixed; bottom:20px; right:20px; background:#ff8fab; color:white; padding:15px 20px; border-radius:12px; font-weight:bold; font-family:'Nunito', sans-serif; z-index:99999; box-shadow:0 10px 30px rgba(0,0,0,0.15); transform:translateY(100px); opacity:0; transition:all 0.4s ease;";
+        toast.style.cssText = "position:fixed; bottom:20px; right:20px; background:#4ECDC4; color:white; padding:15px 20px; border-radius:12px; font-weight:bold; font-family:'Quicksand',sans-serif; z-index:99999; box-shadow:0 10px 30px rgba(0,0,0,0.2); transform:translateY(100px); opacity:0; transition:all 0.4s ease;";
         document.body.appendChild(toast);
         setTimeout(() => { toast.style.transform = "translateY(0)"; toast.style.opacity = "1"; }, 100);
         setTimeout(() => { toast.style.transform = "translateY(100px)"; toast.style.opacity = "0"; }, 3500);
         setTimeout(() => { toast.remove(); }, 4000);
     }
 
-    // 1. HÀM ĐẨY LỊCH SỬ LÊN CLOUD
-    window.syncHistoryToCloud = async function(historyData) {
+    window.saveHistoryToCloud = async function(score, total, userAnswersMap) {
+        if (!window.currentUserUid) {
+            showInGameToast("⚠️ Hãy đăng nhập để lưu lịch sử làm bài!");
+            return;
+        }
+        let now = new Date();
+        let attemptId = Date.now();
+        let toeicScore = Math.round(((score / total) * 495) / 5) * 5;
+        
+        try {
+            await setDoc(doc(db, "user_test_histories", window.currentUserUid + "_" + TEST_ID + "_" + attemptId), {
+                id: attemptId,
+                uid: window.currentUserUid,
+                testId: TEST_ID,
+                date: now.toLocaleDateString('vi-VN'),
+                time: now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+                score: score,
+                total: total,
+                toeicScore: toeicScore,
+                answers: userAnswersMap,
+                timestamp: attemptId
+            });
+            showInGameToast("☁️ Đã lưu lịch sử chi tiết lên Cloud!");
+        } catch (e) { console.error("Lỗi lưu lịch sử:", e); }
+    };
+
+    window.getHistoryFromCloud = async function() {
+        if (!window.currentUserUid) return [];
+        let history = [];
+        try {
+            const q = query(collection(db, "user_test_histories"), 
+                            where("uid", "==", window.currentUserUid),
+                            where("testId", "==", TEST_ID));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                history.push(doc.data());
+            });
+            history.sort((a, b) => b.timestamp - a.timestamp);
+        } catch (e) { console.error("Lỗi tải lịch sử:", e); }
+        return history;
+    };
+
+    window.deleteHistoryFromCloud = async function(attemptId) {
         if (!window.currentUserUid) return;
         try {
-            // Đặt tên document phân biệt theo Test và User
-            let docId = window.currentUserUid + "_history_test2_2018";
-            await setDoc(doc(db, "user_test_histories", docId), {
-                savedHistory: historyData,
-                lastUpdated: Date.now()
-            }, { merge: true }); // Merge true để không đè mất các field khác nếu có
-            
-        } catch (error) {
-            console.error("Lỗi đồng bộ lịch sử: ", error);
-        }
-    }
+            await deleteDoc(doc(db, "user_test_histories", window.currentUserUid + "_" + TEST_ID + "_" + attemptId));
+            showInGameToast("🗑 Đã xóa bài làm khỏi Cloud!");
+        } catch (e) { console.error("Lỗi xóa lịch sử:", e); }
+    };
 
-    // 2. LẮNG NGHE ĐĂNG NHẬP VÀ KÉO LỊCH SỬ VỀ
     onAuthStateChanged(auth, (user) => {
         if (user) {
             window.currentUserUid = user.uid;
             window.currentUserEmail = user.email;
-            
-            // Tự động nhận diện ID file hiện tại (2018 hay 2019)
-            let is2019 = document.title.includes("2019");
-            let docSuffix = is2019 ? "_history_test2_2019" : "_history_test2_2018";
-            let localKey = is2019 ? "snapenglish_test2_2019_history" : "snapenglish_test2_2018_history";
-            
-            let docId = user.uid + docSuffix;
-            const docRef = doc(db, "user_test_histories", docId);
-            
-            // SỬ DỤNG ONSNAPSHOT ĐỂ ĐỒNG BỘ REAL-TIME
-            onSnapshot(docRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    let cloudData = docSnap.data().savedHistory;
-                    if (cloudData) {
-                        // Nạp vào máy tính/điện thoại hiện tại
-                        localStorage.setItem(localKey, JSON.stringify(cloudData));
-                        
-                        // Tự động làm mới bảng lịch sử nếu người dùng đang mở nó
-                        let historyModal = document.getElementById('historyOverlay');
-                        if (historyModal && historyModal.style.display === 'flex') {
-                            openHistoryModal();
-                        }
-                    }
-                }
-            }, (error) => {
-                console.error("Lỗi đồng bộ Realtime: ", error);
-            });
-
         } else {
-            showInGameToast("⚠️ Chưa đăng nhập! Lịch sử và Điểm sẽ không được đồng bộ.");
+            showInGameToast("⚠️ Chưa đăng nhập! Điểm sẽ không được lưu.");
         }
     });
 
@@ -2862,11 +2870,6 @@ function removeHighlight() {
         let timestamp = Date.now();
         let docId = window.currentUserUid + "_toeic_" + timestamp;
 
-        let now = new Date();
-        let hours = now.getHours().toString().padStart(2, '0');
-        let minutes = now.getMinutes().toString().padStart(2, '0');
-        let timeString = hours + ":" + minutes; 
-
         try {
             await setDoc(doc(db, "user_toeic_scores", docId), {
                 email: window.currentUserEmail,
@@ -2876,13 +2879,11 @@ function removeHighlight() {
                 correctQ: correct,
                 totalQ: total,
                 score: scoreConverted,
-                date: now.toLocaleDateString('vi-VN'),
-                time: timeString, 
-                Time: timeString, 
-                timeTaken: timeTaken,
+                timeTaken: timeTaken, // Được cập nhật truyền thêm biến này để theo dõi time
+                date: new Date().toLocaleDateString('vi-VN'),
                 timestamp: timestamp
             });
-            showInGameToast("☁️ Đã nộp điểm lên bảng vàng SnapEnglish!");
+            showInGameToast("☁️ Đã đồng bộ điểm Reading lên Tracker!");
         } catch (e) {
             console.error(e);
         }
