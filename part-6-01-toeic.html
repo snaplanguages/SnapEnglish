@@ -659,7 +659,7 @@
 
     function closeConfirmModal() { document.getElementById('confirmOverlay').style.display = 'none'; }
 
-    function submitQuiz(isRestoring = false) {
+   function submitQuiz(isRestoring = false) {
         if (document.getElementById('confirmOverlay')) {
              document.getElementById('confirmOverlay').style.display = 'none';
         }
@@ -684,15 +684,26 @@
 
         renderView(); 
 
+        // Tính toán thời gian đã làm
+        let timeTakenStr = "--:--";
+        if (!isRestoring && typeof testDuration !== 'undefined') {
+            let inputPhut = parseInt(document.getElementById('timeInput').value) || 15;
+            let thoiGianDaLam = (inputPhut * 60) - testDuration;
+            if (thoiGianDaLam < 0) thoiGianDaLam = 0;
+            let m = Math.floor(thoiGianDaLam / 60);
+            let s = thoiGianDaLam % 60;
+            timeTakenStr = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
         if (!isRestoring) {
             document.getElementById('score-correct').innerText = correctCount;
             document.getElementById('score-total').innerText = totalQuestions;
             document.getElementById('result-overlay').classList.add('active');
 
-            saveAttemptToHistory(correctCount, totalQuestions, userAnswers);
+            saveLocalHistory(correctCount, totalQuestions, userAnswers, timeTakenStr);
 
             if(window.luuDiemTOEICLenFirebase) {
-                window.luuDiemTOEICLenFirebase(totalQuestions, correctCount, "Text completion 01", "Reading", "Part 6");
+                window.luuDiemTOEICLenFirebase(totalQuestions, correctCount, "Text completion 01", "Reading", "Part 6", userAnswers, timeTakenStr);
             }
         }
     }
@@ -704,122 +715,122 @@
         navDropdown.classList.add('show');
     }
 
-    // --- BỘ QUẢN LÝ LỊCH SỬ MỚI (FIREBASE & LOCAL) ---
-    const TEST_ID = "p6_01"; 
-    const HISTORY_KEY = "snapenglish_" + TEST_ID + "_history";
-    let currentHistoryList = []; 
+    const LOCAL_HISTORY_KEY = "snapenglish_p6_01_history";
 
-    async function saveAttemptToHistory(score, total, answersObj) {
+    function saveLocalHistory(score, total, answersObj, timeTakenStr) {
+        let history = JSON.parse(localStorage.getItem(LOCAL_HISTORY_KEY)) || [];
         let now = new Date();
-        let timestamp = Date.now();
-        let attempt = {
-            id: timestamp, 
-            timestamp: timestamp, 
+        history.unshift({
+            id: Date.now().toString(),
             date: now.toLocaleDateString('vi-VN'),
             time: now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
             score: score,
             total: total,
-            answers: answersObj
-        };
-
-        let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
-        history.unshift(attempt);
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-
-        if (window.syncHistoryToFirebase) {
-            await window.syncHistoryToFirebase(attempt, TEST_ID);
-        }
+            answers: answersObj,
+            timeTaken: timeTakenStr
+        });
+        localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify(history));
     }
 
-    async function openHistoryModal() {
+    function openHistoryModal() {
         document.getElementById('setupOverlay').style.display = 'none';
         document.getElementById('historyOverlay').style.display = 'flex';
-        let listEl = document.getElementById("historyList");
-
-        listEl.innerHTML = `<div style="text-align:center; color: var(--primary-dark); padding: 20px; font-weight: 800;">Đang lấy dữ liệu từ Máy chủ... ☁️⏳</div>`;
-
-        if (window.currentUserUid && window.getHistoryFromFirebase) {
-            currentHistoryList = await window.getHistoryFromFirebase(TEST_ID);
-            if (!currentHistoryList || currentHistoryList.length === 0) {
-                currentHistoryList = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
-            }
-        } else {
-            currentHistoryList = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
-        }
-
-        if (currentHistoryList.length === 0) {
-            listEl.innerHTML = `<div style="text-align:center; color:#888; padding: 20px;">Cậu chưa làm bài lần nào trên tài khoản này. 🐾</div>`;
-        } else {
-            listEl.innerHTML = currentHistoryList.map((item, index) => {
-                let docId = item.docId || item.id;
-                return `
-                <div class="history-item">
-                    <div class="history-info">
-                        <span class="history-date">Lần ${currentHistoryList.length - index}: ${item.time} - ${item.date}</span>
-                        <span class="history-score">Đúng: ${item.score}/${item.total} câu</span>
-                    </div>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn-review" onclick="restoreAttempt(${index})">Xem lại</button>
-                        <button class="btn-delete-history" onclick="deleteAttempt('${docId}')" title="Xóa bài này">&times;</button>
-                    </div>
-                </div>
-                `;
-            }).join("");
-        }
+        renderHistoryList();
     }
 
-    function closeHistoryModal() {
-        document.getElementById('historyOverlay').style.display = 'none';
+    function closeHistoryModal() { 
+        document.getElementById('historyOverlay').style.display = 'none'; 
         document.getElementById('setupOverlay').style.display = 'flex';
     }
 
-    let pendingDeleteId = null;
-    function deleteAttempt(attemptId) {
-        pendingDeleteId = attemptId;
+    function renderHistoryList() {
+        let listEl = document.getElementById("historyList");
+        listEl.innerHTML = `<div style="text-align:center; color: var(--primary-dark); padding: 20px; font-weight: 800;">Đang tải dữ liệu... 🐾</div>`;
+        
+        if (window.currentUserUid && window.layLichSuTuFirebase) {
+            window.layLichSuTuFirebase().then(firebaseHistory => {
+                hienThiDanhSach(firebaseHistory, listEl, true);
+            });
+        } else {
+            let localHistory = JSON.parse(localStorage.getItem(LOCAL_HISTORY_KEY)) || [];
+            hienThiDanhSach(localHistory, listEl, false);
+        }
+    }
+
+    function hienThiDanhSach(historyArray, listEl, isCloud) {
+        if (!historyArray || historyArray.length === 0) {
+            listEl.innerHTML = `<div style="text-align:center; color:#888; padding: 20px;">Cậu chưa làm bài lần nào. ${isCloud ? '(Cloud)' : '(Thiết bị này)'} 🐾</div>`;
+            return;
+        }
+
+        listEl.innerHTML = historyArray.map((item, index) => {
+            let soCauDung = item.correctQ !== undefined ? item.correctQ : item.score;
+            let tongSoCau = item.totalQ !== undefined ? item.totalQ : item.total;
+            let diemQuyDoi = isCloud && item.score !== undefined && item.score > tongSoCau ? ` (Điểm: ${item.score})` : '';
+
+            return `
+            <div class="history-item">
+                <div class="history-info">
+                    <span class="history-date">Lần ${historyArray.length - index}: ${item.time || ''} ${item.date}</span>
+                    <span class="history-score">Đúng: ${soCauDung}/${tongSoCau} câu${diemQuyDoi} ${isCloud ? '☁️' : '📱'}</span>
+                    <span style="color: var(--text-gray); font-size: 0.85rem; font-weight: 600;">⏱ Thời gian: ${item.timeTaken || '--:--'}</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-review" onclick='restoreAttempt(${JSON.stringify(item.answers || {})})'>Xem lại</button>
+                    <button class="btn-delete-history" onclick="deleteAttempt('${item.id}')" title="Xóa">&times;</button>
+                </div>
+            </div>
+            `;
+        }).join("");
+    }
+
+    let pendingDelete = { id: null };
+    function deleteAttempt(id) {
+        pendingDelete = { id };
         document.getElementById('customConfirmDeleteOverlay').style.display = 'flex';
     }
     
     function closeConfirmDelete() {
-        pendingDeleteId = null;
+        pendingDelete = { id: null };
         document.getElementById('customConfirmDeleteOverlay').style.display = 'none';
     }
 
-    async function executeDelete() {
-        if (pendingDeleteId !== null) {
-            document.getElementById('customConfirmDeleteOverlay').style.display = 'none';
-            let listEl = document.getElementById("historyList");
-            listEl.innerHTML = `<div style="text-align:center; color: var(--primary-dark); padding: 20px; font-weight: 800;">Đang dọn dẹp trên Đám mây... 🗑️☁️</div>`;
+    function executeDelete() {
+        if (!pendingDelete.id) return;
+        
+        let listEl = document.getElementById("historyList");
+        listEl.innerHTML = `<div style="text-align:center; color: var(--primary-dark); padding: 20px; font-weight: 800;">Đang dọn dẹp... 🗑️☁️</div>`;
 
-            if (window.currentUserUid && window.deleteHistoryDocFirebase && typeof pendingDeleteId === 'string') {
-                await window.deleteHistoryDocFirebase(pendingDeleteId);
-            }
-
-            let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
-            history = history.filter(h => h.id != pendingDeleteId && h.docId != pendingDeleteId);
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-
-            pendingDeleteId = null;
-            openHistoryModal(); 
+        if (window.xoaLichSuFirebase) {
+            window.xoaLichSuFirebase(pendingDelete.id).then(() => {
+                closeConfirmDelete();
+                renderHistoryList();
+            });
+        } else {
+            let history = JSON.parse(localStorage.getItem(LOCAL_HISTORY_KEY)) || [];
+            history = history.filter(h => h.id !== pendingDelete.id);
+            localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify(history));
+            closeConfirmDelete();
+            renderHistoryList();
         }
     }
 
-    function restoreAttempt(index) {
-        let attempt = currentHistoryList[index];
-        if(!attempt) return;
-
+    function restoreAttempt(answersObj) {
+        if (!answersObj || Object.keys(answersObj).length === 0) return;
+        
         document.getElementById('historyOverlay').style.display = 'none';
         
         currentIndex = 0;
         initDropdown();
         
         for (let key in userAnswers) delete userAnswers[key];
-        Object.assign(userAnswers, attempt.answers || {});
+        Object.assign(userAnswers, answersObj);
         
         isSubmitted = false; 
         submitQuiz(true);
         
         let toastMsg = document.createElement("div");
-        toastMsg.innerText = "✨ Đã khôi phục bài làm từ Đám mây!";
+        toastMsg.innerText = "✨ Đã khôi phục bài làm từ Lịch sử!";
         toastMsg.style.cssText = "position:fixed; top:20px; right:20px; background:var(--primary); color:white; padding:15px 25px; border-radius:12px; font-weight:800; z-index:99999; box-shadow:0 10px 30px rgba(0,0,0,0.2);";
         document.body.appendChild(toastMsg);
         setTimeout(() => toastMsg.remove(), 3000);
@@ -864,45 +875,9 @@
         }
     });
 
-    window.syncHistoryToFirebase = async function(attempt, testId) {
-        if (!window.currentUserUid) return attempt;
-        let docId = window.currentUserUid + "_" + testId + "_" + attempt.timestamp;
-        attempt.docId = docId;
-        attempt.uid = window.currentUserUid;
-        attempt.testId = testId;
-        try {
-            await setDoc(doc(db, "snapenglish_history", docId), attempt);
-            return attempt;
-        } catch (e) { console.error("Lỗi đồng bộ lịch sử đám mây:", e); return attempt; }
-    };
-
-    window.getHistoryFromFirebase = async function(testId) {
-        if (!window.currentUserUid) return null;
-        try {
-            const q = query(collection(db, "snapenglish_history"), where("uid", "==", window.currentUserUid));
-            const querySnapshot = await getDocs(q);
-            let history = [];
-            querySnapshot.forEach((docSnap) => {
-                let data = docSnap.data();
-                if (data.testId === testId) {
-                    history.push(data);
-                }
-            });
-            history.sort((a, b) => b.timestamp - a.timestamp);
-            return history;
-        } catch (e) { console.error("Lỗi tải lịch sử từ đám mây:", e); return null; }
-    };
-
-    window.deleteHistoryDocFirebase = async function(docId) {
-        if (!window.currentUserUid || !docId) return;
-        try {
-            await deleteDoc(doc(db, "snapenglish_history", docId));
-        } catch (e) { console.error("Lỗi xóa lịch sử:", e); }
-    };
-
     function calculateToeicScore(skill, correct, total) {
         let percentage = correct / total;
-        let maxScore = 495; // Reading Max score is 495
+        let maxScore = 495; 
         let step = 5;
         let estimated = Math.round((percentage * maxScore) / step) * step;
         if (estimated > maxScore) return maxScore;
@@ -910,22 +885,10 @@
         return estimated;
     }
 
-    window.luuDiemTOEICLenFirebase = async function(tongSoCau, soCauDung, tenBai, kyNang, tenPart) {
+    window.luuDiemTOEICLenFirebase = async function(tongSoCau, soCauDung, tenBai, kyNang, tenPart, answersData, timeTakenStr) {
         if (!window.currentUserUid) return; 
 
         let diemQuyDoi = calculateToeicScore(kyNang, soCauDung, tongSoCau);
-        let thoiGianHienTai = "--";
-        let inputPhut = parseInt(document.getElementById('timeInput').value) || 15; 
-        let tongThoiGianGoc = inputPhut * 60;
-
-        if (typeof testDuration !== 'undefined') {
-            let thoiGianDaLam = tongThoiGianGoc - testDuration;
-            if (thoiGianDaLam < 0) thoiGianDaLam = 0; 
-            
-            let m = Math.floor(thoiGianDaLam / 60);
-            let s = thoiGianDaLam % 60;
-            thoiGianHienTai = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-        }
         let timestamp = Date.now();
         let docId = window.currentUserUid + "_toeic_" + timestamp;
         
@@ -935,16 +898,53 @@
                 skill: kyNang,           
                 testName: tenBai,        
                 partName: tenPart,       
-                timeTaken: thoiGianHienTai,
                 totalQ: tongSoCau,
                 correctQ: soCauDung,
                 score: diemQuyDoi,       
                 date: new Date().toLocaleDateString('vi-VN'),
-                timestamp: timestamp
+                time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+                timestamp: timestamp,
+                answers: answersData || {},
+                timeTaken: timeTakenStr || "--:--"
             });
             showInGameToast("☁️ Đã đồng bộ điểm số lên Máy Chủ!");
         } catch (error) {
             console.error(error);
+        }
+    }
+
+    // --- LẤY LỊCH SỬ CHUẨN TỪ CÙNG 1 COLLECTION ---
+    window.layLichSuTuFirebase = async function() {
+        if (!window.currentUserEmail) return [];
+        try {
+            const q = query(
+                collection(db, "user_toeic_scores"),
+                where("email", "==", window.currentUserEmail),
+                where("testName", "==", "Text completion 01"),
+                where("partName", "==", "Part 6")
+            );
+            const querySnapshot = await getDocs(q);
+            let history = [];
+            querySnapshot.forEach((docSnap) => {
+                let data = docSnap.data();
+                data.id = docSnap.id; 
+                history.push(data);
+            });
+            history.sort((a, b) => b.timestamp - a.timestamp);
+            return history;
+        } catch (error) {
+            console.error("Lỗi tải lịch sử từ Firebase:", error);
+            showInGameToast("❌ Lỗi đồng bộ dữ liệu. Đang dùng tạm lịch sử trên máy.");
+            return [];
+        }
+    }
+
+    window.xoaLichSuFirebase = async function(docId) {
+        try {
+            await deleteDoc(doc(db, "user_toeic_scores", docId));
+            showInGameToast("🗑 Đã xóa bài làm khỏi Máy Chủ!");
+        } catch (error) {
+            console.error("Lỗi xóa trên Firebase:", error);
         }
     }
 </script>
