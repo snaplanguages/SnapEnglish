@@ -2363,8 +2363,8 @@ window.restoreAttempt = restoreAttempt;
 window.deleteAttempt = deleteAttempt; // Thêm kết nối cho hàm Xóa
 
 // --- QUẢN LÝ LỊCH SỬ LÀM BÀI BẰNG LOCALSTORAGE ---
-const HISTORY_KEY = "snapenglish_test2_2018_history";
-let isReviewingMode = false; // Biến cờ hiệu để biết đang xem lại hay làm thật
+const HISTORY_KEY = "snapenglish_test1_2019_history";
+let isReviewingMode = false; 
 
 function saveAttemptToHistory(score, total, userAnswersMap) {
     let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
@@ -2667,7 +2667,7 @@ function removeHighlight() {
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, collection, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
@@ -2681,8 +2681,11 @@ function removeHighlight() {
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+const TEST_ID = "test1_2019";
 
-    // Thông báo Toast trượt góc
+    window.currentUserUid = null;
+    window.currentUserEmail = null;
+    
     function showInGameToast(msg) {
         let toast = document.createElement("div");
         toast.innerText = msg;
@@ -2693,6 +2696,56 @@ function removeHighlight() {
         setTimeout(() => { toast.remove(); }, 4000);
     }
 
+    window.saveHistoryToCloud = async function(score, total, userAnswersMap) {
+        if (!window.currentUserUid) {
+            showInGameToast("⚠️ Hãy đăng nhập để lưu lịch sử làm bài!");
+            return;
+        }
+        let now = new Date();
+        let attemptId = Date.now();
+        let toeicScore = Math.round(((score / total) * 495) / 5) * 5;
+        
+        try {
+            await setDoc(doc(db, "user_test_histories", window.currentUserUid + "_" + TEST_ID + "_" + attemptId), {
+                id: attemptId,
+                uid: window.currentUserUid,
+                testId: TEST_ID,
+                date: now.toLocaleDateString('vi-VN'),
+                time: now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+                score: score,
+                total: total,
+                toeicScore: toeicScore,
+                answers: userAnswersMap,
+                timestamp: attemptId
+            });
+            showInGameToast("☁️ Đã lưu lịch sử chi tiết lên Cloud!");
+        } catch (e) { console.error("Lỗi lưu lịch sử:", e); }
+    };
+
+    window.getHistoryFromCloud = async function() {
+        if (!window.currentUserUid) return [];
+        let history = [];
+        try {
+            const q = query(collection(db, "user_test_histories"), 
+                            where("uid", "==", window.currentUserUid),
+                            where("testId", "==", TEST_ID));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                history.push(doc.data());
+            });
+            history.sort((a, b) => b.timestamp - a.timestamp);
+        } catch (e) { console.error("Lỗi tải lịch sử:", e); }
+        return history;
+    };
+
+    window.deleteHistoryFromCloud = async function(attemptId) {
+        if (!window.currentUserUid) return;
+        try {
+            await deleteDoc(doc(db, "user_test_histories", window.currentUserUid + "_" + TEST_ID + "_" + attemptId));
+            showInGameToast("🗑 Đã xóa bài làm khỏi Cloud!");
+        } catch (e) { console.error("Lỗi xóa lịch sử:", e); }
+    };
+
     onAuthStateChanged(auth, (user) => {
         if (user) {
             window.currentUserUid = user.uid;
@@ -2702,18 +2755,12 @@ function removeHighlight() {
         }
     });
 
-   // Thêm timeTaken vào tham số của hàm
     window.luuDiemTOEICReadingFull = async function(correct, total, testTitle, timeTaken) {
         if (!window.currentUserUid) return;
         
         let scoreConverted = Math.round(((correct / total) * 495) / 5) * 5;
         let timestamp = Date.now();
         let docId = window.currentUserUid + "_toeic_" + timestamp;
-
-        let now = new Date();
-        let hours = now.getHours().toString().padStart(2, '0');
-        let minutes = now.getMinutes().toString().padStart(2, '0');
-        let timeString = hours + ":" + minutes; 
 
         try {
             await setDoc(doc(db, "user_toeic_scores", docId), {
@@ -2724,10 +2771,8 @@ function removeHighlight() {
                 correctQ: correct,
                 totalQ: total,
                 score: scoreConverted,
-                date: now.toLocaleDateString('vi-VN'),
-                time: timeString, 
-                Time: timeString, 
-                timeTaken: timeTaken, // Thêm dòng này để fix lỗi undefined
+                timeTaken: timeTaken, // Được cập nhật truyền thêm biến này để theo dõi time
+                date: new Date().toLocaleDateString('vi-VN'),
                 timestamp: timestamp
             });
             showInGameToast("☁️ Đã đồng bộ điểm Reading lên Tracker!");
