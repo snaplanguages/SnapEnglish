@@ -8,265 +8,365 @@
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* SnapEnglish Pastel & Glassmorphism Palette */
-            --bg-gradient: linear-gradient(135deg, #f3e7e9 0%, #e3eeff 99%, #e3eeff 100%);
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.8);
+            /* SnapEnglish Color Palette */
             --snap-dark: #1E293B;
+            --snap-primary: #4F46E5; 
+            --snap-secondary: #06B6D4; 
+            --snap-accent: #F59E0B; 
+            --bg-light: #F8FAFC;
+            --card-bg: #FFFFFF;
             --text-main: #334155;
+            --text-muted: #64748B;
             
-            /* Highlight Colors - Pastel Tones */
-            --hl-para-bg: #dbeafe; /* Pastel Blue */
-            --hl-para-text: #1e3a8a;
-            --hl-vocab-bg: #d1fae5; /* Pastel Green */
-            --hl-vocab-text: #064e3b;
-            --hl-idea-bg: #ffedd5; /* Pastel Orange */
-            --hl-idea-text: #7c2d12;
-            --hl-note-bg: #fce7f3; /* Pastel Pink */
-            --hl-note-text: #831843;
+            /* Highlight Colors for Memory Anchors */
+            --hl-para-bg: #DBEAFE; /* Blue */
+            --hl-para-text: #1D4ED8;
+            --hl-vocab-bg: #D1FAE5; /* Green */
+            --hl-vocab-text: #047857;
+            --hl-idea-bg: #FFEDD5; /* Orange */
+            --hl-idea-text: #C2410C;
         }
 
         * { box-sizing: border-box; }
 
         body { 
             font-family: 'Be Vietnam Pro', sans-serif; 
-            background: var(--bg-gradient); 
+            background: var(--bg-light); 
             margin: 0; 
+            display: flex; 
             height: 100vh; 
             overflow: hidden; 
             color: var(--text-main); 
-            padding: 20px;
         }
 
-        /* 3 Columns Layout */
-        .container {
-            display: grid;
-            grid-template-columns: 32% 34% 34%;
-            gap: 20px;
-            height: 100%;
+        /* Sidebar: Analysis & Guide */
+        .sidebar { 
+            width: 420px; 
+            background: var(--card-bg); 
+            border-right: 1px solid #E2E8F0;
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 4px 0 20px rgba(0,0,0,0.02);
+            z-index: 10;
         }
 
-        /* Glassmorphism Column Style */
-        .glass-col {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+        .sidebar-header { 
+            padding: 25px; 
+            background: linear-gradient(135deg, var(--snap-primary), #818CF8);
+            color: white;
         }
+        .sidebar-header h1 { margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
+        .sidebar-header p { margin: 5px 0 0 0; font-size: 0.9rem; font-weight: 500; opacity: 0.9; }
 
-        .col-header-area {
-            padding: 20px 25px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
-            background: rgba(255, 255, 255, 0.4);
-            flex-shrink: 0;
-        }
-
-        .col-header-area h2 {
-            margin: 0 0 5px 0;
-            font-size: 1.25rem;
-            font-weight: 800;
-            color: var(--snap-dark);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .col-header-area p.subtitle {
-            margin: 0;
-            font-size: 0.85rem;
-            color: #64748B;
-            font-weight: 500;
-        }
-
-        /* Scrollable Content Area */
-        .scroll-content {
+        .guide-content {
             padding: 25px;
             overflow-y: auto;
             flex: 1;
         }
 
-        /* Custom Scrollbar for all columns */
-        .scroll-content::-webkit-scrollbar { width: 6px; }
-        .scroll-content::-webkit-scrollbar-track { background: transparent; }
-        .scroll-content::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 10px; }
-        .scroll-content::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.6); }
-
-        /* Guide Section Formatting */
-        .guide-box {
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-            border: 1px solid white;
+        .guide-section { margin-bottom: 25px; }
+        .guide-section h3 { 
+            margin: 0 0 10px 0; 
+            color: var(--snap-dark); 
+            font-size: 1.1rem; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-
-        .guide-box h3 { margin: 0 0 15px 0; font-size: 1.1rem; color: var(--snap-dark); }
-        .guide-box p { margin: 0 0 10px 0; font-size: 0.95rem; line-height: 1.7; }
-        .guide-box ul { margin: 0 0 10px 0; padding-left: 20px; font-size: 0.95rem; line-height: 1.7; }
-        .guide-box li { margin-bottom: 8px; }
-
-        .note-alert {
-            background: var(--hl-note-bg);
-            color: var(--hl-note-text);
-            padding: 15px;
-            border-radius: 12px;
-            border-left: 4px solid #f43f5e;
-            font-size: 0.95rem;
-            font-weight: 500;
-            margin-top: 15px;
+        
+        .logic-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
-
-        /* Vocabulary & Paraphrasing Tags */
-        .vocab-tag {
-            display: inline-block;
-            background: white;
-            padding: 8px 12px;
+        .logic-item {
+            background: #F1F5F9;
+            padding: 12px 15px;
             border-radius: 8px;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            border: 1px solid #e2e8f0;
-            width: 100%;
-            transition: transform 0.2s;
+            border-left: 4px solid var(--snap-primary);
         }
-        .vocab-tag:hover { transform: translateX(5px); }
-        .vocab-tag strong { color: var(--snap-dark); display: block; margin-bottom: 2px;}
+        .logic-item h4 {
+            margin: 0 0 5px 0;
+            font-size: 0.95rem;
+            color: var(--snap-dark);
+        }
+        .logic-item p {
+            margin: 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-main);
+        }
+
+        .guide-section p { margin: 0 0 10px 0; font-size: 0.95rem; line-height: 1.6; color: var(--text-main); }
+        .guide-section ul { margin: 0; padding-left: 20px; font-size: 0.95rem; line-height: 1.6; }
+        
+        .legend-box {
+            background: #F1F5F9;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        .legend-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;}
+        .legend-item:last-child { margin-bottom: 0; }
+        .color-dot { width: 14px; height: 14px; border-radius: 4px; }
+
+        /* Main Content: Prompt & Essay */
+        .main-content { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .prompt-container {
+            padding: 25px 40px;
+            background: white;
+            border-bottom: 1px solid #E2E8F0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+        }
+        .prompt-label { text-transform: uppercase; color: var(--snap-accent); font-weight: 800; font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 5px; display: block;}
+        .prompt-text { font-size: 1.3rem; font-weight: 700; color: var(--snap-dark); margin: 0;}
+
+        /* CSS Grid 3 cột: Cột Anh - Vách Ngăn - Cột Việt */
+        .essay-container {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 30px;
+            padding: 30px 40px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .vertical-divider {
+            width: 2px;
+            background-image: linear-gradient(to bottom, #CBD5E1 50%, transparent 50%);
+            background-size: 2px 12px;
+            height: 100%;
+            margin-top: 40px;
+            opacity: 0.6;
+        }
+
+        .col-header {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--snap-secondary);
+            margin: 0 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #E2E8F0;
+            padding-bottom: 10px;
+        }
 
         /* Paragraph Styling & Focus Mode */
         .paragraph-card {
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 16px;
-            padding: 22px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-            border: 2px solid transparent;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            border: 1px solid #E2E8F0;
             font-size: 1.05rem;
             line-height: 1.8;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .prompt-box {
-            background: linear-gradient(to right, #e0c3fc 0%, #8ec5fc 100%);
-            color: #1e1e2f;
-            padding: 20px;
-            border-radius: 16px;
-            margin-bottom: 25px;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(142, 197, 252, 0.4);
-        }
-
-        /* Focus Mode Logic */
-        .focus-mode .paragraph-card { opacity: 0.35; filter: grayscale(80%); }
-        .focus-mode .paragraph-card.active { 
+        .essay-container.focus-mode .paragraph-card { opacity: 0.4; filter: grayscale(50%); }
+        .essay-container.focus-mode .paragraph-card.active { 
             opacity: 1; 
             filter: grayscale(0%);
-            box-shadow: 0 10px 30px rgba(142, 197, 252, 0.3); 
-            border-color: #8ec5fc;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.15); 
+            border-color: var(--snap-primary);
             transform: scale(1.02);
-            background: white;
         }
 
-        .paragraph-card:hover:not(.active) { border-color: rgba(142, 197, 252, 0.5); background: white; }
+        .paragraph-card:hover:not(.active) { border-color: #CBD5E1; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+
+        .trans-card {
+            background: #F8FAFC;
+            border: 1px dashed #CBD5E1;
+            box-shadow: none;
+        }
 
         /* Highlights */
-        mark { padding: 3px 6px; border-radius: 6px; font-weight: 600; background: transparent; }
+        mark { padding: 2px 6px; border-radius: 6px; font-weight: 600; }
         .hl-para { background-color: var(--hl-para-bg); color: var(--hl-para-text); }
         .hl-vocab { background-color: var(--hl-vocab-bg); color: var(--hl-vocab-text); }
         .hl-idea { background-color: var(--hl-idea-bg); color: var(--hl-idea-text); }
 
-        .legend-box { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
-        .legend-item { font-size: 0.85rem; font-weight: 600; padding: 6px 12px; border-radius: 20px; }
+        .vocab-list { margin-top: 15px; }
+        .vocab-item { background: #F8FAFC; border: 1px solid #E2E8F0; padding: 10px 15px; border-radius: 8px; margin-bottom: 10px; font-size: 0.9rem;}
+        .vocab-item strong { display: block; color: var(--snap-dark); font-size: 1rem; margin-bottom: 4px;}
 
+        /* =========================================
+           RESPONSIVE DESIGN (Media Queries) 
+           ========================================= */
+
+        /* Dành cho màn hình Laptop nhỏ và Tablet ngang (max-width: 1200px) */
+        @media screen and (max-width: 1200px) {
+            .sidebar { width: 320px; }
+            .essay-container { padding: 20px 25px; gap: 20px; }
+            .prompt-container { padding: 20px 25px; }
+        }
+
+        /* Dành cho Tablet dọc (max-width: 992px) */
+        @media screen and (max-width: 992px) {
+            body { 
+                flex-direction: column; 
+                height: auto; 
+                overflow: auto; 
+            }
+            .sidebar { 
+                width: 100%; 
+                border-right: none; 
+                border-bottom: 2px solid #E2E8F0;
+            }
+            .guide-content {
+                max-height: 40vh; /* Giới hạn chiều cao phần phân tích trên tablet để nhường chỗ cho bài học */
+                padding: 20px 25px;
+            }
+            .main-content {
+                flex: none;
+                overflow: visible;
+            }
+            .essay-container {
+                overflow: visible;
+                height: auto;
+            }
+        }
+
+        /* Dành cho Điện thoại di động (Mobile) (max-width: 768px) */
+        @media screen and (max-width: 768px) {
+            .essay-container { 
+                grid-template-columns: 1fr; /* Gộp thành 1 cột duy nhất xếp chồng */
+                padding: 15px;
+                gap: 15px;
+            }
+            .vertical-divider { 
+                display: none; /* Ẩn vách ngăn giữa 2 cột */
+            }
+            .prompt-container { 
+                padding: 15px; 
+            }
+            .prompt-text { 
+                font-size: 1.15rem; 
+            }
+            .sidebar-header { 
+                padding: 15px; 
+            }
+            .sidebar-header h1 { 
+                font-size: 1.25rem; 
+            }
+            .col-header {
+                font-size: 1rem;
+            }
+            
+            /* Tùy chỉnh Focus Mode trên mobile: giảm mờ để dễ đọc hơn khi không gian hẹp */
+            .essay-container.focus-mode .paragraph-card { opacity: 1; filter: none; }
+            .essay-container.focus-mode .paragraph-card:not(.active) { opacity: 0.6; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container" id="main-container">
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h1>SnapEnglish</h1>
+        <p>Phân tích Bài mẫu Task 2: Work and Payment </p>
+    </div>
     
-    <div class="glass-col">
-        <div class="col-header-area">
-            <h2>💡 Phân tích & Hướng dẫn</h2>
-            <p class="subtitle">SnapEnglish | Task 2: Work and Payment</p>
-        </div>
-        <div class="scroll-content">
+    <div class="guide-content">
+        <div class="guide-section">
+            <h3>🎯 Tư duy & Lập luận (Why & How)</h3>
+            <p>Dạng bài "Discuss both views". Mỗi đoạn body phải giải thích cho từng quan điểm: tại sao lại là 'necessary' và tại sao là 'unfair'.</p>
             
-            <div class="guide-box">
-                <h3>1. Ý tưởng (Idea)</h3>
-                <p>Đây là dạng bài <strong>"Discuss both views"</strong>, với mỗi đoạn body, mình phải đưa ra ý giải thích cho từng view của đề bài: Tại sao trả lương cho giám đốc cao hơn lại necessary và tại sao trả lương cho giám đốc cao hơn lại unfair.</p>
-                <p>Đề bài yêu cầu mình <strong>"give your own opinions"</strong>, nó có nghĩa là người viết phải đưa ra “lập trường" rõ ràng, thường là mình sẽ chọn nghiêng về view nào: necessary hay unfair?</p>
-                <p>Do đề này khó có idea, vậy nên trong cả body 1 và body 2, chúng mình chỉ phát triển ý 'unfair' bằng 1 luận điểm duy nhất:</p>
-                <ul>
-                    <li><strong>Body 1:</strong> Một số người nói lương giám đốc quá cao là unfair vì thời gian đến công ty giống nhau, cam kết công việc giống nhau thì lương phải tương đương nhau.</li>
-                    <li><strong>Body 2:</strong> Đây là quan điểm mà chúng mình đồng ý. Vì có thể thời gian ở công ty là bằng nhau thật đó, nhưng giám đốc chịu nhiều áp lực hơn, họ phải ra những quyết định quan trọng hơn, vì vậy nên lương cao hơn => Vậy lương cao là 'necessary' để giữ động lực làm việc cho họ, không thì họ sẽ chán và làm việc không tốt, ảnh hưởng đến cả công ty.</li>
-                </ul>
-                <div class="note-alert">
-                    🔥 <strong>Lưu ý quan trọng:</strong> 2 keyword để hỏi là 'unfair' và 'necessary', bạn phải đưa ra quan điểm chứng minh tại sao 'không công bằng' và tại sao lương cao là cần thiết. Mình đưa ra idea như nào cũng được, nhưng kết quả sau cùng phải trả lời cho được câu hỏi của đề bài là 'unfair' và 'necessary' nhen. Đây cũng chính là vấn đề của nhiều bạn chưa hiểu rõ về yêu cầu của đề thi, mình lo tập trung show quá nhiều vocab trong bài mà quên mất yêu cầu đề đang hỏi việc gì, mọi người lưu ý nhen.
+            <div class="logic-breakdown">
+                <div class="logic-item">
+                    <h4>Mở bài (Định vị)</h4>
+                    <p>Yêu cầu "give your own opinions" có nghĩa là người viết phải đưa ra lập trường rõ ràng. Trong bài này, tác giả chọn nghiêng về view 'necessary'.</p>
+                </div>
+                <div class="logic-item" style="border-left-color: var(--snap-accent);">
+                    <h4>Body 1 (Quan điểm Unfair)</h4>
+                    <p>Chỉ phát triển 1 luận điểm duy nhất: Thời gian đến công ty giống nhau, cam kết giống nhau thì lương phải tương đương. Phát triển xa hơn bằng cách bàn về cực đoan như làm thêm giờ không lương, dẫn đến sự ganh tị (envy).</p>
+                </div>
+                <div class="logic-item" style="border-left-color: var(--snap-secondary);">
+                    <h4>Body 2 (Quan điểm Necessary - Ý kiến cá nhân)</h4>
+                    <p>Đồng ý với quan điểm này. Giải thích rằng giám đốc chịu nhiều áp lực hơn, ra quyết định quan trọng. Giải thích thêm về khía cạnh đời sống cá nhân bị ảnh hưởng, nên mức lương cao là cần thiết để giữ động lực làm việc.</p>
+                </div>
+                <div class="logic-item" style="border-left-color: #10B981;">
+                    <h4>Lưu ý quan trọng</h4>
+                    <p>Luôn phải bám sát 2 keyword là 'unfair' và 'necessary' để giải quyết trọng tâm câu hỏi, tránh mải mê khoe từ vựng mà quên mất yêu cầu đề bài.</p>
                 </div>
             </div>
+        </div>
 
-            <div class="guide-box">
-                <h3>2. Phát triển ý</h3>
-                <p>Do mỗi body (100-120 từ) mà chỉ phát triển xung quanh có duy nhất 1 supporting idea, nên mình sẽ bị áp lực phát triển ý, làm sao viết nhiều chữ xoay quanh 1 ý duy nhất mà vẫn mạch lạc.</p>
-                <ul>
-                    <li><strong>Body 1:</strong> Câu 1 là topic sentence, 2 câu sau mình sẽ lần lượt dùng để giải thích tại sao lại là unfair. Câu 4 mình sẽ discuss thêm ý ở 2 câu trước, bàn về 1 trường hợp cực đoan hơn là họ thậm chí còn phải làm thêm giờ mà không có lương, dẫn đến hệ quả ở câu 5 (sự ganh tị-envy).</li>
-                    <li><strong>Body 2:</strong> Câu 1 cũng là topic sentence, đưa ra quan điểm rõ ràng rằng mình đồng ý với quan điểm ở body 2. Hai câu sau mình giải thích rõ, tại sao cần lương cao về khía cạnh công việc. Hai câu sau giải thích lương cao về khía cạnh đời sống cá nhân. Và cuối cùng sự cống hiến về 'công việc' và 'đời sống cá nhân' dẫn đến sự cần thiết' của lương cao ở câu cuối.</li>
-                </ul>
+        <div class="guide-section">
+            <h3>🎨 Bảng màu phân tích (Legend)</h3>
+            <div class="legend-box">
+                <div class="legend-item">
+                    <div class="color-dot" style="background: var(--hl-para-bg); border: 1px solid var(--hl-para-text);"></div>
+                    <span style="color: var(--hl-para-text)">Kỹ năng Paraphrasing</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-dot" style="background: var(--hl-vocab-bg); border: 1px solid var(--hl-vocab-text);"></div>
+                    <span style="color: var(--hl-vocab-text)">Từ vựng học thuật (Lexical)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-dot" style="background: var(--hl-idea-bg); border: 1px solid var(--hl-idea-text);"></div>
+                    <span style="color: var(--hl-idea-text)">Phát triển ý sâu (Idea Expansion)</span>
+                </div>
             </div>
+        </div>
 
-            <div class="guide-box">
-                <h3>3. Paraphrasing <span style="font-size: 0.8rem; background: var(--hl-para-bg); color: var(--hl-para-text); padding: 3px 8px; border-radius: 10px; margin-left: 5px;">Màu Xanh Dương</span></h3>
-                <p>Đọc đề bài này lên, mình có thể ngay lập tức lường trước 2 từ của đề bài sẽ bị lặp rất nhiều trong bài viết, đó là: <strong>'directors'</strong> và <strong>'salaries'</strong>.</p>
-                
-                <p><strong>'Directors'</strong> là giám đốc, người ở vị trí cấp cao, có vai trò quản trị. Mình có thể paraphrase 'directors' bằng một số cách, chẳng hạn:</p>
-                <div class="vocab-tag"><strong>Managerial positions</strong>Vị trí quản lý</div>
-                <div class="vocab-tag"><strong>Individuals in top positions</strong>Nhân vật cấp cao</div>
-                <div class="vocab-tag"><strong>Senior managers</strong>Người quản lý cấp cao</div>
-                
-                <p style="margin-top: 15px;"><strong>'Salary'</strong> là lương trả cố định theo tháng. Bạn cần thận nha, mình thường paraphrase 'salary' thành 'wages'. 'Wage' là từ lương trả theo tuần (giống các cầu thủ bóng đá bên Anh). Đây là khái niệm ít có trong tiếng Việt, vì nước mình trả lương theo tháng (salary) không hà. Trong bài này, tuỳ bối cảnh, mình có thể paraphrase 'salary' bằng:</p>
-                <div class="vocab-tag"><strong>Higher incomes</strong>Mức thu nhập cao hơn</div>
-                <div class="vocab-tag"><strong>Compensation (package)</strong>Lương/gói đãi ngộ mà công ty offer cho nhân viên</div>
-                <div class="vocab-tag"><strong>Additional payment</strong>Khoản tiền lương trả thêm</div>
-                <div class="vocab-tag"><strong>Disparities in salaries</strong>Sự chênh lệch về lương</div>
+        <div class="guide-section">
+            <h3>📖 Cụm từ & Paraphrasing ghi điểm</h3>
+            <div class="vocab-list">
+                <div class="vocab-item">
+                    <strong>Managerial positions / Senior managers</strong>
+                    Vị trí quản lý / Người quản lý cấp cao
+                </div>
+                <div class="vocab-item">
+                    <strong>Compensation package / Higher incomes</strong>
+                    Gói đãi ngộ / Mức thu nhập cao hơn 
+                </div>
+                <div class="vocab-item">
+                    <strong>Subordinate</strong>
+                    Nhân viên cấp dưới 
+                </div>
+                <div class="vocab-item">
+                    <strong>Comparable compensation</strong>
+                    Mức lương ngang bằng nhau 
+                </div>
+                <div class="vocab-item">
+                    <strong>Beyond one's job scope</strong>
+                    Nằm ngoài phạm vi công việc
+                </div>
+                <div class="vocab-item">
+                    <strong>Morale and attitudes</strong>
+                    Tinh thần và thái độ làm việc
+                </div>
+                <div class="vocab-item">
+                    <strong>Motivations are compromised</strong>
+                    Động lực bị suy giảm 
+                </div>
             </div>
-
-            <div class="guide-box">
-                <h3>4. Vocabulary <span style="font-size: 0.8rem; background: var(--hl-vocab-bg); color: var(--hl-vocab-text); padding: 3px 8px; border-radius: 10px; margin-left: 5px;">Màu Xanh Lá</span></h3>
-                <p>Chủ đề Work/salary cũng là chủ đề rất hay gặp trong IELTS WRITING, mọi người cùng học 1 số từ/cụm từ hay nhé:</p>
-                <div class="vocab-tag"><strong>Subordinate (n)</strong>Nhân viên cấp dưới</div>
-                <div class="vocab-tag"><strong>Offer sb higher incomes (v)</strong>Trả lương cho ai cao hơn</div>
-                <div class="vocab-tag"><strong>Comparable compensation (n)</strong>Mức lương ngang bằng nhau</div>
-                <div class="vocab-tag"><strong>Beyond one's job scope (prep phrase)</strong>Nằm ngoài phạm vi công việc</div>
-                <div class="vocab-tag"><strong>Morale and attitudes (n)</strong>Tinh thần và thái độ làm việc</div>
-                <div class="vocab-tag"><strong>Motivations are compromised</strong>Động lực bị suy giảm</div>
-            </div>
-
         </div>
     </div>
+</div>
 
-    <div class="glass-col">
-        <div class="col-header-area">
-            <h2>📝 Bản Tiếng Anh</h2>
-            <p class="subtitle">Click vào đoạn văn để bật chế độ Focus</p>
-        </div>
-        <div class="scroll-content">
+<div class="main-content">
+    <div class="prompt-container">
+        <span class="prompt-label">Đề bài IELTS (Topic)</span>
+        <p class="prompt-text">Directors of large organizations earn much higher salaries than ordinary employees do. Some people think it is necessary, but others are of the opinion that it is unfair. Discuss both views and give your own opinions. </p>
+    </div>
+
+    <div class="essay-container" id="essay-container">
+        
+        <div class="col-english">
+            <h2 class="col-header">📝 Bản Tiếng Anh (Sample)</h2>
+            <p style="font-size: 0.85rem; color: #94A3B8; margin-bottom: 15px;">*Click vào từng đoạn văn để bật chế độ Focus Mode (Tập trung).</p>
             
-            <div class="prompt-box">
-                <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; opacity: 0.8;">Đề bài (Topic)</div>
-                Directors of large organizations earn much higher salaries than ordinary employees do. Some people think it is necessary, but others are of the opinion that it is unfair. Discuss both views and give your own opinions.
-            </div>
-
-            <div class="legend-box">
-                <div class="legend-item hl-para">Paraphrasing</div>
-                <div class="legend-item hl-vocab">Vocabulary</div>
-                <div class="legend-item hl-idea">Idea Expansion</div>
-            </div>
-
             <div class="paragraph-card" onclick="toggleFocus(this, 'p1')">
                 Opinions are divided on whether higher positions in organizations, such as <mark class="hl-para">directors</mark>, should be better paid than their <mark class="hl-vocab">subordinates</mark>. In my view, it is entirely fair and necessary to <mark class="hl-vocab">offer directors significantly higher salaries</mark> due to the pressure and tasks they are responsible for.
             </div>
@@ -282,74 +382,52 @@
             <div class="paragraph-card" onclick="toggleFocus(this, 'p4')">
                 In conclusion, from my perspective, despite certain criticism from those opposing huge salary differences between job titles in a given company, I contend that <mark class="hl-para">senior managers</mark> deserve better <mark class="hl-para">compesation packages</mark> for their responsibility and effort.
             </div>
-
         </div>
-    </div>
 
-    <div class="glass-col">
-        <div class="col-header-area">
-            <h2>🌍 Bản Tiếng Việt</h2>
-            <p class="subtitle">Bản dịch sẽ tự động sáng lên khi bạn tra cứu</p>
-        </div>
-        <div class="scroll-content" id="vn-scroll-area">
-            
-            <div class="prompt-box" style="background: linear-gradient(to right, #fbc2eb 0%, #a6c1ee 100%); box-shadow: 0 4px 15px rgba(251, 194, 235, 0.4);">
-                <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; opacity: 0.8;">Dịch đề bài</div>
-                Giám đốc của các tổ chức lớn kiếm được mức lương cao hơn nhiều so với nhân viên bình thường. Một số người nghĩ rằng điều đó là cần thiết, nhưng những người khác lại có ý kiến cho rằng điều đó là không công bằng. Thảo luận về cả hai quan điểm và đưa ra ý kiến của riêng bạn.
-            </div>
+        <div class="vertical-divider"></div>
 
-            <div class="paragraph-card trans-card" id="trans-p1" onclick="toggleFocus(document.querySelectorAll('.paragraph-card')[0], 'p1')">
+        <div class="col-vietnamese">
+            <h2 class="col-header">🌍 Bản dịch Tiếng Việt</h2>
+            <p style="font-size: 0.85rem; color: #94A3B8; margin-bottom: 15px;">*Bản dịch tương ứng sẽ sáng lên khi bạn bấm vào tiếng Anh.</p>
+
+            <div class="paragraph-card trans-card" id="trans-p1">
                 Có nhiều ý kiến trái chiều về việc liệu các vị trí cao trong tổ chức, chẳng hạn như <mark class="hl-para">giám đốc</mark>, có nên được trả lương cao hơn so với <mark class="hl-vocab">nhân viên cấp dưới</mark> của họ hay không. Theo quan điểm của tôi, việc <mark class="hl-vocab">trả cho giám đốc mức lương cao hơn đáng kể</mark> là hoàn toàn công bằng và cần thiết do những áp lực và nhiệm vụ mà họ phải chịu trách nhiệm.
             </div>
 
-            <div class="paragraph-card trans-card" id="trans-p2" onclick="toggleFocus(document.querySelectorAll('.paragraph-card')[1], 'p2')">
+            <div class="paragraph-card trans-card" id="trans-p2">
                 Một mặt, những người tin rằng việc mang lại cho <mark class="hl-para">các vị trí quản lý</mark> <mark class="hl-para">mức thu nhập cao hơn</mark> là vô lý có những lý lẽ biện minh riêng của họ. Một trong những lý do đó là, bất kể cấp bậc của một người trong tổ chức, nhân viên thường được yêu cầu làm việc với cùng một khoảng thời gian, thường là từ 9 giờ sáng đến 5 giờ chiều. Họ lập luận rằng cùng một mức độ cam kết sẽ mang lại <mark class="hl-vocab">mức thù lao tương đương</mark> từ tổ chức. Ngoài ra, trong một số trường hợp nhất định, nhân viên cấp thấp có thể làm việc quá sức và được giao những công việc vụn vặt <mark class="hl-vocab">nằm ngoài phạm vi công việc</mark> của họ mà không nhận được khoản thanh toán thêm. Hơn nữa, <mark class="hl-para">sự chênh lệch đáng kể về tiền lương</mark> có khả năng dẫn đến sự đố kỵ, điều này có thể tác động tiêu cực đến <mark class="hl-vocab">tinh thần và thái độ</mark> của toàn bộ lực lượng lao động.
             </div>
 
-            <div class="paragraph-card trans-card" id="trans-p3" onclick="toggleFocus(document.querySelectorAll('.paragraph-card')[2], 'p3')">
+            <div class="paragraph-card trans-card" id="trans-p3">
                 Tuy nhiên, tôi giữ quan điểm rằng các giám đốc có quyền nhận được mức lương cao hơn đáng kể. Mặc dù thời gian làm việc có thể giống nhau, nhưng <mark class="hl-para">những cá nhân ở vị trí cấp cao</mark> liên tục phải chịu áp lực cao hơn nhiều về các vấn đề vận hành. Đó là, họ được yêu cầu phải đưa ra và chịu trách nhiệm về các chiến lược quan trọng để đảm bảo sự thành công liên tục của tổ chức. <mark class="hl-idea">Thậm chí ngoài môi trường văn phòng, do áp lực phải chịu đựng, các nhà quản lý có xu hướng liên tục dành sự chú ý của họ cho các vấn đề kinh doanh.</mark> Điều này làm tổn hại đến thời gian cá nhân của họ để thư giãn và chăm sóc gia đình, khiến sự cân bằng giữa công việc và cuộc sống đối với nhiều người trong số họ trở nên bất khả thi. Trách nhiệm và đóng góp cao hơn sẽ dẫn đến thu nhập cao hơn, nếu không <mark class="hl-vocab">động lực của họ có thể bị suy giảm</mark>, có khả năng ảnh hưởng đến hiệu suất tổng thể của toàn bộ công ty.
             </div>
 
-            <div class="paragraph-card trans-card" id="trans-p4" onclick="toggleFocus(document.querySelectorAll('.paragraph-card')[3], 'p4')">
+            <div class="paragraph-card trans-card" id="trans-p4">
                 Tóm lại, từ góc độ của tôi, bất chấp những lời chỉ trích nhất định từ những người phản đối sự khác biệt lớn về tiền lương giữa các chức danh công việc trong một công ty nhất định, tôi cho rằng <mark class="hl-para">các nhà quản lý cấp cao</mark> xứng đáng nhận được <mark class="hl-para">các gói đãi ngộ</mark> tốt hơn cho trách nhiệm và nỗ lực của họ.
             </div>
-
         </div>
     </div>
-
 </div>
 
 <script>
     function toggleFocus(element, id) {
-        const container = document.getElementById('main-container');
+        const container = document.getElementById('essay-container');
         
-        // Nếu click lại vào chính element đang active -> Tắt focus mode
         if (element.classList.contains('active')) {
             container.classList.remove('focus-mode');
             document.querySelectorAll('.paragraph-card').forEach(el => el.classList.remove('active'));
             return;
         }
 
-        // Bật focus mode cho toàn cục
         container.classList.add('focus-mode');
         document.querySelectorAll('.paragraph-card').forEach(el => el.classList.remove('active'));
         
-        // Highlight thẻ bên Tiếng Anh
         element.classList.add('active');
         
-        // Highlight thẻ bên Tiếng Việt và tự động cuộn tới
         const transCard = document.getElementById('trans-' + id);
         if (transCard) {
             transCard.classList.add('active');
-            
-            // Lấy container cuộn của cột Tiếng Việt
-            const vnScrollArea = document.getElementById('vn-scroll-area');
-            
-            // Tính toán vị trí cuộn trơn tru
-            vnScrollArea.scrollTo({
-                top: transCard.offsetTop - vnScrollArea.offsetTop - 20,
-                behavior: 'smooth'
-            });
+            transCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     }
 </script>
