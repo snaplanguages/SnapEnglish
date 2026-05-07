@@ -381,7 +381,8 @@
     let currentIndex = 0;
     let userAnswers = new Array(questions.length).fill(null);
     const audio = document.getElementById('q-audio');
-    const LOCAL_HISTORY_KEY = "snapenglish_p1_t1_2018_history";
+    const LOCAL_HISTORY_KEY = "snapenglish_p1_t1_2018_history"; // Đổi thành 2019 ở file 2019
+    let startTime = 0; // Biến lưu thời gian bắt đầu
 
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -393,6 +394,7 @@
         currentMode = mode;
         currentIndex = 0;
         userAnswers.fill(null);
+        startTime = Date.now(); // Bắt đầu tính giờ
         showScreen('screen-test');
         renderQuestion();
     }
@@ -456,6 +458,15 @@
         const listDiv = document.getElementById('result-list');
         listDiv.innerHTML = '';
 
+        // Tính toán thời gian làm bài (phút:giây)
+        let timeTakenStr = "--:--";
+        if (!isRestoring && startTime > 0) {
+            let diffSeconds = Math.floor((Date.now() - startTime) / 1000);
+            let m = Math.floor(diffSeconds / 60);
+            let s = diffSeconds % 60;
+            timeTakenStr = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
         questions.forEach((q, idx) => {
             const isCorrect = userAnswers[idx] === q.correct;
             if(isCorrect) correctCount++;
@@ -482,9 +493,10 @@
         }
 
         if(!isRestoring) {
-            saveLocalHistory(correctCount, questions.length, userAnswers);
+            saveLocalHistory(correctCount, questions.length, userAnswers, timeTakenStr);
             if(window.luuDiemTOEICLenFirebase) {
-                window.luuDiemTOEICLenFirebase(questions.length, correctCount, "ETS 2018 - Test 1", "Listening", "Part 1", userAnswers);
+                // CHÚ Ý: Đổi tên bài ở tham số thứ 3 tương ứng với file nhé (VD: "ETS 2018 - Test 1" hoặc "ETS 2019 - Test 1")
+                window.luuDiemTOEICLenFirebase(questions.length, correctCount, "ETS 2018 - Test 1", "Listening", "Part 1", userAnswers, timeTakenStr);
             }
         }
     }
@@ -527,7 +539,7 @@
     }
 
     // --- LOGIC LỊCH SỬ ---
-    function saveLocalHistory(score, total, answersArray) {
+    function saveLocalHistory(score, total, answersArray, timeTakenStr) {
         let history = JSON.parse(localStorage.getItem(LOCAL_HISTORY_KEY)) || [];
         let now = new Date();
         history.unshift({
@@ -536,7 +548,8 @@
             time: now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
             score: score,
             total: total,
-            answers: answersArray
+            answers: answersArray,
+            timeTaken: timeTakenStr // Đã lưu thêm thời gian
         });
         localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify(history));
     }
@@ -574,6 +587,7 @@
                 <div class="history-info">
                     <span class="history-date">Lần ${historyArray.length - index}: ${item.time || ''} ${item.date}</span>
                     <span class="history-score">Đúng: ${item.score || item.correctQ}/${item.total || item.totalQ} câu ${isCloud ? '☁️' : '📱'}</span>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">⏱ Thời gian: ${item.timeTaken || '--:--'}</span>
                 </div>
                 <div style="display: flex; gap: 8px;">
                     <button class="btn-review" onclick='restoreAttempt(${JSON.stringify(item.answers || [])})'>Xem lại</button>
@@ -623,7 +637,8 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, collection, query, where, getDocs, deleteDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    // Xóa orderBy khỏi import để dùng cho nhẹ
+    import { getFirestore, doc, setDoc, collection, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
@@ -667,8 +682,8 @@
         return estimated;
     }
 
-    // UPDATE: Thêm tham số answersArray để lưu luôn đáp án lên mây
-    window.luuDiemTOEICLenFirebase = async function(tongSoCau, soCauDung, tenBai, kyNang, tenPart, answersArray) {
+    // Đã thêm tham số timeTakenStr vào hàm lưu
+    window.luuDiemTOEICLenFirebase = async function(tongSoCau, soCauDung, tenBai, kyNang, tenPart, answersArray, timeTakenStr) {
         if (!window.currentUserUid) return; 
 
         let diemQuyDoi = calculateToeicScore(kyNang, soCauDung, tongSoCau);
@@ -687,7 +702,8 @@
                 date: new Date().toLocaleDateString('vi-VN'),
                 time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
                 timestamp: timestamp,
-                answers: answersArray // Mảng đáp án A B C D để phục vụ chức năng "Xem lại"
+                answers: answersArray,
+                timeTaken: timeTakenStr || "--" // Lưu thông tin thời gian lên mây
             });
             showInGameToast("☁️ Đã đồng bộ điểm số lên Máy Chủ!");
         } catch (error) {
@@ -695,15 +711,14 @@
         }
     }
 
-    // FETCH LỊCH SỬ TỪ FIREBASE ĐỂ ĐỒNG BỘ CÁC THIẾT BỊ
     window.layLichSuTuFirebase = async function() {
         if (!window.currentUserEmail) return [];
         try {
+            // Đã xóa orderBy("timestamp") để tránh lỗi Composite Index
             const q = query(
                 collection(db, "user_toeic_scores"),
                 where("email", "==", window.currentUserEmail),
-                where("testName", "==", "ETS 2018 - Test 1"),
-                orderBy("timestamp", "desc")
+                where("testName", "==", "ETS 2018 - Test 1") // NHỚ CHÚ Ý: Ở file 2019 cậu sửa lại tên chỗ này nhé
             );
             const querySnapshot = await getDocs(q);
             let history = [];
@@ -712,6 +727,8 @@
                 data.id = doc.id; 
                 history.push(data);
             });
+            // Tự sắp xếp mới nhất lên đầu bằng Javascript
+            history.sort((a, b) => b.timestamp - a.timestamp);
             return history;
         } catch (error) {
             console.error("Lỗi tải lịch sử từ Firebase:", error);
@@ -720,7 +737,6 @@
         }
     }
 
-    // XÓA LỊCH SỬ TRÊN FIREBASE
     window.xoaLichSuFirebase = async function(docId) {
         try {
             await deleteDoc(doc(db, "user_toeic_scores", docId));
@@ -730,5 +746,3 @@
         }
     }
 </script>
-</body>
-</html>
