@@ -580,11 +580,21 @@
             return;
         }
 
-        listEl.innerHTML = historyArray.map((item, index) => `
+        listEl.innerHTML = historyArray.map((item, index) => {
+            // Xử lý triệt để vụ nhầm lẫn giữa điểm quy đổi và số câu đúng
+            let soCauDung = item.correctQ !== undefined ? item.correctQ : item.score;
+            let tongSoCau = item.totalQ !== undefined ? item.totalQ : item.total;
+            
+            // Nếu là cloud, lấy thêm điểm TOEIC quy đổi để hiển thị
+            let diemQuyDoi = isCloud && item.score !== undefined && item.score > tongSoCau 
+                ? ` (Điểm TOEIC: ${item.score})` 
+                : '';
+
+            return `
             <div class="history-item">
                 <div class="history-info">
                     <span class="history-date">Lần ${historyArray.length - index}: ${item.time || ''} ${item.date}</span>
-                    <span class="history-score">Đúng: ${item.score || item.correctQ}/${item.total || item.totalQ} câu ${isCloud ? '☁️' : '📱'}</span>
+                    <span class="history-score">Đúng: ${soCauDung}/${tongSoCau} câu${diemQuyDoi} ${isCloud ? '☁️' : '📱'}</span>
                     <span style="color: var(--text-muted); font-size: 0.85rem;">⏱ Thời gian: ${item.timeTaken || '--:--'}</span>
                 </div>
                 <div style="display: flex; gap: 8px;">
@@ -592,7 +602,8 @@
                     <button class="btn-delete-history" onclick="deleteAttempt('${item.id}', ${isCloud})" title="Xóa">&times;</button>
                 </div>
             </div>
-        `).join("");
+            `;
+        }).join("");
     }
 
     let pendingDelete = { id: null, isCloud: false };
@@ -716,7 +727,7 @@
             const q = query(
                 collection(db, "user_toeic_scores"),
                 where("email", "==", window.currentUserEmail),
-                where("testName", "==", "ETS 2018 - Test 1") // NHỚ CHÚ Ý: Ở file 2019 cậu sửa lại tên chỗ này nhé
+                where("testName", "==", "ETS 2018 - Test 1") 
             );
             const querySnapshot = await getDocs(q);
             let history = [];
