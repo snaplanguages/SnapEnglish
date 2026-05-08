@@ -2,413 +2,649 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>IELTS Listening Test 2 - Part 1 | SnapEnglish</title>
     <link rel="icon" type="image/png" href="ảnh.png">
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #a78bfa;      
-            --primary-dark: #7c3aed;
-            --accent: #fbbf24;       
-            --bg-body: #fdfcfd;      
-            --text-main: #374151;
-            --text-light: #6b7280;
-            --correct: #10b981;
-            --wrong: #ef4444;
-            --bg-modal: rgba(255, 255, 255, 0.95);
-            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            /* Muted Mauve & Sand Palette - Cute, Mature, Profound */
+            --primary: #8e7d8f;      
+            --primary-dark: #5c4d5c;
+            --secondary: #d4a373;       
+            --success: #6a994e;
+            --danger: #bc4749; 
+            --bg-main: #fcfafb;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --text-main: #4a4a4a;
+            --text-muted: #888;
+            --border: #e6e1e5;
+            --highlight: #fef0d9;
+            --header-h: 80px;
+            --footer-h: 85px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Quicksand', sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito Sans', sans-serif; }
 
         body {
-            background: var(--bg-body);
+            background-color: var(--bg-main);
+            background-image: radial-gradient(circle at top left, #f5eff2 0%, transparent 40%),
+                              radial-gradient(circle at bottom right, #fdf6f2 0%, transparent 40%);
             color: var(--text-main);
-            min-height: 100vh;
-            display: flex; flex-direction: column;
-            overflow-x: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        /* --- UI COMPONENTS --- */
-        .screen { display: none; flex-direction: column; height: 100vh; width: 100%; animation: slideIn 0.5s ease; }
-        .screen.active { display: flex; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        /* Thanh cuộn dễ thương */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #dcd6db; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-        /* Custom Popup/Modal UI */
-        .overlay {
+        /* KÍNH (GLASSMORPHISM) */
+        .glass-effect {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(142, 125, 143, 0.08);
+        }
+
+        /* CUSTOM MODAL / POPUP */
+        .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4); backdrop-filter: blur(5px);
-            display: none; align-items: center; justify-content: center; z-index: 10000;
+            background: rgba(45, 52, 54, 0.6); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center; z-index: 9999;
+            opacity: 0; transition: opacity 0.3s ease;
         }
-        .cute-modal {
-            background: white; padding: 30px; border-radius: 30px; 
-            width: 90%; max-width: 450px; text-align: center;
-            box-shadow: var(--shadow); border: 4px solid var(--primary);
-            animation: bounceIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            position: relative;
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .modal-box {
+            padding: 40px; border-radius: 24px; width: 90%; max-width: 500px;
+            text-align: center; transform: translateY(20px);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            max-height: 90vh; overflow-y: auto;
+            background: rgba(255, 255, 255, 0.95);
         }
-        @keyframes bounceIn { 0% { transform: scale(0.3); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-
-        .modal-title { font-family: 'Lora', serif; font-size: 24px; color: var(--primary-dark); margin-bottom: 15px; }
-        .modal-body { font-size: 16px; line-height: 1.6; color: var(--text-main); margin-bottom: 20px; }
+        .modal-overlay.show .modal-box { transform: translateY(0); }
+        .modal-title { font-size: 26px; font-weight: 800; color: var(--primary-dark); margin-bottom: 10px; font-family: 'Lora', serif; }
+        .modal-desc { font-size: 16px; color: var(--text-muted); margin-bottom: 25px; line-height: 1.6; white-space: pre-line; }
         
-        .highlight-key { background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 6px; font-weight: 700; border-bottom: 2px solid #fbbf24; }
-        .highlight-quote { font-style: italic; color: var(--primary-dark); border-left: 3px solid var(--primary); padding-left: 10px; margin: 10px 0; display: block; text-align: left; }
-
-        /* --- BUTTONS --- */
-        .btn-group { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .mode-btn {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; padding: 16px; margin: 12px 0; border-radius: 16px;
+            font-size: 17px; font-weight: 700; cursor: pointer; border: 2px solid var(--border);
+            background: rgba(255, 255, 255, 0.9); color: var(--text-main); transition: all 0.2s;
+        }
+        .mode-btn:hover, .mode-btn.selected { border-color: var(--primary); background: #f5eff2; color: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(142, 125, 143, 0.2); }
+        
         .btn {
-            border: none; padding: 12px 25px; border-radius: 20px; font-weight: 700;
-            cursor: pointer; transition: 0.3s; font-family: inherit; font-size: 15px;
-            display: inline-flex; align-items: center; gap: 8px;
+            padding: 14px 28px; border-radius: 14px; font-weight: 700; font-size: 16px;
+            cursor: pointer; border: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: 1;
         }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-dark); transform: scale(1.05); }
-        .btn-outline { background: #f3f4f6; color: var(--text-main); border: 2px solid #e5e7eb; }
-        .btn-outline:hover { background: #e5e7eb; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; box-shadow: 0 4px 15px rgba(92, 77, 92, 0.3); }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(92, 77, 92, 0.4); }
+        .btn-outline { background: white; border: 2px solid var(--border); color: var(--text-main); }
+        .btn-outline:hover { background: #f5eff2; }
+        .btn-success { background: linear-gradient(135deg, #8ba870 0%, var(--success) 100%); color: white; box-shadow: 0 4px 15px rgba(106, 153, 78, 0.3);}
 
-        /* --- HEADER & PLAYER --- */
+        .modal-actions { display: flex; justify-content: center; gap: 15px; margin-top: 25px; flex-wrap: wrap; }
+
+        /* HEADER & AUDIO PLAYER */
         header {
-            height: 80px; background: white; padding: 0 30px;
-            display: flex; align-items: center; justify-content: space-between;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); z-index: 100;
+            height: var(--header-h); border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; padding: 0 30px;
+            z-index: 100;
         }
-        .brand { font-size: 22px; font-weight: 800; color: var(--primary-dark); }
-        .audio-ui { display: flex; align-items: center; gap: 12px; background: #f5f3ff; padding: 8px 20px; border-radius: 50px; }
-        .play-btn { background: var(--primary); color: white; width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer; }
-        .progress-bar { -webkit-appearance: none; width: 120px; height: 6px; background: #ddd6fe; border-radius: 5px; }
-        .progress-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 15px; height: 15px; background: var(--primary-dark); border-radius: 50%; cursor: pointer; }
+        .brand { font-size: 24px; font-weight: 800; color: var(--primary-dark); font-family: 'Lora', serif; flex-shrink: 0;}
+        .brand span { color: var(--primary); }
 
-        /* --- CONTENT --- */
-        .container { flex: 1; overflow-y: auto; padding: 40px 20px; }
-        .test-card {
-            background: white; max-width: 850px; margin: 0 auto;
-            padding: 40px; border-radius: 35px; border: 3px solid #f3f4f6;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.02);
-        }
-        .instruction-box { background: #eff6ff; color: #1e40af; padding: 20px; border-radius: 20px; margin-bottom: 30px; border: 2px dashed #bfdbfe; font-weight: 600; }
+        .header-right { display: flex; align-items: center; gap: 20px;}
+
+        .audio-controls { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.7); padding: 8px 15px; border-radius: 30px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.02);}
         
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        td { padding: 15px; border-bottom: 1px solid #f3f4f6; font-size: 17px; }
+        .play-pause-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; border-radius: 50%;
+            width: 38px; height: 38px; cursor: pointer; display: flex; justify-content: center; align-items: center;
+            font-size: 15px; transition: 0.2s; box-shadow: 0 2px 8px rgba(142, 125, 143, 0.3);
+        }
+        .play-pause-btn:hover { transform: scale(1.05); }
+        
+        .skip-btn {
+            background: white; border: 2px solid var(--border); border-radius: 50%;
+            width: 32px; height: 32px; cursor: pointer; font-weight: bold; color: var(--primary-dark);
+            display: flex; justify-content: center; align-items: center; transition: 0.2s; font-size: 12px;
+        }
+        .skip-btn:hover { border-color: var(--primary); background: var(--primary); color: white; }
+        
+        .progress-bar {
+            -webkit-appearance: none; width: 150px; height: 6px; background: #e1d5e2; 
+            border-radius: 5px; outline: none; cursor: pointer;
+        }
+        .progress-bar::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; 
+            background: var(--primary-dark); cursor: pointer; transition: 0.2s; box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        }
+        .progress-bar::-webkit-slider-thumb:hover { transform: scale(1.3); }
+        
+        .time-display { font-weight: 700; color: var(--primary-dark); font-size: 14px; min-width: 40px; text-align: center; }
+        .hidden { display: none !important; }
+
+        /* MAIN CONTENT AREA */
+        main {
+            flex: 1; overflow-y: auto; padding: 40px 30px; scroll-behavior: smooth;
+            margin-bottom: var(--footer-h);
+        }
+        .part-container { width: 100%; max-width: 900px; margin: 0 auto; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .part-title { font-size: 32px; font-weight: 800; color: var(--primary-dark); margin-bottom: 10px; font-family: 'Lora', serif;}
+        .part-desc { font-size: 17px; color: var(--text-main); margin-bottom: 30px; padding: 18px 25px; background: #fdf6f2; border-left: 5px solid var(--secondary); border-radius: 0 16px 16px 0; font-weight: 600;}
+
+        /* NOTES BOX & INPUTS */
+        .notes-box {
+            padding: 35px; border-radius: 24px; line-height: 2.2; font-size: 18px; margin-bottom: 50px;
+        }
+        .notes-box h3 { color: var(--primary-dark); text-align: center; margin-top: 0; font-family: 'Lora', serif; font-size: 24px; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px;}
+        
         input[type="text"] {
-            border: 2px solid #e5e7eb; border-radius: 10px; padding: 8px 12px;
-            width: 150px; outline: none; transition: 0.3s; font-weight: 700; color: var(--primary-dark);
+            border: 2px solid var(--border); border-radius: 12px; padding: 8px 16px;
+            font-family: inherit; font-size: 17px; color: var(--primary-dark);
+            outline: none; background: rgba(255,255,255,0.9); transition: all 0.3s; font-weight: 700; width: 220px; text-align: center;
         }
-        input[type="text"]:focus { border-color: var(--primary); background: #f5f3ff; }
-        
-        .q-row { position: relative; }
-        .bulb-btn {
-            background: none; border: none; cursor: pointer; font-size: 20px;
-            margin-left: 10px; opacity: 0.5; transition: 0.3s; visibility: hidden;
+        input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(142, 125, 143, 0.2); transform: translateY(-2px);}
+        input[type="text"].correct-input { border-color: var(--success); color: var(--success); background: #f1f8e9; }
+        input[type="text"].wrong-input { border-color: var(--danger); color: var(--danger); background: #ffebee; }
+        input[type="text"]:disabled { background: #f5eff2; cursor: not-allowed; opacity: 0.9;}
+
+        /* CUSTOM TABLE for PART 1 */
+        .custom-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--border); }
+        .custom-table th { background: var(--primary); color: white; padding: 15px; text-align: left; font-size: 18px; }
+        .custom-table td { border-bottom: 1px solid #eee; padding: 15px; font-size: 18px; vertical-align: middle; }
+        .custom-table tr.hidden-exp-row { border-bottom: none; display: none; } /* Default hide explanation rows */
+        .custom-table tr.hidden-exp-row td { padding: 0; border: none; }
+
+        /* EXPLANATION BOX STYLE */
+        .explanation-box {
+            padding: 20px 25px; background: rgba(255, 255, 255, 0.95);
+            border-left: 6px solid var(--success);
+            font-size: 16px; line-height: 1.7; animation: fadeIn 0.5s; box-shadow: inset 0 4px 10px rgba(0,0,0,0.02);
+            border-bottom: 1px solid #eee;
         }
-        .bulb-btn.show { visibility: visible; opacity: 1; }
-        .bulb-btn:hover { transform: rotate(15deg) scale(1.2); }
+        .exp-title { font-weight: 800; color: var(--success); margin-bottom: 12px; font-size: 18px; border-bottom: 2px dashed rgba(106, 153, 78, 0.3); padding-bottom: 8px; display: flex; align-items: center; gap: 10px;}
+        .exp-content p { margin-bottom: 8px; }
+        .exp-content mark { background-color: var(--highlight); color: var(--primary-dark); font-weight: bold; padding: 0 4px; border-radius: 4px; }
 
-        /* Nav Footer */
-        footer { height: 80px; background: white; border-top: 1px solid #eee; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .dot { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; cursor: pointer; border: 2px solid #eee; color: #999; }
-        .dot.active { border-color: var(--primary); background: #f5f3ff; color: var(--primary); }
-        .dot.correct { background: var(--correct); border-color: var(--correct); color: white; }
-        .dot.wrong { background: var(--wrong); border-color: var(--wrong); color: white; }
+        /* FOOTER NAVIGATION */
+        footer {
+            height: var(--footer-h); border-top: 1px solid var(--border);
+            display: flex; flex-direction: column; justify-content: center; padding: 0 30px;
+            z-index: 100; position: fixed; bottom: 0; width: 100%;
+        }
+        .nav-scroller { display: flex; gap: 12px; overflow-x: auto; padding: 10px 0; align-items: center; justify-content: center; }
+        .nav-dot {
+            min-width: 45px; height: 45px; border: 2px solid var(--border); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800;
+            cursor: pointer; color: var(--text-muted); background: rgba(255,255,255,0.8); transition: 0.2s; flex-shrink: 0;
+        }
+        .nav-dot:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
+        .nav-dot.answered { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(142, 125, 143, 0.3); }
+        .nav-dot.correct { background: var(--success); color: white; border-color: var(--success); }
+        .nav-dot.wrong { background: var(--danger); color: white; border-color: var(--danger); }
 
-        /* Responsive */
-        @media (max-width: 600px) {
-            header { height: auto; padding: 15px; flex-direction: column; gap: 10px; }
-            .audio-ui { width: 100%; }
-            .test-card { padding: 20px; }
+        @media (max-width: 768px) {
+            header { flex-direction: column; height: auto; padding: 15px; gap: 15px; }
+            .header-right { width: 100%; justify-content: space-between; flex-direction: column; }
+            .audio-controls { width: 100%; justify-content: space-between;}
+            main { padding: 20px 15px; }
+            .notes-box { padding: 20px; }
+            input[type="text"] { width: 100%; margin-top: 10px; }
         }
     </style>
 </head>
 <body>
 
-    <div id="screen-welcome" class="screen active" style="justify-content: center; align-items: center;">
-        <div class="test-card" style="text-align: center; border-color: var(--primary);">
-            <div style="font-size: 60px; margin-bottom: 20px;">🍯</div>
-            <h1 class="modal-title" style="font-size: 32px;">Accommodation Form</h1>
-            <p style="color: var(--text-light); margin-bottom: 30px;">IELTS Listening Test 2 - Part 1<br>Luyện tập kỹ năng nghe và điền thông tin chính xác.</p>
-            <div class="btn-group">
-                <button class="btn btn-outline" onclick="openHistory()">🕒 Lịch sử</button>
-                <button class="btn btn-primary" onclick="showStartPopup('practice')">🎯 Luyện tập</button>
-                <button class="btn btn-primary" style="background: var(--primary-dark);" onclick="showStartPopup('mock')">🏆 Thi thử</button>
+    <div id="setupModal" class="modal-overlay show">
+        <div class="modal-box glass-effect">
+            <div class="modal-title">Test 2 - Part 1 ✨</div>
+            <div class="modal-desc">Chào mừng bạn đến với góc luyện nghe! Bạn muốn làm bài ở chế độ nào?</div>
+            
+            <button class="mode-btn" onclick="selectMode('practice')">🌿 Luyện Tập (Được tự do tua Audio)</button>
+            <button class="mode-btn" onclick="selectMode('mock')">🔥 Thi Thử (Phát 1 mạch & tự thu bài)</button>
+            
+            <div class="modal-actions" style="display: none;" id="startAction">
+                <button class="btn btn-primary" style="width: 100%;" onclick="askReady()">Tiếp tục</button>
             </div>
         </div>
     </div>
 
-    <div id="screen-test" class="screen">
-        <header>
-            <div class="brand">IELTS Listening 🎧</div>
-            <div class="audio-ui">
-                <button class="play-btn" onclick="togglePlay()" id="playPause">▶</button>
-                <span style="font-weight: 700; font-size: 14px;" id="timeDisplay">0:00</span>
-                <input type="range" class="progress-bar" id="audioBar" value="0" min="0" step="1" onchange="seekAudio(this.value)">
-                <button class="btn btn-primary" style="padding: 8px 15px; font-size: 13px;" onclick="promptSubmit()">NỘP BÀI</button>
+    <div id="startConfirmModal" class="modal-overlay">
+        <div class="modal-box glass-effect">
+            <div class="modal-title">Sẵn sàng chưa?</div>
+            <div class="modal-desc" id="startConfirmMsg"></div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="backToSetup()">Quay lại</button>
+                <button class="btn btn-primary" onclick="startTestActual()">Bắt đầu ngay</button>
             </div>
-        </header>
+        </div>
+    </div>
 
-        <div class="container">
-            <div class="test-card">
-                <h2>Student Information</h2>
-                <div class="instruction-box">Write ONE WORD AND/OR A NUMBER for each answer.</div>
+    <div id="submitModal" class="modal-overlay">
+        <div class="modal-box glass-effect">
+            <div class="modal-title">Xác nhận nộp bài</div>
+            <div class="modal-desc">Bạn có chắc chắn muốn nộp bài? Các câu chưa làm sẽ bị tính là sai.</div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('submitModal')">Chưa đâu</button>
+                <button class="btn btn-primary" onclick="evaluateTest()">Đồng ý nộp</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultModal" class="modal-overlay">
+        <div class="modal-box glass-effect">
+            <div class="modal-title" id="resultTitle">Kết Quả Bài Làm 🎉</div>
+            <div style="font-size: 56px; font-weight: 800; color: var(--primary-dark); margin: 15px 0; text-shadow: 2px 2px 0px rgba(142, 125, 143, 0.3);" id="scoreDisplay">0/10</div>
+            <div style="font-size: 22px; font-weight: 800; color: var(--success); margin-bottom: 20px; background: #f1f8e9; display: inline-block; padding: 10px 25px; border-radius: 20px;" id="bandDisplay">Band (Ước lượng): 0.0</div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="location.reload()">Làm lại từ đầu</button>
+                <button class="btn btn-primary" onclick="closeModal('resultModal')">Xem giải thích chi tiết</button>
+            </div>
+        </div>
+    </div>
+
+    <header class="glass-effect">
+        <div class="brand">Snap<span>English</span> Part 1</div>
+        
+        <div class="header-right">
+            <div class="audio-controls" id="audioContainer">
+                <button class="skip-btn" id="btn-backward" onclick="skipAudio(-10)">-10</button>
+                <button class="play-pause-btn" id="playPauseBtn" onclick="togglePlay()">▶</button>
+                <span class="time-display" id="currentTimeDisplay">0:00</span>
+                <input type="range" class="progress-bar" id="audioProgress" value="0" min="0" step="1" onchange="seekAudio(this.value)">
+                <span class="time-display" id="totalTimeDisplay">/ --:--</span>
+                <button class="skip-btn" id="btn-forward" onclick="skipAudio(10)">+10</button>
                 
-                <table>
-                    <tr class="q-row">
-                        <td width="40%">Type of accommodation:</td>
-                        <td>hall of residence</td>
-                    </tr>
-                    <tr class="q-row">
-                        <td>Name:</td>
-                        <td>Anu (1) <input type="text" id="q1" oninput="updateNav(1)"> <button class="bulb-btn" id="bulb-1" onclick="showExpl(1)">💡</button></td>
-                    </tr>
-                    <tr class="q-row">
-                        <td>Date of birth:</td>
-                        <td>(2) <input type="text" id="q2" oninput="updateNav(2)"> 1972 <button class="bulb-btn" id="bulb-2" onclick="showExpl(2)">💡</button></td>
-                    </tr>
-                    <tr class="q-row">
-                        <td>Country of origin:</td>
-                        <td>India</td>
-                    </tr>
-                    <tr class="q-row">
-                        <td>Course of study:</td>
-                        <td>(3) <input type="text" id="q3" oninput="updateNav(3)"> <button class="bulb-btn" id="bulb-3" onclick="showExpl(3)">💡</button></td>
-                    </tr>
-                    <tr class="q-row">
-                        <td>Number of years in hall:</td>
-                        <td>(4) <input type="text" id="q4" oninput="updateNav(4)"> <button class="bulb-btn" id="bulb-4" onclick="showExpl(4)">💡</button></td>
-                    </tr>
-                    <tr class="q-row">
-                        <td>Catering arrangement:</td>
-                        <td>half board</td>
-                    </tr>
-                    <tr class="q-row">
-                        <td>Special dietary:</td>
-                        <td>no (5) <input type="text" id="q5" oninput="updateNav(5)"> (red) <button class="bulb-btn" id="bulb-5" onclick="showExpl(5)">💡</button></td>
-                    </tr>
-                    <tr class="q-row">
-                        <td>Preferred room type:</td>
-                        <td>a single (6) <input type="text" id="q6" oninput="updateNav(6)"> <button class="bulb-btn" id="bulb-6" onclick="showExpl(6)">💡</button></td>
-                    </tr>
-                    <tr class="q-row">
-                        <td>Interests:</td>
-                        <td>the (7) <input type="text" id="q7" oninput="updateNav(7)"> and badminton <button class="bulb-btn" id="bulb-7" onclick="showExpl(7)">💡</button></td>
-                    </tr>
-                    <tr class="q-row">
-                        <td>Priorities - students:</td>
-                        <td>to be with (8) <input type="text" id="q8" oninput="updateNav(8)"> students <button class="bulb-btn" id="bulb-8" onclick="showExpl(8)">💡</button></td>
-                    </tr>
-                    <tr class="q-row">
-                        <td>Priorities - location:</td>
-                        <td>to live outside the (9) <input type="text" id="q9" oninput="markAnswered(9)"> <button class="bulb-btn" id="bulb-9" onclick="showExpl(9)">💡</button></td>
-                    </tr>
-                    <tr class="q-row">
-                        <td>Priorities - social:</td>
-                        <td>to have a (10) <input type="text" id="q10" oninput="updateNav(10)"> area <button class="bulb-btn" id="bulb-10" onclick="showExpl(10)">💡</button></td>
-                    </tr>
+                <audio id="testAudio" class="hidden" preload="metadata">
+                    <source src="https://github.com/snaplanguages/SnapEnglish-audioieltslistening01/blob/1f5e120d9f5c3c2598b4ffea2baf89c6a33ba1ae/IELTS%20Listening%20Test%202.mp3?raw=true" type="audio/mpeg">
+                </audio>
+            </div>
+            <button class="btn btn-primary" id="btnSubmit" onclick="requestSubmit()" style="padding: 10px 20px; border-radius: 30px;">NỘP BÀI</button>
+        </div>
+    </header>
+
+    <main id="mainContainer">
+        <div id="part1" class="part-container active">
+            <div class="part-title">Part 1: Questions 1-10</div>
+            <div class="part-desc">Complete the form below. Write <b>ONE WORD AND/OR A NUMBER</b>.</div>
+            
+            <div class="notes-box glass-effect">
+                <h3>ACCOMMODATION FORM - STUDENT INFORMATION</h3>
+                <table class="custom-table">
+                    <tbody>
+                        <tr><td style="width: 40%">Type of accommodation:</td><td>hall of residence</td></tr>
+                        
+                        <tr><td>Name:</td><td>Anu <b>(1)</b> <input type="text" id="q1" oninput="markAnswered(1)"></td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-1" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 1</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">Bhatt</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"Yes, A-N-U <mark>B-H-A-double T</mark>."</i></p>
+                                    <p><b>Phân tích:</b> Người nữ đánh vần họ của mình là B-H-A-double T (B-H-A-T-T). Chú ý cách phát âm chữ cái.</p>
+                                </div>
+                            </div>
+                        </td></tr>
+
+                        <tr><td>Date of birth:</td><td><b>(2)</b> <input type="text" id="q2" oninput="markAnswered(2)"> 1972</td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-2" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 2</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">31 March / 31st March / March 31</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"The <mark>31st of March</mark> 1972."</i></p>
+                                    <p><b>Phân tích:</b> Do đề bài giới hạn "ONE WORD AND/OR A NUMBER" và phần sau đã có số "1972", ta chỉ điền ngày và tháng: "31 March".</p>
+                                </div>
+                            </div>
+                        </td></tr>
+
+                        <tr><td>Country of origin:</td><td>India</td></tr>
+                        
+                        <tr><td>Course of study:</td><td><b>(3)</b> <input type="text" id="q3" oninput="markAnswered(3)"></td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-3" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 3</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">nursing</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"I’m doing a course in <mark>nursing</mark>."</i></p>
+                                    <p><b>Phân tích:</b> Anu nói cô ấy đang học khóa điều dưỡng (nursing).</p>
+                                </div>
+                            </div>
+                        </td></tr>
+
+                        <tr><td>Number of years planned in hall:</td><td><b>(4)</b> <input type="text" id="q4" oninput="markAnswered(4)"></td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-4" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 4</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">2 / two</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"Well, it’ll take three years, but I’d only like to stay in hall for <mark>two</mark>."</i></p>
+                                    <p><b>Phân tích:</b> Dù khóa học kéo dài 3 năm, Anu dự định (planned) chỉ ở ký túc xá trong 2 năm.</p>
+                                </div>
+                            </div>
+                        </td></tr>
+
+                        <tr><td>Preferred catering arrangement:</td><td>half board</td></tr>
+                        
+                        <tr><td>Special dietary requirements:</td><td>no <b>(5)</b> <input type="text" id="q5" oninput="markAnswered(5)"> (red)</td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-5" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 5</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">meat</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"Yes, I don’t take red <mark>meat</mark>."</i></p>
+                                    <p><b>Phân tích:</b> Yêu cầu ăn kiêng đặc biệt của cô ấy là không ăn thịt đỏ (red meat). Đề bài đã cho chữ (red) ở ngoài ngoặc nên ta điền "meat".</p>
+                                </div>
+                            </div>
+                        </td></tr>
+
+                        <tr><td>Preferred room type:</td><td>a single <b>(6)</b> <input type="text" id="q6" oninput="markAnswered(6)"></td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-6" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 6</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">bedsit / bed-sit</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"...I think the <mark>bed-sit</mark> sounds the best option."</i></p>
+                                    <p><b>Phân tích:</b> Có 2 loại phòng đơn được nhắc đến. Vì học bổng khá hào phóng, cô ấy chọn phòng "bedsit" (phòng trọ nhỏ có cả giường và khu bếp).</p>
+                                </div>
+                            </div>
+                        </td></tr>
+
+                        <tr><td>Interests:</td><td>the <b>(7)</b> <input type="text" id="q7" oninput="markAnswered(7)"> and badminton</td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-7" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 7</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">theatre / theater</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"Um... well, I love the <mark>theater</mark>."</i></p>
+                                    <p><b>Phân tích:</b> Sở thích của cô ấy gồm sân khấu (theatre/theater) và cầu lông (badminton).</p>
+                                </div>
+                            </div>
+                        </td></tr>
+
+                        <tr><td>Priorities in choice of hall:</td><td>to be with other students who are <b>(8)</b> <input type="text" id="q8" oninput="markAnswered(8)"></td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-8" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 8</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">mature / older</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"Well, the first thing is I’d prefer a hall where there are other <mark>mature</mark> students, if possible."</i></p>
+                                    <p><b>Phân tích:</b> Ưu tiên số một của Anu là được ở cùng những sinh viên trưởng thành/lớn tuổi (mature students).</p>
+                                </div>
+                            </div>
+                        </td></tr>
+
+                        <tr><td></td><td>To live outside the <b>(9)</b> <input type="text" id="q9" oninput="markAnswered(9)"></td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-9" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 9</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">town</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"Uh... and I’d prefer to be out of <mark>town</mark>."</i></p>
+                                    <p><b>Phân tích:</b> "out of" đồng nghĩa với "outside". Cô ấy muốn sống bên ngoài trung tâm thị trấn (town).</p>
+                                </div>
+                            </div>
+                        </td></tr>
+
+                        <tr><td></td><td>To have a <b>(10)</b> <input type="text" id="q10" oninput="markAnswered(10)"> area for socializing</td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-10" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 10</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">shared</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"Well, I would like somewhere with a <mark>shared</mark> area, a TV room for example..."</i></p>
+                                    <p><b>Phân tích:</b> Để dễ dàng giao lưu (socializing), Anu muốn có một khu vực dùng chung (shared area) như phòng xem tivi.</p>
+                                </div>
+                            </div>
+                        </td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
+    </main>
 
-        <footer>
-            <div class="nav-scroller" id="navDots"></div>
-        </footer>
-    </div>
-
-    <div id="popupOverlay" class="overlay">
-        <div class="cute-modal" id="modalContainer">
-            <h2 class="modal-title" id="mTitle">Tiêu đề</h2>
-            <div class="modal-body" id="mBody">Nội dung...</div>
-            <div class="btn-group" id="mActions"></div>
-        </div>
-    </div>
-
-    <audio id="mainAudio" src="https://raw.githubusercontent.com/snaplanguages/SnapEnglish-audioieltslistening01/1f5e120d9f5c3c2598b4ffea2baf89c6a33ba1ae/IELTS%20Listening%20Test%202.mp3"></audio>
+    <footer class="glass-effect">
+        <div style="font-size:13px; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-bottom:5px; text-align:center;">Bảng điều hướng</div>
+        <div class="nav-scroller" id="navPalette"></div>
+    </footer>
 
     <script>
+        // Answer Key for Part 1 (1 - 10)
         const answerKey = {
-            1: ["Bhatt"], 2: ["31 March"], 3: ["nursing"], 4: ["2", "two"], 5: ["meat"],
-            6: ["bedsit", "bed-sit"], 7: ["theatre", "theater"], 8: ["mature"], 9: ["town"], 10: ["shared"]
+            1: ["bhatt"], 2: ["31 march", "31st march", "march 31", "31-march"], 3: ["nursing"], 4: ["2", "two"], 5: ["meat"],
+            6: ["bedsit", "bed-sit"], 7: ["theatre", "theater"], 8: ["mature", "older"], 9: ["town"], 10: ["shared"]
         };
 
-        const explanations = {
-            1: {
-                title: "Câu 1: Spelling Name 📝",
-                text: "Lưu ý Officer yêu cầu đánh vần họ. Anu đánh vần là: <span class='highlight-key'>B-H-A-double T</span>.<br><span class='highlight-quote'>Anu: Yes, A-N-U B-H-A-double T.</span>"
-            },
-            2: {
-                title: "Câu 2: Date of Birth 🎂",
-                text: "Anu trả lời ngày sinh của mình là ngày <span class='highlight-key'>31 tháng 3</span> năm 1972.<br><span class='highlight-quote'>Anu: The 31st of March 1972.</span>"
-            },
-            3: {
-                title: "Câu 3: Course 🎓",
-                text: "Khi được hỏi về ngành học, Anu trả lời cô ấy học <span class='highlight-key'>nursing</span> (điều dưỡng).<br><span class='highlight-quote'>Anu: I’m doing a course in nursing.</span>"
-            },
-            4: {
-                title: "Câu 4: Duration ⏳",
-                text: "Officer hỏi Anu muốn ở bao lâu. Cô trả lời khóa học mất 3 năm nhưng chỉ muốn ở ký túc xá <span class='highlight-key'>2</span> năm.<br><span class='highlight-quote'>Anu: Well, it’ll take three years, but I’d only like to stay in hall for two.</span>"
-            },
-            5: {
-                title: "Câu 5: Dietary 🥩",
-                text: "Anu yêu cầu chế độ ăn đặc biệt là không ăn <span class='highlight-key'>red meat</span> (thịt đỏ). Vì đề bài đã cho chữ 'red', bạn chỉ cần điền 'meat'.<br><span class='highlight-quote'>Anu: Yes, I don’t take red meat.</span>"
-            },
-            6: {
-                title: "Câu 6: Room Type 🏠",
-                text: "Dù đắt hơn 20 bảng, Anu chọn loại phòng <span class='highlight-key'>bed-sit</span> vì nó rộng và tiện nghi hơn.<br><span class='highlight-quote'>Anu: I think the bed-sit sounds the best option.</span>"
-            },
-            7: {
-                title: "Câu 7: Interests 🎭",
-                text: "Sở thích đầu tiên Anu nhắc đến là <span class='highlight-key'>theatre</span> (kịch nghệ).<br><span class='highlight-quote'>Anu: Um... well, I love the theater.</span>"
-            },
-            8: {
-                title: "Câu 8: Priority - Students 👨‍🎓",
-                text: "Anu ưu tiên ở cùng những sinh viên <span class='highlight-key'>mature</span> (sinh viên lớn tuổi/chững chạc).<br><span class='highlight-quote'>Anu: I’d prefer a hall where there are other mature students.</span>"
-            },
-            9: {
-                title: "Câu 9: Location 📍",
-                text: "Cô ấy muốn ở nơi <span class='highlight-key'>out of town</span> (ngoại ô/xa trung tâm). Đề bài có chữ 'outside the', nên ta điền 'town'.<br><span class='highlight-quote'>Anu: and I’d prefer to be out of town.</span>"
-            },
-            10: {
-                title: "Câu 10: Social Area 🛋️",
-                text: "Cô ấy muốn một khu vực <span class='highlight-key'>shared</span> (dùng chung) như phòng TV để kết bạn.<br><span class='highlight-quote'>Anu: I would like somewhere with a shared area, a TV room for example.</span>"
-            }
-        };
-
-        let currentMode = '';
-        const audio = document.getElementById('mainAudio');
-        const START_TIME = 40;
-        const END_TIME = 357;
+        let mode = '';
         let isSubmitted = false;
 
-        // --- POPUP SYSTEM ---
-        function openPopup(title, body, actions = []) {
-            document.getElementById('mTitle').innerText = title;
-            document.getElementById('mBody').innerHTML = body;
-            const actionArea = document.getElementById('mActions');
-            actionArea.innerHTML = '';
-            
-            if (actions.length === 0) {
-                actions = [{ text: "Đóng", cb: closePopup, style: "btn-outline" }];
-            }
+        // --- AUDIO CONFIGURATION (Part 1 slice) ---
+        // Yêu cầu: Part 1 từ 0:40 tới 5:57
+        const audio = document.getElementById('testAudio');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const audioProgress = document.getElementById('audioProgress');
+        const currentTimeDisplay = document.getElementById('currentTimeDisplay');
+        const totalTimeDisplay = document.getElementById('totalTimeDisplay');
+        
+        const START_TIME = 40;     // 0:40
+        const END_TIME = 357;      // 5:57
+        const DURATION = END_TIME - START_TIME; // 317 giây
+        
+        audioProgress.max = DURATION;
 
-            actions.forEach(a => {
-                const b = document.createElement('button');
-                b.className = `btn ${a.style || 'btn-primary'}`;
-                b.innerText = a.text;
-                b.onclick = a.cb;
-                actionArea.appendChild(b);
-            });
-            document.getElementById('popupOverlay').style.display = 'flex';
-        }
+        // Hiển thị tổng thời gian tĩnh cho đoạn trích
+        let totalMins = Math.floor(DURATION / 60);
+        let totalSecs = Math.floor(DURATION % 60);
+        totalTimeDisplay.innerText = "/ " + totalMins + ":" + (totalSecs < 10 ? "0" : "") + totalSecs;
 
-        function closePopup() { document.getElementById('popupOverlay').style.display = 'none'; }
-
-        // --- TEST LOGIC ---
-        function showStartPopup(mode) {
-            currentMode = mode;
-            openPopup(
-                mode === 'mock' ? "Chế độ Thi Thử 🏆" : "Chế độ Luyện Tập 🎯",
-                mode === 'mock' ? "Bạn sẽ nghe audio 1 lần duy nhất.\nAudio tự động nộp bài khi kết thúc." : "Bạn có thể tự do điều khiển audio và xem giải thích sau khi nộp.",
-                [
-                    { text: "Bắt đầu ngay!", cb: startTest, style: "btn-primary" },
-                    { text: "Quay lại", cb: closePopup, style: "btn-outline" }
-                ]
-            );
-        }
-
-        function startTest() {
-            closePopup();
-            document.getElementById('screen-welcome').classList.remove('active');
-            document.getElementById('screen-test').classList.add('active');
-            audio.currentTime = START_TIME;
-            if (currentMode === 'mock') {
-                audio.play();
-                document.getElementById('playPause').disabled = true;
-            }
-            initNav();
-        }
-
-        function initNav() {
-            const nav = document.getElementById('navDots');
-            nav.innerHTML = '';
-            for(let i=1; i<=10; i++) {
-                const d = document.createElement('div');
-                d.className = 'dot'; d.id = `dot-${i}`; d.innerText = i;
-                nav.appendChild(d);
-            }
-        }
-
-        function updateNav(q) {
-            const val = document.getElementById(`q${q}`).value.trim();
-            document.getElementById(`dot-${q}`).classList.toggle('active', val !== '');
-        }
-
-        function promptSubmit() {
-            openPopup("Nộp bài? 📑", "Cậu có chắc chắn muốn nộp bài bây giờ không?", [
-                { text: "Nộp bài", cb: submitTest, style: "btn-primary" },
-                { text: "Xem lại", cb: closePopup, style: "btn-outline" }
-            ]);
-        }
-
-        function submitTest() {
-            closePopup();
-            isSubmitted = true;
-            audio.pause();
-            let score = 0;
-            
-            for(let i=1; i<=10; i++) {
-                const input = document.getElementById(`q${i}`);
-                const dot = document.getElementById(`dot-${i}`);
-                const userAns = input.value.trim().toLowerCase();
-                const correctOnes = answerKey[i].map(v => v.toLowerCase());
-
-                if (correctOnes.includes(userAns) && userAns !== "") {
-                    score++;
-                    input.style.borderColor = "var(--correct)";
-                    dot.className = "dot correct";
-                } else {
-                    input.style.borderColor = "var(--wrong)";
-                    dot.className = "dot wrong";
-                    input.value = (userAns ? userAns + " ❌" : "") + " → " + answerKey[i][0];
-                }
-                document.getElementById(`bulb-${i}`).classList.add('show');
-            }
-
-            openResult(score);
-        }
-
-        function openResult(score) {
-            openPopup("Kết quả 🎉", `Cậu đã đúng <span class='highlight-key' style='font-size:24px'>${score}/10</span> câu.<br>Nhấp vào các icon 💡 cạnh câu hỏi để xem giải thích chi tiết nhé!`, [
-                { text: "Xem bài làm", cb: closePopup, style: "btn-primary" },
-                { text: "Làm lại", cb: () => location.reload(), style: "btn-outline" }
-            ]);
-        }
-
-        function showExpl(q) {
-            const data = explanations[q];
-            openPopup(data.title, data.text);
-        }
-
-        // --- AUDIO ENGINE ---
+        // Custom Player Controls
         function togglePlay() {
-            if (audio.paused) { audio.play(); document.getElementById('playPause').innerText = "⏸"; }
-            else { audio.pause(); document.getElementById('playPause').innerText = "▶"; }
+            if(audio.paused) {
+                audio.play();
+                playPauseBtn.innerHTML = "⏸";
+            } else {
+                audio.pause();
+                playPauseBtn.innerHTML = "▶";
+            }
         }
 
-        audio.addEventListener('timeupdate', () => {
-            if (audio.currentTime < START_TIME) audio.currentTime = START_TIME;
-            if (audio.currentTime > END_TIME) {
-                audio.pause();
-                if (currentMode === 'mock' && !isSubmitted) submitTest();
+        function seekAudio(value) {
+            audio.currentTime = START_TIME + parseInt(value);
+        }
+
+        function skipAudio(seconds) {
+            let newTime = audio.currentTime + seconds;
+            if (newTime < START_TIME) newTime = START_TIME;
+            if (newTime > END_TIME) newTime = END_TIME;
+            audio.currentTime = newTime;
+        }
+
+        audio.addEventListener('timeupdate', function() {
+            // Giữ audio trong khung giờ quy định
+            if (audio.currentTime < START_TIME && audio.currentTime > 0) {
+                audio.currentTime = START_TIME;
             }
-            
-            const progress = ((audio.currentTime - START_TIME) / (END_TIME - START_TIME)) * 100;
-            document.getElementById('audioBar').value = audio.currentTime - START_TIME;
-            
-            let cur = audio.currentTime - START_TIME;
-            let m = Math.floor(cur/60); let s = Math.floor(cur%60);
-            document.getElementById('timeDisplay').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+
+            if (audio.currentTime >= END_TIME && !isSubmitted) {
+                audio.pause();
+                playPauseBtn.innerHTML = "▶";
+                audioProgress.value = DURATION;
+                
+                let mins = Math.floor(DURATION / 60);
+                let secs = Math.floor(DURATION % 60);
+                currentTimeDisplay.innerText = mins + ":" + (secs < 10 ? "0" : "") + secs;
+
+                if (mode === 'mock') {
+                    evaluateTest(); // Tự động nộp bài
+                }
+            } else {
+                let currentProgress = audio.currentTime - START_TIME;
+                if(currentProgress < 0) currentProgress = 0;
+                audioProgress.value = currentProgress;
+                
+                let mins = Math.floor(currentProgress / 60);
+                let secs = Math.floor(currentProgress % 60);
+                currentTimeDisplay.innerText = mins + ":" + (secs < 10 ? "0" : "") + secs;
+            }
         });
 
-        function seekAudio(val) { audio.currentTime = START_TIME + parseInt(val); }
+        // Tự động load audio để chuẩn bị sẵn
+        audio.addEventListener('loadedmetadata', () => {
+            audio.currentTime = START_TIME;
+        });
+
+        // Khởi tạo Navigation Footer
+        const navPalette = document.getElementById('navPalette');
+        for (let i = 1; i <= 10; i++) {
+            let dot = document.createElement("div");
+            dot.className = "nav-dot"; dot.id = `nav-${i}`; dot.innerText = i;
+            dot.onclick = () => {
+                let el = document.getElementById('q'+i);
+                if(el) {
+                    el.scrollIntoView({behavior: "smooth", block: "center"});
+                    let parent = el.closest('tr');
+                    parent.style.transition = "background 0.5s";
+                    let oldBg = parent.style.background;
+                    parent.style.background = "var(--highlight)";
+                    setTimeout(() => parent.style.background = oldBg, 1000);
+                }
+            };
+            navPalette.appendChild(dot);
+        }
+
+        // Modal Logic
+        function selectMode(selectedMode) {
+            mode = selectedMode;
+            document.querySelectorAll('#setupModal .mode-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            document.getElementById('startAction').style.display = 'flex';
+        }
+
+        function askReady() {
+            document.getElementById('setupModal').classList.remove('show');
+            let msg = mode === 'mock' 
+                ? "Ở chế độ <b>Thi Thử</b>:<br><br>• Audio sẽ tự động phát 1 mạch không dừng.<br>• Mất quyền tua tới / lùi.<br>• Bài sẽ tự động nộp khi hết audio." 
+                : "Ở chế độ <b>Luyện Tập</b>:<br><br>• Bạn được quyền chủ động Play/Pause.<br>• Có thể tua audio tới/lui tùy ý.";
+            document.getElementById('startConfirmMsg').innerHTML = msg;
+            document.getElementById('startConfirmModal').classList.add('show');
+        }
+
+        function backToSetup() {
+            closeModal('startConfirmModal');
+            document.getElementById('setupModal').classList.add('show');
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+        function startTestActual() {
+            closeModal('startConfirmModal');
+            
+            // Fix vị trí audio
+            audio.currentTime = START_TIME; 
+
+            if(mode === 'mock') {
+                document.getElementById('btn-backward').classList.add('hidden');
+                document.getElementById('btn-forward').classList.add('hidden');
+                audioProgress.disabled = true; 
+                audio.play();
+                playPauseBtn.innerHTML = "⏸";
+                playPauseBtn.disabled = true; // Khóa nút play/pause
+            }
+        }
+
+        function markAnswered(id) {
+            if (isSubmitted) return;
+            let textInput = document.getElementById('q'+id);
+            let answered = (textInput && textInput.value.trim() !== '');
+            document.getElementById('nav-'+id).classList.toggle('answered', answered);
+        }
+
+        function requestSubmit() {
+            if (mode === 'practice') {
+                document.getElementById('submitModal').classList.add('show');
+            } else {
+                evaluateTest();
+            }
+        }
+
+        // Tính Band Score ước lượng (Dựa trên tỷ lệ điểm của 10 câu)
+        function calculateBandPartial(correct) {
+            let normalizedCorrect = (correct / 10) * 40; // Quy đổi ra thang 40
+            if (normalizedCorrect >= 39) return 9.0;
+            if (normalizedCorrect >= 37) return 8.5;
+            if (normalizedCorrect >= 35) return 8.0;
+            if (normalizedCorrect >= 32) return 7.5;
+            if (normalizedCorrect >= 30) return 7.0;
+            if (normalizedCorrect >= 26) return 6.5;
+            if (normalizedCorrect >= 23) return 6.0;
+            if (normalizedCorrect >= 20) return 5.5;
+            if (normalizedCorrect >= 16) return 5.0;
+            if (normalizedCorrect >= 13) return 4.5;
+            if (normalizedCorrect >= 10) return 4.0;
+            return 3.5;
+        }
+
+        function evaluateTest() {
+            isSubmitted = true;
+            closeModal('submitModal');
+            document.getElementById('btnSubmit').style.display = 'none';
+            
+            audio.pause();
+            playPauseBtn.innerHTML = "▶";
+            
+            let score = 0;
+
+            for (let i = 1; i <= 10; i++) {
+                let textInput = document.getElementById('q'+i);
+                let userAns = textInput ? textInput.value.trim().toLowerCase() : '';
+                
+                let isCorrect = answerKey[i] && answerKey[i].includes(userAns);
+                let navDot = document.getElementById('nav-'+i);
+                navDot.classList.remove('answered');
+                
+                if (isCorrect) {
+                    score++;
+                    navDot.classList.add('correct');
+                    if(textInput) textInput.classList.add('correct-input');
+                } else {
+                    navDot.classList.add('wrong');
+                    if(textInput) {
+                        textInput.classList.add('wrong-input');
+                        if(userAns) textInput.value = userAns + " ✓ " + answerKey[i][0].toUpperCase();
+                        else textInput.value = "✓ " + answerKey[i][0].toUpperCase();
+                    }
+                }
+                
+                if(textInput) textInput.disabled = true;
+
+                // Mở khối giải thích
+                let expBox = document.getElementById('exp-'+i);
+                if(expBox) {
+                    let parentRow = expBox.closest('tr.hidden-exp-row');
+                    if(parentRow) {
+                        parentRow.style.display = "table-row";
+                        parentRow.classList.remove('hidden-exp-row');
+                    }
+                }
+            }
+
+            let band = calculateBandPartial(score);
+            
+            document.getElementById('scoreDisplay').innerText = score + "/10";
+            document.getElementById('bandDisplay').innerText = "Band (Ước lượng): " + band.toFixed(1);
+            
+            document.getElementById('resultModal').classList.add('show');
+        }
     </script>
 </body>
 </html>
