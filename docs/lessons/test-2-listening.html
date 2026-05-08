@@ -1,195 +1,253 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>IELTS Listening Test 2 | SnapEnglish</title>
     <link rel="icon" type="image/png" href="ảnh.png">
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
             /* Muted Mauve & Sand Palette - Cute, Mature, Profound */
             --primary: #8e7d8f;      
             --primary-dark: #5c4d5c;
-            --accent: #d4a373;       
-            --bg-body: #fcfafb;      
-            --bg-pane: #ffffff;
+            --secondary: #d4a373;       
+            --success: #6a994e;
+            --danger: #bc4749; 
+            --bg-main: #fcfafb;
+            --bg-card: rgba(255, 255, 255, 0.85);
             --text-main: #4a4a4a;
-            --text-light: #888;
+            --text-muted: #888;
             --border: #e6e1e5;
-            --highlight: #fef0d9;    
-            --correct: #6a994e;
-            --wrong: #bc4749;
-            --exp-bg: #f5eff2;       
-            --header-h: 70px;
-            --footer-h: 80px;
+            --highlight: #fef0d9;
+            --header-h: 75px;
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito Sans', sans-serif; }
 
         body {
-            margin: 0; padding: 0;
-            font-family: 'Quicksand', sans-serif;
-            background: var(--bg-body);
+            background-color: var(--bg-main);
+            background-image: radial-gradient(circle at top left, #f5eff2 0%, transparent 40%),
+                              radial-gradient(circle at bottom right, #fdf6f2 0%, transparent 40%);
             color: var(--text-main);
             height: 100vh;
-            display: flex; flex-direction: column;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
-            width: 100%;
         }
 
-        /* --- OVERLAY & MODAL --- */
-        #setupOverlay, .custom-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.85); backdrop-filter: blur(8px);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 9999;
-        }
-        .custom-overlay { display: none; z-index: 99999; }
-        
-        .setup-modal, .custom-modal {
-            background: white; padding: 40px; border-radius: 25px;
-            box-shadow: 0 15px 40px rgba(142, 125, 143, 0.15);
-            width: 90%; max-width: 500px; text-align: center;
-            border: 2px solid var(--border);
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .setup-modal h2, .custom-modal h2 { 
-            font-family: 'Lora', serif; color: var(--primary-dark); font-size: 28px; margin-top: 0; 
-        }
-        
-        .mode-btn {
-            display: block; width: 100%; padding: 15px; margin: 15px 0;
-            border-radius: 15px; font-size: 18px; font-weight: 700; cursor: pointer;
-            transition: 0.3s; font-family: inherit;
-        }
-        .mode-practice { background: #fdf6f2; color: #c48b5d; border: 2px solid #f6decb; }
-        .mode-practice:hover, .mode-practice.selected { background: var(--accent); color: white; border-color: var(--accent); }
-        .mode-mock { background: #f5eff2; color: var(--primary-dark); border: 2px solid #e1d5e2; }
-        .mode-mock:hover, .mode-mock.selected { background: var(--primary); color: white; border-color: var(--primary); }
-        
-        .start-btn {
-            background: var(--primary); color: white; border: none; padding: 12px 35px;
-            border-radius: 50px; font-size: 18px; font-weight: 700; cursor: pointer;
-            margin-top: 20px; transition: 0.3s; display: none; box-shadow: 0 5px 15px rgba(142, 125, 143, 0.3);
-        }
-        .start-btn:hover { transform: translateY(-3px); }
-
-        .modal-actions { display: flex; gap: 15px; margin-top: 25px; justify-content: center; }
-        .btn-cancel { background: #f5f5f5; color: #666; border: 2px solid #ddd; padding: 12px 20px; border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; font-family: inherit; flex: 1; }
-        .btn-cancel:hover { background: #e0e0e0; border-color: #ccc; }
-        .btn-confirm { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; font-family: inherit; flex: 1; box-shadow: 0 4px 0 var(--primary-dark); }
-        .btn-confirm:active { transform: translateY(4px); box-shadow: none; }
-
-        /* --- HEADER --- */
-        header {
-            height: var(--header-h); background: #fff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 30px; z-index: 100;
-        }
-        
-        .brand { font-size: 24px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; }
-        .brand span { background: var(--primary); color: white; padding: 4px 10px; border-radius: 10px; font-size: 16px; }
-
-        .audio-controls { display: flex; align-items: center; gap: 15px; background: #f5eff2; padding: 5px 15px; border-radius: 30px; }
-        audio { height: 35px; outline: none; }
-        .skip-btn {
-            background: white; border: 2px solid var(--border); border-radius: 50%;
-            width: 35px; height: 35px; cursor: pointer; font-weight: bold; color: var(--primary-dark);
-            display: flex; justify-content: center; align-items: center; transition: 0.2s;
-        }
-        .skip-btn:hover { border-color: var(--primary); background: var(--primary); color: white; }
-        .hidden { display: none !important; }
-
-        .btn-submit { 
-            background: var(--primary); color: white; border: none; padding: 10px 25px; 
-            border-radius: 15px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s;
-            font-family: inherit; box-shadow: 0 4px 0 var(--primary-dark);
-        }
-        .btn-submit:active { transform: translateY(4px); box-shadow: none; }
-
-        /* --- LAYOUT FULL WIDTH --- */
-        .container { 
-            display: flex; flex-direction: column;
-            height: calc(100vh - var(--header-h) - var(--footer-h)); 
-            width: 100%; max-width: 100%; 
-            margin: 0; padding: 30px 60px;
-            overflow-y: auto; scroll-behavior: smooth;
-        }
-
-        ::-webkit-scrollbar { width: 10px; height: 10px; }
-        ::-webkit-scrollbar-thumb { background: #dcd6db; border-radius: 5px; }
+        /* Tùy chỉnh thanh cuộn */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #dcd6db; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-        .tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
-        .tab {
-            padding: 10px 25px; font-size: 18px; font-weight: 700; color: var(--text-light);
-            cursor: pointer; border-radius: 15px; transition: 0.3s; border: 2px solid transparent;
-        }
-        .tab.active { background: #f5eff2; color: var(--primary-dark); border-color: var(--primary); }
-
-        .tab-content { display: none; animation: fadeIn 0.3s; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.03); }
-        .tab-content.active { display: block; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- CONTENT STYLES --- */
-        h2 { color: var(--primary-dark); margin-top: 0; font-size: 28px; font-family: 'Lora', serif; }
-        h3 { color: #555; border-bottom: 2px solid #f5eff2; padding-bottom: 5px; margin-top: 30px; font-size: 22px; }
-        p { margin-bottom: 20px; font-size: 18px; line-height: 1.8; }
-        
-        .instruction {
-            background: #fdf6f2; color: #a6714a; padding: 15px; border-radius: 12px;
-            font-weight: 600; font-size: 16px; margin-bottom: 25px; border: 2px dashed #eecfb6;
+        /* KÍNH (GLASSMORPHISM) */
+        .glass-effect {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(142, 125, 143, 0.08);
         }
 
-        .custom-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--border); }
+        /* CUSTOM MODAL / POPUP */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(45, 52, 54, 0.6); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center; z-index: 9999;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .modal-box {
+            padding: 40px; border-radius: 24px; width: 90%; max-width: 550px;
+            text-align: center; transform: translateY(20px);
+            transition: transform 0.3s ease; max-height: 90vh; overflow-y: auto;
+            background: rgba(255, 255, 255, 0.95);
+        }
+        .modal-overlay.show .modal-box { transform: translateY(0); }
+        .modal-title { font-size: 26px; font-weight: 800; color: var(--primary-dark); margin-bottom: 10px; font-family: 'Lora', serif; }
+        .modal-desc { font-size: 16px; color: var(--text-muted); margin-bottom: 25px; line-height: 1.6; }
+        
+        .mode-btn {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; padding: 16px; margin: 12px 0; border-radius: 16px;
+            font-size: 17px; font-weight: 700; cursor: pointer; border: 2px solid var(--border);
+            background: rgba(255, 255, 255, 0.9); color: var(--text-main); transition: all 0.2s;
+        }
+        .mode-btn:hover, .mode-btn.selected { border-color: var(--primary); background: #f5eff2; color: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(142, 125, 143, 0.2); }
+        
+        .btn {
+            padding: 14px 28px; border-radius: 14px; font-weight: 700; font-size: 16px;
+            cursor: pointer; border: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; box-shadow: 0 4px 15px rgba(92, 77, 92, 0.3); }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(92, 77, 92, 0.4); }
+        .btn-outline { background: white; border: 2px solid var(--border); color: var(--text-main); }
+        .btn-outline:hover { background: #f5eff2; }
+        .btn-success { background: linear-gradient(135deg, #8ba870 0%, var(--success) 100%); color: white; box-shadow: 0 4px 15px rgba(106, 153, 78, 0.3);}
+        .btn-danger { background: linear-gradient(135deg, #d3696a 0%, var(--danger) 100%); color: white; box-shadow: 0 4px 15px rgba(188, 71, 73, 0.3);}
+
+        .modal-actions { display: flex; justify-content: center; gap: 15px; margin-top: 25px; flex-wrap: wrap; }
+
+        /* LỊCH SỬ THI MODAL */
+        .history-container { display: none; text-align: left; animation: fadeIn 0.3s; }
+        .table-wrapper { width: 100%; overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); margin-top: 15px; }
+        #historyTable { width: 100%; border-collapse: collapse; min-width: 500px; background: white;}
+        #historyTable th { background: #f5eff2; color: var(--primary-dark); padding: 15px; font-weight: 700; font-size: 15px;}
+        #historyTable td { padding: 15px; border-bottom: 1px solid var(--border); font-size: 15px; vertical-align: middle;}
+        #historyTable tr:last-child td { border-bottom: none; }
+        #historyTable tr:hover { background: #faf8f9; }
+        
+        .action-btns { display: flex; gap: 8px; }
+        .btn-sm { padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s;}
+        .btn-review { background: #f5eff2; color: var(--primary-dark); }
+        .btn-review:hover { background: var(--primary); color: white; }
+        .btn-delete { background: #fdf6f6; color: var(--danger); }
+        .btn-delete:hover { background: var(--danger); color: white; }
+
+        /* HEADER */
+        header {
+            height: var(--header-h); border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; padding: 0 30px;
+            z-index: 100;
+        }
+        .brand { font-size: 24px; font-weight: 800; color: var(--primary-dark); font-family: 'Lora', serif; flex-shrink: 0;}
+        .brand span { color: var(--primary); }
+        
+        .audio-controls { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.6); padding: 6px 15px; border-radius: 30px; border: 1px solid var(--border);}
+        audio { height: 35px; outline: none; max-width: 250px;}
+        .skip-btn {
+            background: white; border: none; border-radius: 50%;
+            width: 32px; height: 32px; cursor: pointer; font-weight: bold; color: var(--primary-dark);
+            display: flex; justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .skip-btn:hover { background: var(--primary); color: white; transform: scale(1.1);}
+        .hidden { display: none !important; }
+
+        .tabs { display: flex; gap: 8px; background: rgba(255,255,255,0.5); padding: 6px; border-radius: 16px; margin: 0 20px; align-items: center; flex: 1; overflow-x: auto;}
+        .tab-btn {
+            padding: 8px 24px; border: none; background: transparent; border-radius: 12px;
+            font-weight: 700; color: var(--text-muted); cursor: pointer; transition: 0.3s; font-size: 15px; white-space: nowrap;
+        }
+        .tab-btn.active { background: white; color: var(--primary-dark); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .tab-btn.nav-trigger { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; margin-left: auto; box-shadow: 0 4px 10px rgba(92, 77, 92, 0.2); }
+        .tab-btn.nav-trigger:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(92, 77, 92, 0.4); }
+
+        .header-right { display: flex; align-items: center; gap: 15px; flex-shrink: 0;}
+
+        /* BẢNG ĐIỀU HƯỚNG MODAL */
+        .nav-grid-modal { display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 12px; margin-top: 15px;}
+        .nav-dot {
+            height: 45px; border-radius: 12px; border: 2px solid var(--border);
+            display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px;
+            cursor: pointer; background: rgba(255,255,255,0.8); color: var(--text-muted); transition: all 0.2s;
+        }
+        .nav-dot:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px);}
+        .nav-dot.answered { background: var(--primary); border-color: var(--primary); color: white; box-shadow: 0 4px 10px rgba(142, 125, 143, 0.4);}
+        .nav-dot.correct { background: var(--success); border-color: var(--success); color: white; }
+        .nav-dot.wrong { background: var(--danger); border-color: var(--danger); color: white; }
+
+        /* MAIN CONTENT AREA */
+        main {
+            flex: 1; overflow-y: auto; padding: 40px 30px; scroll-behavior: smooth;
+        }
+        .part-container { display: none; width: 100%; animation: fadeIn 0.4s ease; max-width: 1100px; margin: 0 auto; }
+        .part-container.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .part-title { font-size: 32px; font-weight: 800; color: var(--primary-dark); margin-bottom: 10px; font-family: 'Lora', serif;}
+        .part-desc { font-size: 17px; color: var(--text-main); margin-bottom: 30px; padding: 18px 25px; background: #fdf6f2; border-left: 5px solid var(--secondary); border-radius: 0 16px 16px 0; font-weight: 600;}
+
+        /* NOTES BOX & INPUTS */
+        .notes-box {
+            padding: 35px; border-radius: 24px; line-height: 2.2; font-size: 18px; margin-bottom: 35px;
+        }
+        .notes-box h3 { color: var(--primary-dark); text-align: center; margin-top: 0; font-family: 'Lora', serif; font-size: 24px; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px;}
+        .notes-box ul { list-style-type: none; padding-left: 0; }
+        .notes-box ul li { position: relative; padding-left: 25px; margin-bottom: 15px; }
+        .notes-box ul li::before { content: '🌸'; position: absolute; left: 0; font-size: 14px; top: 2px; }
+        
+        input[type="text"] {
+            border: 2px solid var(--border); border-radius: 12px; padding: 8px 16px;
+            font-family: inherit; font-size: 17px; color: var(--primary-dark);
+            outline: none; background: rgba(255,255,255,0.9); transition: all 0.3s; font-weight: 700; width: 220px; text-align: center;
+        }
+        input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(142, 125, 143, 0.2); transform: translateY(-2px);}
+        input[type="text"].correct-input { border-color: var(--success); color: var(--success); background: #f1f8e9; }
+        input[type="text"].wrong-input { border-color: var(--danger); color: var(--danger); background: #ffebee; }
+        input[type="text"]:disabled { background: #f5eff2; cursor: not-allowed; opacity: 0.9;}
+
+        /* MULTIPLE CHOICE & SPLIT LAYOUT */
+        .q-card {
+            padding: 30px; border-radius: 24px; margin-bottom: 30px; scroll-margin-top: 100px; background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 8px 32px 0 rgba(142, 125, 143, 0.08);
+        }
+        .q-header { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px; }
+        .q-num {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; width: 40px; height: 40px;
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 18px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(92, 77, 92, 0.2);
+        }
+        .q-text { font-size: 19px; font-weight: 700; color: var(--text-main); line-height: 1.5; padding-top: 5px;}
+
+        .options-grid { display: flex; flex-direction: column; gap: 15px; }
+        .opt-label {
+            display: flex; align-items: center; padding: 15px 25px; border-radius: 16px;
+            border: 2px solid var(--border); cursor: pointer; transition: all 0.2s;
+            background: rgba(255,255,255,0.6); font-weight: 600; font-size: 17px;
+        }
+        .opt-label:hover:not(.disabled) { border-color: var(--primary); background: white; transform: translateX(5px); }
+        .opt-label input { margin-right: 18px; transform: scale(1.4); accent-color: var(--primary); cursor: pointer;}
+        .opt-label.selected { border-color: var(--primary); background: #f5eff2; box-shadow: 0 4px 15px rgba(142, 125, 143, 0.15);}
+        .opt-label.disabled { cursor: default; pointer-events: none; }
+
+        .opt-label.is-correct { border-color: var(--success) !important; background: #f1f8e9 !important; color: #4b7432;}
+        .opt-label.is-wrong { border-color: var(--danger) !important; background: #ffebee !important; opacity: 0.7; text-decoration: line-through;}
+        
+        /* EXPLANATION BOX STYLE */
+        .explanation-box {
+            display: none; margin-top: 15px; padding: 20px 25px; background: rgba(255, 255, 255, 0.95);
+            border-left: 6px solid var(--success); border-radius: 12px;
+            font-size: 16px; line-height: 1.7; animation: fadeIn 0.5s; box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+        }
+        .explanation-box.show { display: block; }
+        .exp-title { font-weight: 800; color: var(--success); margin-bottom: 12px; font-size: 18px; border-bottom: 2px dashed rgba(106, 153, 78, 0.3); padding-bottom: 8px; display: flex; align-items: center; gap: 10px;}
+        .exp-content p { margin-bottom: 8px; }
+        .exp-content mark { background-color: var(--highlight); color: var(--primary-dark); font-weight: bold; padding: 0 4px; border-radius: 4px; }
+        
+        .q-wrap { margin-bottom: 15px; }
+
+        /* TOAST NOTIFICATION */
+        #toastNotification {
+            position: fixed; bottom: -100px; right: 30px;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px);
+            border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(92, 77, 92, 0.15);
+            padding: 16px 24px; border-radius: 16px; display: flex; align-items: center; gap: 15px;
+            z-index: 10000; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        #toastNotification.show { bottom: 30px; }
+        .toast-icon { font-size: 28px; }
+        .toast-title { font-weight: 800; color: var(--primary-dark); font-size: 17px; }
+        .toast-desc { color: var(--text-muted); font-size: 15px; margin-top: 4px;}
+
+        /* CUSTOM TABLE for PART 1 and 2 */
+        .custom-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--border); }
         .custom-table th { background: var(--primary); color: white; padding: 15px; text-align: left; font-size: 18px; }
         .custom-table td { border-bottom: 1px solid #eee; padding: 15px; font-size: 18px; vertical-align: middle; }
+        .custom-table tr.hidden-exp-row { border-bottom: none; }
+        .custom-table tr.hidden-exp-row td { padding: 0; border: none; }
 
-        input[type="text"], select {
-            border: 2px solid #e6e1e5; border-radius: 8px; padding: 8px 15px;
-            font-family: inherit; font-size: 18px; color: var(--primary-dark);
-            outline: none; background: white; transition: 0.2s; font-weight: 600; width: 180px;
-        }
-        input[type="text"]:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(142, 125, 143, 0.15); }
-        input[type="text"].correct-input { border-color: var(--correct); color: var(--correct); background: #f1f8e9; }
-        input[type="text"].wrong-input { border-color: var(--wrong); color: var(--wrong); background: #ffebee; }
-
-        .mc-option { display: block; margin: 10px 0; cursor: pointer; padding: 12px; border-radius: 10px; transition: background 0.2s; font-size: 18px; border: 1px solid transparent; }
-        .mc-option:hover { background: #f5eff2; border-color: #dcd6db; }
-        .mc-option input { margin-right: 12px; transform: scale(1.3); accent-color: var(--primary); }
-
-        /* --- MAP IMAGE STYLES --- */
-        .map-container {
-            text-align: center;
-            margin: 30px 0;
-            padding: 20px;
-            background: #faf8f9;
-            border-radius: 15px;
-            border: 2px dashed var(--border);
-        }
-        .map-image {
-            max-width: 100%;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            border: 2px solid #e1d5e2;
-        }
-
-        /* --- DRAG AND DROP STYLES --- */
-        .drag-palette { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; background: #faf8f9; padding: 20px; border-radius: 15px; border: 2px dashed var(--border); }
+        /* MAP & DRAG DROP */
+        .map-container { text-align: center; margin: 30px 0; padding: 20px; background: #faf8f9; border-radius: 20px; border: 2px dashed var(--border); }
+        .map-image { max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border: 2px solid #e1d5e2; }
+        
+        .drag-palette { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; background: #faf8f9; padding: 20px; border-radius: 15px; border: 2px dashed var(--border); justify-content: center;}
         .drag-item {
             width: 45px; height: 45px; background: var(--primary); color: white;
             display: flex; align-items: center; justify-content: center;
-            border-radius: 10px; cursor: grab; font-weight: bold; font-size: 20px;
+            border-radius: 12px; cursor: grab; font-weight: bold; font-size: 20px;
             box-shadow: 0 4px 10px rgba(142, 125, 143, 0.3); transition: 0.2s;
         }
         .drag-item:active { cursor: grabbing; transform: scale(1.1); }
@@ -197,427 +255,757 @@
         
         .drop-zone {
             display: inline-flex; width: 60px; height: 45px; border: 2px dashed #b8adb9;
-            border-radius: 10px; align-items: center; justify-content: center;
+            border-radius: 12px; align-items: center; justify-content: center;
             background: #ffffff; font-weight: bold; color: var(--primary-dark); vertical-align: middle; transition: 0.3s;
         }
-        .drop-zone.drag-over { background: var(--highlight); border-color: var(--accent); transform: scale(1.05); }
+        .drop-zone.drag-over { background: var(--highlight); border-color: var(--secondary); transform: scale(1.05); }
         .drop-zone .drag-item { margin: 0; box-shadow: none; cursor: pointer; }
 
-        /* --- EXPLANATION BOX --- */
-        .explanation {
-            background: var(--exp-bg); border-left: 5px solid var(--primary);
-            padding: 15px 20px; margin-top: 15px; border-radius: 0 12px 12px 0;
-            font-size: 17px; color: var(--primary-dark); font-weight: 500;
-            display: none; animation: fadeIn 0.4s; line-height: 1.6;
+        @media (max-width: 768px) {
+            header { flex-direction: column; height: auto; padding: 15px; gap: 15px; }
+            .header-right { width: 100%; justify-content: space-between; }
+            .tabs { width: 100%; padding: 5px; }
+            .audio-controls { width: 100%; justify-content: space-between;}
+            audio { width: 100%; max-width: none;}
+            main { padding: 20px 15px; }
+            .notes-box, .q-card { padding: 20px; }
+            input[type="text"] { width: 100%; margin-top: 10px; }
+            .modal-box { padding: 30px 20px; }
         }
-        .explanation strong { color: var(--accent); }
-
-        /* --- FOOTER --- */
-        footer {
-            height: var(--footer-h); background: #fff; border-top: 2px solid var(--border);
-            display: flex; flex-direction: column; justify-content: center; padding: 0 30px;
-            z-index: 100; position: fixed; bottom: 0; width: 100%;
-        }
-        .nav-scroller { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; align-items: center; }
-        .nav-dot {
-            min-width: 40px; height: 40px; border: 2px solid #eee; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600;
-            cursor: pointer; color: #999; background: white; transition: 0.2s; flex-shrink: 0;
-        }
-        .nav-dot:hover { border-color: var(--primary); color: var(--primary); }
-        .nav-dot.done { background: #f5eff2; color: var(--primary-dark); border-color: #dcd6db; }
-        .nav-dot.correct { background: var(--correct); color: white; border-color: var(--correct); }
-        .nav-dot.incorrect { background: var(--wrong); color: white; border-color: var(--wrong); }
     </style>
 </head>
 <body>
 
-    <div id="setupOverlay">
-        <div class="setup-modal">
-            <h2>Chào mừng đến với Listening Library ✨</h2>
-            <p style="font-size: 18px; color: #666; margin-bottom: 25px;">Bạn hãy chọn chế độ:</p>
-            
-            <button class="mode-btn mode-practice" onclick="selectMode('practice')">🎯 Luyện tập</button>
-            <button class="mode-btn mode-mock" onclick="selectMode('mock')">🏆 Thi thử</button>
-            
-            <button class="start-btn" id="startBtn" onclick="askReady()">Sẵn sàng</button>
-        </div>
-    </div>
+    <!-- SETTINGS & HISTORY MODAL -->
+    <div id="setupModal" class="modal-overlay show">
+        <div class="modal-box glass-effect">
+            <div id="setupContent">
+                <div class="modal-title">IELTS Listening Test 2</div>
+                <div class="modal-desc">Chào mừng bạn đến với thư viện bài nghe! Bạn muốn làm gì hôm nay?</div>
+                
+                <button class="mode-btn" onclick="showTestOptions()">
+                    <span style="font-size: 24px;">📝</span> Làm bài
+                </button>
+                <button class="mode-btn" onclick="openHistoryTab()">
+                    <span style="font-size: 24px;">🕒</span> Xem lịch sử
+                </button>
+            </div>
 
-    <div id="startConfirmOverlay" class="custom-overlay">
-        <div class="custom-modal">
-            <h2>Xác nhận bắt đầu</h2>
-            <p id="startConfirmMsg" style="font-size: 18px; color: #555; margin-bottom: 20px; white-space: pre-line;"></p>
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeModal('startConfirmOverlay')">Hủy</button>
-                <button class="btn-confirm" onclick="startTestActual()">Bắt đầu</button>
+            <div id="testOptionsContent" style="display: none;">
+                <div class="modal-title" style="font-size: 22px;">Chọn Chế Độ</div>
+                <button class="mode-btn" onclick="selectMode('practice')">🌿 Luyện Tập </button>
+                <button class="mode-btn" onclick="selectMode('mock')">🔥 Thi Thử </button>
+                <div class="modal-actions">
+                    <button class="btn btn-outline" onclick="backToMenu()">Quay lại</button>
+                    <button class="btn btn-primary" style="display: none;" id="btnStart" onclick="startTest()">BẮT ĐẦU</button>
+                </div>
+            </div>
+
+            <div id="historyContent" class="history-container">
+                <div class="modal-title" style="font-size: 22px; text-align: center;">Lịch Sử Làm Bài</div>
+                <div id="historyLoading" style="text-align: center; color: var(--text-muted); margin: 20px 0;">Đang tải dữ liệu...</div>
+                
+                <div class="table-wrapper">
+                    <table id="historyTable">
+                        <thead>
+                            <tr>
+                                <th>Ngày làm</th>
+                                <th>Kết quả</th>
+                                <th>Band</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody"></tbody>
+                    </table>
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-outline" onclick="backToMenu()">Quay lại Menu</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="submitModal" class="custom-overlay">
-        <div class="custom-modal">
-            <h2>Xác nhận nộp bài?</h2>
-            <p style="font-size: 18px; color: #555; margin-bottom: 10px;">Bạn có chắc chắn nộp bài không?</p>
+    <!-- CONFIRM SUBMISSION MODAL -->
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-box glass-effect">
+            <div class="modal-title">Xác nhận nộp bài</div>
+            <div class="modal-desc">Bạn có chắc chắn muốn nộp bài? Các câu chưa làm sẽ bị tính là sai.</div>
             <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeModal('submitModal')">Quay lại</button>
-                <button class="btn-confirm" onclick="evaluateTest()">Nộp</button>
+                <button class="btn btn-outline" onclick="closeModal('confirmModal')">Quay lại</button>
+                <button class="btn btn-primary" onclick="evaluateTest(false)">Đồng ý nộp bài</button>
             </div>
         </div>
     </div>
 
-    <div id="resultOverlay" class="custom-overlay">
-        <div class="custom-modal">
-            <h2>🎉 Chúc mừng!</h2>
-            <p style="font-size: 16px; color: #666;">Bạn đã hoàn thành bài.</p>
-            <div id="resultMessage" style="margin: 20px 0; line-height: 1.8;"></div>
-            <button class="btn-confirm" style="width: 100%; margin-top: 10px;" onclick="closeModal('resultOverlay')">Xem chi tiết</button>
+    <!-- DELETE HISTORY CONFIRM MODAL -->
+    <div id="deleteConfirmModal" class="modal-overlay">
+        <div class="modal-box glass-effect">
+            <div class="modal-title">Xác nhận xóa</div>
+            <div class="modal-desc">Bạn có chắc chắn muốn xóa bài làm này khỏi lịch sử không?</div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('deleteConfirmModal')">Hủy</button>
+                <button class="btn btn-danger" id="btnConfirmDelete" onclick="executeDelete()">Xóa luôn</button>
+            </div>
         </div>
     </div>
 
-    <header>
-        <div class="brand">
-            <span>SnapEnglish</span> Test 2 IELTS Listening
+    <!-- RESULT MODAL -->
+    <div id="resultModal" class="modal-overlay">
+        <div class="modal-box glass-effect">
+            <div class="modal-title" id="resultTitle">Kết Quả Bài Thi 🎉</div>
+            <div style="font-size: 56px; font-weight: 800; color: var(--primary-dark); margin: 15px 0; text-shadow: 2px 2px 0px rgba(142, 125, 143, 0.3);" id="scoreDisplay">0/40</div>
+            <div style="font-size: 26px; font-weight: 800; color: var(--success); margin-bottom: 20px; background: #f1f8e9; display: inline-block; padding: 10px 25px; border-radius: 20px;" id="bandDisplay">Band: 0.0</div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="location.reload()">Làm bài mới</button>
+                <button class="btn btn-primary" onclick="closeModal('resultModal')">Xem giải thích chi tiết</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAV MODAL -->
+    <div id="navModal" class="modal-overlay">
+        <div class="modal-box glass-effect" style="max-width: 600px;">
+            <div class="modal-title">Bảng Điều Hướng (1 - 40)</div>
+            <div class="nav-grid-modal" id="navGrid"></div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('navModal')">Đóng bảng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="glass-effect">
+        <div class="brand">Snap<span>English</span> Test 2</div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab(1)">Part 1</button>
+            <button class="tab-btn" onclick="switchTab(2)">Part 2</button>
+            <button class="tab-btn" onclick="switchTab(3)">Part 3</button>
+            <button class="tab-btn" onclick="switchTab(4)">Part 4</button>
+            <button class="tab-btn nav-trigger" onclick="document.getElementById('navModal').classList.add('show')">🧭 Điều hướng</button>
         </div>
         
-        <div class="audio-controls" id="audioContainer">
-            <button class="skip-btn" id="btn-backward" onclick="skipAudio(-10)">-10</button>
-            <audio id="testAudio" controls controlsList="nodownload">
-                <source src="https://github.com/snaplanguages/SnapEnglish-audioieltslistening01/blob/1f5e120d9f5c3c2598b4ffea2baf89c6a33ba1ae/IELTS%20Listening%20Test%202.mp3?raw=true" type="audio/mpeg">
-                Trình duyệt của bạn không hỗ trợ audio.
-            </audio>
-            <button class="skip-btn" id="btn-forward" onclick="skipAudio(10)">+10</button>
+        <div class="header-right">
+            <div class="audio-controls" id="audioContainer">
+                <button class="skip-btn" onclick="skipAudio(-10)">-10</button>
+                <audio id="testAudio" controls controlsList="nodownload">
+                    <source src="https://github.com/snaplanguages/SnapEnglish-audioieltslistening01/blob/1f5e120d9f5c3c2598b4ffea2baf89c6a33ba1ae/IELTS%20Listening%20Test%202.mp3?raw=true" type="audio/mpeg">
+                </audio>
+                <button class="skip-btn" onclick="skipAudio(10)">+10</button>
+            </div>
+            <button class="btn btn-primary" id="btnSubmit" onclick="requestSubmit()">NỘP BÀI</button>
         </div>
-
-        <button class="btn-submit" id="topSubmitBtn" onclick="requestSubmit()">NỘP BÀI</button>
     </header>
 
-    <div class="container" id="mainContainer">
-        <div class="tabs">
-            <div class="tab active" onclick="switchTab(1)">Part 1</div>
-            <div class="tab" onclick="switchTab(2)">Part 2</div>
-            <div class="tab" onclick="switchTab(3)">Part 3</div>
-            <div class="tab" onclick="switchTab(4)">Part 4</div>
-        </div>
-
+    <main id="mainContainer">
         <!-- PART 1 -->
-        <div id="part1" class="tab-content active">
-            <h2>Part 1: Questions 1-10</h2>
-            <div class="instruction">Complete the form below. Write <strong>ONE WORD AND/OR A NUMBER</strong>.</div>
+        <div id="part1" class="part-container active">
+            <div class="part-title">Part 1: Questions 1-10</div>
+            <div class="part-desc">Complete the form below. Write <b>ONE WORD AND/OR A NUMBER</b>.</div>
             
-            <h3>ACCOMMODATION FORM - STUDENT INFORMATION</h3>
-            <table class="custom-table">
-                <tbody>
-                    <tr><td style="width: 40%">Type of accommodation:</td><td>hall of residence</td></tr>
-                    <tr><td>Name:</td><td>Anu <strong>(1)</strong> <input type="text" id="q1" oninput="markAnswered(1)"></td></tr>
-                    <tr id="row-e1"><td colspan="2" style="padding:0; border:none;"><div id="e1" class="explanation"></div></td></tr>
-                    
-                    <tr><td>Date of birth:</td><td><strong>(2)</strong> <input type="text" id="q2" oninput="markAnswered(2)"> 1972</td></tr>
-                    <tr id="row-e2"><td colspan="2" style="padding:0; border:none;"><div id="e2" class="explanation"></div></td></tr>
+            <div class="notes-box glass-effect">
+                <h3>ACCOMMODATION FORM - STUDENT INFORMATION</h3>
+                <table class="custom-table">
+                    <tbody>
+                        <tr><td style="width: 40%">Type of accommodation:</td><td>hall of residence</td></tr>
+                        
+                        <tr><td>Name:</td><td>Anu <b>(1)</b> <input type="text" id="q1" oninput="markAnswered(1)"></td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-1" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 1</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">Bhatt</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"Yes, A-N-U <mark>B-H-A-double T</mark>."</i></p>
+                                    <p><b>Phân tích:</b> Người nữ đánh vần họ của mình là B-H-A-double T (B-H-A-T-T). Chú ý cách phát âm chữ cái.</p>
+                                </div>
+                            </div>
+                        </td></tr>
 
-                    <tr><td>Country of origin:</td><td>India</td></tr>
-                    <tr><td>Course of study:</td><td><strong>(3)</strong> <input type="text" id="q3" oninput="markAnswered(3)"></td></tr>
-                    <tr id="row-e3"><td colspan="2" style="padding:0; border:none;"><div id="e3" class="explanation"></div></td></tr>
+                        <tr><td>Date of birth:</td><td><b>(2)</b> <input type="text" id="q2" oninput="markAnswered(2)"> 1972</td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-2" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 2</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">31 March / 31st March / March 31</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"The <mark>31st of March</mark> 1972."</i></p>
+                                    <p><b>Phân tích:</b> Do đề bài giới hạn "ONE WORD AND/OR A NUMBER" và phần sau đã có số "1972", ta chỉ điền ngày và tháng: "31 March".</p>
+                                </div>
+                            </div>
+                        </td></tr>
 
-                    <tr><td>Number of years planned in hall:</td><td><strong>(4)</strong> <input type="text" id="q4" oninput="markAnswered(4)"></td></tr>
-                    <tr id="row-e4"><td colspan="2" style="padding:0; border:none;"><div id="e4" class="explanation"></div></td></tr>
+                        <tr><td>Country of origin:</td><td>India</td></tr>
+                        
+                        <tr><td>Course of study:</td><td><b>(3)</b> <input type="text" id="q3" oninput="markAnswered(3)"></td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-3" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 3</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">nursing</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"I’m doing a course in <mark>nursing</mark>."</i></p>
+                                    <p><b>Phân tích:</b> Anu nói cô ấy đang học khóa điều dưỡng (nursing).</p>
+                                </div>
+                            </div>
+                        </td></tr>
 
-                    <tr><td>Preferred catering arrangement:</td><td>half board</td></tr>
-                    <tr><td>Special dietary requirements:</td><td>no <strong>(5)</strong> <input type="text" id="q5" oninput="markAnswered(5)"> (red)</td></tr>
-                    <tr id="row-e5"><td colspan="2" style="padding:0; border:none;"><div id="e5" class="explanation"></div></td></tr>
+                        <tr><td>Number of years planned in hall:</td><td><b>(4)</b> <input type="text" id="q4" oninput="markAnswered(4)"></td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-4" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 4</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">2 / two</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"Well, it’ll take three years, but I’d only like to stay in hall for <mark>two</mark>."</i></p>
+                                    <p><b>Phân tích:</b> Dù khóa học kéo dài 3 năm, Anu dự định (planned) chỉ ở ký túc xá trong 2 năm.</p>
+                                </div>
+                            </div>
+                        </td></tr>
 
-                    <tr><td>Preferred room type:</td><td>a single <strong>(6)</strong> <input type="text" id="q6" oninput="markAnswered(6)"></td></tr>
-                    <tr id="row-e6"><td colspan="2" style="padding:0; border:none;"><div id="e6" class="explanation"></div></td></tr>
+                        <tr><td>Preferred catering arrangement:</td><td>half board</td></tr>
+                        
+                        <tr><td>Special dietary requirements:</td><td>no <b>(5)</b> <input type="text" id="q5" oninput="markAnswered(5)"> (red)</td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-5" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 5</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">meat</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"Yes, I don’t take red <mark>meat</mark>."</i></p>
+                                    <p><b>Phân tích:</b> Yêu cầu ăn kiêng đặc biệt của cô ấy là không ăn thịt đỏ (red meat). Đề bài đã cho chữ (red) ở ngoài ngoặc nên ta điền "meat".</p>
+                                </div>
+                            </div>
+                        </td></tr>
 
-                    <tr><td>Interests:</td><td>the <strong>(7)</strong> <input type="text" id="q7" oninput="markAnswered(7)"> and badminton</td></tr>
-                    <tr id="row-e7"><td colspan="2" style="padding:0; border:none;"><div id="e7" class="explanation"></div></td></tr>
+                        <tr><td>Preferred room type:</td><td>a single <b>(6)</b> <input type="text" id="q6" oninput="markAnswered(6)"></td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-6" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 6</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">bedsit / bed-sit</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"...I think the <mark>bed-sit</mark> sounds the best option."</i></p>
+                                    <p><b>Phân tích:</b> Có 2 loại phòng đơn được nhắc đến. Vì học bổng khá hào phóng, cô ấy chọn phòng "bedsit" (phòng trọ nhỏ có cả giường và khu bếp).</p>
+                                </div>
+                            </div>
+                        </td></tr>
 
-                    <tr><td>Priorities in choice of hall:</td><td>to be with other students who are <strong>(8)</strong> <input type="text" id="q8" oninput="markAnswered(8)"></td></tr>
-                    <tr id="row-e8"><td colspan="2" style="padding:0; border:none;"><div id="e8" class="explanation"></div></td></tr>
+                        <tr><td>Interests:</td><td>the <b>(7)</b> <input type="text" id="q7" oninput="markAnswered(7)"> and badminton</td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-7" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 7</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">theatre / theater</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"Um... well, I love the <mark>theater</mark>."</i></p>
+                                    <p><b>Phân tích:</b> Sở thích của cô ấy gồm sân khấu (theatre/theater) và cầu lông (badminton).</p>
+                                </div>
+                            </div>
+                        </td></tr>
 
-                    <tr><td></td><td>To live outside the <strong>(9)</strong> <input type="text" id="q9" oninput="markAnswered(9)"></td></tr>
-                    <tr id="row-e9"><td colspan="2" style="padding:0; border:none;"><div id="e9" class="explanation"></div></td></tr>
+                        <tr><td>Priorities in choice of hall:</td><td>to be with other students who are <b>(8)</b> <input type="text" id="q8" oninput="markAnswered(8)"></td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-8" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 8</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">mature / older</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"Well, the first thing is I’d prefer a hall where there are other <mark>mature</mark> students, if possible."</i></p>
+                                    <p><b>Phân tích:</b> Ưu tiên số một của Anu là được ở cùng những sinh viên trưởng thành/lớn tuổi (mature students).</p>
+                                </div>
+                            </div>
+                        </td></tr>
 
-                    <tr><td></td><td>To have a <strong>(10)</strong> <input type="text" id="q10" oninput="markAnswered(10)"> area for socializing</td></tr>
-                    <tr id="row-e10"><td colspan="2" style="padding:0; border:none;"><div id="e10" class="explanation"></div></td></tr>
-                </tbody>
-            </table>
+                        <tr><td></td><td>To live outside the <b>(9)</b> <input type="text" id="q9" oninput="markAnswered(9)"></td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-9" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 9</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">town</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"Uh... and I’d prefer to be out of <mark>town</mark>."</i></p>
+                                    <p><b>Phân tích:</b> "out of" đồng nghĩa với "outside". Cô ấy muốn sống bên ngoài trung tâm thị trấn (town).</p>
+                                </div>
+                            </div>
+                        </td></tr>
+
+                        <tr><td></td><td>To have a <b>(10)</b> <input type="text" id="q10" oninput="markAnswered(10)"> area for socializing</td></tr>
+                        <tr class="hidden-exp-row"><td colspan="2">
+                            <div id="exp-10" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 10</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">shared</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"Well, I would like somewhere with a <mark>shared</mark> area, a TV room for example..."</i></p>
+                                    <p><b>Phân tích:</b> Để dễ dàng giao lưu (socializing), Anu muốn có một khu vực dùng chung (shared area) như phòng xem tivi.</p>
+                                </div>
+                            </div>
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- PART 2 -->
-        <div id="part2" class="tab-content">
-            <h2>Part 2: Questions 11-20</h2>
-            <div class="instruction">Questions 11-13: Complete the table below. Write <strong>NO MORE THAN THREE WORDS</strong>.</div>
-            <h3>PARKS AND OPEN SPACES</h3>
+        <div id="part2" class="part-container">
+            <div class="part-title">Part 2: Questions 11-20</div>
+            <div class="part-desc">Complete the table below for Q11-13 (<b>NO MORE THAN THREE WORDS</b>). Choose A, B, C for Q14-16. Label the map for Q17-20.</div>
             
-            <table class="custom-table">
-                <thead><tr><th>Name of place</th><th>Of particular interest</th><th>Open</th></tr></thead>
-                <tbody>
-                    <tr><td>Halland Common</td><td>Source of River Ouse</td><td>24 hours</td></tr>
-                    <tr><td>Holt Island</td><td>Many different <strong>(11)</strong> <input type="text" id="q11" oninput="markAnswered(11)"></td><td>Between <strong>(12)</strong> <input type="text" id="q12" oninput="markAnswered(12)"> and Sunday</td></tr>
-                    <tr><td>Longfield Country Park</td><td>Reconstruction of a 2000 year old <strong>(13)</strong> <input type="text" id="q13" oninput="markAnswered(13)"> with activities for children</td><td>Daylight hours</td></tr>
-                </tbody>
-            </table>
-            <div id="e11" class="explanation"></div>
-            <div id="e12" class="explanation"></div>
-            <div id="e13" class="explanation"></div>
-
-            <div class="instruction" style="margin-top:40px;">Questions 14-16: Choose the correct letter, A, B or C.</div>
-            
-            <p><strong>14. As part of Monday's activity, visitors will</strong></p>
-            <label class="mc-option"><input type="radio" name="q14" value="A" onchange="markAnswered(14)"> A. prepare food with herbs</label>
-            <label class="mc-option"><input type="radio" name="q14" value="B" onchange="markAnswered(14)"> B. meet a well-known herbalist</label>
-            <label class="mc-option"><input type="radio" name="q14" value="C" onchange="markAnswered(14)"> C. dye cloth with herbs</label>
-            <div id="e14" class="explanation"></div>
-
-            <p style="margin-top:25px;"><strong>15. For the activity on Wednesday,</strong></p>
-            <label class="mc-option"><input type="radio" name="q15" value="A" onchange="markAnswered(15)"> A. only group bookings are accepted</label>
-            <label class="mc-option"><input type="radio" name="q15" value="B" onchange="markAnswered(15)"> B. visitors should book in advance</label>
-            <label class="mc-option"><input type="radio" name="q15" value="C" onchange="markAnswered(15)"> C. attendance is free</label>
-            <div id="e15" class="explanation"></div>
-
-            <p style="margin-top:25px;"><strong>16. For the activity on Saturday, visitors should</strong></p>
-            <label class="mc-option"><input type="radio" name="q16" value="A" onchange="markAnswered(16)"> A. come in suitable clothing</label>
-            <label class="mc-option"><input type="radio" name="q16" value="B" onchange="markAnswered(16)"> B. make sure they are able to stay for the whole day</label>
-            <label class="mc-option"><input type="radio" name="q16" value="C" onchange="markAnswered(16)"> C. tell the rangers before the event what they wish to do</label>
-            <div id="e16" class="explanation"></div>
-
-            <div class="instruction" style="margin-top:40px;">Questions 17-20: Label the map below. Drag and drop the correct letter A-I into the boxes.</div>
-            
-            <!-- THÊM BẢN ĐỒ VÀO ĐÂY -->
-            <div class="map-container">
-                <img src="https://lh5.googleusercontent.com/ygWeMZTkpM3cC5yqbjb3cSPm4i6YCCT6_-QvGTTiIKEQjUq0g3qPRZyyMq4vZdN-WNf8pGYXmJ49HXxQdqlDjEKg_ZReeWjHsqa_BUoi8jV9LgQsA9zRasCpDzRDrIqDpuQNZl7qVTGeQYhViDeytys" alt="Hinchingbrooke Park Map" class="map-image">
+            <div class="notes-box glass-effect">
+                <h3>PARKS AND OPEN SPACES</h3>
+                <table class="custom-table">
+                    <thead><tr><th>Name of place</th><th>Of particular interest</th><th>Open</th></tr></thead>
+                    <tbody>
+                        <tr><td>Halland Common</td><td>Source of River Ouse</td><td>24 hours</td></tr>
+                        <tr><td>Holt Island</td><td>Many different <b>(11)</b> <input type="text" id="q11" oninput="markAnswered(11)"></td><td>Between <b>(12)</b> <input type="text" id="q12" oninput="markAnswered(12)"> and Sunday</td></tr>
+                        <tr class="hidden-exp-row"><td colspan="3">
+                            <div id="exp-11" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 11</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">trees</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"Then there’s Holt Island, which is noted for its great range of <mark>trees</mark>."</i></p>
+                                    <p><b>Phân tích:</b> "noted for" (nổi tiếng về) tương ứng với "particular interest". "great range of" đồng nghĩa với "Many different". Đáp án cần điền là trees.</p>
+                                </div>
+                            </div>
+                            <div id="exp-12" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 12</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">Friday</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"The island is only open to the public from <mark>Friday</mark> to Sunday..."</i></p>
+                                    <p><b>Phân tích:</b> Hòn đảo chỉ mở cửa từ thứ Sáu (Friday) đến Chủ nhật.</p>
+                                </div>
+                            </div>
+                        </td></tr>
+                        <tr><td>Longfield Country Park</td><td>Reconstruction of a 2000 year old <b>(13)</b> <input type="text" id="q13" oninput="markAnswered(13)"> with activities for children</td><td>Daylight hours</td></tr>
+                        <tr class="hidden-exp-row"><td colspan="3">
+                            <div id="exp-13" class="explanation-box">
+                                <div class="exp-title">📝 Giải thích chi tiết: Câu 13</div>
+                                <div class="exp-content">
+                                    <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">farm</span></p>
+                                    <p><b>Dẫn chứng audio:</b> <i>"Longfield has a modern replica of a <mark>farm</mark> from over 2,000 years ago."</i></p>
+                                    <p><b>Phân tích:</b> "Reconstruction" (Sự tái hiện/phục dựng) đồng nghĩa với "replica" trong audio. Đối tượng được phục dựng là một nông trại (farm).</p>
+                                </div>
+                            </div>
+                        </td></tr>
+                    </tbody>
+                </table>
             </div>
 
-            <div class="drag-palette">
-                <div class="drag-item" draggable="true" data-val="A">A</div>
-                <div class="drag-item" draggable="true" data-val="B">B</div>
-                <div class="drag-item" draggable="true" data-val="C">C</div>
-                <div class="drag-item" draggable="true" data-val="D">D</div>
-                <div class="drag-item" draggable="true" data-val="E">E</div>
-                <div class="drag-item" draggable="true" data-val="F">F</div>
-                <div class="drag-item" draggable="true" data-val="G">G</div>
-                <div class="drag-item" draggable="true" data-val="H">H</div>
-                <div class="drag-item" draggable="true" data-val="I">I</div>
+            <div class="q-card glass-effect" id="card-14">
+                <div class="q-header"><div class="q-num">14</div><div class="q-text">As part of Monday's activity, visitors will</div></div>
+                <div class="options-grid">
+                    <label class="opt-label" onclick="selectAnswer(14, 'A')"><input type="radio" name="q14" value="A"> A. prepare food with herbs</label>
+                    <label class="opt-label" onclick="selectAnswer(14, 'B')"><input type="radio" name="q14" value="B"> B. meet a well-known herbalist</label>
+                    <label class="opt-label" onclick="selectAnswer(14, 'C')"><input type="radio" name="q14" value="C"> C. dye cloth with herbs</label>
+                </div>
+                <div id="exp-14" class="explanation-box">
+                    <div class="exp-title">📝 Giải thích chi tiết: Câu 14</div>
+                    <div class="exp-content">
+                        <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">C. dye cloth with herbs</span></p>
+                        <p><b>Dẫn chứng audio:</b> <i>"...practice the technique of using them as color <mark>dyes for cloth</mark>, and listen to an illustrated talk about their use in cooking and medicine."</i></p>
+                        <p><b>Phân tích:</b> Khách tham quan sẽ thực hành nhuộm vải bằng thảo mộc (dye cloth) và chỉ *nghe giảng* về việc dùng thảo mộc nấu ăn chứ không trực tiếp chuẩn bị món ăn (A sai). Không có thông tin gặp gỡ chuyên gia nổi tiếng (B sai).</p>
+                    </div>
+                </div>
             </div>
 
-            <div style="background: white; padding: 25px; border-radius: 12px; border: 2px solid var(--border);">
-                <h3>Hinchingbrooke Park Features</h3>
-                <p><strong>17.</strong> bird hide <div class="drop-zone" data-q="17"></div></p>
-                <div id="e17" class="explanation"></div>
+            <div class="q-card glass-effect" id="card-15">
+                <div class="q-header"><div class="q-num">15</div><div class="q-text">For the activity on Wednesday,</div></div>
+                <div class="options-grid">
+                    <label class="opt-label" onclick="selectAnswer(15, 'A')"><input type="radio" name="q15" value="A"> A. only group bookings are accepted</label>
+                    <label class="opt-label" onclick="selectAnswer(15, 'B')"><input type="radio" name="q15" value="B"> B. visitors should book in advance</label>
+                    <label class="opt-label" onclick="selectAnswer(15, 'C')"><input type="radio" name="q15" value="C"> C. attendance is free</label>
+                </div>
+                <div id="exp-15" class="explanation-box">
+                    <div class="exp-title">📝 Giải thích chi tiết: Câu 15</div>
+                    <div class="exp-content">
+                        <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">B. visitors should book in advance</span></p>
+                        <p><b>Dẫn chứng audio:</b> <i>"We keep to a small number of people in the group, so if you want to go, you’ll need to <mark>phone the park ranger a few days ahead</mark>."</i></p>
+                        <p><b>Phân tích:</b> "phone... a few days ahead" nghĩa là phải đặt trước (book in advance). Người ta nói giữ số lượng người trong nhóm nhỏ chứ không phải chỉ nhận nhóm (A sai). Có phí nhỏ phải trả khi đến (C sai).</p>
+                    </div>
+                </div>
+            </div>
 
-                <p><strong>18.</strong> dog-walking area <div class="drop-zone" data-q="18"></div></p>
-                <div id="e18" class="explanation"></div>
+            <div class="q-card glass-effect" id="card-16">
+                <div class="q-header"><div class="q-num">16</div><div class="q-text">For the activity on Saturday, visitors should</div></div>
+                <div class="options-grid">
+                    <label class="opt-label" onclick="selectAnswer(16, 'A')"><input type="radio" name="q16" value="A"> A. come in suitable clothing</label>
+                    <label class="opt-label" onclick="selectAnswer(16, 'B')"><input type="radio" name="q16" value="B"> B. make sure they are able to stay for the whole day</label>
+                    <label class="opt-label" onclick="selectAnswer(16, 'C')"><input type="radio" name="q16" value="C"> C. tell the rangers before the event what they wish to do</label>
+                </div>
+                <div id="exp-16" class="explanation-box">
+                    <div class="exp-title">📝 Giải thích chi tiết: Câu 16</div>
+                    <div class="exp-content">
+                        <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">A. come in suitable clothing</span></p>
+                        <p><b>Dẫn chứng audio:</b> <i>"One thing though is to make sure you’re <mark>wearing something that you don't mind getting dirty or torn</mark>."</i></p>
+                        <p><b>Phân tích:</b> Việc "mặc trang phục không sợ bị bẩn hoặc rách" tương đương với việc mang trang phục phù hợp với hoạt động tay chân (suitable clothing).</p>
+                    </div>
+                </div>
+            </div>
 
-                <p><strong>19.</strong> flower garden <div class="drop-zone" data-q="19"></div></p>
-                <div id="e19" class="explanation"></div>
+            <div class="q-card glass-effect">
+                <h3 style="margin-bottom: 20px; color: var(--primary-dark); border-bottom: 2px solid var(--border); padding-bottom: 10px;">Label the map (17-20)</h3>
+                
+                <div class="map-container">
+                    <img src="https://lh5.googleusercontent.com/ygWeMZTkpM3cC5yqbjb3cSPm4i6YCCT6_-QvGTTiIKEQjUq0g3qPRZyyMq4vZdN-WNf8pGYXmJ49HXxQdqlDjEKg_ZReeWjHsqa_BUoi8jV9LgQsA9zRasCpDzRDrIqDpuQNZl7qVTGeQYhViDeytys" alt="Hinchingbrooke Park Map" class="map-image">
+                    <p style="color: #888; font-style: italic; margin-top:10px;">(Hinchingbrooke Park Map)</p>
+                </div>
 
-                <p><strong>20.</strong> wooded area <div class="drop-zone" data-q="20"></div></p>
-                <div id="e20" class="explanation"></div>
+                <div class="drag-palette">
+                    <div class="drag-item" draggable="true" data-val="A">A</div>
+                    <div class="drag-item" draggable="true" data-val="B">B</div>
+                    <div class="drag-item" draggable="true" data-val="C">C</div>
+                    <div class="drag-item" draggable="true" data-val="D">D</div>
+                    <div class="drag-item" draggable="true" data-val="E">E</div>
+                    <div class="drag-item" draggable="true" data-val="F">F</div>
+                    <div class="drag-item" draggable="true" data-val="G">G</div>
+                    <div class="drag-item" draggable="true" data-val="H">H</div>
+                    <div class="drag-item" draggable="true" data-val="I">I</div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.6); padding: 25px; border-radius: 16px; border: 2px solid var(--border);">
+                    <div class="q-wrap">
+                        <div style="display: flex; align-items: center; justify-content: space-between; font-size:18px;"><b>17.</b> bird hide <div class="drop-zone" data-q="17"></div></div>
+                        <div id="exp-17" class="explanation-box">
+                            <div class="exp-title">📝 Giải thích Q17</div>
+                            <div class="exp-content">
+                                <p><b>Đáp án đúng: A</b></p>
+                                <p><b>Dẫn chứng:</b> <i>"...there’s a lake in the northwest of the park with a <mark>bird hide</mark> to the west of it at the end of a path."</i></p>
+                                <p><b>Phân tích:</b> Nơi xem chim (bird hide) nằm ở phía Tây của hồ (phía Tây Bắc bản đồ), ở cuối một con đường dẫn vào. Đó là vị trí A.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="q-wrap">
+                        <div style="display: flex; align-items: center; justify-content: space-between; font-size:18px;"><b>18.</b> dog-walking area <div class="drop-zone" data-q="18"></div></div>
+                        <div id="exp-18" class="explanation-box">
+                            <div class="exp-title">📝 Giải thích Q18</div>
+                            <div class="exp-content">
+                                <p><b>Đáp án đúng: I</b></p>
+                                <p><b>Dẫn chứng:</b> <i>"Fairly close to where refreshments are available, there’s a <mark>dog walking area</mark> in the southern part of the park, leading off from the path."</i></p>
+                                <p><b>Phân tích:</b> Khu dắt chó đi dạo (dog-walking area) nằm ở khu vực phía Nam (southern part), gần nơi bán nước (refreshments). Đó là vị trí I.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="q-wrap">
+                        <div style="display: flex; align-items: center; justify-content: space-between; font-size:18px;"><b>19.</b> flower garden <div class="drop-zone" data-q="19"></div></div>
+                        <div id="exp-19" class="explanation-box">
+                            <div class="exp-title">📝 Giải thích Q19</div>
+                            <div class="exp-content">
+                                <p><b>Đáp án đúng: F</b></p>
+                                <p><b>Dẫn chứng:</b> <i>"...you can go to the flower garden. That’s the <mark>circular area</mark> on the map surrounded by paths."</i></p>
+                                <p><b>Phân tích:</b> Vườn hoa là một khu vực hình tròn (circular area) được bao quanh bởi các con đường. Vị trí khớp với mô tả là F.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="q-wrap">
+                        <div style="display: flex; align-items: center; justify-content: space-between; font-size:18px;"><b>20.</b> wooded area <div class="drop-zone" data-q="20"></div></div>
+                        <div id="exp-20" class="explanation-box">
+                            <div class="exp-title">📝 Giải thích Q20</div>
+                            <div class="exp-content">
+                                <p><b>Đáp án đúng: E</b></p>
+                                <p><b>Dẫn chứng:</b> <i>"...there’s a wooded area in the <mark>western section</mark> of the park between two paths."</i></p>
+                                <p><b>Phân tích:</b> Khu vực nhiều cây cối (wooded area) nằm ở khu vực phía Tây (western section), nằm giữa hai lối đi. Đó là vị trí E.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- PART 3 -->
-        <div id="part3" class="tab-content">
-            <h2>Part 3: Questions 21-30</h2>
-            <div class="instruction">Questions 21-24: Choose the correct letter, A, B or C.</div>
-            
-            <h3>Self-Access Centre</h3>
-            <p><strong>21. Students want to keep the Self-Access Centre because</strong></p>
-            <label class="mc-option"><input type="radio" name="q21" value="A" onchange="markAnswered(21)"> A. they enjoy the variety of equipment</label>
-            <label class="mc-option"><input type="radio" name="q21" value="B" onchange="markAnswered(21)"> B. they like being able to work on their own</label>
-            <label class="mc-option"><input type="radio" name="q21" value="C" onchange="markAnswered(21)"> C. it is an important part of their studies</label>
-            <div id="e21" class="explanation"></div>
+        <div id="part3" class="part-container">
+            <div class="part-title">Part 3: Questions 21-30</div>
+            <div class="part-desc">Choose the correct letter, A, B or C for Q21-24. Complete the notes for Q25-30.</div>
 
-            <p style="margin-top:25px;"><strong>22. Some teachers would prefer to</strong></p>
-            <label class="mc-option"><input type="radio" name="q22" value="A" onchange="markAnswered(22)"> A. close the Self-Access Centre</label>
-            <label class="mc-option"><input type="radio" name="q22" value="B" onchange="markAnswered(22)"> B. move the Self-Access Centre elsewhere</label>
-            <label class="mc-option"><input type="radio" name="q22" value="C" onchange="markAnswered(22)"> C. restrict access to the Self-Access Centre</label>
-            <div id="e22" class="explanation"></div>
-
-            <p style="margin-top:25px;"><strong>23. The students' main concern about using the library would be</strong></p>
-            <label class="mc-option"><input type="radio" name="q23" value="A" onchange="markAnswered(23)"> A. the size of the library</label>
-            <label class="mc-option"><input type="radio" name="q23" value="B" onchange="markAnswered(23)"> B. difficulty in getting help</label>
-            <label class="mc-option"><input type="radio" name="q23" value="C" onchange="markAnswered(23)"> C. the lack of materials</label>
-            <div id="e23" class="explanation"></div>
-
-            <p style="margin-top:25px;"><strong>24. The Director of Studies is concerned about</strong></p>
-            <label class="mc-option"><input type="radio" name="q24" value="A" onchange="markAnswered(24)"> A. the cost of upgrading the centre</label>
-            <label class="mc-option"><input type="radio" name="q24" value="B" onchange="markAnswered(24)"> B. the lack of space in the centre</label>
-            <label class="mc-option"><input type="radio" name="q24" value="C" onchange="markAnswered(24)"> C. the difficulty in supervising the centre</label>
-            <div id="e24" class="explanation"></div>
-
-            <div class="instruction" style="margin-top:40px;">Questions 25-30: Complete the notes below. Write <strong>NO MORE THAN TWO WORDS</strong>.</div>
-            <div style="background: white; padding: 30px; border-radius: 12px; border: 2px solid var(--border);">
-                <h3 style="margin-top: 0;">Necessary improvements to the existing Self-Access Centre</h3>
+            <div class="notes-box glass-effect">
+                <h3>Self-Access Centre</h3>
                 
-                <p><strong>Equipment</strong><br>Replace computers to create more space</p>
-                
-                <p><strong>Resources</strong><br>
-                The level of the <strong>(25)</strong> <input type="text" id="q25" oninput="markAnswered(25)"> materials, in particular, should be more clearly shown.<br>
-                <div id="e25" class="explanation"></div>
-                Update the <strong>(26)</strong> <input type="text" id="q26" oninput="markAnswered(26)"> collection.<br>
-                <div id="e26" class="explanation"></div>
-                Buy some <strong>(27)</strong> <input type="text" id="q27" oninput="markAnswered(27)"> and divide them up.</p>
-                <div id="e27" class="explanation"></div>
+                <div class="q-wrap" id="card-21">
+                    <div class="q-header"><div class="q-num">21</div><div class="q-text">Students want to keep the Self-Access Centre because</div></div>
+                    <div class="options-grid">
+                        <label class="opt-label" onclick="selectAnswer(21, 'A')"><input type="radio" name="q21" value="A"> A. they enjoy the variety of equipment</label>
+                        <label class="opt-label" onclick="selectAnswer(21, 'B')"><input type="radio" name="q21" value="B"> B. they like being able to work on their own</label>
+                        <label class="opt-label" onclick="selectAnswer(21, 'C')"><input type="radio" name="q21" value="C"> C. it is an important part of their studies</label>
+                    </div>
+                    <div id="exp-21" class="explanation-box">
+                        <div class="exp-title">📝 Giải thích chi tiết: Câu 21</div>
+                        <div class="exp-content">
+                            <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">C. it is an important part of their studies</span></p>
+                            <p><b>Dẫn chứng audio:</b> <i>"...they see it as a pretty <mark>major component</mark> of their course."</i></p>
+                            <p><b>Phân tích:</b> Học sinh muốn giữ trung tâm tự học lại vì họ coi nó là một cấu phần quan trọng (major component) trong khóa học của mình, đồng nghĩa với "important part of their studies".</p>
+                        </div>
+                    </div>
+                </div>
 
-                <p><strong>Use of the room</strong><br>
-                Speak to the teachers and organize a <strong>(28)</strong> <input type="text" id="q28" oninput="markAnswered(28)"> for supervising the centre.<br>
-                <div id="e28" class="explanation"></div>
-                Install an <strong>(29)</strong> <input type="text" id="q29" oninput="markAnswered(29)">.<br>
-                <div id="e29" class="explanation"></div>
-                Restrict personal use of <strong>(30)</strong> <input type="text" id="q30" oninput="markAnswered(30)"> on computers.</p>
-                <div id="e30" class="explanation"></div>
+                <div class="q-wrap" id="card-22" style="margin-top:30px;">
+                    <div class="q-header"><div class="q-num">22</div><div class="q-text">Some teachers would prefer to</div></div>
+                    <div class="options-grid">
+                        <label class="opt-label" onclick="selectAnswer(22, 'A')"><input type="radio" name="q22" value="A"> A. close the Self-Access Centre</label>
+                        <label class="opt-label" onclick="selectAnswer(22, 'B')"><input type="radio" name="q22" value="B"> B. move the Self-Access Centre elsewhere</label>
+                        <label class="opt-label" onclick="selectAnswer(22, 'C')"><input type="radio" name="q22" value="C"> C. restrict access to the Self-Access Centre</label>
+                    </div>
+                    <div id="exp-22" class="explanation-box">
+                        <div class="exp-title">📝 Giải thích chi tiết: Câu 22</div>
+                        <div class="exp-content">
+                            <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">B. move the Self-Access Centre elsewhere</span></p>
+                            <p><b>Dẫn chứng audio:</b> <i>"Some of us also think that we could benefit a lot more by <mark>relocating</mark> the self-access center to the main university library building."</i></p>
+                            <p><b>Phân tích:</b> Giáo viên muốn "relocating" (di dời) trung tâm này đến thư viện chính của trường. Điều này tương đương với "move elsewhere".</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="q-wrap" id="card-23" style="margin-top:30px;">
+                    <div class="q-header"><div class="q-num">23</div><div class="q-text">The students' main concern about using the library would be</div></div>
+                    <div class="options-grid">
+                        <label class="opt-label" onclick="selectAnswer(23, 'A')"><input type="radio" name="q23" value="A"> A. the size of the library</label>
+                        <label class="opt-label" onclick="selectAnswer(23, 'B')"><input type="radio" name="q23" value="B"> B. difficulty in getting help</label>
+                        <label class="opt-label" onclick="selectAnswer(23, 'C')"><input type="radio" name="q23" value="C"> C. the lack of materials</label>
+                    </div>
+                    <div id="exp-23" class="explanation-box">
+                        <div class="exp-title">📝 Giải thích chi tiết: Câu 23</div>
+                        <div class="exp-content">
+                            <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">B. difficulty in getting help</span></p>
+                            <p><b>Dẫn chứng audio:</b> <i>"Our main worry would be <mark>not being able to go to a teacher for advice</mark>."</i></p>
+                            <p><b>Phân tích:</b> Nỗi lo lớn nhất của sinh viên là không có giáo viên ở đó để xin lời khuyên, đồng nghĩa với việc khó khăn trong việc tìm kiếm sự trợ giúp (difficulty in getting help).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="q-wrap" id="card-24" style="margin-top:30px;">
+                    <div class="q-header"><div class="q-num">24</div><div class="q-text">The Director of Studies is concerned about</div></div>
+                    <div class="options-grid">
+                        <label class="opt-label" onclick="selectAnswer(24, 'A')"><input type="radio" name="q24" value="A"> A. the cost of upgrading the centre</label>
+                        <label class="opt-label" onclick="selectAnswer(24, 'B')"><input type="radio" name="q24" value="B"> B. the lack of space in the centre</label>
+                        <label class="opt-label" onclick="selectAnswer(24, 'C')"><input type="radio" name="q24" value="C"> C. the difficulty in supervising the centre</label>
+                    </div>
+                    <div id="exp-24" class="explanation-box">
+                        <div class="exp-title">📝 Giải thích chi tiết: Câu 24</div>
+                        <div class="exp-content">
+                            <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">C. the difficulty in supervising the centre</span></p>
+                            <p><b>Dẫn chứng audio:</b> <i>"...but it’s the problem of <mark>timetabling a teacher to be in there</mark> outside class hours."</i></p>
+                            <p><b>Phân tích:</b> Giám đốc không lo về không gian hay chi phí, điều ông lo ngại là làm sao để xếp lịch có giáo viên trực/quản lý (supervising) ở trung tâm ngoài giờ học.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notes-box glass-effect" style="margin-top: 30px;">
+                <h3 style="margin-bottom: 20px;">Improvements to Self-Access Centre</h3>
+                
+                <p><b>Equipment</b><br>Replace computers to create more space</p>
+                
+                <p style="margin-top:15px;"><b>Resources</b><br>
+                The level of the <b>(25)</b> <input type="text" id="q25" oninput="markAnswered(25)"> materials, in particular, should be more clearly shown.</p>
+                <div id="exp-25" class="explanation-box">
+                    <div class="exp-title">📝 Giải thích chi tiết: Câu 25</div>
+                    <div class="exp-content">
+                        <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">reading</span></p>
+                        <p><b>Dẫn chứng audio:</b> <i>"...find it difficult to find materials that are appropriate for their level, especially <mark>reading</mark> resources."</i></p>
+                    </div>
+                </div>
+
+                <p style="margin-top:15px;">Update the <b>(26)</b> <input type="text" id="q26" oninput="markAnswered(26)"> collection.</p>
+                <div id="exp-26" class="explanation-box">
+                    <div class="exp-title">📝 Giải thích chi tiết: Câu 26</div>
+                    <div class="exp-content">
+                        <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">CD</span></p>
+                        <p><b>Dẫn chứng audio:</b> <i>"The <mark>CD</mark> section especially needs to be more current."</i></p>
+                        <p><b>Phân tích:</b> "Update" đồng nghĩa với "needs to be more current". Đối tượng cần cập nhật là CD section (bộ sưu tập CD).</p>
+                    </div>
+                </div>
+
+                <p style="margin-top:15px;">Buy some <b>(27)</b> <input type="text" id="q27" oninput="markAnswered(27)"> and divide them up.</p>
+                <div id="exp-27" class="explanation-box">
+                    <div class="exp-title">📝 Giải thích chi tiết: Câu 27</div>
+                    <div class="exp-content">
+                        <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">workbooks</span></p>
+                        <p><b>Dẫn chứng audio:</b> <i>"What do you think of the idea of introducing some <mark>workbooks</mark>? If we break them up into separate pages..."</i></p>
+                        <p><b>Phân tích:</b> "divide them up" ứng với "break them up". Họ dự định mua thêm "workbooks" để xé nhỏ ra.</p>
+                    </div>
+                </div>
+
+                <p style="margin-top:15px;"><b>Use of the room</b><br>
+                Speak to the teachers and organize a <b>(28)</b> <input type="text" id="q28" oninput="markAnswered(28)"> for supervising the centre.</p>
+                <div id="exp-28" class="explanation-box">
+                    <div class="exp-title">📝 Giải thích chi tiết: Câu 28</div>
+                    <div class="exp-content">
+                        <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">timetable / schedule</span></p>
+                        <p><b>Dẫn chứng audio:</b> <i>"I’ll have to talk to the teachers and make sure we can all reach some agreement on a <mark>timetable</mark> to supervise the center after class."</i></p>
+                    </div>
+                </div>
+
+                <p style="margin-top:15px;">Install an <b>(29)</b> <input type="text" id="q29" oninput="markAnswered(29)">.</p>
+                <div id="exp-29" class="explanation-box">
+                    <div class="exp-title">📝 Giải thích chi tiết: Câu 29</div>
+                    <div class="exp-content">
+                        <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">alarm</span></p>
+                        <p><b>Dẫn chứng audio:</b> <i>"Um, what about putting in an <mark>alarm</mark>?"</i></p>
+                        <p><b>Phân tích:</b> "Install" đồng nghĩa "putting in". Để cải thiện an ninh, họ quyết định lắp báo động (alarm).</p>
+                    </div>
+                </div>
+
+                <p style="margin-top:15px;">Restrict personal use of <b>(30)</b> <input type="text" id="q30" oninput="markAnswered(30)"> on computers.</p>
+                <div id="exp-30" class="explanation-box">
+                    <div class="exp-title">📝 Giải thích chi tiết: Câu 30</div>
+                    <div class="exp-content">
+                        <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">email / emails</span></p>
+                        <p><b>Dẫn chứng audio:</b> <i>"...see whether we could somehow limit the access to <mark>email</mark>."</i></p>
+                        <p><b>Phân tích:</b> "Restrict personal use" đồng nghĩa với "limit the access to". Họ muốn giới hạn việc sinh viên dùng máy tính để xem email cá nhân.</p>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- PART 4 -->
-        <div id="part4" class="tab-content">
-            <h2>Part 4: Questions 31-40</h2>
-            <div class="instruction">Complete the notes below. Write <strong>ONE WORD ONLY</strong>.</div>
+        <div id="part4" class="part-container">
+            <div class="part-title">Part 4: Questions 31-40</div>
+            <div class="part-desc">Complete the notes below. Write <b>ONE WORD ONLY</b>.</div>
             
-            <div style="background: white; padding: 30px; border-radius: 12px; border: 2px solid var(--border); line-height:2;">
-                <h3 style="text-align:center; color:var(--primary-dark); margin-top:0;">BUSINESS CULTURE</h3>
+            <div class="notes-box glass-effect">
+                <h3 style="color: var(--primary-dark);">BUSINESS CULTURE</h3>
                 
-                <h4 style="color: var(--accent);">Power Culture</h4>
-                <ul style="list-style-type: square; margin-left: 20px;">
+                <h4 style="color: var(--secondary); font-size: 20px; margin-top:20px; margin-bottom:10px;">Power Culture</h4>
+                <ul>
                     <li>Characteristics of organization: small</li>
-                    <li><strong>(31)</strong> <input type="text" id="q31" oninput="markAnswered(31)"> power source</li>
-                    <div id="e31" class="explanation"></div>
+                    <li><b>(31)</b> <input type="text" id="q31" oninput="markAnswered(31)"> power source</li>
+                    <div id="exp-31" class="explanation-box">
+                        <div class="exp-title">📝 Giải thích chi tiết: Câu 31</div>
+                        <div class="exp-content">
+                            <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">central</span></p>
+                            <p><b>Dẫn chứng audio:</b> <i>"It’s the type of culture that needs a <mark>central</mark> source of power to be effective..."</i></p>
+                        </div>
+                    </div>
+                    
                     <li>Few rules and procedures</li>
-                    <li>Communication by <strong>(32)</strong> <input type="text" id="q32" oninput="markAnswered(32)"></li>
-                    <div id="e32" class="explanation"></div>
+                    <li>Communication by <b>(32)</b> <input type="text" id="q32" oninput="markAnswered(32)"></li>
+                    <div id="exp-32" class="explanation-box">
+                        <div class="exp-title">📝 Giải thích chi tiết: Câu 32</div>
+                        <div class="exp-content">
+                            <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">conversation / conversations</span></p>
+                            <p><b>Dẫn chứng audio:</b> <i>"Another characteristic is that communication usually takes the form of <mark>conversations</mark> rather than say formal meetings..."</i></p>
+                        </div>
+                    </div>
+                    
                     <li>Advantage: can act quickly</li>
-                    <li>Disadvantage: might not act <strong>(33)</strong> <input type="text" id="q33" oninput="markAnswered(33)"></li>
-                    <div id="e33" class="explanation"></div>
-                    <li>Suitable employee: not afraid of <strong>(34)</strong> <input type="text" id="q34" oninput="markAnswered(34)"></li>
-                    <div id="e34" class="explanation"></div>
+                    <li>Disadvantage: might not act <b>(33)</b> <input type="text" id="q33" oninput="markAnswered(33)"></li>
+                    <div id="exp-33" class="explanation-box">
+                        <div class="exp-title">📝 Giải thích chi tiết: Câu 33</div>
+                        <div class="exp-content">
+                            <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">effectively</span></p>
+                            <p><b>Dẫn chứng audio:</b> <i>"But on the negative side, this type of organization doesn’t always act <mark>effectively</mark>..."</i></p>
+                        </div>
+                    </div>
+                    
+                    <li>Suitable employee: not afraid of <b>(34)</b> <input type="text" id="q34" oninput="markAnswered(34)"></li>
+                    <div id="exp-34" class="explanation-box">
+                        <div class="exp-title">📝 Giải thích chi tiết: Câu 34</div>
+                        <div class="exp-content">
+                            <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">risk / risks</span></p>
+                            <p><b>Dẫn chứng audio:</b> <i>"And the kind of person who does well... is one who is happy to take <mark>risks</mark>."</i></p>
+                            <p><b>Phân tích:</b> "not afraid of" (không e ngại) tương đương với "happy to take" (sẵn sàng đón nhận). Điền "risks".</p>
+                        </div>
+                    </div>
                     <li>Does not need job security</li>
                 </ul>
 
-                <h4 style="color: var(--accent);">Role Culture</h4>
-                <ul style="list-style-type: square; margin-left: 20px;">
-                    <li>Characteristic of organization: large, many <strong>(35)</strong> <input type="text" id="q35" oninput="markAnswered(35)"></li>
-                    <div id="e35" class="explanation"></div>
+                <h4 style="color: var(--secondary); font-size: 20px; margin-top:30px; margin-bottom:10px;">Role Culture</h4>
+                <ul>
+                    <li>Characteristic of organization: large, many <b>(35)</b> <input type="text" id="q35" oninput="markAnswered(35)"></li>
+                    <div id="exp-35" class="explanation-box">
+                        <div class="exp-title">📝 Giải thích chi tiết: Câu 35</div>
+                        <div class="exp-content">
+                            <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">levels</span></p>
+                            <p><b>Dẫn chứng audio:</b> <i>"And this type is usually found in large companies which have lots of different <mark>levels</mark> in them."</i></p>
+                        </div>
+                    </div>
+
                     <li>Specialized departments</li>
-                    <li>Rules and procedures e.g. job <strong>(36)</strong> <input type="text" id="q36" oninput="markAnswered(36)"> and rules for discipline</li>
-                    <div id="e36" class="explanation"></div>
+                    <li>Rules and procedures e.g. job <b>(36)</b> <input type="text" id="q36" oninput="markAnswered(36)"> and rules for discipline</li>
+                    <div id="exp-36" class="explanation-box">
+                        <div class="exp-title">📝 Giải thích chi tiết: Câu 36</div>
+                        <div class="exp-content">
+                            <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">description / descriptions</span></p>
+                            <p><b>Dẫn chứng audio:</b> <i>"For example, there are specific job <mark>descriptions</mark>, rules for discipline and so on."</i></p>
+                        </div>
+                    </div>
+
                     <li>Advantages: economies of scale</li>
-                    <li>Successful when <strong>(37)</strong> <input type="text" id="q37" oninput="markAnswered(37)"> ability is important</li>
-                    <div id="e37" class="explanation"></div>
-                    <li>Disadvantages: slow to see when <strong>(38)</strong> <input type="text" id="q38" oninput="markAnswered(38)"> is needed</li>
-                    <div id="e38" class="explanation"></div>
+                    <li>Successful when <b>(37)</b> <input type="text" id="q37" oninput="markAnswered(37)"> ability is important</li>
+                    <div id="exp-37" class="explanation-box">
+                        <div class="exp-title">📝 Giải thích chi tiết: Câu 37</div>
+                        <div class="exp-content">
+                            <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">technical</span></p>
+                            <p><b>Dẫn chứng audio:</b> <i>"...it is particularly successful in business markets where <mark>technical</mark> expertise is important."</i></p>
+                            <p><b>Phân tích:</b> "ability" có thể hiểu tương đương với "expertise" (chuyên môn). Điền "technical".</p>
+                        </div>
+                    </div>
+
+                    <li>Disadvantages: slow to see when <b>(38)</b> <input type="text" id="q38" oninput="markAnswered(38)"> is needed</li>
+                    <div id="exp-38" class="explanation-box">
+                        <div class="exp-title">📝 Giải thích chi tiết: Câu 38</div>
+                        <div class="exp-content">
+                            <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">change</span></p>
+                            <p><b>Dẫn chứng audio:</b> <i>"On the other hand, this culture is often very slow to recognize the need for <mark>change</mark>..."</i></p>
+                        </div>
+                    </div>
+
                     <li>Slow to react</li>
                     <li>Suitable employee: values security</li>
-                    <li>Does not want <strong>(39)</strong> <input type="text" id="q39" oninput="markAnswered(39)"></li>
-                    <div id="e39" class="explanation"></div>
+                    <li>Does not want <b>(39)</b> <input type="text" id="q39" oninput="markAnswered(39)"></li>
+                    <div id="exp-39" class="explanation-box">
+                        <div class="exp-title">📝 Giải thích chi tiết: Câu 39</div>
+                        <div class="exp-content">
+                            <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">responsibility</span></p>
+                            <p><b>Dẫn chứng audio:</b> <i>"Well, it suits employees who value security and who don’t particularly want to have <mark>responsibility</mark>."</i></p>
+                        </div>
+                    </div>
                 </ul>
 
-                <h4 style="color: var(--accent);">Task Culture</h4>
-                <ul style="list-style-type: square; margin-left: 20px;">
+                <h4 style="color: var(--secondary); font-size: 20px; margin-top:30px; margin-bottom:10px;">Task Culture</h4>
+                <ul>
                     <li>Characteristic of organization: project oriented</li>
                     <li>In competitive market or making product with short life</li>
-                    <li>Advantages: <strong>(40)</strong> <input type="text" id="q40" oninput="markAnswered(40)"></li>
-                    <div id="e40" class="explanation"></div>
+                    <li>Advantages: <b>(40)</b> <input type="text" id="q40" oninput="markAnswered(40)"></li>
+                    <div id="exp-40" class="explanation-box">
+                        <div class="exp-title">📝 Giải thích chi tiết: Câu 40</div>
+                        <div class="exp-content">
+                            <p><b>Đáp án đúng:</b> <span style="color: var(--success); font-weight: bold;">flexible</span></p>
+                            <p><b>Dẫn chứng audio:</b> <i>"Now one of the major benefits of this culture is that it’s <mark>flexible</mark>..."</i></p>
+                        </div>
+                    </div>
                 </ul>
             </div>
+            <div style="height: 50px;"></div>
         </div>
-        <div style="height: 100px;"></div>
+    </main>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toastNotification">
+        <div class="toast-icon">☁️</div>
+        <div class="toast-content">
+            <div class="toast-title">Đồng bộ thành công!</div>
+            <div class="toast-desc" id="toastMsg">Điểm của bạn đã được cập nhật lên hệ thống.</div>
+        </div>
     </div>
 
-    <footer>
-        <div style="font-size:14px; font-weight:bold; color:var(--text-light); text-transform:uppercase; margin-bottom:5px;">Navigation Panel</div>
-        <div class="nav-scroller" id="navPalette"></div>
-    </footer>
-
     <script>
+        // Answer Key
         const answerKey = {
-            1: ["Bhatt"], 2: ["31 March"], 3: ["nursing"], 4: ["2"], 5: ["meat"],
-            6: ["bedsit"], 7: ["theatre", "theater"], 8: ["mature", "older"], 9: ["town"], 10: ["shared"],
-            11: ["trees"], 12: ["Friday"], 13: ["farm"], 14: ["C"], 15: ["B"], 16: ["A"], 
-            17: ["A"], 18: ["I"], 19: ["F"], 20: ["E"], 
-            21: ["C"], 22: ["B"], 23: ["B"], 24: ["C"], 
-            25: ["reading"], 26: ["cd"], 27: ["workbooks"], 28: ["timetable", "schedule"], 29: ["alarm"], 30: ["email", "emails"], 
+            1: ["bhatt"], 2: ["31 march", "31st march", "march 31", "31-march"], 3: ["nursing"], 4: ["2", "two"], 5: ["meat"],
+            6: ["bedsit", "bed-sit"], 7: ["theatre", "theater"], 8: ["mature", "older"], 9: ["town"], 10: ["shared"],
+            11: ["trees"], 12: ["friday"], 13: ["farm"], 14: ["c"], 15: ["b"], 16: ["a"], 
+            17: ["a"], 18: ["i"], 19: ["f"], 20: ["e"], 
+            21: ["c"], 22: ["b"], 23: ["b"], 24: ["c"], 
+            25: ["reading"], 26: ["cd", "cds"], 27: ["workbooks"], 28: ["timetable", "schedule"], 29: ["alarm"], 30: ["email", "emails"], 
             31: ["central"], 32: ["conversation", "conversations"], 33: ["effectively"], 34: ["risk", "risks"], 35: ["levels"], 
             36: ["description", "descriptions"], 37: ["technical"], 38: ["change"], 39: ["responsibility"], 40: ["flexible"]
         };
 
-        const explanationsData = {
-            1: "Người nữ đánh vần tên họ là: A-N-U... <strong>B-H-A double T</strong>.",
-            2: "Người nữ nói: <strong>31-March</strong> 1972. Chỉ điền ngày tháng vì đề bài yêu cầu giới hạn 1 từ/1 số.",
-            3: "I'm doing a course in <strong>nursing</strong>.",
-            4: "Cô ấy nói sẽ học 3 năm nhưng chỉ muốn ở ký túc xá <strong>2</strong> năm (stay in hall for two).",
-            5: "I don't take red <strong>meat</strong>.",
-            6: "Well, actually my grant is quite generous and I think the <strong>bedsit</strong> sounds the best option.",
-            7: "Ummm. Well, I love the <strong>theatre</strong>.",
-            8: "The first thing is I'd prefer a hall where there are other <strong>mature</strong> students.",
-            9: "I'd prefer to be out of <strong>town</strong>.",
-            10: "I would like somewhere with a <strong>shared</strong> area, a TV room for example.",
-            11: "Holt Island, which is noted for its great range of <strong>trees</strong>.",
-            12: "The island is only open to the public from <strong>Friday</strong> to Sunday.",
-            13: "Longfield has a modern replica of a <strong>farm</strong> from over two thousand years ago.",
-            14: "(C) You'll start with a tour... practise the technique of using them as colour dyes for cloth.",
-            15: "(B) We keep to a small number of people... phone the park ranger a few days ahead (book in advance).",
-            16: "(A) Make sure you're wearing something that you don't mind getting dirty or torn (suitable clothing).",
-            17: "(A) As you can see, there's a lake in the north west... with a bird hide to the west of it.",
-            18: "(I) Fairly close to where refreshments are available, there's a dog-walking area in the southern part.",
-            19: "(F) The flower garden: that's the circular area on the map surrounded by paths.",
-            20: "(E) And finally, there's a wooded area in the western section of the park, between two paths.",
-            21: "(C) From the students' point of view... they see it as a pretty major component of their course.",
-            22: "(B) Some of us also think that we could benefit a lot more by relocating the Self-Access Centre to the main University library building.",
-            23: "(B) Our main worry would be not being able to go to a teacher for advice (difficulty in getting help).",
-            24: "(C) It's the problem of timetabling a teacher to be in there outside class hours (difficulty in supervising).",
-            25: "...find it difficult to find materials that are appropriate for their level, especially <strong>reading</strong> resources...",
-            26: "The <strong>CD</strong> section especially needs to be more current.",
-            27: "What do you think of the idea of introducing some <strong>workbooks</strong>?",
-            28: "...make sure we can all reach some agreement on a <strong>timetable</strong> to supervise the centre...",
-            29: "What about putting in an <strong>alarm</strong>? - Good idea.",
-            30: "...see whether we could somehow limit the access to <strong>email</strong>.",
-            31: "It's the type of culture that needs a <strong>central</strong> source of power to be effective.",
-            32: "Another characteristic is that communication usually takes the form of <strong>conversations</strong>.",
-            33: "But on the negative side, this type of organisation doesn't always act <strong>effectively</strong>.",
-            34: "And the kind of person who does well... is one who is happy to take <strong>risks</strong>.",
-            35: "...found in large companies, which have lots of different <strong>levels</strong> in them.",
-            36: "For example, there are specific job <strong>descriptions</strong>, rules for discipline...",
-            37: "It is particularly successful in business markets where <strong>technical</strong> expertise is important.",
-            38: "On the other hand, this culture is often very slow to recognise the need for <strong>change</strong>...",
-            39: "Well it suits employees who value security, and who don't particularly want to have <strong>responsibility</strong>.",
-            40: "Now one of the major benefits of this culture is that it's <strong>flexible</strong>."
-        };
-
+        let isSubmitted = false;
         let mode = '';
         const audio = document.getElementById('testAudio');
-        let isSubmitted = false;
+        window.historyDataList = [];
 
-        // Initialize Navigation Drawer
-        const navPalette = document.getElementById('navPalette');
+        // Init Nav Grid Modal
+        const navGrid = document.getElementById('navGrid');
         for (let i = 1; i <= 40; i++) {
-            let dot = document.createElement("div");
-            dot.className = "nav-dot"; dot.id = `nav-${i}`; dot.innerText = i;
-            dot.onclick = () => {
-                let part = i <= 10 ? 1 : i <= 20 ? 2 : i <= 30 ? 3 : 4;
-                switchTab(part);
-                setTimeout(() => {
-                    let el = document.getElementById('q'+i);
-                    if(!el && document.getElementsByName('q'+i).length > 0) el = document.getElementsByName('q'+i)[0].parentNode;
-                    if(!el) el = document.querySelector(`.drop-zone[data-q="${i}"]`);
-                    
-                    if(el) {
-                        el.scrollIntoView({behavior: "smooth", block: "center"});
-                        el.style.transition = "background 0.5s";
-                        let originalBg = el.style.background;
-                        el.style.background = "var(--highlight)";
-                        setTimeout(() => el.style.background = originalBg, 1000);
-                    }
-                }, 100);
-            };
-            navPalette.appendChild(dot);
+            navGrid.innerHTML += `<div class="nav-dot" id="nav-${i}" onclick="scrollToQ(${i})">${i}</div>`;
         }
 
-        // Drag and Drop Logic with Container Scroll
-        const mainContainer = document.getElementById('mainContainer');
+        // --- Drag and Drop Logic ---
         let draggedItem = null;
-
         document.querySelectorAll('.drag-item').forEach(item => {
             item.addEventListener('dragstart', function(e) {
                 if(isSubmitted) { e.preventDefault(); return; }
@@ -628,17 +1016,6 @@
                 this.classList.remove('dragging');
                 draggedItem = null;
             });
-        });
-
-        // Handle auto-scroll when dragging near edge of container
-        mainContainer.addEventListener('dragover', e => {
-            const rect = mainContainer.getBoundingClientRect();
-            const threshold = 80;
-            if (e.clientY < rect.top + threshold) {
-                mainContainer.scrollTop -= 15;
-            } else if (e.clientY > rect.bottom - threshold) {
-                mainContainer.scrollTop += 15;
-            }
         });
 
         document.querySelectorAll('.drop-zone').forEach(zone => {
@@ -653,7 +1030,6 @@
                 e.preventDefault();
                 this.classList.remove('drag-over');
                 if (draggedItem) {
-                    // Return existing child back to palette if replacing
                     if (this.children.length > 0) {
                         document.querySelector('.drag-palette').appendChild(this.children[0]);
                     }
@@ -663,154 +1039,261 @@
             });
         });
 
+        function showTestOptions() {
+            document.getElementById('setupContent').style.display = 'none';
+            document.getElementById('historyContent').style.display = 'none';
+            document.getElementById('testOptionsContent').style.display = 'block';
+        }
+
+        function openHistoryTab() {
+            document.getElementById('setupContent').style.display = 'none';
+            document.getElementById('testOptionsContent').style.display = 'none';
+            document.getElementById('historyContent').style.display = 'block';
+            if(window.taiLichSuIELTS) window.taiLichSuIELTS();
+        }
+
+        function backToMenu() {
+            document.getElementById('testOptionsContent').style.display = 'none';
+            document.getElementById('historyContent').style.display = 'none';
+            document.getElementById('setupContent').style.display = 'block';
+        }
+
         function selectMode(selectedMode) {
             mode = selectedMode;
-            document.querySelector('.mode-practice').classList.toggle('selected', mode === 'practice');
-            document.querySelector('.mode-mock').classList.toggle('selected', mode === 'mock');
-            document.getElementById('startBtn').style.display = 'inline-block';
+            document.querySelectorAll('#testOptionsContent .mode-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            document.getElementById('btnStart').style.display = 'inline-flex';
         }
 
-        function askReady() {
-            let msg = mode === 'mock' 
-                ? "Bạn đã chọn chế độ Thi Thử.\nAudio sẽ tự động phát.\nBài kiểm tra sẽ kết thúc sau audio kết thúc 1 phút.\nBạn đã sẵn sàng chưa?" 
-                : "Bạn đã chọn chế độ Luyện Tập.\nBạn có thể tự điều chỉnh audio.\nBạn đã sẵn sàng chưa?";
-            document.getElementById('startConfirmMsg').innerText = msg;
-            document.getElementById('startConfirmOverlay').style.display = 'flex';
-        }
-
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        function startTestActual() {
-            closeModal('startConfirmOverlay');
-            document.getElementById('setupOverlay').style.display = 'none';
-            
-            if(mode === 'mock') {
-                document.getElementById('btn-backward').classList.add('hidden');
-                document.getElementById('btn-forward').classList.add('hidden');
+        function startTest() {
+            document.getElementById('setupModal').classList.remove('show');
+            if (mode === 'mock') {
                 audio.removeAttribute('controls');
+                document.querySelectorAll('.skip-btn').forEach(b => b.classList.add('hidden'));
                 audio.play();
-                audio.onended = () => { setTimeout(() => { if(!isSubmitted) evaluateTest(); }, 60000); };
             }
         }
 
-        function skipAudio(seconds) { audio.currentTime += seconds; }
+        function skipAudio(sec) { audio.currentTime += sec; }
 
-        function switchTab(tabNum) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.getElementById('part' + tabNum).classList.add('active');
-            document.querySelectorAll('.tab')[tabNum-1].classList.add('active');
-            mainContainer.scrollTop = 0;
+        function switchTab(num) {
+            document.querySelectorAll('.tab-btn:not(.nav-trigger)').forEach((btn, i) => btn.classList.toggle('active', i+1 === num));
+            document.querySelectorAll('.part-container').forEach((part, i) => part.classList.toggle('active', i+1 === num));
+            document.getElementById('mainContainer').scrollTop = 0;
         }
 
-        function markAnswered(qNum) {
-            if(isSubmitted) return;
-            const navCircle = document.getElementById('nav-' + qNum);
+        function scrollToQ(i) {
+            closeModal('navModal');
+            let tab = 1;
+            if(i > 10) tab = 2;
+            if(i > 20) tab = 3;
+            if(i > 30) tab = 4;
+            switchTab(tab);
+            setTimeout(() => {
+                let el = document.getElementById('q'+i) || document.getElementById('card-'+i) || document.getElementsByName('q'+i)[0] || document.querySelector(`.drop-zone[data-q="${i}"]`);
+                if(el) {
+                    el.scrollIntoView({behavior: "smooth", block: "center"});
+                    let parent = el.closest('.q-card') || el.closest('.notes-box') || el.closest('.q-wrap') || el.closest('tr') || el;
+                    parent.style.transition = "box-shadow 0.5s";
+                    let oldShadow = parent.style.boxShadow;
+                    parent.style.boxShadow = "0 0 0 4px var(--primary)";
+                    setTimeout(() => parent.style.boxShadow = oldShadow, 1000);
+                }
+            }, 100);
+        }
+
+        function markAnswered(id) {
+            if (isSubmitted) return;
             let answered = false;
-            
-            const textInput = document.getElementById('q' + qNum);
+            let textInput = document.getElementById('q'+id);
             if(textInput && textInput.value.trim() !== '') answered = true;
             
-            const radios = document.getElementsByName('q' + qNum);
-            for(let r of radios) { if(r.checked) answered = true; }
+            let radios = document.querySelectorAll(`input[name="q${id}"]:checked`);
+            if(radios.length > 0) answered = true;
 
-            const dropZone = document.querySelector(`.drop-zone[data-q="${qNum}"]`);
+            let dropZone = document.querySelector(`.drop-zone[data-q="${id}"]`);
             if(dropZone && dropZone.children.length > 0) answered = true;
 
-            if(answered) navCircle.classList.add('done');
-            else navCircle.classList.remove('done');
+            document.getElementById('nav-'+id).classList.toggle('answered', answered);
         }
 
-        function requestSubmit() {
-            if (mode === 'practice') { document.getElementById('submitModal').style.display = 'flex'; } 
-            else { evaluateTest(); }
+        function selectAnswer(id, val) {
+            if (isSubmitted) return;
+            document.querySelectorAll(`input[name="q${id}"]`).forEach(inp => {
+                inp.checked = (inp.value === val);
+                if(inp.checked) inp.parentElement.classList.add('selected');
+                else inp.parentElement.classList.remove('selected');
+            });
+            document.getElementById('nav-'+id).classList.add('answered');
         }
 
-        function evaluateTest() {
+        function requestSubmit() { document.getElementById('confirmModal').classList.add('show'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+        function evaluateTest(isReviewMode = false) {
             isSubmitted = true;
-            closeModal('submitModal');
-            document.getElementById('topSubmitBtn').classList.add('hidden');
+            closeModal('confirmModal');
             audio.pause();
             
-            document.querySelectorAll('input').forEach(el => el.disabled = true);
+            document.querySelectorAll('.opt-label').forEach(lbl => {
+                lbl.classList.remove('selected', 'is-correct', 'is-wrong');
+                lbl.classList.add('disabled');
+            });
             document.querySelectorAll('.drag-item').forEach(el => el.setAttribute('draggable', 'false'));
-            
+
+            document.getElementById('btnSubmit').style.display = 'none';
+
             let score = 0;
+            let userAnswersDict = {};
 
-            for(let i = 1; i <= 40; i++) {
-                let userAnswer = '';
-                const textInput = document.getElementById('q' + i);
-                if(textInput) userAnswer = textInput.value.trim().toLowerCase();
+            for (let i = 1; i <= 40; i++) {
+                let userAns = '';
+                let textInput = document.getElementById('q'+i);
+                let dropZone = document.querySelector(`.drop-zone[data-q="${i}"]`);
+                let radios = document.querySelectorAll(`input[name="q${i}"]`);
                 
-                const radios = document.getElementsByName('q' + i);
-                for(let r of radios) { if(r.checked) userAnswer = r.value.toLowerCase(); }
+                if(textInput) {
+                    userAns = textInput.value.split(" ✓")[0].trim().toLowerCase();
+                    userAnswersDict['q'+i] = userAns;
+                } else if(dropZone) {
+                    if(dropZone.children.length > 0 && dropZone.children[0].classList.contains('drag-item')) {
+                        userAns = dropZone.children[0].dataset.val.toLowerCase();
+                    } else if (dropZone.dataset.tmpval) {
+                        userAns = dropZone.dataset.tmpval.toLowerCase();
+                    }
+                    userAnswersDict['q'+i] = userAns;
+                } else if(radios.length > 0) {
+                    let checked = document.querySelector(`input[name="q${i}"]:checked`);
+                    if(checked) userAns = checked.value.toLowerCase();
+                    userAnswersDict['q'+i] = userAns;
+                }
 
-                const dropZone = document.querySelector(`.drop-zone[data-q="${i}"]`);
-                if(dropZone && dropZone.children.length > 0) userAnswer = dropZone.children[0].dataset.val.toLowerCase();
-
-                const navCircle = document.getElementById('nav-' + i);
-                navCircle.classList.remove('done');
-
-                const correctAnswers = answerKey[i].map(a => a.toLowerCase());
+                let isCorrect = answerKey[i] && answerKey[i].includes(userAns);
+                let navDot = document.getElementById('nav-'+i);
+                navDot.classList.remove('answered');
                 
-                if(correctAnswers.includes(userAnswer)) {
+                if (isCorrect) {
                     score++;
-                    navCircle.classList.add('correct');
+                    navDot.classList.add('correct');
                     if(textInput) textInput.classList.add('correct-input');
-                    if(dropZone) dropZone.style.borderColor = "var(--correct)";
+                    if(dropZone) {
+                        dropZone.style.borderColor = "var(--success)";
+                        dropZone.style.backgroundColor = "#f1f8e9";
+                    }
                 } else {
-                    navCircle.classList.add('incorrect');
+                    navDot.classList.add('wrong');
                     if(textInput) {
                         textInput.classList.add('wrong-input');
-                        textInput.value = (userAnswer ? userAnswer + " " : "") + "✓ " + answerKey[i][0];
-                    } else if (radios.length > 0) {
-                        let correctRadio = document.querySelector(`input[name="q${i}"][value="${answerKey[i][0]}"]`);
-                        if(correctRadio) {
-                            correctRadio.parentNode.style.backgroundColor = "var(--exp-bg)";
-                            correctRadio.parentNode.style.border = "2px solid var(--correct)";
-                        }
+                        if(userAns) textInput.value = userAns + " ✓ " + answerKey[i][0].toUpperCase();
+                        else textInput.value = "✓ " + answerKey[i][0].toUpperCase();
                     } else if (dropZone) {
-                        dropZone.style.borderColor = "var(--wrong)";
-                        dropZone.innerHTML = `<span style="color:var(--wrong)">❌</span> <span style="color:var(--correct)">${answerKey[i][0]}</span>`;
+                        dropZone.style.borderColor = "var(--danger)";
+                        dropZone.style.backgroundColor = "#ffebee";
+                        dropZone.innerHTML = `<span style="color:var(--danger)">❌</span> <span style="color:var(--success); font-weight:bold; margin-left:5px;">${answerKey[i][0].toUpperCase()}</span>`;
+                    } else if(radios.length > 0) {
+                        document.querySelectorAll(`input[name="q${i}"]`).forEach(inp => {
+                            let lbl = inp.parentElement;
+                            if(inp.value.toLowerCase() === answerKey[i][0].toLowerCase()) lbl.classList.add('is-correct');
+                            if(inp.checked && !isCorrect) lbl.classList.add('is-wrong');
+                        });
                     }
                 }
+                
+                if(textInput) textInput.disabled = true;
+                if(radios.length > 0) radios.forEach(r => r.disabled = true);
 
-                // Show Explanation
-                const expBox = document.getElementById('e' + i);
-                if(expBox && explanationsData[i]) {
-                    expBox.innerHTML = `💡 <strong>Giải thích:</strong> ${explanationsData[i]}`;
-                    expBox.style.display = 'block';
+                let expBox = document.getElementById('exp-'+i);
+                if(expBox) {
+                    expBox.classList.add('show');
+                    let parentRow = expBox.closest('tr.hidden-exp-row');
+                    if(parentRow) parentRow.classList.remove('hidden-exp-row');
                 }
             }
 
-            document.getElementById('resultMessage').innerHTML = `
-                <strong style="font-size: 26px; color: var(--accent); display: block; margin-bottom: 10px;">Correct: ${score}/40</strong>
-                <strong style="font-size: 26px; color: var(--primary);">Band Score: ${calculateBand(score)}</strong>
-            `;
+            // Tính Band Score
+            let band = 0;
+            if(score >= 39) band = 9.0; else if(score >= 37) band = 8.5;
+            else if(score >= 35) band = 8.0; else if(score >= 32) band = 7.5;
+            else if(score >= 30) band = 7.0; else if(score >= 26) band = 6.5;
+            else if(score >= 23) band = 6.0; else if(score >= 18) band = 5.5;
+            else if(score >= 16) band = 5.0; else if(score >= 13) band = 4.5;
+            else if(score >= 10) band = 4.0;
             
-            if(window.luuDiemIELTSFullTest) {
-                window.luuDiemIELTSFullTest(score, calculateBand(score), "Test 2");
+            document.getElementById('scoreDisplay').innerText = score + "/40";
+            document.getElementById('bandDisplay').innerText = "Band: " + band.toFixed(1);
+            
+            if(isReviewMode) {
+                document.getElementById('resultTitle').innerText = "Chế Độ Ôn Tập 📖";
+            } else {
+                document.getElementById('resultTitle').innerText = "Kết Quả Bài Thi 🎉";
+                if(window.luuDiemIELTSFullTest) {
+                    window.luuDiemIELTSFullTest(score, band.toFixed(1), "Test 2", userAnswersDict);
+                }
             }
+
+            document.getElementById('resultModal').classList.add('show');
+        }
+
+        window.xemLaiLichSu = function(docId) {
+            let attempt = window.historyDataList.find(d => d.id === docId);
+            if(!attempt) return;
             
-            setTimeout(() => { document.getElementById('resultOverlay').style.display = 'flex'; }, 500);
+            document.getElementById('setupModal').classList.remove('show');
+            
+            let ans = attempt.userAnswers || {};
+            for(let i=1; i<=40; i++) {
+                let textInput = document.getElementById('q'+i);
+                let dropZone = document.querySelector(`.drop-zone[data-q="${i}"]`);
+                let val = ans['q'+i] || '';
+                
+                if(textInput) {
+                    textInput.value = val;
+                } else if(dropZone) {
+                    if(val) {
+                        let item = document.querySelector(`.drag-item[data-val="${val.toUpperCase()}"]`);
+                        if(item) {
+                            dropZone.appendChild(item);
+                        } else {
+                            // Backup in case drag item is missing or used elsewhere
+                            dropZone.dataset.tmpval = val;
+                        }
+                    }
+                } else {
+                    document.querySelectorAll(`input[name="q${i}"]`).forEach(inp => {
+                        inp.checked = (inp.value.toLowerCase() === val);
+                    });
+                }
+            }
+            evaluateTest(true);
         }
 
-        function calculateBand(score) {
-            if(score >= 39) return "9.0"; if(score >= 37) return "8.5";
-            if(score >= 35) return "8.0"; if(score >= 32) return "7.5";
-            if(score >= 30) return "7.0"; if(score >= 26) return "6.5";
-            if(score >= 23) return "6.0"; if(score >= 18) return "5.5";
-            if(score >= 16) return "5.0"; if(score >= 13) return "4.5";
-            if(score >= 10) return "4.0"; return "< 4.0";
+        // BIẾN TOÀN CỤC CHO XÓA
+        let pendingDeleteId = null;
+        let pendingDeleteBtn = null;
+
+        window.xoaLichSuUI = function(docId, btnElement) {
+            pendingDeleteId = docId;
+            pendingDeleteBtn = btnElement;
+            document.getElementById('deleteConfirmModal').classList.add('show');
         }
+
+        window.executeDelete = async function() {
+            document.getElementById('deleteConfirmModal').classList.remove('show');
+            if(window.xoaLichSu && pendingDeleteId && pendingDeleteBtn) {
+                await window.xoaLichSu(pendingDeleteId, pendingDeleteBtn);
+            }
+            pendingDeleteId = null;
+            pendingDeleteBtn = null;
+        }
+
     </script>
-
-    <!-- FIREBASE INTEGRATION FOR SCORE TRACKER -->
+    
+    <!-- FIREBASE INTEGRATION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-
+        import { getFirestore, doc, setDoc, collection, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        
         const firebaseConfig = {
             apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
             authDomain: "snapenglish-cb6e2.firebaseapp.com",
@@ -824,16 +1307,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        function showSyncToast(msg) {
-            let toast = document.createElement("div");
-            toast.innerText = msg;
-            toast.style.cssText = "position:fixed; bottom:20px; right:20px; background:#ff477e; color:white; padding:12px 25px; border-radius:50px; font-weight:bold; font-family:'Quicksand',sans-serif; z-index:99999; box-shadow:0 8px 20px rgba(0,0,0,0.15); transform:translateY(100px); opacity:0; transition:all 0.5s ease;";
-            document.body.appendChild(toast);
-            setTimeout(() => { toast.style.transform = "translateY(0)"; toast.style.opacity = "1"; }, 100);
-            setTimeout(() => { toast.style.transform = "translateY(100px)"; toast.style.opacity = "0"; }, 3500);
-            setTimeout(() => { document.body.removeChild(toast); }, 4000); 
-        }
-
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 window.currentUserUid = user.uid;
@@ -841,25 +1314,148 @@
             }
         });
 
-        window.luuDiemIELTSFullTest = async function(diemSo, bandScore, tenBai) {
-            if (!window.currentUserUid) return;
-            let timestamp = Date.now();
-            let docId = window.currentUserUid + "_ielts_" + timestamp; 
+        // TẢI LỊCH SỬ
+        window.taiLichSuIELTS = async function() {
+            const tbody = document.getElementById("historyBody");
+            const loading = document.getElementById("historyLoading");
 
-            await setDoc(doc(db, "user_ielts_scores", docId), {
-                email: window.currentUserEmail,
-                skill: "Listening",
-                testName: tenBai,
-                partName: "Full Test",
-                correctQ: diemSo,
-                totalQ: 40,
-                bandScore: parseFloat(bandScore),
-                date: new Date().toLocaleDateString("vi-VN"),
-                timeTaken: "", 
-                timestamp: timestamp
-            });
-            showSyncToast("☁️ Đã đồng bộ Band " + bandScore + " lên Tracker!");
+            if (!window.currentUserUid) {
+                tbody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Vui lòng đăng nhập để xem lịch sử.</td></tr>";
+                loading.style.display = "none";
+                return;
+            }
+
+            loading.style.display = "block";
+            tbody.innerHTML = "";
+
+            try {
+                const q = query(
+                    collection(db, "user_ielts_scores"),
+                    where("email", "==", window.currentUserEmail),
+                    where("skill", "==", "Listening"),
+                    where("testName", "==", "Test 2") // Test 2
+                );
+
+                const querySnapshot = await getDocs(q);
+                let html = "";
+                
+                if (querySnapshot.empty) {
+                    html = "<tr><td colspan='4' style='text-align:center;'>Bạn chưa làm bài test này.</td></tr>";
+                } else {
+                    window.historyDataList = [];
+                    querySnapshot.forEach((doc) => { 
+                        let data = doc.data();
+                        data.id = doc.id; 
+                        window.historyDataList.push(data); 
+                    });
+                    
+                    window.historyDataList.sort((a, b) => b.timestamp - a.timestamp);
+
+                    window.historyDataList.forEach((data) => {
+                        let dateObj = new Date(data.timestamp);
+                        let dateString = dateObj.toLocaleDateString("vi-VN") + " " + dateObj.getHours() + ":" + (dateObj.getMinutes() < 10 ? '0':'') + dateObj.getMinutes();
+
+                        html += `
+                            <tr>
+                                <td>${dateString}</td>
+                                <td><strong>${data.correctQ} / 40</strong></td>
+                                <td><strong style="color: var(--primary-dark); font-size: 1.1em;">${data.bandScore}</strong></td>
+                                <td>
+                                    <div class="action-btns">
+                                        <button onclick="xemLaiLichSu('${data.id}')" class="btn-sm btn-review">Xem lại</button>
+                                        <button onclick="xoaLichSuUI('${data.id}', this)" class="btn-sm btn-delete">Xóa</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+                tbody.innerHTML = html;
+            } catch (error) {
+                console.error("Lỗi fetch lịch sử: ", error);
+                tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; color: var(--danger);'>Đã xảy ra lỗi.</td></tr>";
+            } finally {
+                loading.style.display = "none";
+            }
+        }
+
+        // LƯU ĐIỂM + ĐÁP ÁN
+        window.luuDiemIELTSFullTest = async function(diemSo, bandScore, tenBai, userAnswersDict) {
+            const toast = document.getElementById('toastNotification');
+            const toastMsg = document.getElementById('toastMsg');
+            const toastTitle = document.querySelector('.toast-title');
+
+            if (!window.currentUserUid) {
+                if (toast && toastMsg && toastTitle) {
+                    toastTitle.innerText = "Lưu điểm thất bại!";
+                    toastTitle.style.color = "var(--danger)";
+                    toastMsg.innerText = "Bạn chưa đăng nhập! Vui lòng đăng nhập ở trang chủ để đồng bộ điểm.";
+                    toast.classList.add('show');
+                    setTimeout(() => { toast.classList.remove('show'); }, 5000); 
+                }
+                return;
+            }
+
+            let timestamp = Date.now();
+            let docId = window.currentUserUid + "_ielts_t2_" + timestamp; 
+
+            try {
+                await setDoc(doc(db, "user_ielts_scores", docId), {
+                    email: window.currentUserEmail,
+                    skill: "Listening",
+                    testName: tenBai,
+                    partName: "Full Test",
+                    correctQ: diemSo,
+                    totalQ: 40,
+                    bandScore: parseFloat(bandScore),
+                    userAnswers: userAnswersDict,
+                    date: new Date().toLocaleDateString("vi-VN"),
+                    timestamp: timestamp
+                });
+                
+                if (toast && toastMsg && toastTitle) {
+                    toastTitle.innerText = "Đồng bộ thành công!";
+                    toastTitle.style.color = "var(--primary-dark)";
+                    toastMsg.innerText = "Đã lưu kết quả Band " + bandScore + " và Đáp án của bạn!";
+                    toast.classList.add('show');
+                    setTimeout(() => { toast.classList.remove('show'); }, 4000); 
+                }
+            } catch (error) {
+                console.error("Lỗi khi lưu điểm: ", error);
+            }
+        }
+
+        // XÓA LỊCH SỬ
+        window.xoaLichSu = async function(docId, btnElement) {
+            let originalText = btnElement.innerText;
+            btnElement.innerText = "...";
+            btnElement.disabled = true;
+
+            try {
+                await deleteDoc(doc(db, "user_ielts_scores", docId));
+                
+                const toast = document.getElementById('toastNotification');
+                const toastMsg = document.getElementById('toastMsg');
+                const toastTitle = document.querySelector('.toast-title');
+                if (toast && toastMsg && toastTitle) {
+                    toastTitle.innerText = "Đã xóa!";
+                    toastTitle.style.color = "var(--primary-dark)";
+                    toastMsg.innerText = "Đã xóa lịch sử làm bài!";
+                    toast.classList.add('show');
+                    setTimeout(() => { toast.classList.remove('show'); }, 3000);
+                }
+                window.taiLichSuIELTS();
+            } catch (error) {
+                console.error("Lỗi khi xóa lịch sử: ", error);
+                btnElement.innerText = "Lỗi!";
+                setTimeout(() => {
+                    btnElement.innerText = originalText;
+                    btnElement.disabled = false;
+                }, 2000);
+            }
         }
     </script>
 </body>
 </html>
+test-2-listening-v2.html
+Đang hiển thị test-2-listening-v2.html.
