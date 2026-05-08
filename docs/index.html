@@ -5,13 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SnapEnglish</title>
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/snaplanguages/Snap/964b0b8abf9b8fc2e08bfcab051c3a14d2499d3b/docs/lessons/%E1%BA%A3nh.png">
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Quicksand', sans-serif;
+            font-family: 'Be Vietnam Pro', sans-serif;
         }
 
         body {
@@ -19,6 +21,9 @@
             color: #333;
             overflow-x: hidden;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         /* Watermark SnapEnglish */
@@ -38,13 +43,13 @@
 
         /* Hero Section */
         .hero {
-            min-height: 100vh;
+            flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 3rem 2rem;
+            padding: 4rem 2rem 3rem;
             position: relative;
         }
 
@@ -65,25 +70,46 @@
 
         .hero-content {
             z-index: 1;
-            max-width: 900px;
+            max-width: 1000px;
+            width: 100%;
             animation: fadeIn 1s ease-out;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* Header Image */
-        .hero-image {
+        /* Image Slider Container */
+        .hero-slider {
             width: 100%;
-            max-width: 450px;
+            max-width: 500px;
+            aspect-ratio: 4 / 3;
+            position: relative;
+            margin-bottom: 2.5rem;
             border-radius: 24px;
-            margin-bottom: 2rem;
             box-shadow: 0 20px 50px rgba(0,0,0,0.08);
-            animation: float 6s ease-in-out infinite;
             border: 6px solid #fff;
+            overflow: hidden;
+            animation: float 6s ease-in-out infinite;
         }
 
-        /* Brand Frame (Khung cho Brand) */
+        .hero-slider img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            animation: slideFade 16s infinite;
+        }
+
+        /* Timing cho 4 ảnh (mỗi ảnh hiển thị 4s) */
+        .hero-slider img:nth-child(1) { animation-delay: 0s; }
+        .hero-slider img:nth-child(2) { animation-delay: 4s; }
+        .hero-slider img:nth-child(3) { animation-delay: 8s; }
+        .hero-slider img:nth-child(4) { animation-delay: 12s; }
+
+        /* Brand Frame */
         .brand-container {
             display: inline-block;
             background: rgba(255, 255, 255, 0.7);
@@ -100,6 +126,7 @@
             color: #ff7b54;
             margin: 0;
             letter-spacing: -1px;
+            font-weight: 700;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
         }
 
@@ -109,6 +136,7 @@
             margin-bottom: 2.5rem;
             line-height: 1.7;
             max-width: 700px;
+            font-weight: 500;
         }
 
         /* Nút Bắt đầu */
@@ -132,12 +160,11 @@
             box-shadow: 0 15px 35px rgba(255, 87, 34, 0.4);
         }
 
-        /* Features Section */
+        /* Features Section - Sắp xếp theo Grid */
         .features {
-            display: flex;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 2rem;
-            flex-wrap: wrap;
             margin-top: 5rem;
             width: 100%;
         }
@@ -146,13 +173,14 @@
             background: #fff;
             padding: 2.5rem 2rem;
             border-radius: 24px;
-            width: 290px;
             text-align: left;
             box-shadow: 0 10px 40px rgba(0,0,0,0.03);
             transition: all 0.4s ease;
             border: 1px solid rgba(0,0,0,0.02);
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .feature-card::before {
@@ -194,12 +222,14 @@
             font-size: 0.95rem;
             line-height: 1.6;
             margin-bottom: 1.5rem;
+            flex-grow: 1; /* Cân bằng chiều cao các thẻ */
         }
 
         .tags {
             display: flex;
             flex-wrap: wrap;
             gap: 0.6rem;
+            margin-top: auto;
         }
 
         .tag {
@@ -208,8 +238,33 @@
             padding: 5px 12px;
             border-radius: 20px;
             font-size: 0.75rem;
-            font-weight: 700;
+            font-weight: 600;
             letter-spacing: 0.5px;
+        }
+
+        /* Footer / Chân trang */
+        .footer {
+            text-align: center;
+            padding: 2.5rem 2rem;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid rgba(0,0,0,0.04);
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .footer p {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer p:last-child {
+            margin-bottom: 0;
+        }
+
+        .footer strong {
+            color: #ff5722;
+            font-weight: 700;
         }
 
         /* Animations */
@@ -224,13 +279,35 @@
             100% { transform: translateY(0px); }
         }
 
-        /* Responsive */
+        @keyframes slideFade {
+            0% { opacity: 0; }
+            5% { opacity: 1; }
+            25% { opacity: 1; }
+            30% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        /* Responsive Breakpoints */
+        /* Máy tính bảng */
+        @media (max-width: 992px) {
+            .features {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .hero-slider {
+                max-width: 450px;
+            }
+        }
+
+        /* Điện thoại */
         @media (max-width: 768px) {
             h1.brand-name { font-size: 2.8rem; }
             .brand-container { padding: 10px 30px; }
-            .features { flex-direction: column; align-items: center; margin-top: 3rem; }
-            .feature-card { width: 100%; max-width: 350px; }
+            .features { grid-template-columns: 1fr; margin-top: 3rem; }
             body::before { font-size: 25vw; }
+            .hero-slider {
+                max-width: 100%;
+                aspect-ratio: 4 / 3;
+            }
         }
     </style>
 </head>
@@ -238,7 +315,13 @@
 
     <section class="hero">
         <div class="hero-content">
-            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="SnapEnglish Study" class="hero-image">
+            
+            <div class="hero-slider">
+                <img src="https://raw.githubusercontent.com/snaplanguages/Snap/2e1907f3b70c764d0a74c91a8ec34b68f6651422/assets/update.jpg" alt="SnapEnglish Update">
+                <img src="https://raw.githubusercontent.com/snaplanguages/Snap/2e1907f3b70c764d0a74c91a8ec34b68f6651422/assets/Writing%20task%201.jpg" alt="Writing Task 1">
+                <img src="https://raw.githubusercontent.com/snaplanguages/Snap/2e1907f3b70c764d0a74c91a8ec34b68f6651422/assets/toeic-reading.jpg" alt="TOEIC Reading">
+                <img src="https://raw.githubusercontent.com/snaplanguages/Snap/2e1907f3b70c764d0a74c91a8ec34b68f6651422/assets/writing%20task%202.jpg" alt="Writing Task 2">
+            </div>
             
             <div class="brand-container">
                 <h1 class="brand-name">SnapEnglish ✨</h1>
@@ -249,7 +332,6 @@
             <a href="https://snaplanguages.github.io/Snap/lessons/index.html" class="cta-btn">Bắt đầu 🚀</a>
 
             <div class="features">
-                <!-- Card 1 -->
                 <div class="feature-card">
                     <div class="feature-icon">🎯</div>
                     <h3 class="feature-title">IELTS Chuyên Sâu</h3>
@@ -262,7 +344,6 @@
                     </div>
                 </div>
 
-                <!-- Card 2 -->
                 <div class="feature-card">
                     <div class="feature-icon">🎧</div>
                     <h3 class="feature-title">General English</h3>
@@ -275,7 +356,6 @@
                     </div>
                 </div>
 
-                <!-- Card 3 -->
                 <div class="feature-card">
                     <div class="feature-icon">💼</div>
                     <h3 class="feature-title">TOEIC Thực Chiến</h3>
@@ -288,6 +368,11 @@
             </div>
         </div>
     </section>
+
+    <footer class="footer">
+        <p>© Bản quyền thuộc về <strong>SnapEnglish</strong>.</p>
+        <p>Phát triển dựa trên sự tham khảo và chắt lọc từ nhiều nguồn tài liệu uy tín, nhằm mang đến lộ trình học tập khoa học và tối ưu nhất.</p>
+    </footer>
 
 </body>
 </html>
