@@ -6,18 +6,18 @@
 <p>**📁 Cấu trúc thư mục**</p>
 <p>Dưới đây là sơ lược về cách tổ chức của repository:</p>
 <p>/docs: Chứa toàn bộ nội dung tài liệu, mã nguồn HTML/CSS cho trang web chính thức.</p>
-index.html: File chạy chính của ứng dụng/trang web.
-**🚀 Truy cập dự án**
-Bạn có thể xem trực tiếp kết quả của dự án tại:
-👉 snaplanguages.github.io/Snap/
-**🛠 Hướng dẫn phát triển**
-Nếu bạn muốn đóng góp hoặc chạy dự án này ở máy cục bộ (local):
-1. Clone repository:
-git clone https://github.com/snaplanguages/Snap.git
-2. Mở tài liệu:
-Truy cập vào thư mục docs để chỉnh sửa các file nội dung.
-**🤝 Đóng góp**
-Chúng mình luôn hoan nghênh mọi đóng góp! Nếu bạn có ý tưởng hoặc phát hiện lỗi, hãy:
-1. Mở một Issue để thảo luận.
-2. Gửi một Pull Request sau khi đã chỉnh sửa.
-© 2026 snaplanguages
+<p>index.html: File chạy chính của ứng dụng/trang web.</p>
+<p>**🚀 Truy cập dự án**</p>
+<p>Bạn có thể xem trực tiếp kết quả của dự án tại:</p>
+<p>👉 snaplanguages.github.io/Snap/</p>
+<p>**🛠 Hướng dẫn phát triển**</p>
+<p>Nếu bạn muốn đóng góp hoặc chạy dự án này ở máy cục bộ (local):</p>
+<p>1. Clone repository:</p>
+<p>git clone https://github.com/snaplanguages/Snap.git</p>
+<p>2. Mở tài liệu:</p>
+<p>Truy cập vào thư mục docs để chỉnh sửa các file nội dung.</p>
+<p>**🤝 Đóng góp**</p>
+<p>Mình luôn hoan nghênh mọi đóng góp! Nếu bạn có ý tưởng hoặc phát hiện lỗi, hãy:</p>
+<p>1. Mở một Issue để thảo luận.</p>
+<p>2. Gửi một Pull Request sau khi đã chỉnh sửa.</p>
+<p>© 2026 snaplanguages</p>
