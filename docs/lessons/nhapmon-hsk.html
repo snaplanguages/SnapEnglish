@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sổ Tay Nhập Môn HSK | SnapChinese</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Noto+Sans+SC:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Tông màu rực rỡ phong cách SnapChinese */
+            --primary: #ff007f; /* Bright Pink */
+            --primary-dark: #d8006b; /* Deep Pink */
+            --secondary: #ff6b9e; /* Hot Pink */
+            --accent: #ff5722; /* Deep Orange */
+            --bg-color: #fff0f5; /* Lavender Blush */
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --text-main: #4a148c; /* Dark Purple for better contrast */
+            --text-muted: #7b1fa2; /* Purple */
+            --hanzi-color: #ff1493; /* DeepPink */
+            --font-cn: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif; 
+        }
+
+        * {
+            box-sizing: border-box; margin: 0; padding: 0;
+            font-family: 'Nunito', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            /* Nền hoa anh đào rực rỡ */
+            background-image: linear-gradient(to bottom, rgba(255,240,245,0.85), rgba(255,255,255,0.6)),
+                url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: var(--text-main);
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh; padding-bottom: 40px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMATION BAY LƯỢN (Hoa lá, con thú) */
+        #leaves { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 0; overflow: hidden; }
+        .leaf { position: absolute; top: -10%; pointer-events: none; animation: fall linear infinite, sway ease-in-out infinite alternate; text-shadow: 0 2px 10px rgba(255,0,127,0.3); }
+        @keyframes fall { 0% { top: -10%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 110%; opacity: 0; } }
+        @keyframes sway { 0% { transform: translateX(0) rotate(0deg); } 100% { transform: translateX(50px) rotate(45deg); } }
+
+        /* --- BRANDING & HEADER --- */
+        .branding {
+            width: 100%; background: rgba(255,255,255,0.9); text-align: center; padding: 6px 0;
+            font-size: 0.8rem; font-weight: 800; color: var(--primary-dark);
+            letter-spacing: 1px; box-shadow: 0 2px 10px rgba(255, 0, 127, 0.1);
+            text-transform: uppercase; position: relative; z-index: 10;
+        }
+
+        .header {
+            width: 100%; max-width: 800px; padding: 15px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; border-radius: 0 0 25px 25px;
+            box-shadow: 0 8px 25px rgba(255, 0, 127, 0.3);
+            position: relative; z-index: 10;
+        }
+
+        .btn-back {
+            background: rgba(255,255,255,0.25); color: white; text-decoration: none;
+            padding: 8px 14px; border-radius: 20px; font-weight: bold; font-size: 0.9rem;
+            display: flex; align-items: center; gap: 5px; border: 1px solid rgba(255,255,255,0.6);
+            transition: 0.2s; box-shadow: 0 4px 10px rgba(255,107,158,0.3);
+        }
+        .btn-back:hover { background: white; color: var(--primary); }
+        .btn-back:active { transform: scale(0.95); }
+
+        .header h2 { font-size: 1.3rem; text-align: center; flex: 1; margin: 0 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        .header-spacer { width: 90px; }
+
+        /* --- TABS --- */
+        .tabs {
+            display: flex; justify-content: flex-start; gap: 10px;
+            margin: 25px auto 15px; padding: 8px 15px; width: 100%; max-width: 800px;
+            overflow-x: auto; scrollbar-width: none; position: relative; z-index: 10;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+
+        .tab-btn {
+            flex: 0 0 auto; border: 2px solid transparent; background: rgba(255,255,255,0.8);
+            padding: 10px 22px; border-radius: 25px;
+            font-size: 1rem; font-weight: 800; color: var(--primary-dark);
+            cursor: pointer; transition: all 0.25s; box-shadow: 0 4px 10px rgba(255,0,127,0.1);
+        }
+        .tab-btn:hover { border-color: var(--secondary); background: white; }
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white;
+            box-shadow: 0 6px 15px rgba(255, 0, 127, 0.4); border-color: transparent;
+        }
+
+        /* --- CONTENT AREA --- */
+        .section { display: none; width: 100%; max-width: 800px; padding: 0 15px; animation: fadeIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; z-index: 10; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        /* --- KNOWLEDGE CARDS --- */
+        .knowledge-card {
+            background: var(--card-bg); border-radius: 25px; padding: 25px; margin-bottom: 25px;
+            box-shadow: 0 8px 30px rgba(255, 0, 127, 0.12); border-top: 5px solid var(--primary);
+            backdrop-filter: blur(10px);
+        }
+        .card-title { color: var(--primary); font-size: 1.4rem; font-weight: 900; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; text-shadow: 1px 1px 0px rgba(255,107,158,0.2);}
+        .knowledge-card p { line-height: 1.6; font-size: 1.05rem; color: var(--text-muted); font-weight: 600; margin-bottom: 10px;}
+
+        /* Hanzi Grid in Cards */
+        .grid-hz { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-top: 15px; }
+        .hz-box {
+            background: rgba(255,240,245,0.7); border: 2px dashed #ffb7c5; border-radius: 20px;
+            padding: 15px 10px; text-align: center; display: flex; flex-direction: column; align-items: center;
+            transition: transform 0.2s;
+        }
+        .hz-box:hover { transform: translateY(-5px); border-color: var(--secondary); background: white; box-shadow: 0 5px 15px rgba(255,0,127,0.15); }
+        .hz-box .hz { font-family: var(--font-cn); font-size: 3rem; color: var(--hanzi-color); margin-bottom: 5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(255,107,158,0.2); }
+        .hz-box .py { color: #9c27b0; font-weight: 800; font-size: 0.95rem; background: #f3e5f5; padding: 4px 12px; border-radius: 12px; margin-bottom: 5px;}
+        .hz-box .mean { color: var(--text-main); font-size: 0.85rem; font-weight: 800; }
+
+        /* Stroke Grid */
+        .stroke-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .stroke-card {
+            display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.9);
+            padding: 15px; border-radius: 18px; box-shadow: 0 5px 15px rgba(255,0,127,0.08);
+            border-left: 6px solid var(--secondary); transition: transform 0.2s;
+        }
+        .stroke-card:hover { transform: translateX(5px); }
+        .stroke-visual {
+            width: 55px; height: 55px; background: #ffe4e1; border-radius: 14px;
+            display: flex; justify-content: center; align-items: center; font-size: 2.2rem;
+            color: var(--primary); font-weight: bold; font-family: var(--font-cn); border: 1px solid #ffb7c5;
+        }
+        .stroke-info h3 { color: var(--primary-dark); font-size: 1.1rem; margin-bottom: 2px; font-weight: 800; }
+        .stroke-info p { color: #880e4f; font-size: 0.85rem; margin: 0; font-weight: 600;}
+
+        /* Nút Next To Game / Next Tab */
+        .btn-next-game, .btn-next-tab {
+            display: block; width: 100%; max-width: 400px; margin: 30px auto; text-align: center;
+            background: linear-gradient(135deg, var(--secondary), var(--accent), var(--primary)); color: white;
+            padding: 16px 20px; border-radius: 30px; font-size: 1.2rem; font-weight: 900;
+            text-decoration: none; box-shadow: 0 6px 20px rgba(255, 0, 127, 0.4); transition: 0.3s;
+            border: none; cursor: pointer;
+        }
+        .btn-next-game:hover, .btn-next-tab:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(255, 87, 34, 0.5); filter: brightness(1.1); }
+        .btn-next-game:active, .btn-next-tab:active { transform: translateY(0); }
+
+    </style>
+</head>
+<body>
+
+    <div id="leaves"></div>
+
+    <div class="branding">© Bản Quyền Thuộc Về SnapChinese 🎀</div>
+
+    <header class="header">
+        <a href="index.html" class="btn-back">🦄 Về Trang Chủ</a>
+        <h2>Sổ Tay Nhập Môn</h2>
+        <div class="header-spacer"></div>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('chu-han')">🌸 1. Chữ Hán</button>
+        <button class="tab-btn" onclick="switchTab('net-co-ban')">🦋 2. Các Nét</button>
+        <button class="tab-btn" onclick="switchTab('bo-thu')">💎 3. Bộ Thủ</button>
+    </div>
+
+    <section id="chu-han" class="section active">
+        <div style="text-align: center; margin-bottom: 25px;">
+            <h1 style="font-size: 1.8rem; color: var(--primary-dark); font-weight: 900; text-shadow: 1px 1px 0px rgba(255,107,158,0.3);">Bí Mật Của Chữ Hán 📜</h1>
+            <p style="color: var(--text-muted); font-weight: 700; font-size: 1rem; margin-top: 5px;">Chữ Hán (汉字) là công cụ ghi chép mang tính biểu ngữ. Có 4 dạng cấu tạo phổ biến nhất.</p>
+        </div>
+
+        <div class="knowledge-card">
+            <div class="card-title"><span>🎨</span> Chữ Tượng Hình</div>
+            <p>Là loại chữ tạo ra sớm nhất, mô phỏng lại hình dáng của vật thực. Những gì vẽ được đều được đơn giản hóa thành chữ Hán.</p>
+            <div class="grid-hz">
+                <div class="hz-box"><span class="hz">目</span><span class="py">mù</span><span class="mean">Mắt (Hình con mắt)</span></div>
+                <div class="hz-box"><span class="hz">木</span><span class="py">mù</span><span class="mean">Cây (Hình cái cây)</span></div>
+                <div class="hz-box"><span class="hz">口</span><span class="py">kǒu</span><span class="mean">Miệng (Cái miệng)</span></div>
+                <div class="hz-box"><span class="hz">人</span><span class="py">rén</span><span class="mean">Người (Đang đi)</span></div>
+            </div>
+        </div>
+
+        <div class="knowledge-card">
+            <div class="card-title"><span>📍</span> Chữ Chỉ Sự</div>
+            <p>Dùng ký hiệu trừu tượng hoặc thêm nét gợi ý vào chữ tượng hình để biểu đạt khái niệm khó vẽ.</p>
+            <div class="grid-hz">
+                <div class="hz-box"><span class="hz">本</span><span class="py">běn</span><span class="mean">Gốc cây (Gạch dưới Mộc)</span></div>
+                <div class="hz-box"><span class="hz">寸</span><span class="py">cùn</span><span class="mean">Tấc (Đơn vị đo)</span></div>
+                <div class="hz-box"><span class="hz">中</span><span class="py">zhōng</span><span class="mean">Ở giữa, trung tâm</span></div>
+            </div>
+        </div>
+
+        <div class="knowledge-card">
+            <div class="card-title"><span>🧩</span> Chữ Hội Ý</div>
+            <p>Kết hợp 2 hoặc nhiều chữ có ý nghĩa liên quan để tạo thành một nghĩa mới hoàn toàn.</p>
+            <div class="grid-hz">
+                <div class="hz-box"><span class="hz">明</span><span class="py">míng (Sáng)</span><span class="mean">日 (Trời) + 月 (Trăng)</span></div>
+                <div class="hz-box"><span class="hz">从</span><span class="py">cóng (Theo)</span><span class="mean">Hai chữ 人 đi theo nhau</span></div>
+                <div class="hz-box"><span class="hz">林</span><span class="py">lín (Rừng)</span><span class="mean">Hai chữ 木 cạnh nhau</span></div>
+            </div>
+        </div>
+
+        <div class="knowledge-card">
+            <div class="card-title"><span>🔊</span> Chữ Hình Thanh</div>
+            <p>Chiếm hơn 90% chữ Hán hiện nay. Gồm 2 phần: <b>Hình bàng</b> (chỉ ý nghĩa) và <b>Thanh bàng</b> (chỉ âm đọc).</p>
+            <div style="background: rgba(255,228,225,0.5); padding: 18px; border-radius: 18px; margin-top: 15px; border: 1px solid #ffb7c5;">
+                <p style="margin-bottom: 8px;">Ví dụ chữ gốc: <span style="font-family: var(--font-cn); font-size: 1.6rem; color: var(--primary-dark); font-weight: bold;">青</span> /qīng/ (màu xanh).</p>
+                <ul style="padding-left: 20px; color: var(--text-muted); font-weight: 700; line-height: 1.8;">
+                    <li>💧 Thêm bộ Thủy (nước) ➔ <span style="font-family: var(--font-cn); font-size: 1.4rem; color: #2196f3;">清</span> /qīng/: nước trong.</li>
+                    <li>❤️ Thêm bộ Tâm (tim) ➔ <span style="font-family: var(--font-cn); font-size: 1.4rem; color: #e91e63;">情</span> /qíng/: tình cảm.</li>
+                    <li>☀️ Thêm bộ Nhật (mặt trời) ➔ <span style="font-family: var(--font-cn); font-size: 1.4rem; color: #ff9800;">晴</span> /qíng/: trời nắng.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <button class="btn-next-tab" onclick="switchTab('net-co-ban')">Tiếp theo: Các Nét Cơ Bản 💖 ❯</button>
+    </section>
+
+    <section id="net-co-ban" class="section">
+        <div style="text-align: center; margin-bottom: 25px;">
+            <h1 style="font-size: 1.8rem; color: var(--primary-dark); font-weight: 900; text-shadow: 1px 1px 0px rgba(255,107,158,0.3);">8 Nét Chữ Cơ Bản ✍️</h1>
+            <p style="color: var(--text-muted); font-weight: 700; font-size: 1rem; margin-top: 5px;">Giống như bảng chữ cái tiếng Việt có 29 chữ, chữ Hán được cấu tạo bởi 8 nét bút.</p>
+        </div>
+
+        <div class="stroke-grid mb-6">
+            <div class="stroke-card">
+                <div class="stroke-visual">一</div>
+                <div class="stroke-info"><h3>Nét Ngang</h3><p>Trái sang phải (VD: 一, 二)</p></div>
+            </div>
+            <div class="stroke-card">
+                <div class="stroke-visual">丨</div>
+                <div class="stroke-info"><h3>Nét Sổ</h3><p>Trên xuống dưới (VD: 十, 中)</p></div>
+            </div>
+            <div class="stroke-card">
+                <div class="stroke-visual">丶</div>
+                <div class="stroke-info"><h3>Nét Chấm</h3><p>Chấm nhẹ từ trên (VD: 立, 头)</p></div>
+            </div>
+            <div class="stroke-card">
+                <div class="stroke-visual">/</div>
+                <div class="stroke-info"><h3>Nét Hất</h3><p>Hất xéo lên phải (VD: 冰, 湖)</p></div>
+            </div>
+            <div class="stroke-card">
+                <div class="stroke-visual">丿</div>
+                <div class="stroke-info"><h3>Nét Phẩy</h3><p>Cong xuống trái (VD: 八, 顺)</p></div>
+            </div>
+            <div class="stroke-card">
+                <div class="stroke-visual">乀</div>
+                <div class="stroke-info"><h3>Nét Mác</h3><p>Thẳng xéo xuống phải (VD: 入)</p></div>
+            </div>
+            <div class="stroke-card">
+                <div class="stroke-visual">乛</div>
+                <div class="stroke-info"><h3>Nét Gập</h3><p>Gập khúc (VD: 区, 凹)</p></div>
+            </div>
+            <div class="stroke-card">
+                <div class="stroke-visual">亅</div>
+                <div class="stroke-info"><h3>Nét Móc</h3><p>Móc lên ở cuối (VD: 小, 水)</p></div>
+            </div>
+        </div>
+
+        <div class="knowledge-card" style="margin-top: 25px; background: rgba(255,235,238,0.8); border-color: #f44336;">
+            <div class="card-title" style="color: #d32f2f;"><span>⚠️</span> Quy tắc bút thuận (Ghi nhớ)</div>
+            <ul style="padding-left: 20px; color: #880e4f; font-weight: 800; line-height: 1.8;">
+                <li>Ngang trước, Sổ sau (VD: 十).</li>
+                <li>Phẩy trước, Mác sau (VD: 八, 人).</li>
+                <li>Trên trước, Dưới sau (VD: 二, 三).</li>
+                <li>Trái trước, Phải sau (VD: 明, 林).</li>
+                <li>Ngoài trước, Trong sau (VD: 月).</li>
+                <li>Vào nhà trước, Đóng cửa sau (Vẽ khung, viết trong, đóng khung).</li>
+            </ul>
+        </div>
+
+        <button class="btn-next-tab" onclick="switchTab('bo-thu')">Tiếp theo: Bộ Thủ ✨ ❯</button>
+    </section>
+
+    <section id="bo-thu" class="section">
+        <div style="text-align: center; margin-bottom: 25px;">
+            <h1 style="font-size: 1.8rem; color: var(--primary-dark); font-weight: 900; text-shadow: 1px 1px 0px rgba(255,107,158,0.3);">Kho Báu Bộ Thủ 💎</h1>
+            <p style="color: var(--text-muted); font-weight: 700; font-size: 1rem; margin-top: 5px;">Hán ngữ có 214 bộ thủ, nhưng bạn chỉ cần nắm vững 50 bộ thông dụng là có thể tự tin tra từ điển rồi!</p>
+        </div>
+
+        <div class="knowledge-card">
+            <div class="card-title"><span>1</span> Bộ thủ là gì?</div>
+            <p>Bộ thủ (<span class="font-hanzi" style="font-size: 1.3rem; color: var(--hanzi-color); font-weight:bold;">部首</span>) là thành phần cơ bản tạo ra chữ Hán. Một chữ Hán có thể có 1 hoặc nhiều bộ ghép lại. Chúng đứng ở mọi vị trí.</p>
+            <div style="background: rgba(255,240,245,0.8); padding: 18px; border-radius: 18px; margin-top: 15px; border: 1px dashed var(--secondary);">
+                <p>👉 Chữ <span class="font-hanzi" style="font-size: 1.6rem; color: var(--primary-dark); font-weight:bold;">天</span> /tiān/ (Trời) được tạo bởi 1 bộ duy nhất là bộ Thiên.</p>
+                <p style="margin-top: 12px;">👉 Chữ <span class="font-hanzi" style="font-size: 1.6rem; color: var(--primary-dark); font-weight:bold;">好</span> /hǎo/ (Tốt) được tạo bởi 2 bộ: <b>Bộ Nữ</b> (Phụ nữ) và <b>Bộ Tử</b> (Con cái). Mẹ có con là điều tốt lành!</p>
+            </div>
+        </div>
+
+        <a href="BO THU 1.html" class="btn-next-game">🎮 Sang Game Tiếp Theo: BỘ THỦ 1 ➔</a>
+    </section>
+
+    <script>
+        // Hiệu ứng rơi rớt hoa lá SnapChinese
+        function initLeaves() {
+            const c = document.getElementById('leaves');
+            const icons = ['🌸','🌺','🎀','🦋','🦄','🍓','✨','💖', '🍑'];
+            for (let i = 0; i < 15; i++) {
+                const l = document.createElement('div');
+                l.className = 'leaf';
+                l.textContent = icons[Math.floor(Math.random() * icons.length)];
+                l.style.left = Math.random() * 100 + 'vw';
+                l.style.fontSize = (Math.random() * 16 + 12) + 'px';
+                l.style.animationDuration = `${Math.random() * 7 + 9}s, ${Math.random() * 3 + 3}s`;
+                l.style.animationDelay = `-${Math.random() * 12}s`;
+                c.appendChild(l);
+            }
+        }
+        initLeaves();
+
+        function switchTab(tabId) {
+            // Remove active from all sections and buttons
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
+            // Add active to selected
+            document.getElementById(tabId).classList.add('active');
+            
+            // Highlight the correct tab in header
+            const tabs = document.querySelectorAll('.tabs .tab-btn');
+            if(tabId === 'chu-han') tabs[0].classList.add('active');
+            if(tabId === 'net-co-ban') tabs[1].classList.add('active');
+            if(tabId === 'bo-thu') tabs[2].classList.add('active');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
