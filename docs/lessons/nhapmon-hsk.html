@@ -149,6 +149,65 @@
         .btn-next-game:hover, .btn-next-tab:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(255, 87, 34, 0.5); filter: brightness(1.1); }
         .btn-next-game:active, .btn-next-tab:active { transform: translateY(0); }
 
+        /* --- CSS CHO POPUP & BÓNG ĐÈN THÊM VÀO --- */
+        .popup-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 2000; opacity: 0; visibility: hidden; transition: all 0.3s ease;
+        }
+        .popup-overlay.show { opacity: 1; visibility: visible; }
+        
+        .popup-content {
+            background: var(--card-bg); border-radius: 25px; padding: 30px 25px;
+            width: 90%; max-width: 380px; text-align: center;
+            box-shadow: 0 10px 40px rgba(255, 0, 127, 0.3);
+            border: 4px solid #ffb7c5; position: relative;
+            transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .popup-overlay.show .popup-content { transform: scale(1); }
+
+        .popup-close {
+            position: absolute; top: 12px; right: 15px;
+            background: #ffe4e1; border: none; color: var(--primary);
+            font-size: 1.2rem; width: 35px; height: 35px; border-radius: 50%;
+            cursor: pointer; font-weight: bold; transition: 0.3s;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .popup-close:hover { background: var(--primary); color: white; transform: rotate(90deg) scale(1.1); }
+
+        .popup-content h3 { color: var(--primary-dark); font-size: 1.4rem; margin-bottom: 5px; font-weight: 900; }
+        .popup-content p { color: var(--text-muted); margin-bottom: 20px; font-size: 0.95rem; font-weight: 700;}
+
+        .popup-links { display: flex; flex-direction: column; gap: 12px; }
+        .popup-link {
+            background: linear-gradient(135deg, rgba(255,107,158,0.1), rgba(255,0,127,0.05));
+            border: 2px dashed #ffb7c5; padding: 12px; border-radius: 18px;
+            text-decoration: none; color: var(--text-main); font-weight: 800; font-size: 1rem;
+            transition: all 0.2s; display: flex; align-items: center; gap: 10px; justify-content: center;
+        }
+        .popup-link:hover {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; transform: translateY(-3px) scale(1.02); 
+            box-shadow: 0 5px 15px rgba(255,0,127,0.3); border-color: transparent;
+        }
+
+        /* Bóng đèn nổi */
+        #floating-lightbulb {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 60px; height: 60px; background: white;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 2rem; cursor: pointer; z-index: 1999;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 5px 15px rgba(255, 0, 127, 0.2);
+            border: 3px solid #ffd700; 
+            animation: floatBulb 2s infinite ease-in-out, glowBulb 1.5s infinite alternate;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease; transform: scale(0);
+        }
+        #floating-lightbulb.show { opacity: 1; visibility: visible; transform: scale(1); }
+        
+        @keyframes floatBulb { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-10px) scale(1); } }
+        @keyframes glowBulb { from { box-shadow: 0 0 10px rgba(255,215,0,0.4); } to { box-shadow: 0 0 35px rgba(255,215,0,0.9), 0 0 10px rgba(255,0,127,0.4); } }
     </style>
 </head>
 <body>
@@ -292,9 +351,25 @@
                 <p style="margin-top: 12px;">👉 Chữ <span class="font-hanzi" style="font-size: 1.6rem; color: var(--primary-dark); font-weight:bold;">好</span> /hǎo/ (Tốt) được tạo bởi 2 bộ: <b>Bộ Nữ</b> (Phụ nữ) và <b>Bộ Tử</b> (Con cái). Mẹ có con là điều tốt lành!</p>
             </div>
         </div>
-
-        <a href="bo-thu-1.html" class="btn-next-game">🎮 Sang Game Tiếp Theo: BỘ THỦ 1 ➔</a>
     </section>
+
+    <div id="radical-popup-overlay" class="popup-overlay">
+        <div class="popup-content">
+            <button class="popup-close" onclick="closePopup()">✖</button>
+            <h3>🌟 Hành Trình Bộ Thủ 🌟</h3>
+            <p>Chọn chặng đường bạn muốn học nhé!</p>
+            <div class="popup-links">
+                <a href="bo-thu-1.html" class="popup-link">🌸 Chặng 1: Bộ thủ cơ bản</a>
+                <a href="bo-thu-2.html" class="popup-link">🌺 Chặng 2: Bộ thủ con người</a>
+                <a href="bo-thu-3.html" class="popup-link">🎀 Chặng 3: Bộ thủ tự nhiên</a>
+                <a href="bo-thu-4.html" class="popup-link">🦋 Chặng 4: Bộ thủ động vật</a>
+                <a href="bo-thu-5.html" class="popup-link">🦄 Chặng 5: Bộ thủ hành động</a>
+                <a href="bo-thu-6.html" class="popup-link">✨ Chặng 6: Bộ thủ nâng cao</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="floating-lightbulb" onclick="openPopup()" title="Mở danh sách bài học">💡</div>
 
     <script>
         // Hiệu ứng rơi rớt hoa lá SnapChinese
@@ -314,6 +389,9 @@
         }
         initLeaves();
 
+        // Biến kiểm tra xem đã mở popup ở tab bộ thủ chưa
+        let hasSeenRadicalPopup = false;
+
         function switchTab(tabId) {
             // Remove active from all sections and buttons
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -329,6 +407,37 @@
             if(tabId === 'bo-thu') tabs[2].classList.add('active');
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // LOGIC XỬ LÝ POPUP VÀ BÓNG ĐÈN
+            if (tabId === 'bo-thu') {
+                if (!hasSeenRadicalPopup) {
+                    // Mở popup lần đầu tiên kèm độ trễ nhỏ để animation mượt hơn
+                    setTimeout(openPopup, 300);
+                } else {
+                    // Nếu đã xem rồi thì chỉ hiện lại bóng đèn
+                    document.getElementById('floating-lightbulb').classList.add('show');
+                }
+            } else {
+                // Ẩn bóng đèn khi chuyển sang tab khác
+                document.getElementById('floating-lightbulb').classList.remove('show');
+            }
+        }
+
+        // Hàm mở popup
+        function openPopup() {
+            document.getElementById('radical-popup-overlay').classList.add('show');
+            document.getElementById('floating-lightbulb').classList.remove('show'); // Ẩn đèn khi bật popup
+        }
+
+        // Hàm đóng popup
+        function closePopup() {
+            document.getElementById('radical-popup-overlay').classList.remove('show');
+            hasSeenRadicalPopup = true; // Đánh dấu là đã xem
+            
+            // Hiện bóng đèn nếu đang ở đúng tab Bộ Thủ
+            if(document.getElementById('bo-thu').classList.contains('active')) {
+                document.getElementById('floating-lightbulb').classList.add('show');
+            }
         }
     </script>
 </body>
