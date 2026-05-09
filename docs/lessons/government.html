@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Government | SnapEnglish</title>
+   <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F4F6F9;
+            --primary: #1B3B6F; /* Navy Blue uy quyền, trưởng thành */
+            --secondary: #9DB4C0;
+            --accent: #E2E8F0;
+            --text-main: #2C3E50;
+            --text-light: #7F8C8D;
+            --white: #FFFFFF;
+            --gold: #C5A880; /* Điểm nhấn vàng kim */
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--white);
+            max-width: 600px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(27, 59, 111, 0.08);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-top: 5px solid var(--gold);
+        }
+
+        h1 {
+            font-family: 'Lora', serif;
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--gold);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .exercise-area {
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .question {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        button.option-btn {
+            background-color: var(--white);
+            border: 2px solid var(--accent);
+            color: var(--text-main);
+            padding: 12px 20px;
+            margin: 8px 0;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+        }
+
+        button.option-btn:hover {
+            background-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        button.option-btn.correct {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: var(--white);
+        }
+
+        button.option-btn.wrong {
+            background-color: #C1121F;
+            border-color: #C1121F;
+            color: var(--white);
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 15px;
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Nunito', sans-serif;
+            margin-bottom: 15px;
+            text-align: center;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--gold);
+        }
+
+        .blank-input {
+            width: auto;
+            min-width: 100px;
+            display: inline-block;
+            margin: 0 10px;
+            padding: 8px;
+            border-bottom: 2px solid var(--gold);
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            border-radius: 0;
+            background-color: transparent;
+        }
+
+        .action-btn {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+            box-shadow: 0 4px 15px rgba(27, 59, 111, 0.3);
+        }
+
+        .action-btn:hover {
+            background-color: #0F264A;
+        }
+
+        .scramble-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .scramble-word {
+            background: var(--accent);
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            color: var(--text-main);
+        }
+        
+        .scramble-word.selected {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .answer-dropzone {
+            min-height: 50px;
+            border: 2px dashed var(--secondary);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 10px;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            height: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Government Vocab Master</h1>
+    <div class="subtitle">"Tư duy vĩ mô, ghi điểm trọn vẹn Task 2."</div>
+    
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="exercise-area" id="exerciseArea">
+        </div>
+
+    <div class="feedback" id="feedbackText"></div>
+    <button class="action-btn" id="nextBtn" style="display: none;" onclick="nextQuestion()">Tiếp tục ➔</button>
+</div>
+
+<script>
+    // FULL DATA TỪ BẢNG GOVERNMENT
+    const vocabData = [
+        // Government roles and responsibilities
+        { en: "play a pivotal role in", vn: "đóng vai trò then chốt trong" },
+        { en: "assume responsibility for", vn: "chịu trách nhiệm về" },
+        { en: "have a duty to ensure", vn: "có nghĩa vụ đảm bảo" },
+        { en: "be accountable for public welfare", vn: "chịu trách nhiệm về phúc lợi xã hội" },
+        { en: "fulfil governmental obligations", vn: "thực hiện nghĩa vụ của chính phủ" },
+        { en: "intervene in social issues", vn: "can thiệp vào các vấn đề xã hội" },
+        { en: "act in the public interest", vn: "hành động vì lợi ích cộng đồng" },
+        { en: "exercise governmental authority", vn: "thực thi quyền lực nhà nước" },
+        { en: "be legally and morally responsible for", vn: "chịu trách nhiệm cả về pháp lý lẫn đạo đức" },
+        { en: "provide essential public services", vn: "cung cấp các dịch vụ công thiết yếu" },
+        { en: "bear the primary responsibility for", vn: "chịu trách nhiệm chính về" },
+        { en: "fulfil its duty to citizens", vn: "thực hiện nghĩa vụ với người dân" },
+        { en: "act in the best interests of society", vn: "hành động vì lợi ích xã hội" },
+        { en: "ensure equal access to public services", vn: "đảm bảo tiếp cận dịch vụ công bằng" },
+        { en: "take a proactive approach to", vn: "áp dụng cách tiếp cận chủ động" },
+
+        // Public spending and budget allocation
+        { en: "allocate public funds to", vn: "phân bổ ngân sách cho" },
+        { en: "prioritize government expenditure", vn: "ưu tiên chi tiêu chính phủ" },
+        { en: "make effective use of taxpayers' money", vn: "sử dụng hiệu quả tiền thuế" },
+        { en: "channel investment into", vn: "dồn đầu tư vào" },
+        { en: "fund large-scale public projects", vn: "tài trợ dự án công quy mô lớn" },
+        { en: "face budgetary constraints", vn: "đối mặt với hạn chế ngân sách" },
+        { en: "divert resources away from", vn: "chuyển nguồn lực khỏi" },
+        { en: "justify public spending on", vn: "biện minh cho chi tiêu công" },
+        { en: "strike a balance in spending", vn: "cân bằng chi tiêu" },
+        { en: "long-term returns on investment", vn: "lợi ích đầu tư dài hạn" },
+        { en: "prioritise government spending on", vn: "ưu tiên chi tiêu cho" },
+        { en: "divert financial resources towards", vn: "chuyển nguồn tài chính sang" },
+        { en: "a strain on the national budget", vn: "gánh nặng lên ngân sách quốc gia" },
+        { en: "justify public expenditure", vn: "biện minh cho chi tiêu công" },
+        { en: "cost-effective public policies", vn: "chính sách công tiết kiệm chi phí" },
+        { en: "financial feasibility", vn: "tính khả thi về mặt tài chính" },
+
+        // Chính sách công và quyết định của chính phủ
+        { en: "formulate public policies", vn: "xây dựng chính xách công" },
+        { en: "implement nationwide programmes", vn: "triển khai chương trình trên toàn quốc" },
+        { en: "adopt a long-term strategic approach", vn: "áp dụng chiến lược dài hạn" },
+        { en: "introduce regulatory measures", vn: "đưa ra các biện pháp quản lý" },
+        { en: "policy-making process", vn: "quá trình hoạch định chính sách" },
+        { en: "evidence-based decision making", vn: "ra quyết định dựa trên bằng chứng" },
+        { en: "address pressing social issues", vn: "giải quyết vấn đề xã hội cấp bách" },
+        { en: "balance competing priorities", vn: "cân bằng các ưu tiên xung đột" },
+        { en: "government intervention is justified", vn: "sự can thiệp của chính phủ là hợp lý" },
+        { en: "policy effectiveness", vn: "hiệu quả của chính sách" },
+        { en: "hold positions of authority", vn: "giữ vị trí quyền lực" },
+        { en: "political maturity and experience", vn: "sự chín chắn và kinh nghiệm chính trị" },
+        { en: "fresh perspective and innovation", vn: "góc nhìn mới và đổi mới" },
+        { en: "effective decision-making", vn: "ra quyết định hiệu quả" },
+        { en: "navigate complex political systems", vn: "xử lý hệ thống chính trị phức tạp" },
+        { en: "public trust in leadership", vn: "niềm tin công chúng vào lãnh đạo" },
+        { en: "represent the interests of citizens", vn: "đại diện lợi ích người dân" },
+        { en: "generational diversity in government", vn: "đa dạng thế hệ trong chính phủ" },
+        { en: "administrative competence", vn: "năng lực quản trị" },
+
+        // Government vs individual responsibility
+        { en: "government intervention is necessary", vn: "sự can thiệp của chính phủ là cần thiết" },
+        { en: "personal responsibility should not be overlooked", vn: "không thể bỏ qua trách nhiệm cá nhân" },
+        { en: "shift responsibility onto individuals", vn: "chuyển trách nhiệm sang cá nhân" },
+        { en: "over-reliance on the government", vn: "phụ thuộc quá mức vào chính phủ" },
+        { en: "encourage self-discipline among citizens", vn: "khuyến khích kỷ luật cá nhân" },
+        { en: "empower individuals to make informed choices", vn: "trao quyền lựa chọn sáng suốt" },
+        { en: "take ownership of one's actions", vn: "tự chịu trách nhiệm hành động" },
+        { en: "strike a balance between regulation and freedom", vn: "cân bằng quản lý và tự do" },
+        { en: "government-led initiatives", vn: "sáng kiến do chính phủ dẫn dắt" },
+        { en: "individual accountability", vn: "trách nhiệm cá nhân" },
+        { en: "a shared responsibility between individuals and the state", vn: "trách nhiệm chung" },
+        { en: "government overreach", vn: "sự can thiệp quá mức của chính phủ" },
+        { en: "rely excessively on state support", vn: "phụ thuộc quá mức vào nhà nước" },
+        { en: "encourage self-discipline and autonomy", vn: "khuyến khích tính tự chủ" },
+        { en: "state intervention versus personal choice", vn: "can thiệp nhà nước so với lựa chọn cá nhân" },
+        { en: "avoid shifting all responsibility onto the government", vn: "tránh đổ toàn bộ trách nhiệm cho chính phủ" },
+
+        // Health, environment and prevention
+        { en: "preventive healthcare measures", vn: "biện pháp y tế phòng ngừa" },
+        { en: "reduce the burden on healthcare systems", vn: "giảm gánh nặng y tế" },
+        { en: "environmental degradation", vn: "sự xuống cấp môi trường" },
+        { en: "air and water pollution", vn: "ô nhiễm không khí và nước" },
+        { en: "improve living conditions", vn: "cải thiện điều kiện sống" },
+        { en: "address root causes of disease", vn: "giải quyết nguyên nhân gốc rễ bệnh tật" },
+        { en: "promote public health awareness", vn: "nâng cao nhận thức sức khỏe" },
+        { en: "sustainable urban development", vn: "phát triển đô thị bền vững" },
+        { en: "mitigate health risks", vn: "giảm thiểu rủi ro sức khỏe" },
+        { en: "long-term health outcomes", vn: "kết quả sức khỏe dài hạn" },
+        { en: "improve citizens' quality of life", vn: "nâng cao chất lượng sống của người dân" },
+        { en: "public health outcomes", vn: "kết quả sức khỏe cộng đồng" },
+        { en: "prevent illness and disease", vn: "phòng ngừa bệnh tật" },
+        { en: "address health inequalities", vn: "giải quyết bất bình đẳng y tế" },
+        { en: "a healthier population", vn: "dân số khỏe mạnh hơn" },
+        { en: "social well-being", vn: "phúc lợi xã hội" },
+        { en: "tackle root causes of disease", vn: "xử lý nguyên nhân gốc rễ của bệnh tật" },
+        { en: "living standards", vn: "mức sống" },
+        { en: "ensure equal access to healthcare", vn: "đảm bảo tiếp cận y tế công bằng" },
+
+        // Education and Youth policy
+        { en: "invest in early education", vn: "đầu tư giáo dục sớm" },
+        { en: "promote holistic development", vn: "thúc đẩy phát triển toàn diện" },
+        { en: "nurture future generations", vn: "nuôi dưỡng thế hệ tương lai" },
+        { en: "ensure equal educational opportunities", vn: "đảm bảo cơ hội giáo dục công bằng" },
+        { en: "school-based programmes", vn: "chương trình triển khai tại trường" },
+        { en: "shape responsible citizens", vn: "hình thành công dân có trách nhiệm" },
+        { en: "provide a supportive learning environment", vn: "môi trường học tập hỗ trợ" },
+        { en: "cultivate creativity and physical fitness", vn: "nuôi dưỡng sáng tạo và thể chất" },
+        { en: "long-term societal benefits", vn: "lợi ích xã hội lâu dài" },
+        { en: "lay a solid foundation for adulthood", vn: "đặt nền tảng vững chắc cho tuổi trưởng thành" },
+
+        // Phát triển dài hạn - lợi ích xã hội
+        { en: "foster sustainable development", vn: "thúc đẩy phát triển bền vững" },
+        { en: "lay the foundation for future growth", vn: "đặt nền móng cho tăng trưởng tương lai" },
+        { en: "enhance national competitiveness", vn: "nâng cao năng lực cạnh tranh quốc gia" },
+        { en: "drive social progress", vn: "thúc đẩy tiến bộ xã hội" },
+        { en: "yield far-reaching benefits", vn: "mang lại lợi ích sâu rộng" },
+        { en: "contribute to nation-building", vn: "đóng góp vào xây dựng đất nước" },
+        { en: "create a more resilient society", vn: "tạo xã hội vững vàng hơn" },
+        { en: "serve the long-term interests of the country", vn: "phục vụ lợi ích lâu dài của quốc gia" },
+        { en: "generate positive ripple effects", vn: "tạo hiệu ứng lan tỏa tích cực" },
+
+        // Arts, Sports, Culture
+        { en: "preserve cultural heritage", vn: "bảo tồn di sản văn hóa" },
+        { en: "promote national identity", vn: "quảng bá bản sắc quốc gia" },
+        { en: "grassroots participation", vn: "sự tham gia từ cộng đồng cơ sở" },
+        { en: "artistic and athletic development", vn: "phát triển nghệ thuật và thể thao" },
+        { en: "commercial viability", vn: "khả năng tự chủ tài chính" },
+        { en: "government subsidies", vn: "trợ cấp chính phủ" },
+        { en: "public access to the arts", vn: "người dân tiếp cận nghệ thuật" },
+        { en: "inspire social cohesion", vn: "thúc đẩy gắn kết xã hội" },
+        { en: "talent cultivation", vn: "bồi dưỡng tài năng" },
+        { en: "balance cultural value and economic return", vn: "cân bằng giá trị văn hóa và kinh tế" },
+
+        // Infrastructure and transport
+        { en: "develop efficient public transport systems", vn: "phát triển giao thông công cộng hiệu quả" },
+        { en: "reduce traffic congestion", vn: "giảm ùn tắc giao thông" },
+        { en: "lower carbon emissions", vn: "giảm khí thải carbon" },
+        { en: "large-scale infrastructure projects", vn: "dự án hạ tầng quy mô lớn" },
+        { en: "cost-effective transport solutions", vn: "giải pháp giao thông tiết kiệm" },
+        { en: "long-term sustainability", vn: "tính bền vững lâu dài" },
+        { en: "enhance national connectivity", vn: "tăng kết nối quốc gia" },
+        { en: "urban and rural development", vn: "phát triển đô thị và nông thôn" },
+        { en: "maintenance and operational costs", vn: "chi phí vận hành và bảo trì" },
+        { en: "ease pressure on road networks", vn: "giảm áp lực lên đường bộ" }
+    ];
+
+    let currentItem = {};
+    let currentIndex = 0;
+    const totalQuestions = 20; 
+    let currentScrambleWords = [];
+    let blankWordData = { word: '', fullEn: '' };
+
+    const exerciseArea = document.getElementById('exerciseArea');
+    const feedbackText = document.getElementById('feedbackText');
+    const nextBtn = document.getElementById('nextBtn');
+    const progressFill = document.getElementById('progressFill');
+
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function shuffleArray(array) {
+        let newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
+
+    function updateProgress() {
+        const percent = (currentIndex / totalQuestions) * 100;
+        progressFill.style.width = `${percent}%`;
+    }
+
+    // RESET SESSION CHO GOOGLE SITES
+    function resetSession() {
+        currentIndex = 0;
+        startExercise();
+    }
+
+    function startExercise() {
+        if (currentIndex >= totalQuestions) {
+            exerciseArea.innerHTML = `
+                <h2 style="font-family: 'Lora', serif; color: var(--primary);">Nhiệm vụ Vĩ mô Hoàn thành!</h2>
+                <p>Xuất sắc! Bạn đã trang bị xong bộ từ vựng Government sắc bén. Áp dụng ngay vào các bài essay để nâng band điểm nào!</p>
+                <button class="action-btn" onclick="resetSession()">Luyện tiếp Session mới</button>
+            `;
+            feedbackText.innerHTML = "";
+            nextBtn.style.display = "none";
+            updateProgress();
+            return;
+        }
+
+        feedbackText.innerHTML = "";
+        nextBtn.style.display = "none";
+        currentItem = getRandomItem(vocabData);
+        updateProgress();
+
+        const type = Math.floor(Math.random() * 5) + 1;
+        
+        switch(type) {
+            case 1: renderMultipleChoice(); break;
+            case 2: renderTyping(); break;
+            case 3: renderMatching(); break;
+            case 4: renderUnscramble(); break;
+            case 5: renderFillInBlank(); break;
+        }
+    }
+
+    function renderMultipleChoice() {
+        let options = [currentItem];
+        while(options.length < 4) {
+            let randomOpt = getRandomItem(vocabData);
+            if(!options.find(o => o.en === randomOpt.en)) options.push(randomOpt);
+        }
+        options = shuffleArray(options);
+
+        let html = `<div class="question">Nghĩa của cụm từ: <br><span style="color:var(--primary); font-family: 'Lora', serif; font-size: 26px;">"${currentItem.en}"</span> là gì?</div>`;
+        options.forEach(opt => {
+            html += `<button class="option-btn" onclick="checkAnswer(this, '${opt.vn.replace(/'/g, "\\'")}', '${currentItem.vn.replace(/'/g, "\\'")}')">${opt.vn}</button>`;
+        });
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderTyping() {
+        exerciseArea.innerHTML = `
+            <div class="question">Viết cụm từ tiếng Anh cho:<br><span style="color:var(--primary); font-size: 22px;">"${currentItem.vn}"</span></div>
+            <input type="text" id="typeInput" placeholder="Gõ tiếng Anh vào đây..." onkeypress="handleEnter(event, checkTyping)">
+            <button class="action-btn" onclick="checkTyping()">Kiểm tra</button>
+        `;
+        setTimeout(() => document.getElementById('typeInput').focus(), 100);
+    }
+
+    function renderMatching() {
+        let options = [currentItem];
+        while(options.length < 4) {
+            let randomOpt = getRandomItem(vocabData);
+            if(!options.find(o => o.vn === randomOpt.vn)) options.push(randomOpt);
+        }
+        options = shuffleArray(options);
+
+        let html = `<div class="question">Chọn tiếng Anh chuẩn cho:<br><span style="color:var(--primary); font-size: 22px;">"${currentItem.vn}"</span></div>`;
+        options.forEach(opt => {
+            html += `<button class="option-btn" onclick="checkAnswer(this, '${opt.en.replace(/'/g, "\\'")}', '${currentItem.en.replace(/'/g, "\\'")}')">${opt.en}</button>`;
+        });
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderUnscramble() {
+        const words = shuffleArray(currentItem.en.split(' '));
+        currentScrambleWords = [];
+        
+        let html = `
+            <div class="question">Xếp từ thành cụm hoàn chỉnh:<br><span style="color:var(--text-light); font-size: 18px;">(${currentItem.vn})</span></div>
+            <div class="answer-dropzone" id="dropzone"></div>
+            <div class="scramble-container" id="scrambleWords">
+        `;
+        
+        words.forEach((word, index) => {
+            html += `<div class="scramble-word" id="sw-${index}" onclick="selectScrambleWord('${word.replace(/'/g, "\\'")}', ${index})">${word}</div>`;
+        });
+        
+        html += `</div><button class="action-btn" onclick="checkScramble()">Kiểm tra</button><button class="action-btn" style="background:#e9ecef; color:#495057; margin-left:10px;" onclick="resetScramble()">Làm lại</button>`;
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderFillInBlank() {
+        const words = currentItem.en.split(' ');
+        if(words.length < 2) { 
+            renderMultipleChoice();
+            return; 
+        }
+        const blankIndex = Math.floor(Math.random() * words.length);
+        blankWordData.word = words[blankIndex];
+        blankWordData.fullEn = currentItem.en;
+        
+        let displayWords = [...words];
+        displayWords[blankIndex] = `<input type="text" id="blankInput" class="blank-input" onkeypress="handleEnter(event, checkBlank)">`;
+        
+        exerciseArea.innerHTML = `
+            <div class="question">Điền từ còn thiếu vào cụm sau:<br><span style="color:var(--text-light); font-size: 18px;">(${currentItem.vn})</span></div>
+            <div style="font-size: 22px; font-weight: 600; margin-bottom: 20px;">
+                ${displayWords.join(' ')}
+            </div>
+            <button class="action-btn" onclick="checkBlank()">Kiểm tra</button>
+        `;
+        setTimeout(() => document.getElementById('blankInput').focus(), 100);
+    }
+
+    function selectScrambleWord(word, index) {
+        document.getElementById(`sw-${index}`).classList.add('selected');
+        currentScrambleWords.push({word, index});
+        renderDropzone();
+    }
+
+    function renderDropzone() {
+        const dropzone = document.getElementById('dropzone');
+        dropzone.innerHTML = currentScrambleWords.map(item => `<div class="scramble-word" style="background:var(--primary); color:white">${item.word}</div>`).join('');
+    }
+
+    function resetScramble() {
+        currentScrambleWords = [];
+        renderDropzone();
+        document.querySelectorAll('.scramble-word').forEach(el => el.classList.remove('selected'));
+    }
+
+    function checkScramble() {
+        const answer = currentScrambleWords.map(item => item.word).join(' ');
+        if(answer === currentItem.en) showFeedback(true);
+        else showFeedback(false, currentItem.en);
+    }
+
+    function checkBlank() {
+        const input = document.getElementById('blankInput').value.trim().toLowerCase();
+        const cleanInput = input.replace(/[.,'"]/g, "");
+        const cleanWord = blankWordData.word.toLowerCase().replace(/[.,'"]/g, "");
+        
+        if(cleanInput === cleanWord) showFeedback(true);
+        else showFeedback(false, blankWordData.fullEn);
+    }
+
+    function handleEnter(e, checkFunction) {
+        if(e.key === 'Enter') checkFunction();
+    }
+
+    function checkAnswer(btn, selected, correct) {
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(b => b.disabled = true);
+        
+        if(selected === correct) {
+            btn.classList.add('correct');
+            showFeedback(true);
+        } else {
+            btn.classList.add('wrong');
+            btns.forEach(b => {
+                if(b.innerText === correct) b.classList.add('correct');
+            });
+            showFeedback(false, correct);
+        }
+    }
+
+    function checkTyping() {
+        const input = document.getElementById('typeInput').value.trim().toLowerCase();
+        const cleanInput = input.replace(/[.,'"]/g, "");
+        const cleanTarget = currentItem.en.toLowerCase().replace(/[.,'"]/g, "");
+
+        if(cleanInput === cleanTarget) showFeedback(true);
+        else showFeedback(false, currentItem.en);
+    }
+
+    function showFeedback(isCorrect, correctAnswer = "") {
+        if(isCorrect) {
+            feedbackText.innerHTML = `<span style="color: #1B3B6F;">Chính xác! Tư duy lập luận rất sắc bén. 🏛️</span>`;
+        } else {
+            feedbackText.innerHTML = `<span style="color: #C1121F;">Chưa chuẩn rồi. Đáp án đúng là: <b>${correctAnswer}</b></span>`;
+        }
+        nextBtn.style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        startExercise();
+    }
+
+    window.onload = startExercise;
+
+</script>
+</body>
+</html>
