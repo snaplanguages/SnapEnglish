@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnapEnglish - Static Bar Charts</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        snapBrand: '#4F46E5', // Indigo-600
+                        snapAccent: '#F472B6', // Pink-400
+                        snapLight: '#EEF2FF', // Indigo-50
+                    },
+                    fontFamily: {
+                        sans: ['"Be Vietnam Pro"', 'sans-serif'],
+                        mono: ['"SFMono-Regular"', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #F8FAFC; color: #334155; }
+        h1, h2, h3, h4, h5 { font-weight: 700; }
+        .card { background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); padding: 1.5rem; margin-bottom: 2rem; border-top: 5px solid #4F46E5; }
+        @media (min-width: 768px) { .card { padding: 2.5rem; } }
+        
+        /* Interactive Inputs */
+        .input-blank { border: none; border-bottom: 2px dashed #94A3B8; background: transparent; padding: 2px 5px; text-align: center; color: #4F46E5; font-weight: 600; outline: none; transition: all 0.3s; min-width: 100px; display: inline-block; }
+        .input-blank:focus { border-bottom-color: #F472B6; background-color: #FDF2F8; }
+        .correct { border-bottom-color: #22C55E !important; color: #16A34A; background-color: #F0FDF4; }
+        .incorrect { border-bottom-color: #EF4444 !important; color: #DC2626; background-color: #FEF2F2; }
+        
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; margin-bottom: 1rem; }
+        th, td { border: 1px solid #E2E8F0; padding: 12px; text-align: left; }
+        th { background-color: #EEF2FF; color: #4F46E5; font-weight: 700; text-align: center; }
+        
+        .hint-box { display: none; background-color: #F0FDF4; border-left: 4px solid #22C55E; padding: 1rem; margin-top: 1rem; border-radius: 4px; }
+        .brand-text { background: linear-gradient(to right, #4F46E5, #F472B6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .formula-box { background-color: #EEF2FF; border-left: 4px solid #4F46E5; padding: 1rem; border-radius: 0.5rem; font-family: monospace; font-size: 1.05rem; color: #3730A3; font-weight: bold; margin: 1rem 0; }
+    </style>
+</head>
+<body class="antialiased leading-relaxed">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold brand-text tracking-wide flex items-center gap-2">
+                <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                SnapEnglish
+            </div>
+            <nav class="text-sm md:text-base text-gray-500 font-semibold hidden md:block">FROM BASICS TO BAND 6.0</nav>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 md:px-6 py-10">
+
+        <div class="text-center mb-12">
+            <span class="px-4 py-1 rounded-full bg-pink-100 text-pink-600 font-bold text-sm tracking-widest mb-4 inline-block">LESSON 05</span>
+            <h1 class="text-3xl md:text-5xl font-bold text-indigo-900 mb-4">TASK 1 - STATIC BAR CHARTS</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">Chuyên sâu vào biểu đồ cột tĩnh: Nắm vững kỹ thuật nhóm dữ liệu và cấu trúc so sánh xuất sắc.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8 mb-10">
+            <div class="card !border-t-pink-400">
+                <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-pink-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    TỔNG QUAN
+                </h2>
+                <div class="space-y-3 text-gray-700">
+                    <p><strong>Biểu đồ tĩnh (Static Charts)</strong> cũng là một loại biểu đồ rất thường gặp trong phần IELTS Writing Task 1. Những biểu đồ này miêu tả số liệu trong một khoảng thời gian cụ thể như một năm hoặc một tháng, nhưng cũng có trường hợp biểu đồ tĩnh không có mốc thời gian.</p>
+                    <p>Vẫn với bốn dạng biểu đồ chính là biểu đồ cột, biểu đồ đường, biểu đồ tròn và bảng, tuy nhiên biểu đồ tĩnh tập trung vào việc <strong>gộp nhóm và so sánh giữa các đối tượng.</strong></p>
+                </div>
+            </div>
+            <div class="card">
+                <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-indigo-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                    NỘI DUNG BÀI HỌC
+                </h2>
+                <p class="mb-3 text-gray-700">Sau bài học này, người học có thể:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>Nắm và áp dụng được các từ vựng về chủ đề Học tập và giáo dục (Study and Education).</li>
+                    <li>Có thể viết tổng quan cho dạng bài biểu đồ tĩnh.</li>
+                    <li>Có thể gộp nhóm các đối tượng cho biểu đồ tĩnh.</li>
+                    <li>Sử dụng được cấu trúc câu 2 chủ thể - 1 thời gian.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card bg-gray-50 border-none">
+            <h3 class="font-bold text-lg text-indigo-800 mb-4">BIỂU ĐỒ TĨNH VÀ BIỂU ĐỒ ĐỘNG</h3>
+            <p class="mb-4 text-gray-700">Dưới đây là các điểm khác nhau giữa biểu đồ động và biểu đồ tĩnh:</p>
+            <div class="overflow-x-auto">
+                <table class="m-0 bg-white">
+                    <thead class="bg-indigo-50">
+                        <tr>
+                            <th class="w-1/4"></th>
+                            <th>Biểu đồ động (Dynamic)</th>
+                            <th>Biểu đồ tĩnh (Static)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-bold text-gray-800 text-center">Đặc điểm nhận diện</td>
+                            <td>Có ít nhất 2 mốc thời gian (tháng/quý/năm,...)</td>
+                            <td>Chỉ có 1 hoặc không có thời gian</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-gray-800 text-center">Trọng tâm nội dung</td>
+                            <td>Miêu tả xu hướng (nội dung chính)<br>So sánh (nội dung phụ)</td>
+                            <td><strong>So sánh giữa các đối tượng</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="text-2xl font-bold mb-8 text-indigo-800">MỘT SỐ BIỂU ĐỒ TĨNH Ở DẠNG BIỂU ĐỒ CỘT THƯỜNG GẶP</h2>
+            
+            <div class="grid lg:grid-cols-2 gap-8 mb-10">
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                    <h3 class="text-center font-bold text-gray-800 mb-4 text-sm">Chart 1: The graph below shows the numbers of male and female research students studying six computer science subjects at a US university in 2011</h3>
+                    <div class="relative h-64 w-full"><canvas id="chart1"></canvas></div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                    <h3 class="text-center font-bold text-gray-800 mb-4 text-sm">Chart 2: The chart below shows the proportion of male and female students studying six art-related subjects at a UK university in 2011</h3>
+                    <div class="relative h-64 w-full"><canvas id="chart2"></canvas></div>
+                </div>
+            </div>
+
+            <div class="bg-indigo-50 p-6 rounded-xl border-l-4 border-indigo-500 shadow-sm">
+                <h3 class="text-center font-bold text-indigo-900 mb-4 text-lg uppercase tracking-wide">Đề bài 1 (Main Focus)</h3>
+                <h4 class="text-center font-semibold text-gray-800 mb-6">Chart 3: The chart shows the information about students studying six main subjects at a US university in 2010</h4>
+                <div class="relative h-80 md:h-96 w-full"><canvas id="chart3"></canvas></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="text-2xl font-bold mb-4 text-indigo-800">TÌM TỪ VỰNG CHỦ ĐỀ</h2>
+            <h3 class="font-bold text-pink-600 mb-4">EXERCISE 1: FILL IN THE GAPS WITH THE GIVEN WORDS</h3>
+            
+            <div class="flex flex-wrap justify-center gap-3 mb-6 p-4 bg-gray-50 rounded-lg">
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded text-indigo-700 font-semibold shadow-sm text-sm">undergraduate</span>
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded text-indigo-700 font-semibold shadow-sm text-sm">female counterparts</span>
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded text-indigo-700 font-semibold shadow-sm text-sm">select accounting as a major</span>
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded text-pink-600 font-semibold shadow-sm text-sm">enroll</span>
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded text-pink-600 font-semibold shadow-sm text-sm">male economics major</span>
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded text-indigo-700 font-semibold shadow-sm text-sm">major (x2)</span>
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded text-pink-600 font-semibold shadow-sm text-sm">pursue</span>
+            </div>
+
+            <div class="space-y-4 text-gray-700 leading-relaxed text-base" id="ex1-container">
+                <p>1. She is an <input type="text" class="input-blank" data-ans="undergraduate"> student at the University of Washington.</p>
+                <p>2. He decided to <input type="text" class="input-blank" data-ans="enroll"> in a course on digital marketing.</p>
+                <p>3. Her <input type="text" class="input-blank" data-ans="major"> is business administration with a focus on marketing.</p>
+                <p>4. He wants to <input type="text" class="input-blank" data-ans="pursue"> marketing as a career after graduation.</p>
+                <p>5. He decided to <input type="text" class="input-blank" data-ans="major"> in economics because he was interested in the global economy.</p>
+                <p>6. He noticed that his <input type="text" class="input-blank" data-ans="female counterparts"> were more likely to choose marketing or finance as their majors.</p>
+                <p>7. The <input type="text" class="input-blank" data-ans="male economics major"> was surprised by the gender gap in his field of study.</p>
+                <p>8. She wanted to <input type="text" class="input-blank" data-ans="select accounting as a major"> because she enjoyed working with numbers and data.</p>
+            </div>
+            
+            <div class="mt-6 text-right">
+                <button onclick="checkInputs('ex1-container')" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded shadow transition-all">Kiểm tra Đáp án</button>
+            </div>
+
+            <div class="mt-8 bg-yellow-50 p-4 border-l-4 border-yellow-500 rounded text-sm text-yellow-800 shadow-sm">
+                <p class="font-bold mb-1">Mẹo:</p>
+                <ul class="list-decimal pl-5 space-y-1">
+                    <li>Ngoài topic Học tập (Study) trong bài học này, một số các từ vựng chủ đề thường xuất hiện trong Writing Task 1 khác bao gồm Tiền tệ và tài chính (Finance and Money), Du lịch (Tourism), Môi trường (Environment), và Sở thích và thói quen (Hobby and Routine).</li>
+                    <li>Ngoài việc học nghĩa của từ, ta cũng cần học các loại tiền tố và hậu tố thường gặp để hiểu rõ hơn về loại từ. Để biết cách từ được dùng trong câu, ta có thể tra Google với cú pháp <strong>"[từ vựng] + in a sentence"</strong>.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card bg-gray-50 border-none">
+            <h2 class="text-2xl font-bold mb-6 text-indigo-800 border-b pb-2">CÁCH VIẾT MỞ BÀI</h2>
+            
+            <h3 class="font-bold text-pink-600 mb-4">BƯỚC 1: PHÂN TÍCH ĐỀ</h3>
+            <p class="mb-2 font-semibold">EXERCISE 2: USING CHART 3 (Đề bài 1), COMPLETE THE TABLE BELOW</p>
+            <div class="overflow-x-auto mb-8 bg-white rounded-lg shadow-sm border border-gray-200">
+                <table id="ex2-container" class="m-0">
+                    <tr><td class="font-bold bg-indigo-50 w-1/3">1. Graph name</td><td><input type="text" class="w-full border-b focus:border-indigo-500 outline-none p-1" placeholder="..."></td></tr>
+                    <tr><td class="font-bold bg-indigo-50">2. What</td><td><input type="text" class="w-full border-b focus:border-indigo-500 outline-none p-1" placeholder="..."></td></tr>
+                    <tr><td class="font-bold bg-indigo-50">3. Where</td><td><input type="text" class="w-full border-b focus:border-indigo-500 outline-none p-1" placeholder="..."></td></tr>
+                    <tr><td class="font-bold bg-indigo-50">4. When</td><td><input type="text" class="w-full border-b focus:border-indigo-500 outline-none p-1" placeholder="..."></td></tr>
+                    <tr><td class="font-bold bg-indigo-50">5. Category</td><td><input type="text" class="w-full border-b focus:border-indigo-500 outline-none p-1" placeholder="..."></td></tr>
+                    <tr><td class="font-bold bg-indigo-50">6. Measurement</td><td><input type="text" class="w-full border-b focus:border-indigo-500 outline-none p-1" placeholder="..."></td></tr>
+                </table>
+            </div>
+
+            <h3 class="font-bold text-pink-600 mb-4">BƯỚC 2: VIẾT MỞ BÀI</h3>
+            <div class="formula-box text-center">Graph name + V (present simple) + what + where + when</div>
+            
+            <div class="overflow-x-auto mt-4 mb-8 bg-white rounded-lg shadow-sm border border-gray-200">
+                <table class="m-0 text-sm">
+                    <thead class="bg-indigo-50">
+                        <tr>
+                            <th></th>
+                            <th>SUBJECT</th>
+                            <th>VERB</th>
+                            <th>WHAT / WHERE</th>
+                            <th>WHEN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-bold bg-gray-50 text-center">Đề bài</td>
+                            <td>The chart below</td>
+                            <td>shows information about</td>
+                            <td>students studying six main subjects at a US university</td>
+                            <td>in 2010.</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold bg-pink-50 text-pink-700 text-center">Viết lại<br>(paraphrase)</td>
+                            <td class="bg-pink-50 font-semibold text-indigo-900">The bar chart</td>
+                            <td class="bg-pink-50 font-semibold text-indigo-900">illustrates / compares</td>
+                            <td class="bg-pink-50 font-semibold text-indigo-900">the number of male and female undergraduates selecting six different subjects as their major in a US college</td>
+                            <td class="bg-pink-50 font-semibold text-indigo-900">in the year 2010.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="font-bold text-indigo-700 mb-2">EXERCISE 3: WRITE AN INTRODUCTION FOR THE CHARTS ON PAGE 70 (Chart 1 & 2)</h3>
+            <div class="space-y-4">
+                <div>
+                    <p class="text-sm font-medium mb-1">1. The graph below shows the numbers of male and female research students studying six computer science subjects at a US university in 2011.</p>
+                    <textarea class="w-full p-2 border border-gray-300 rounded text-sm h-16 focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="The bar chart compares..."></textarea>
+                </div>
+                <div>
+                    <p class="text-sm font-medium mb-1">2. The chart below shows the proportion of male and female students studying six art-related subjects at a UK university in 2011.</p>
+                    <textarea class="w-full p-2 border border-gray-300 rounded text-sm h-16 focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="The bar chart illustrates..."></textarea>
+                </div>
+            </div>
+            <button onclick="toggleHint('hint-intro')" class="text-xs font-bold text-pink-500 mt-2 underline">Xem gợi ý Ex 2 & 3</button>
+            <div id="hint-intro" class="hint-box text-xs leading-relaxed">
+                <strong>Ex 2:</strong> 1. Bar chart | 2. Students studying six main subjects | 3. At a US university | 4. In 2010 | 5. Marketing, Accounting, Finance, Economics, Engineering, Mathematics | 6. Number (of students).<br><br>
+                <strong>Ex 3:</strong> <br>
+                1. The bar chart compares the number of men and women pursuing research degrees in six various computer science disciplines at an American college in the year 2011.<br>
+                2. The bar chart illustrates the percentages of male and female undergraduates who majored in six different arts courses at a university in the UK in 2011.
+            </div>
+        </div>
+
+        <div class="card !border-t-pink-400">
+            <h2 class="text-2xl font-bold mb-4 text-pink-600">CÁCH VIẾT TỔNG QUAN</h2>
+            <p class="mb-4 text-gray-700">Để đưa ra đặc điểm nổi bật nhất của biểu đồ, phần tổng quan của biểu đồ tĩnh có thể được viết ở <strong>thì hiện tại</strong> nếu biểu đồ không nêu thời gian, và <strong>thì quá khứ</strong> nếu biểu đồ có mốc thời gian ở quá khứ.</p>
+            
+            <div class="space-y-6">
+                <div class="bg-white border border-pink-100 rounded-xl p-5 shadow-sm">
+                    <h3 class="font-bold text-lg text-pink-600 mb-2">Câu 1 – CÂU CHỈ ĐỘ LỚN:</h3>
+                    <p class="text-gray-700 mb-2">Ta so sánh giữa các hạng mục để tìm hạng mục lớn nhất/nhỏ nhất.</p>
+                    <div class="formula-box mt-0 mb-2 text-sm md:text-base">Overall, the most significant + [unit] + can be seen in/was in + [category] + while there was the fewest/the least + [unit] + in + [category].</div>
+                    <div class="formula-box mt-0 mb-0 text-sm md:text-base">Overall, [category] + is/was the highest whereas the opposite is/was true for + [category].</div>
+                </div>
+
+                <div class="bg-white border border-indigo-100 rounded-xl p-5 shadow-sm">
+                    <h3 class="font-bold text-lg text-indigo-600 mb-2">Câu 2 – CÂU CHỈ SỰ CHÊNH LỆCH:</h3>
+                    <p class="text-gray-700 mb-2">Ta so sánh giữa các hạng mục để tìm hạng mục có sự chênh lệch lớn nhất.</p>
+                    <div class="formula-box mt-0 mb-0 text-sm md:text-base">In addition / Moreover, the biggest difference was seen in + [category]</div>
+                </div>
+            </div>
+
+            <div class="mt-8 bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col md:flex-row gap-8 items-center">
+                <div class="w-full md:w-1/2">
+                    <h4 class="text-center font-bold text-gray-800 mb-2 text-sm">Quantity of sweets</h4>
+                    <div class="relative h-48 w-full"><canvas id="chartCandies"></canvas></div>
+                </div>
+                <div class="w-full md:w-1/2 space-y-2 text-sm text-gray-800 bg-white p-4 rounded shadow-sm border-l-4 border-yellow-400">
+                    <p><strong>Ví dụ:</strong></p>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>The most significant number of sweets is seen in Dan's donut.</li>
+                        <li>The lowest figure can be seen in Phương Anh's number of candies.</li>
+                        <li>The biggest difference is recorded in the figures of pie.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-8 bg-indigo-50 p-6 rounded-xl border border-indigo-100">
+                <h4 class="font-bold text-indigo-900 mb-4 text-lg">PHÂN TÍCH PHẦN TỔNG QUAN CỦA ĐỀ BÀI (Chart 3)</h4>
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <div class="bg-white p-3 rounded shadow-sm">
+                        <p class="font-bold text-pink-600 mb-1">Đặc điểm độ lớn:</p>
+                        <ul class="list-disc pl-5 text-gray-700 text-sm">
+                            <li>Lớn nhất: Finance</li>
+                            <li>Nhỏ nhất: Engineering</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-3 rounded shadow-sm">
+                        <p class="font-bold text-indigo-600 mb-1">Đặc điểm chênh lệch:</p>
+                        <ul class="list-disc pl-5 text-gray-700 text-sm">
+                            <li>Chênh lệch lớn nhất: Mathematics (Nam cao hơn Nữ rất nhiều)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="bg-white p-4 border-l-4 border-indigo-500 rounded font-medium text-gray-800 shadow-sm text-sm">
+                    ➡ Overall, finance was the most chosen area of qualification among both sexes, whereas the opposite was true for Engineering.<br><br>
+                    In addition, the most significant difference was seen in the number of males and females enrolling in Mathematics.
+                </div>
+            </div>
+
+            <h3 class="font-bold text-indigo-700 mb-2 mt-6">EXERCISE 4: WRITE AN OVERVIEW FOR CHART 1 ON PAGE 70 (Computer Science)</h3>
+            <textarea class="w-full p-3 border border-gray-300 rounded text-sm h-24 focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="Overall, ..."></textarea>
+            <button onclick="toggleHint('hint-overview')" class="text-xs font-bold text-pink-500 mt-2 underline">Xem gợi ý</button>
+            <div id="hint-overview" class="hint-box text-xs leading-relaxed">
+                <strong>Gợi ý:</strong> Overall, male students were predominant in almost all computer science subjects, except for Linguistics and Natural Sciences. In addition, the most significant gender gap was recorded in Mathematics.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="text-2xl font-bold mb-6 text-indigo-800">CÁCH VIẾT THÂN BÀI</h2>
+            
+            <h3 class="font-bold text-lg text-pink-600 mb-3">I. CÁCH CHIA ĐOẠN</h3>
+            <p class="mb-4 text-gray-700">Theo như đề bài đã cho (Chart 3), ta có thể chia đoạn như sau:</p>
+            <ul class="list-none pl-0 space-y-3 mb-6 text-gray-700 font-medium">
+                <li class="bg-indigo-50 p-3 rounded-lg border border-indigo-100 flex items-center gap-3">
+                    <span class="text-2xl">👩 >= 👨</span> 
+                    <span><strong>THÂN BÀI 1:</strong> Nhóm có số lượng Nữ lớn hơn hoặc bằng Nam - Finance, Accounting, Marketing.</span>
+                </li>
+                <li class="bg-pink-50 p-3 rounded-lg border border-pink-100 flex items-center gap-3">
+                    <span class="text-2xl">👩 < 👨</span> 
+                    <span><strong>THÂN BÀI 2:</strong> Nhóm có số lượng Nữ nhỏ hơn Nam - Mathematics, Economics, Engineering.</span>
+                </li>
+            </ul>
+
+            <h3 class="font-bold text-lg text-pink-600 mb-3">II. CHUẨN BỊ DÀN BÀI</h3>
+            <p class="mb-4 text-gray-700">Dàn bài biểu đồ tĩnh không có cột miêu tả xu hướng, mà chỉ có các cột chỉ hạng mục, số liệu và thông tin nổi bật, theo thứ tự từ trái sang phải.</p>
+            
+            <div class="overflow-x-auto mb-6 rounded-lg shadow-sm border border-gray-200 bg-white">
+                <table class="m-0 text-sm">
+                    <thead class="bg-indigo-100">
+                        <tr>
+                            <th colspan="4" class="text-indigo-900">Female (F) >= Male (M) (Thân bài 1)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-semibold align-middle w-1/4">Finance</td>
+                            <td class="w-1/4">~230</td>
+                            <td class="w-1/4">Equal enrollment</td>
+                            <td rowspan="3" class="align-middle bg-gray-50 text-gray-600 text-xs italic p-4">
+                                * Thông tin chung của 2 nhóm đối tượng ghi trong cùng 1 ô.<br><br>
+                                * Dùng "~" cho số liệu làm tròn.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold align-middle">Accounting</td>
+                            <td>200 F<br>170 M</td>
+                            <td>more female<br>(30 more)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold align-middle">Marketing</td>
+                            <td>~120 F<br>80 M</td>
+                            <td>more female<br>(40 more)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="overflow-x-auto mb-6 rounded-lg shadow-sm border border-gray-200 bg-white">
+                <table class="m-0 text-sm">
+                    <thead class="bg-pink-100">
+                        <tr>
+                            <th colspan="4" class="text-pink-900">Female < Male (Thân bài 2)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-semibold align-middle w-1/4">Maths</td>
+                            <td class="w-1/4">200 M<br>~60 F</td>
+                            <td class="w-1/4">M: second most popular<br>F: significantly lower</td>
+                            <td rowspan="3" class="align-middle bg-gray-50 text-gray-600 text-xs italic p-4">
+                                * Ghi số liệu các đối tượng theo cùng 1 thứ tự ở 2 đoạn.<br><br>
+                                * Ghi một số liệu nếu cả 2 đối tượng tương đồng.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold align-middle">Economics</td>
+                            <td>150 M<br>75 F</td>
+                            <td>males x2 females</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold align-middle">Engineering</td>
+                            <td>~50</td>
+                            <td>the same</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="bg-yellow-50 text-yellow-800 p-4 rounded-lg border border-yellow-200 text-sm mb-8 shadow-sm">
+                <p><strong>Lưu ý:</strong> Nội dung chính của dạng bài biểu đồ tĩnh là <strong>so sánh</strong>, nên ta cần đa dạng hóa các kiểu và phương pháp so sánh khác nhau.</p>
+                <p class="mt-2 font-bold">Kiểu so sánh gồm:</p>
+                <ul class="list-disc pl-5 mt-1">
+                    <li>So sánh trong cùng một đối tượng (so sánh số lượng nam và nữ học cùng 1 môn). VD: Đưa ra số liệu nam/nữ học Accounting.</li>
+                    <li>So sánh giữa các đối tượng (so sánh số lượng nam/nữ học các môn khác nhau). VD: Chỉ ra Mathematics là môn học phổ biến thứ hai với nam giới.</li>
+                </ul>
+            </div>
+
+            <h3 class="font-bold text-lg text-pink-600 mb-3 flex items-center gap-2">
+                <span class="bg-pink-500 text-white w-8 h-8 flex items-center justify-center rounded-full text-base">III</span>
+                CẤU TRÚC CÂU 2 CHỦ THỂ - 1 THỜI GIAN
+            </h3>
+            <p class="mb-4 text-gray-700">Sau đây là một số các cấu trúc câu thường được sử dụng (ôn lại từ Unit 2):</p>
+            
+            <div class="space-y-4">
+                <div class="p-4 bg-white border border-indigo-200 rounded-xl shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center">
+                    <div class="font-bold text-2xl text-indigo-300 w-12 text-center shrink-0">01</div>
+                    <div class="flex-1">
+                        <div class="font-mono font-bold text-indigo-700 mb-2 bg-indigo-50 p-2 rounded inline-block">S1 + stood at + [data], số lần + (as many/much as) + that of S2</div>
+                        <p class="text-sm text-gray-700">The number of male economics students stood at 150 students, <span class="font-bold text-pink-500">two times as many as that of / double that of</span> economics females.</p>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-white border border-pink-200 rounded-xl shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center">
+                    <div class="font-bold text-2xl text-pink-300 w-12 text-center shrink-0">02</div>
+                    <div class="flex-1">
+                        <div class="font-mono font-bold text-pink-700 mb-2 bg-pink-50 p-2 rounded inline-block">At [data], S1 + V + số lần + (as many/much as) + that of + S2</div>
+                        <p class="text-sm text-gray-700">At 150 students, the figure for male economics students was <span class="font-bold text-indigo-500">two times as many as that of / double that of</span> their female counterparts.</p>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-white border border-yellow-200 rounded-xl shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center">
+                    <div class="font-bold text-2xl text-yellow-500 w-12 text-center shrink-0">03</div>
+                    <div class="flex-1">
+                        <div class="font-mono font-bold text-yellow-700 mb-2 bg-yellow-50 p-2 rounded inline-block">S1 + stood at + [data], mức chênh lệch + higher than S2</div>
+                        <p class="text-sm text-gray-700">The number of male economics students stood at over 150 students, <span class="font-bold text-pink-500">75 higher than</span> that of females.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 text-xs italic bg-white p-3 border-l-4 border-indigo-400 text-gray-600 shadow-sm rounded">
+                * Phương pháp so sánh bao gồm: So sánh bằng, So sánh hơn, So sánh nhất, So sánh chênh lệch / gấp lần.
+            </div>
+        </div>
+
+        <div class="card bg-gray-50 border-t-indigo-500">
+            <h2 class="text-2xl font-bold mb-6 text-indigo-800">IV. VIẾT BÀI (Chart 3)</h2>
+            
+            <div class="flex flex-col lg:flex-row gap-8">
+                <div class="w-full lg:w-1/3 space-y-3 text-sm text-gray-700 bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                    <p class="font-bold text-indigo-900 mb-2 border-b pb-2">Phân tích câu:</p>
+                    <p><span class="font-bold text-pink-600">(1):</span> Mở bài</p>
+                    <p><span class="font-bold text-pink-600">(2):</span> Tổng quan - Đặc điểm độ lớn</p>
+                    <p><span class="font-bold text-pink-600">(3):</span> Tổng quan - Đặc điểm chênh lệch</p>
+                    <p><span class="font-bold text-pink-600">(4):</span> So sánh số liệu của Finance</p>
+                    <p><span class="font-bold text-pink-600">(5):</span> Đặc điểm chung của Accounting & Marketing</p>
+                    <p><span class="font-bold text-pink-600">(6):</span> So sánh chi tiết Accounting</p>
+                    <p><span class="font-bold text-pink-600">(7):</span> So sánh chi tiết Marketing</p>
+                    <p><span class="font-bold text-pink-600">(8):</span> So sánh chi tiết Mathematics (cấu trúc 03)</p>
+                    <p><span class="font-bold text-pink-600">(9):</span> So sánh chi tiết Economics (cấu trúc 01)</p>
+                    <p><span class="font-bold text-pink-600">(10):</span> So sánh hơn & liệt kê số liệu Engineering</p>
+                </div>
+
+                <div class="w-full lg:w-2/3">
+                    <div class="bg-white border-2 border-indigo-100 p-6 md:p-8 rounded-xl shadow-sm text-gray-800 leading-loose font-serif text-lg">
+                        <p class="mb-4"><sup class="text-pink-500 font-bold mr-1">(1)</sup>The bar chart compares the number of male and female undergraduates selecting six different subjects as their major in a US college in the year 2010.</p>
+                        
+                        <p class="mb-4"><sup class="text-pink-500 font-bold mr-1">(2)</sup>Overall, finance was the most chosen area of qualifications among both sexes, whereas the opposite was true for engineering. <sup class="text-pink-500 font-bold mr-1">(3)</sup>In addition, the most significant difference was in the number of males and females enrolling in mathematics.</p>
+                        
+                        <p class="mb-4"><sup class="text-pink-500 font-bold mr-1">(4)</sup>In detail, at approximately 230 students, the number of female finance students was as high as male enrollment. <sup class="text-pink-500 font-bold mr-1">(5)</sup>As opposed to this, accounting and marketing attracted more females. <sup class="text-pink-500 font-bold mr-1">(6)</sup>The numbers of females pursuing the former subject were 200, 30 students higher than their male counterparts. <sup class="text-pink-500 font-bold mr-1">(7)</sup>Similarly, enrollment for the latter stood at about 120 females, in comparison with only 80 male students.</p>
+                        
+                        <p><sup class="text-pink-500 font-bold mr-1">(8)</sup>As for the remaining subjects, male mathematics students stood at 200, more than triple that of females. <sup class="text-pink-500 font-bold mr-1">(9)</sup>Similarly, the figure for male economics students was 150, almost twice as many as female economics students. <sup class="text-pink-500 font-bold mr-1">(10)</sup>The numbers of males and females who studied engineering were relatively smaller, with around 55 and 52 students, respectively.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="text-2xl font-bold mb-4 text-indigo-800">TỪ MỚI & TỪ NỐI</h2>
+            <div class="overflow-x-auto rounded-lg shadow-sm border border-gray-200">
+                <table class="m-0 text-sm md:text-base">
+                    <thead class="bg-indigo-50">
+                        <tr>
+                            <th class="w-16">ORDER</th>
+                            <th class="w-1/4">WORD</th>
+                            <th class="w-1/4">MEANING</th>
+                            <th>EXAMPLE SENTENCES</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="4" class="font-bold text-center text-indigo-800 bg-gray-50 tracking-wider">NOUN</td></tr>
+                        <tr><td class="text-center font-semibold">1</td><td class="font-bold">Finance</td><td>Tài chính</td><td>The finance department decide how the money will be spent.</td></tr>
+                        <tr><td class="text-center font-semibold">2</td><td class="font-bold">Mathematics</td><td>Toán học</td><td>Mathematics was about numbers and logical thinking.</td></tr>
+                        <tr><td class="text-center font-semibold">3</td><td class="font-bold">Accounting</td><td>Kế toán</td><td>The millionaire hired an accounting firm to take care of his financial accounts.</td></tr>
+                        <tr><td class="text-center font-semibold">4</td><td class="font-bold">Economics</td><td>Kinh tế học</td><td>He gained a first-class Honours degree in economics.</td></tr>
+                        <tr><td class="text-center font-semibold">5</td><td class="font-bold">Engineering</td><td>Kỹ thuật</td><td>Hamish is studying electrical engineering.</td></tr>
+                        <tr><td class="text-center font-semibold">6</td><td class="font-bold">Area of qualifications</td><td>Lĩnh vực chuyên môn</td><td>The most popular area of qualifications in Merriam University is human studies.</td></tr>
+                        <tr><td class="text-center font-semibold">7</td><td class="font-bold">The former</td><td>Đối tượng đầu tiên (trong 2)</td><td rowspan="2" class="align-middle">Accounting and marketing were popular among students. 170 students studied the former while the latter had 120 people.</td></tr>
+                        <tr><td class="text-center font-semibold">8</td><td class="font-bold">The latter</td><td>Đối tượng thứ hai (trong 2)</td></tr>
+                        
+                        <tr><td colspan="4" class="font-bold text-center text-pink-800 bg-gray-50 tracking-wider">VERB</td></tr>
+                        <tr><td class="text-center font-semibold">9</td><td class="font-bold">Attract</td><td>Thu hút</td><td>Her engaging teaching methods attract lots of students to her science class.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card relative overflow-hidden bg-white">
+            <h2 class="text-2xl md:text-3xl font-bold mb-8 text-indigo-900 text-center uppercase tracking-wide border-b-2 border-indigo-200 pb-4 inline-block mx-auto">Comprehensive Practice</h2>
+            
+            <h3 class="font-bold text-lg text-pink-600 mb-4 flex items-center gap-2">
+                <span class="bg-pink-100 text-pink-600 w-8 h-8 flex items-center justify-center rounded text-sm">I</span>
+                EVALUATE THE SUITABILITY OF THE BOLD WORDS
+            </h3>
+            
+            <div class="overflow-x-auto mb-10 border border-gray-200 rounded-lg shadow-sm">
+                <table id="comp-prac-1" class="text-sm m-0 min-w-[800px]">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="w-12 text-center">Order</th>
+                            <th>Sentence</th>
+                            <th class="w-20 text-center">Suitable</th>
+                            <th class="w-24 text-center">Unsuitable</th>
+                            <th class="w-40">Correction</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center font-semibold">1</td>
+                            <td>The <strong>undergraduate</strong> received his history degree, so he became a history teacher.</td>
+                            <td class="text-center"><input type="checkbox" class="w-5 h-5 accent-indigo-600"></td>
+                            <td class="text-center"><input type="checkbox" class="w-5 h-5 accent-pink-600"></td>
+                            <td><input type="text" class="w-full p-2 border rounded" placeholder="..."></td>
+                        </tr>
+                        <tr>
+                            <td class="text-center font-semibold">2</td>
+                            <td>The <strong>figure for</strong> visitors to the UK rose 10% in the last quarter, showing a positive sign for the tourism industry.</td>
+                            <td class="text-center"><input type="checkbox" class="w-5 h-5 accent-indigo-600"></td>
+                            <td class="text-center"><input type="checkbox" class="w-5 h-5 accent-pink-600"></td>
+                            <td><input type="text" class="w-full p-2 border rounded" placeholder="..."></td>
+                        </tr>
+                        <tr>
+                            <td class="text-center font-semibold">3</td>
+                            <td>Metal, oil and soap contain foreign matter, <strong>respectively</strong>.</td>
+                            <td class="text-center"><input type="checkbox" class="w-5 h-5 accent-indigo-600"></td>
+                            <td class="text-center"><input type="checkbox" class="w-5 h-5 accent-pink-600"></td>
+                            <td><input type="text" class="w-full p-2 border rounded" placeholder="..."></td>
+                        </tr>
+                        <tr>
+                            <td class="text-center font-semibold">4</td>
+                            <td>Before you <strong>choose any subject as a major</strong>, you should consider several factors, including the program cost, your salary expectations, and the employment rates in that field of study.</td>
+                            <td class="text-center"><input type="checkbox" class="w-5 h-5 accent-indigo-600"></td>
+                            <td class="text-center"><input type="checkbox" class="w-5 h-5 accent-pink-600"></td>
+                            <td><input type="text" class="w-full p-2 border rounded" placeholder="..."></td>
+                        </tr>
+                        <tr>
+                            <td class="text-center font-semibold">5</td>
+                            <td>Given the choice between working for someone else and working for herself, she'd prefer <strong>the latter</strong>.</td>
+                            <td class="text-center"><input type="checkbox" class="w-5 h-5 accent-indigo-600"></td>
+                            <td class="text-center"><input type="checkbox" class="w-5 h-5 accent-pink-600"></td>
+                            <td><input type="text" class="w-full p-2 border rounded" placeholder="..."></td>
+                        </tr>
+                        <tr>
+                            <td class="text-center font-semibold">6</td>
+                            <td>I have two job offers on the table, one in finance and the other in education. After careful consideration, I decided to accept <strong>the former</strong> because I want to be a teacher.</td>
+                            <td class="text-center"><input type="checkbox" class="w-5 h-5 accent-indigo-600"></td>
+                            <td class="text-center"><input type="checkbox" class="w-5 h-5 accent-pink-600"></td>
+                            <td><input type="text" class="w-full p-2 border rounded" placeholder="..."></td>
+                        </tr>
+                        <tr>
+                            <td class="text-center font-semibold">7</td>
+                            <td>Male workers are often paid more than their <strong>female counterparts</strong>.</td>
+                            <td class="text-center"><input type="checkbox" class="w-5 h-5 accent-indigo-600"></td>
+                            <td class="text-center"><input type="checkbox" class="w-5 h-5 accent-pink-600"></td>
+                            <td><input type="text" class="w-full p-2 border rounded" placeholder="..."></td>
+                        </tr>
+                        <tr>
+                            <td class="text-center font-semibold">8</td>
+                            <td>Ever since he decided to <strong>pursue mathematics</strong>, Eugene has devoted all his time to modern literature.</td>
+                            <td class="text-center"><input type="checkbox" class="w-5 h-5 accent-indigo-600"></td>
+                            <td class="text-center"><input type="checkbox" class="w-5 h-5 accent-pink-600"></td>
+                            <td><input type="text" class="w-full p-2 border rounded" placeholder="..."></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button onclick="toggleHint('hint-prac-1')" class="text-indigo-600 font-bold hover:underline text-sm mb-10">Xem Gợi ý Đáp án phần I</button>
+            <div id="hint-prac-1" class="hint-box text-sm leading-relaxed mb-10">
+                <p><strong>1. Unsuitable.</strong> "Undergraduate" là sinh viên CHƯA tốt nghiệp. Câu này nói đã nhận bằng, nên sửa thành <strong>graduate</strong>.</p>
+                <p><strong>2. Suitable.</strong> Dùng "The figure for" đúng ngữ cảnh.</p>
+                <p><strong>3. Unsuitable.</strong> "Respectively" dùng để liệt kê số liệu theo thứ tự tương ứng, trong câu này không có hai chuỗi liệt kê. Bỏ từ này đi.</p>
+                <p><strong>4. Suitable.</strong></p>
+                <p><strong>5. Suitable.</strong> "The latter" chỉ đối tượng sau (working for herself).</p>
+                <p><strong>6. Unsuitable.</strong> Nếu muốn làm giáo viên (education) thì đó là "the latter", không phải "the former" (finance).</p>
+                <p><strong>7. Suitable.</strong></p>
+                <p><strong>8. Unsuitable.</strong> Theo đuổi Toán nhưng lại dành thời gian cho Văn học? Sửa thành <strong>pursue modern literature</strong>.</p>
+            </div>
+
+            <h3 class="font-bold text-lg text-indigo-700 mb-4 flex items-center gap-2">
+                <span class="bg-indigo-100 text-indigo-700 w-8 h-8 flex items-center justify-center rounded text-sm">II</span>
+                MATCH THE WORDS WITH THEIR DEFINITIONS
+            </h3>
+            <div class="grid md:grid-cols-2 gap-6 text-sm mb-10 bg-gray-50 p-6 rounded-xl border border-gray-200">
+                <div class="space-y-3">
+                    <p>1. area of qualifications (n) <input type="text" class="border rounded w-8 text-center" placeholder="d"></p>
+                    <p>2. attract (v) <input type="text" class="border rounded w-8 text-center" placeholder="b"></p>
+                    <p>3. gender gap (n) <input type="text" class="border rounded w-8 text-center" placeholder="g"></p>
+                    <p>4. major in (v) <input type="text" class="border rounded w-8 text-center" placeholder="h"></p>
+                    <p>5. age brackets (n) <input type="text" class="border rounded w-8 text-center" placeholder="e"></p>
+                    <p>6. level of education (n) <input type="text" class="border rounded w-8 text-center" placeholder="f"></p>
+                    <p>7. enrollment/enrolment (n) <input type="text" class="border rounded w-8 text-center" placeholder="i"></p>
+                    <p>8. institution (n) <input type="text" class="border rounded w-8 text-center" placeholder="a"></p>
+                    <p>9. male-dominated subjects (n) <input type="text" class="border rounded w-8 text-center" placeholder="c"></p>
+                </div>
+                <div class="space-y-3 text-gray-700 italic border-l-2 border-indigo-200 pl-4">
+                    <p>a. an organization that exists to serve a public purpose such as education or support for people who need help</p>
+                    <p>b. to pull or draw someone or something towards them, by the qualities they have</p>
+                    <p>c. a subject that has more male students than female students</p>
+                    <p>d. the subject area that a person has a degree in</p>
+                    <p>e. a specific category or range of ages</p>
+                    <p>f. the stage people have reached in their learning journey</p>
+                    <p>g. the difference or inequality between males and females</p>
+                    <p>h. to study something as your main subject in college / university</p>
+                    <p>i. to put yourself or someone else onto the official list of members of a course, college</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card !border-t-pink-400">
+            <h3 class="font-bold text-lg text-pink-600 mb-6 flex items-center gap-2">
+                <span class="bg-pink-100 text-pink-600 w-8 h-8 flex items-center justify-center rounded text-sm">III</span>
+                LOOK AT THE GRAPH BELOW AND COMPLETE THE REQUIREMENTS
+            </h3>
+            
+            <h4 class="text-center font-bold text-indigo-900 mb-4 text-sm md:text-base">The chart below gives information about levels of education by age range in the UK in 2010 (in percentage)</h4>
+            <div class="relative h-72 md:h-96 w-full mb-8"><canvas id="chartEdu"></canvas></div>
+
+            <div class="space-y-8">
+                <div>
+                    <h4 class="font-bold text-gray-800 mb-3 text-sm">A. FILL IN THE GAPS WITH SUITABLE WORDS</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-sm leading-loose" id="prac-3a">
+                        The (1) <input type="text" class="input-blank w-16" data-ans="bar"> chart (2) <input type="text" class="input-blank w-24" data-ans="compares|illustrates"> the levels of education of five different (3) <input type="text" class="input-blank w-24" data-ans="age groups"> in the UK in 2010.<br>
+                        Overall, (4) <input type="text" class="input-blank w-16" data-ans="most"> people in the <input type="text" class="input-blank w-20" data-ans="older"> groups had no or low-level qualifications while most people in the (5) <input type="text" class="input-blank w-24" data-ans="younger"> groups have university degrees.
+                        <div class="mt-2 text-right"><button onclick="checkInputs('prac-3a')" class="px-4 py-1 bg-pink-500 text-white rounded shadow text-xs">Check</button></div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-gray-800 mb-3 text-sm">B. TRANSLATE THESE SENTENCES</h4>
+                    <div class="grid md:grid-cols-2 gap-4 text-sm mb-4">
+                        <div class="bg-white p-3 border border-indigo-200 rounded">
+                            <p class="font-bold text-indigo-700 mb-1">Age group paraphrase</p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li><strong>16-24 (Teenagers):</strong> People between 16 and 24 years old</li>
+                                <li><strong>24-35 (Young adult):</strong> People aged 24 to 35</li>
+                                <li><strong>35-50 (Adult):</strong> 35 to 50 years old</li>
+                                <li><strong>50-75 (Retirees):</strong> The 50 to 75 age group</li>
+                                <li><strong>75-100 (Seniors):</strong> People over the age of 75</li>
+                            </ul>
+                        </div>
+                        <div class="space-y-3">
+                            <p class="italic text-gray-600">1. Đối với các nhóm 16-24, 24-35 và 35-50, khoảng 9% số người trong mỗi nhóm tuổi này không có bằng cấp, thấp hơn hai lần so với tỷ lệ có bằng trung học (20%), và khoảng ít hơn tám lần so với những người có trình độ đại học (khoảng 72%).</p>
+                            <textarea class="w-full p-2 border rounded focus:ring-1 focus:ring-pink-500 outline-none text-sm h-20" placeholder="For the age groups 16-24, 24-35, and 35-50..."></textarea>
+                            
+                            <p class="italic text-gray-600 mt-2">2. Đối với lứa tuổi 24-35, tỷ lệ người có bằng tốt nghiệp đại học là cao nhất (75%), trong khi tỷ lệ của hai nhóm tuổi còn lại là 70%.</p>
+                            <textarea class="w-full p-2 border rounded focus:ring-1 focus:ring-pink-500 outline-none text-sm h-16" placeholder="For the age group 24-35..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-gray-800 mb-3 text-sm flex items-center gap-2">C. WRITE ONE PARAGRAPH ABOUT GROUP 50-75 & 75+</h4>
+                    <div class="overflow-x-auto mb-3">
+                        <table class="m-0 text-sm bg-white shadow-sm border border-gray-200">
+                            <thead class="bg-gray-100">
+                                <tr><th>Qualification</th><th>Data</th><th>Highlight / Comparison</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="font-semibold">No qual.</td><td>50-75: 30%<br>75+: > 70%</td><td>40% lower<br>highest figure (seniors)</td></tr>
+                                <tr><td class="font-semibold">School</td><td>50-75: 20%<br>75+: ~5%</td><td>4 times<br>similar to other groups (except 75+)</td></tr>
+                                <tr><td class="font-semibold">Uni.</td><td>50-75: 50%<br>75+: ~25%</td><td>double<br>respectively</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <textarea class="w-full p-3 border border-gray-300 rounded text-sm h-32 focus:ring-1 focus:ring-pink-500 outline-none" placeholder="Regarding the older demographics..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="font-bold text-lg text-indigo-700 mb-6 flex items-center gap-2">
+                <span class="bg-indigo-100 text-indigo-700 w-8 h-8 flex items-center justify-center rounded text-sm">IV</span>
+                WRITE AN ESSAY FOR CHART 1 (Computer Science)
+            </h3>
+            
+            <p class="text-sm text-gray-600 italic mb-4">Read the outline on Page 80-81 of the PDF and try to write the essay.</p>
+
+            <h3 class="font-bold text-lg text-pink-600 mt-10 mb-6 flex items-center gap-2 border-t pt-8">
+                <span class="bg-pink-100 text-pink-600 w-8 h-8 flex items-center justify-center rounded text-sm">V</span>
+                READ THE SAMPLE ESSAY (Chart 1)
+            </h3>
+            <div class="bg-indigo-50 border-2 border-indigo-200 p-6 rounded-xl shadow-sm text-gray-800 leading-loose font-serif text-lg mb-6">
+                <p class="mb-4">The bar chart compares the numbers of male and female students enrolling in six different information technology subjects at an American university in 2011.</p>
+                <p class="mb-4">Overall, male students were predominant in all courses, except for Linguistics and Natural Sciences. In addition, the most significant difference in the number of male and female learners was recorded in Mathematics.</p>
+                <p class="mb-4">As for male-dominated subjects, at 200 entries, the number of male undergraduates pursuing Mathematics was equal to that of Psychology. However, the gender gap in Psychology was smaller, with 25 females fewer within the total 375 students, while male learners majoring in Mathematics were almost seven times as many as their female counterparts. Engineering and Programming attracted similar numbers of learners of both genders, standing at 150 males as opposed to about 75 females.</p>
+                <p>In contrast, Linguistics experienced a completely opposite gender pattern, as female enrollments were higher, with approximately 120 females compared to 60 males. The number of female and male students choosing Natural Sciences was the same at 200, making it the most chosen area of qualifications for both genders.</p>
+            </div>
+            
+            <div class="bg-white p-4 border border-gray-200 rounded shadow-sm text-sm">
+                <p class="font-bold mb-2">Questions:</p>
+                <p>1. <strong>"Predominant"</strong> mean: Chiếm ưu thế / chiếm đa số.</p>
+                <p>2. <strong>"Male-dominated subjects"</strong> mean: Môn học đa số là nam giới.</p>
+                <p>3. <strong>"Experienced a completely opposite gender pattern"</strong> mean: Trải qua một xu hướng giới tính hoàn toàn trái ngược (nữ nhiều hơn nam).</p>
+            </div>
+
+            <h3 class="font-bold text-lg text-pink-600 mt-10 mb-6 flex items-center gap-2 border-t pt-8">
+                <span class="bg-pink-100 text-pink-600 w-8 h-8 flex items-center justify-center rounded text-sm">VI</span>
+                READ THE SAMPLE ESSAY (Chart 2: Art-related)
+            </h3>
+            <div class="bg-pink-50 border-2 border-pink-200 p-6 rounded-xl shadow-sm text-gray-800 leading-loose font-serif text-lg mb-6">
+                <p class="mb-4">The bar chart compares the number of men and women majoring in six arts-related disciplines at a UK institution in 2011.</p>
+                <p class="mb-4">Overall, English language & Literature was the most attractive area of qualification among both sexes. In addition, except for Art & Design, almost all of the courses recorded a predominance of female students; Philosophy had the largest gender gap.</p>
+                <p class="mb-4">As for the three most popular subjects, females majoring in English language & Literature made up 250 people, as opposed to about 230 male learners. Linguistics secured the second highest number of students, with 240 females and 180 males. Similar to this, Communication & Media Study attracted the third biggest number of students, at around 210 males and 270 females.</p>
+                <p>Regarding other subjects, History & Archeology, Art & Design, and Philosophy recorded a much smaller number of students. History & Archeology and Philosophy recorded the fewest female students, at around 125 and 150 women; but they were still two to three times as high as men. Art & Design, conversely, was the only subject where male students outnumbered females (180 males and 160 females).</p>
+            </div>
+
+            <div class="bg-white p-5 border border-gray-200 rounded shadow-sm text-sm">
+                <p class="font-bold mb-3 border-b pb-2">Vocabulary Check:</p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="font-semibold text-indigo-700">Linking phrases:</p>
+                        <p>- To compare: <em>as opposed to, conversely, similar to this, but</em>.</p>
+                        <p>- To introduce new categories: <em>As for the three most popular subjects, Regarding other subjects</em>.</p>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-pink-600">Paraphrases:</p>
+                        <p>- How many -> The number of</p>
+                        <p>- Subject -> Disciplines / Area of qualification</p>
+                        <p>- More (women) -> A predominance of / Outnumbered</p>
+                        <p>- The difference -> Gender gap</p>
+                        <p>- Student -> Learners / Enrollments</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-indigo-900 text-white text-center py-8 mt-12 border-t-4 border-pink-500">
+        <p class="font-heading font-bold text-xl mb-2 tracking-wide">SnapEnglish</p>
+        <p class="text-sm text-indigo-300 font-medium mb-1">IELTS Writing Journey - Từ Cơ Bản Đến Band 6.0</p>
+        </footer>
+
+    <script>
+        // Check input logic
+        function checkInputs(containerId) {
+            let container = document.getElementById(containerId);
+            let inputs = container.querySelectorAll('.input-blank');
+            inputs.forEach(input => {
+                let ansString = input.getAttribute('data-ans').toLowerCase();
+                let validAnswers = ansString.split('|'); 
+                let val = input.value.toLowerCase().trim();
+                
+                input.classList.remove('correct', 'incorrect');
+                if (val !== '') {
+                    if (validAnswers.includes(val)) {
+                        input.classList.add('correct');
+                    } else {
+                        input.classList.add('incorrect');
+                    }
+                }
+            });
+        }
+
+        function toggleHint(id) {
+            let el = document.getElementById(id);
+            el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+        }
+
+        // --- Chart.js Configurations ---
+        Chart.defaults.font.family = '"Be Vietnam Pro", sans-serif';
+        const barOptH = { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { position: 'bottom' } } };
+        const barOptV = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } };
+
+        // Chart 1: Computer Science (US 2011)
+        new Chart(document.getElementById('chart1'), {
+            type: 'bar',
+            data: {
+                labels: ['Linguistics', 'Psychology', 'Nature Sciences', 'Engineering', 'Programming', 'Mathematics'],
+                datasets: [
+                    { label: 'Male', data: [60, 200, 200, 150, 150, 200], backgroundColor: '#3B82F6' },
+                    { label: 'Female', data: [120, 175, 200, 75, 75, 30], backgroundColor: '#BFDBFE' }
+                ]
+            },
+            options: barOptH
+        });
+
+        // Chart 2: Art-related (UK 2011)
+        new Chart(document.getElementById('chart2'), {
+            type: 'bar',
+            data: {
+                labels: ['Linguistics', 'Philosophy', 'English', 'History', 'Art & Design', 'Communication'],
+                datasets: [
+                    { label: 'Male', data: [180, 50, 230, 90, 180, 210], backgroundColor: '#FDE047' },
+                    { label: 'Female', data: [240, 150, 250, 120, 160, 270], backgroundColor: '#86EFAC' }
+                ]
+            },
+            options: barOptH
+        });
+
+        // Chart 3: US University 2010 (Main Focus)
+        new Chart(document.getElementById('chart3'), {
+            type: 'bar',
+            data: {
+                labels: ['Marketing', 'Accounting', 'Finance', 'Economics', 'Engineering', 'Mathematics'],
+                datasets: [
+                    { label: 'Male', data: [80, 170, 230, 150, 60, 200], backgroundColor: '#4F46E5' },
+                    { label: 'Female', data: [120, 200, 230, 75, 55, 60], backgroundColor: '#FDE047' }
+                ]
+            },
+            options: barOptH
+        });
+
+        // Chart Candies
+        new Chart(document.getElementById('chartCandies'), {
+            type: 'bar',
+            data: {
+                labels: ['Candy', 'Pie', 'Donut', 'Cookie'],
+                datasets: [
+                    { label: 'Phương Anh', data: [4, 7, 8, 5], backgroundColor: '#3B82F6' },
+                    { label: 'Đan', data: [2, 3, 9, 5], backgroundColor: '#FDE047' }
+                ]
+            },
+            options: barOptV
+        });
+
+        // Chart Education
+        new Chart(document.getElementById('chartEdu'), {
+            type: 'bar',
+            data: {
+                labels: ['16-24', '24-35', '35-50', '50-75', '75-100'],
+                datasets: [
+                    { label: 'University Degree', data: [10, 75, 70, 50, 25], backgroundColor: '#3B82F6' },
+                    { label: 'School Certificate', data: [70, 20, 20, 20, 5], backgroundColor: '#F97316' },
+                    { label: 'No qualifications', data: [10, 9, 9, 30, 75], backgroundColor: '#D1D5DB' }
+                ]
+            },
+            options: { ...barOptV, scales: { y: { max: 80 } } }
+        });
+    </script>
+</body>
+</html>
