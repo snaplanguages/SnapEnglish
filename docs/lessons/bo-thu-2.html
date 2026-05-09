@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Game Bộ Thủ 2 | SnapChinese</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Nunito:wght@700;800;900&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Tông màu SnapChinese Cao cấp */
+            --primary: #ff007f; /* Bright Rose Pink */
+            --primary-light: #ffb7c5; /* Sakura Pink */
+            --secondary: #9c27b0; /* Deep Purple */
+            --accent: #ff5722; /* Coral Orange */
+            --bg-gradient-1: #fff0f5; 
+            --bg-gradient-2: #fce4ec;
+            --surface: rgba(255, 255, 255, 0.85);
+            --text-main: #311b92; /* Very Dark Purple */
+            --text-muted: #6a1b9a;
+            --hanzi-color: #e91e63; /* Pinkish Red */
+            --font-ui: 'Quicksand', sans-serif;
+            --font-head: 'Nunito', sans-serif;
+            --font-cn: 'Noto Serif SC', serif;
+            --radius-lg: 28px;
+            --radius-md: 16px;
+            --shadow-float: 0 12px 35px rgba(255, 0, 127, 0.12);
+            --shadow-inner: inset 0 2px 10px rgba(255, 255, 255, 0.7);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-ui); -webkit-tap-highlight-color: transparent;}
+
+        body {
+            background: linear-gradient(135deg, var(--bg-gradient-1), var(--bg-gradient-2)),
+                        url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover; background-attachment: fixed; background-blend-mode: overlay;
+            color: var(--text-main); display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh; padding-bottom: 60px; overflow-x: hidden;
+        }
+
+        /* --- ANIMATION HOA LÁ --- */
+        #particles { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 0; }
+        .particle { position: absolute; top: -10%; animation: dropAndSpin linear infinite; opacity: 0.7; text-shadow: 0 2px 5px rgba(255,0,127,0.2);}
+        @keyframes dropAndSpin { 
+            0% { top: -10%; transform: translateX(0) rotate(0deg); opacity: 0; } 
+            10% { opacity: 0.8; } 
+            90% { opacity: 0.8; } 
+            100% { top: 110%; transform: translateX(80px) rotate(360deg); opacity: 0; } 
+        }
+
+        /* --- HEADER NAVBAR --- */
+        .navbar {
+            width: 100%; background: var(--surface); backdrop-filter: blur(15px);
+            padding: 12px 25px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 20px rgba(255,0,127,0.06); position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.5);
+        }
+        .nav-brand { font-family: var(--font-head); font-weight: 900; font-size: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 8px;}
+        .btn-back {
+            background: white; color: var(--primary); text-decoration: none; padding: 8px 18px; border-radius: 20px; 
+            font-weight: 700; font-size: 0.95rem; transition: 0.3s; border: 2px solid var(--primary-light);
+            box-shadow: 0 4px 10px rgba(255,183,197,0.3);
+        }
+        .btn-back:hover { background: var(--primary-light); color: white; transform: translateY(-2px);}
+
+        /* --- MÀN HÌNH CHUNG --- */
+        .screen { display: none; width: 100%; max-width: 900px; padding: 30px 20px; animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); flex-direction: column; align-items: center; position: relative; z-index: 10;}
+        .screen.active { display: flex; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- STUDY SECTION (THIẾT KẾ KHOA HỌC) --- */
+        .study-header { text-align: center; margin-bottom: 35px; width: 100%; }
+        .study-title { font-family: var(--font-head); font-size: 2rem; font-weight: 900; color: var(--secondary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0px rgba(255,255,255,0.8);}
+        .study-subtitle { font-size: 1.05rem; color: var(--text-muted); font-weight: 700; background: var(--surface); display: inline-block; padding: 8px 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);}
+        
+        .study-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px; width: 100%;}
+        
+        .study-card {
+            background: rgba(255,255,255,0.95); border-radius: var(--radius-lg); display: flex; overflow: hidden;
+            box-shadow: var(--shadow-float); transition: 0.3s; border: 1px solid rgba(255,255,255,0.8);
+            position: relative;
+        }
+        .study-card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(255,0,127,0.18); border-color: var(--primary-light);}
+        
+        .st-hz-box {
+            background: linear-gradient(160deg, #fff, var(--primary-light));
+            width: 120px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            border-right: 2px dashed rgba(255,0,127,0.2); padding: 15px; position: relative;
+        }
+        .st-hz { font-family: var(--font-cn); font-size: 4rem; color: var(--hanzi-color); font-weight: 900; line-height: 1; text-shadow: 3px 3px 0px rgba(255,255,255,0.8);}
+        .st-hz-var { font-family: var(--font-cn); font-size: 1.6rem; color: var(--secondary); margin-top: 5px; background: white; padding: 2px 10px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
+        
+        .st-info { flex: 1; padding: 22px; display: flex; flex-direction: column; justify-content: center;}
+        .st-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px;}
+        .st-name { font-family: var(--font-head); font-size: 1.3rem; font-weight: 900; color: var(--secondary); }
+        .st-py { background: var(--bg-gradient-2); color: var(--primary); padding: 4px 12px; border-radius: 12px; font-weight: 800; font-size: 0.95rem;}
+        .st-mean { font-size: 1rem; color: var(--text-dark); font-weight: 800; margin-bottom: 12px;}
+        
+        /* Box Mẹo Nhớ (Mnemonic) */
+        .st-mnemonic { background: #fff8e1; border-left: 4px solid var(--accent); padding: 8px 12px; border-radius: 8px; margin-bottom: 12px; font-size: 0.9rem; color: #d84315; font-weight: 600; line-height: 1.5;}
+        
+        .st-ex { font-size: 0.9rem; color: #555; font-weight: 600; background: #f8f9fa; padding: 6px 12px; border-radius: 8px;}
+        .st-ex span { font-family: var(--font-cn); font-weight: 900; color: var(--primary); font-size: 1.15rem;}
+
+        .btn-large {
+            background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none;
+            padding: 18px 40px; border-radius: 35px; font-family: var(--font-head); font-size: 1.25rem; font-weight: 900;
+            box-shadow: 0 8px 25px rgba(156, 39, 176, 0.4); cursor: pointer; transition: 0.3s; margin-top: 40px; width: 100%; max-width: 400px;
+            text-transform: uppercase; letter-spacing: 1.5px;
+        }
+        .btn-large:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 12px 35px rgba(156, 39, 176, 0.5); }
+        .btn-large:active { transform: translateY(0) scale(0.98); }
+
+        /* --- QUIZ SECTION --- */
+        .game-container { background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); border-radius: var(--radius-lg); padding: 35px 30px; box-shadow: var(--shadow-float); width: 100%; border: 1px solid rgba(255,255,255,0.6);}
+        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; font-family: var(--font-head); font-weight: 900; color: var(--secondary); font-size: 1.1rem; }
+        .score-badge { background: linear-gradient(135deg, var(--primary-light), var(--primary)); color: white; padding: 6px 18px; border-radius: 20px; box-shadow: 0 4px 10px rgba(255,0,127,0.2);}
+        
+        .progress-bar { width: 100%; height: 14px; background: rgba(0,0,0,0.06); border-radius: 10px; margin-bottom: 30px; overflow: hidden; position: relative;}
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--primary), var(--secondary)); width: 0%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 10px;}
+        
+        .question-box { background: white; padding: 25px; border-radius: var(--radius-md); margin-bottom: 30px; border-left: 5px solid var(--secondary); box-shadow: 0 4px 15px rgba(0,0,0,0.04);}
+        .question-text { font-size: 1.3rem; font-weight: 700; color: var(--text-main); line-height: 1.6; }
+        
+        .hz-py-inline { display: inline-flex; align-items: baseline; gap: 4px; color: var(--primary); background: var(--bg-gradient-1); padding: 4px 12px; border-radius: 12px; border: 1px solid var(--primary-light);}
+        .hz-char { font-family: var(--font-cn); font-weight: 900; font-size: 1.7rem; color: var(--hanzi-color);}
+        .py-text { font-family: var(--font-ui); font-size: 1rem; color: var(--secondary); font-weight: 800; }
+        
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        @media (max-width: 650px) { .options-grid { grid-template-columns: 1fr; } .study-grid { grid-template-columns: 1fr;} }
+        
+        .option-btn {
+            background: white; border: 2px solid #f0f0f0; padding: 20px; border-radius: var(--radius-md);
+            font-size: 1.1rem; font-weight: 700; color: #444; cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; align-items: center; text-align: left; gap: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+        .opt-label { background: #f5f5f5; color: var(--text-muted); width: 36px; height: 36px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-family: var(--font-head); font-weight: 900; flex-shrink: 0; font-size: 1.1rem; transition: 0.3s;}
+        .option-btn:hover { border-color: var(--primary-light); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(255,0,127,0.1);}
+        .option-btn:active { transform: scale(0.97); }
+        .option-btn.selected { background: var(--bg-gradient-1); border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary);}
+        .option-btn.selected .opt-label { background: var(--primary); color: white; }
+        
+        .btn-check {
+            background: #e0e0e0; color: #888; border: none; padding: 20px; border-radius: var(--radius-lg); font-family: var(--font-head); text-transform: uppercase; letter-spacing: 2px;
+            font-size: 1.2rem; font-weight: 900; width: 100%; margin-top: 35px; cursor: not-allowed; transition: 0.3s;
+        }
+        .btn-check.active {
+            background: linear-gradient(135deg, var(--secondary), var(--primary)); color: white;
+            box-shadow: 0 8px 0 #6a1b9a, 0 15px 25px rgba(156,39,176,0.4); cursor: pointer;
+        }
+        .btn-check.active:active { transform: translateY(8px); box-shadow: 0 0 0 #6a1b9a; }
+
+        /* --- MODAL GIẢI THÍCH (THÔNG MINH) --- */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(49, 27, 146, 0.6); backdrop-filter: blur(6px); z-index: 1000; justify-content: center; align-items: center; padding: 20px;
+        }
+        .modal-content {
+            background: white; width: 100%; max-width: 480px; padding: 40px 30px;
+            border-radius: var(--radius-lg); text-align: center; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3); position: relative; overflow: hidden;
+        }
+        .modal-banner { position: absolute; top: 0; left: 0; width: 100%; height: 10px; background: var(--primary); }
+        .modal-icon { font-size: 5rem; margin-bottom: 15px; line-height: 1; filter: drop-shadow(0 8px 15px rgba(0,0,0,0.15));}
+        .modal-title { font-family: var(--font-head); font-size: 1.8rem; font-weight: 900; margin-bottom: 12px; }
+        .modal-desc { font-size: 1.1rem; color: #333; margin-bottom: 30px; line-height: 1.6; font-weight: 700; background: #f8f9fa; padding: 18px; border-radius: 12px; border-left: 4px solid var(--secondary); text-align: left;}
+        .btn-next { background: var(--secondary); color: white; border: none; padding: 16px 35px; border-radius: 30px; font-family: var(--font-head); font-size: 1.15rem; font-weight: 900; cursor: pointer; width: 100%; text-transform: uppercase; box-shadow: 0 6px 20px rgba(156,39,176,0.4); transition: 0.3s;}
+        .btn-next:hover { background: #7b1fa2; transform: translateY(-3px);}
+        @keyframes popIn { 0% { transform: scale(0.7) translateY(30px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+
+        /* --- KẾT QUẢ --- */
+        .result-container { text-align: center; padding: 30px; }
+        .score-circle { 
+            width: 180px; height: 180px; border-radius: 50%; border: 8px solid var(--primary-light); 
+            display: flex; align-items: center; justify-content: center; font-family: var(--font-head);
+            font-size: 4rem; font-weight: 900; color: var(--primary); margin: 30px auto; 
+            background: white; box-shadow: 0 15px 35px rgba(255,0,127,0.2), inset 0 6px 20px rgba(0,0,0,0.06);
+            position: relative;
+        }
+        .score-circle::after {
+            content: ''; position: absolute; top: -14px; left: -14px; right: -14px; bottom: -14px;
+            border-radius: 50%; border: 3px dashed var(--accent); animation: rotate 12s linear infinite;
+        }
+        @keyframes rotate { 100% { transform: rotate(360deg); } }
+        .rank-badge { background: linear-gradient(135deg, var(--accent), var(--primary)); color: white; padding: 12px 30px; border-radius: 25px; font-family: var(--font-head); font-size: 1.3rem; font-weight: 900; margin-bottom: 25px; box-shadow: 0 8px 20px rgba(255,87,34,0.4); text-transform: uppercase; display: inline-block;}
+        
+    </style>
+</head>
+<body>
+
+    <div id="particles"></div>
+
+    <nav class="navbar">
+        <div class="nav-brand">🌸 SnapChinese</div>
+        <a href="Nhập môn tiếng Trung.html" class="btn-back">❮ Sổ Tay</a>
+    </nav>
+
+    <section id="screen-study" class="screen active">
+        <div class="study-header">
+            <h1 class="study-title">Nhóm 2: Nhà Cửa & Đồ Vật</h1>
+            <p class="study-subtitle">10 bộ thủ cơ bản gắn liền với đời sống hàng ngày.</p>
+        </div>
+        
+        <div class="study-grid" id="study-container">
+            </div>
+
+        <button class="btn-large" onclick="startQuiz()">Sẵn Sàng Thử Thách ➔</button>
+    </section>
+
+    <section id="screen-quiz" class="screen">
+        <div class="game-container">
+            <div class="game-header">
+                <span class="score-badge" id="score-display">🏆 Điểm: 0</span>
+                <span id="question-count">Câu: 1/10</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+            
+            <div class="question-box">
+                <div id="question-text" class="question-text"></div>
+            </div>
+            <div class="options-grid" id="options-container"></div>
+            
+            <button id="btn-submit" class="btn-check" onclick="checkAnswer()" disabled>CHỐT ĐÁP ÁN</button>
+        </div>
+    </section>
+
+    <section id="screen-result" class="screen">
+        <div class="game-container result-container">
+            <div style="font-size: 6rem; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.15));" id="result-icon">🏠</div>
+            <h2 style="font-family: var(--font-head); font-size: 2.2rem; color: var(--secondary); font-weight: 900; margin-top: 20px;">BÁO CÁO THÀNH TÍCH</h2>
+            <div class="score-circle" id="final-score">100</div>
+            <div class="rank-badge" id="result-rank">CHUYÊN GIA KIẾN TRÚC</div>
+            <p id="result-msg" style="color: var(--text-muted); font-size: 1.2rem; font-weight: 800; margin-bottom: 35px;"></p>
+            
+            <button class="btn-large" style="margin-top: 0; background: linear-gradient(135deg, var(--secondary), var(--primary));" onclick="location.href='BO THU 3.html'">Chinh Phục Nhóm Tiếp Theo ➔</button>
+            <button class="btn-back" style="margin-top: 25px; background: white; color: var(--secondary); border: 2px solid var(--secondary); width: 100%; max-width: 400px; justify-content: center; padding: 14px; font-size: 1.1rem; box-shadow:none;" onclick="location.reload()">↻ Ôn tập lại bài này</button>
+        </div>
+    </section>
+
+    <div id="explanation-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-banner"></div>
+            <div id="modal-icon" class="modal-icon">🌸</div>
+            <h3 id="modal-title" class="modal-title">Chính xác!</h3>
+            <p id="modal-desc" class="modal-desc">Giải thích chi tiết sẽ hiện ở đây.</p>
+            <button class="btn-next" onclick="nextQuestion()">Tiếp tục ❯</button>
+        </div>
+    </div>
+
+    <script>
+        // === ANIMATION NỀN KHOA HỌC/CUTE ===
+        function initParticles() {
+            const c = document.getElementById('particles');
+            const icons = ['🌸','🏠','🚪','🏹','💎','🐚','✨','🎀'];
+            for (let i = 0; i < 20; i++) {
+                const l = document.createElement('div');
+                l.className = 'particle';
+                l.textContent = icons[Math.floor(Math.random() * icons.length)];
+                l.style.left = Math.random() * 100 + 'vw';
+                l.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                l.style.animationDuration = `${Math.random() * 10 + 8}s, ${Math.random() * 5 + 3}s`;
+                l.style.animationDelay = `-${Math.random() * 15}s`;
+                c.appendChild(l);
+            }
+        }
+        initParticles();
+
+        // === HỆ THỐNG ÂM THANH MỚI (TINH TẾ & KHOA HỌC HƠN) ===
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+        function initAudio() { if (!audioCtx) audioCtx = new AudioContext(); if (audioCtx.state === 'suspended') audioCtx.resume(); }
+        document.body.addEventListener('click', initAudio, { once: true });
+
+        function playSfx(type) {
+            if(!audioCtx) return;
+            const n = audioCtx.currentTime;
+            
+            if(type === 'click') { 
+                // Tiếng click sắc nét, gọn gàng
+                const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+                o.type = 'sine'; o.frequency.setValueAtTime(800, n); o.frequency.exponentialRampToValueAtTime(200, n + 0.08);
+                g.gain.setValueAtTime(0.2, n); g.gain.exponentialRampToValueAtTime(0.01, n + 0.08);
+                o.connect(g).connect(audioCtx.destination); o.start(n); o.stop(n + 0.08);
+            } else if(type === 'correct') { 
+                // Chuông ma thuật (tăng dần)
+                [523.25, 659.25, 783.99, 1046.50, 1567.98].forEach((f, i) => {
+                    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+                    o.type = 'triangle'; o.frequency.value = f;
+                    g.gain.setValueAtTime(0, n + i*0.06); 
+                    g.gain.linearRampToValueAtTime(0.1, n + i*0.06 + 0.02); 
+                    g.gain.exponentialRampToValueAtTime(0.01, n + i*0.06 + 0.4);
+                    o.connect(g).connect(audioCtx.destination); o.start(n + i*0.06); o.stop(n + i*0.06 + 0.5);
+                });
+            } else if(type === 'wrong') { 
+                // Tiếng trượt thất vọng (Slide down)
+                const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+                o.type = 'sawtooth'; 
+                o.frequency.setValueAtTime(300, n); o.frequency.exponentialRampToValueAtTime(80, n + 0.4);
+                g.gain.setValueAtTime(0.15, n); g.gain.linearRampToValueAtTime(0, n + 0.4);
+                o.connect(g).connect(audioCtx.destination); o.start(n); o.stop(n + 0.4);
+            }
+        }
+
+        // === DATA NHÓM 2 (Bổ sung Mnemonic) ===
+        const studyData = [
+            { name: "Bộ Miên", hz: "宀", py: "mián", mean: "Mái nhà", ex: "<span>家</span> (jiā: nhà), <span>安</span> (ān: an)", mnemonic: "🏠 Hình ảnh mái nhà có ống khói nhô lên." },
+            { name: "Bộ Nghiễm", hz: "广", py: "guǎng", mean: "Mái che, tòa nhà", ex: "<span>店</span> (diàn: cửa hàng)", mnemonic: "🏭 Mái hiên cất chìa ra ngoài hoặc vách núi." },
+            { name: "Bộ Môn", hz: "门", py: "mén", mean: "Cửa hai cánh", ex: "<span>问</span> (wèn: hỏi), <span>间</span> (jiān: gian)", mnemonic: "🚪 Nhìn giống hai cánh cửa đang mở ra." },
+            { name: "Bộ Đao", hz: "刀", hz2: "刂", py: "dāo", mean: "Con dao, vũ khí", ex: "<span>别</span> (bié: đừng), <span>到</span> (dào: đến)", mnemonic: "🔪 Hình lưỡi dao cong (刀) hoặc hai nhát chém (刂)." },
+            { name: "Bộ cung", hz: "弓", py: "gōng", mean: "Cái cung", ex: "<span>张</span> (zhāng: họ Trương)", mnemonic: "🏹 Hình cây cung uốn lượn đang giương dây." },
+            { name: "Bộ Xa", hz: "车", py: "chē", mean: "Xe cộ", ex: "<span>辆</span> (liàng: lượng từ xe)", mnemonic: "🛒 Nhìn từ trên xuống một chiếc xe có trục và bánh." },
+            { name: "Bộ Y", hz: "衣", hz2: "衤", py: "yī", mean: "Quần áo", ex: "<span>裤</span> (kù: quần), <span>衫</span> (shān: áo)", mnemonic: "👘 Giống phần cổ áo vắt chéo và nếp gấp áo." },
+            { name: "Bộ Cân", hz: "巾", py: "jīn", mean: "Cái khăn", ex: "<span>帮</span> (bāng: giúp)", mnemonic: "🧣 Trông như một chiếc khăn đang vắt ngang giá." },
+            { name: "Bộ Bối", hz: "贝", py: "bèi", mean: "Vỏ sò, tiền bạc", ex: "<span>贵</span> (guì: đắt), <span>买</span> (mǎi: mua)", mnemonic: "🐚 Hình vỏ sò hé mở. Xưa kia vỏ sò dùng làm tiền tệ." },
+            { name: "Bộ Ngọc", hz: "玉", hz2: "王", py: "yù", mean: "Ngọc báu", ex: "<span>现</span> (xiàn: hiện), <span>玩</span> (wán: chơi)", mnemonic: "💎 Ba viên ngọc quý được xâu chuỗi trên một sợi dây." }
+        ];
+
+        function hp(hanzi, pinyin) { return `<span class="hz-py-inline"><span class="hz-char">${hanzi}</span><span class="py-text">${pinyin}</span></span>`; }
+
+        const quizData = [
+            { q: `Chữ 'Nhà' ${hp('家', 'jiā')} có bộ Miên ${hp('宀', 'mián')} ở trên vì sao?`, options: ["Nghĩa là con heo", "Nghĩa là mái nhà che chở", "Nghĩa là con người", "Nghĩa là con dao"], correct: 1, explain: "Bộ Miên tượng trưng cho mái nhà, bên dưới là con heo (bộ Thỉ)." },
+            { q: `Bộ Môn ${hp('门', 'mén')} trong chữ 'Hỏi' ${hp('问', 'wèn')} mang ý nghĩa?`, options: ["Cái cửa để gõ", "Cái miệng để hỏi", "Mái nhà", "Tiền bạc"], correct: 0, explain: "Thời xưa, muốn hỏi thăm điều gì người ta phải đến trước cửa nhà người khác cất tiếng." },
+            { q: `Chữ 'Tiền' ${hp('钱', 'qián')} và 'Đắt' ${hp('贵', 'guì')} thường chứa bộ nào?`, options: ["Bộ Đao", "Bộ Y", "Bộ Bối", "Bộ Miên"], correct: 2, explain: "Vỏ sò (bộ Bối) được dùng làm tiền tệ giao thương thời cổ đại." },
+            { q: `Bộ Đao đứng ${hp('刂', 'dāo')} trong chữ 'Đến' ${hp('到', 'dào')} gợi hình ảnh?`, options: ["Cái xe", "Con dao/vũ khí", "Quần áo", "Mái hiên"], correct: 1, explain: "Bộ Đao liên quan đến các hành động cắt, phân chia, sự mạnh mẽ hoặc vũ khí." },
+            { q: `Chữ 'Quần' ${hp('裤', 'kù')} có bộ Y ${hp('衤', 'yī')} vì nó liên quan đến?`, options: ["Nhà cửa", "Tiền bạc", "Quần áo, vải vóc", "Xe cộ"], correct: 2, explain: "Tất cả các loại trang phục, y phục thường mang bộ Y." },
+            { q: `Tại sao chữ 'Cửa hàng' ${hp('店', 'diàn')} có bộ Nghiễm ${hp('广', 'guǎng')}?`, options: ["Vì cửa hàng là một tòa nhà", "Vì bán dao", "Vì bán xe", "Vì bán ngọc"], correct: 0, explain: "Bộ Nghiễm chỉ các công trình, mái hiên, tòa nhà công cộng." },
+            { q: `Bộ Xa ${hp('车', 'chē')} xuất hiện trong các chữ liên quan đến?`, options: ["Đồ ăn", "Phương tiện giao thông", "Vải vóc", "Cây cối"], correct: 1, explain: "Xa (Xe) biểu thị các loại phương tiện chuyên chở." },
+            { q: `Bộ Ngọc ${hp('王', 'yù')} thường xuất hiện trong các chữ chỉ?`, options: ["Đồ vật quý giá, đá quý", "Nhà vệ sinh", "Con dao", "Con đường"], correct: 0, explain: "Chữ Vương (王) khi làm bộ thủ thường là biến thể của bộ Ngọc (đá quý)." },
+            { q: `Bộ Cân ${hp('巾', 'jīn')} trong chữ 'Giúp' ${hp('帮', 'bāng')} gợi hình ảnh gì?`, options: ["Con dao", "Cái khăn/mảnh vải", "Mái nhà", "Vỏ sò"], correct: 1, explain: "Bộ Cân chỉ các vật phẩm làm bằng vải như khăn." },
+            { q: `Chữ 'Mua' ${hp('买', 'mǎi')} chứa bộ Bối vì cần có cái gì để mua?`, options: ["Sức mạnh", "Tiền bạc", "Quần áo", "Mái nhà"], correct: 1, explain: "Mua bán là hoạt động thương mại gắn liền với tiền bạc (vỏ sò/Bối)." }
+        ];
+
+        let currentIdx = 0, score = 0, selectedOption = null;
+
+        window.onload = () => {
+            const studyHtml = studyData.map(item => `
+                <div class="study-card">
+                    <div class="st-hz-box">
+                        <div class="st-hz">${item.hz}</div>
+                        ${item.hz2 ? `<div class="st-hz-var">${item.hz2}</div>` : ''}
+                    </div>
+                    <div class="st-info">
+                        <div class="st-header">
+                            <span class="st-name">${item.name}</span>
+                            <span class="st-py">${item.py}</span>
+                        </div>
+                        <div class="st-mean">${item.mean}</div>
+                        <div class="st-mnemonic">💡 ${item.mnemonic}</div>
+                        <div class="st-ex">VD: ${item.ex}</div>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('study-container').innerHTML = studyHtml;
+        };
+
+        function switchScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function startQuiz() {
+            playSfx('click');
+            switchScreen('screen-quiz');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = quizData[currentIdx];
+            document.getElementById('score-display').innerHTML = `🏆 Điểm: ${score}`;
+            document.getElementById('question-count').innerText = `Câu: ${currentIdx + 1}/${quizData.length}`;
+            document.getElementById('progress').style.width = `${((currentIdx) / quizData.length) * 100}%`;
+            document.getElementById('question-text').innerHTML = q.q;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            selectedOption = null;
+            
+            const btnSubmit = document.getElementById('btn-submit');
+            btnSubmit.classList.remove('active');
+            btnSubmit.disabled = true;
+
+            ['A', 'B', 'C', 'D'].forEach((l, i) => {
+                if(!q.options[i]) return;
+                const b = document.createElement('div');
+                b.className = 'option-btn';
+                b.innerHTML = `<div class="opt-label">${l}</div><div>${q.options[i]}</div>`;
+                b.onclick = () => {
+                    playSfx('click');
+                    document.querySelectorAll('.option-btn').forEach(opt => opt.classList.remove('selected'));
+                    b.classList.add('selected');
+                    selectedOption = i;
+                    
+                    btnSubmit.classList.add('active');
+                    btnSubmit.disabled = false;
+                };
+                container.appendChild(b);
+            });
+        }
+
+        function checkAnswer() {
+            if (selectedOption === null) return;
+            const q = quizData[currentIdx];
+            const isCorrect = (selectedOption === q.correct);
+            
+            const modal = document.getElementById('explanation-modal');
+            const mTitle = document.getElementById('modal-title');
+            const mIcon = document.getElementById('modal-icon');
+            const banner = document.querySelector('.modal-banner');
+
+            if (isCorrect) { 
+                playSfx('correct'); score += 10; 
+                mIcon.innerText = "🌟"; 
+                mTitle.innerText = "Xuất sắc!"; 
+                mTitle.style.color = "var(--primary)";
+                banner.style.background = "var(--primary)";
+            } else { 
+                playSfx('wrong');
+                mIcon.innerText = "🥀"; 
+                mTitle.innerText = "Chưa chính xác rùi!"; 
+                mTitle.style.color = "var(--accent)"; 
+                banner.style.background = "var(--accent)";
+            }
+            
+            document.getElementById('score-display').innerHTML = `🏆 Điểm: ${score}`;
+            document.getElementById('modal-desc').innerHTML = `<b>Giải thích khoa học:</b><br>${q.explain}`;
+            modal.style.display = 'flex';
+        }
+
+        function nextQuestion() {
+            playSfx('click');
+            document.getElementById('explanation-modal').style.display = 'none';
+            currentIdx++;
+            if (currentIdx < quizData.length) {
+                loadQuestion(); 
+            } else { 
+                document.getElementById('progress').style.width = `100%`;
+                setTimeout(showFinal, 300);
+            }
+        }
+
+        function showFinal() {
+            switchScreen('screen-result');
+            document.getElementById('final-score').innerText = score;
+            
+            let rank, msg, icon;
+            if (score >= 100) { rank = "KIẾN TRÚC SƯ NGÔN NGỮ"; msg = "Không thể tin nổi! Bạn nắm trọn toàn bộ cấu trúc rồi. 👑"; icon = "🏰"; }
+            else if (score >= 80) { rank = "CHUYÊN GIA SOI CHỮ"; msg = "Rất tuyệt! Tầm nhìn của bạn sắc bén như bộ Đao vậy! 🔥"; icon = "😎"; }
+            else if (score >= 50) { rank = "DÂN CHƠI HỆ ĐỒ VẬT"; msg = "Khá lắm! Cần ôn lại chút đỉnh là hoàn hảo ngay! 👍"; icon = "✨"; }
+            else { rank = "THIÊN TÀI LẠC ĐƯỜNG"; msg = "Ối! Chắc bạn mới rớt từ hành tinh khác xuống đúng không? 😂"; icon = "🛸"; }
+
+            document.getElementById('result-icon').innerText = icon;
+            document.getElementById('result-rank').innerText = rank;
+            document.getElementById('result-msg').innerText = `"${msg}"`;
+        }
+    </script>
+</body>
+</html>
