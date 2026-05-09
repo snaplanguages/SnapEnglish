@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Crime | SnapEnglish</title>
+   <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F5F5F7;
+            --primary: #2B2D42; /* Xanh đen Midnight nghiêm nghị */
+            --secondary: #8D99AE;
+            --accent: #EDF2F4;
+            --text-main: #1A1A24;
+            --text-light: #6C757D;
+            --white: #FFFFFF;
+            --danger: #D90429; /* Đỏ Crimson làm điểm nhấn */
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--white);
+            max-width: 600px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(43, 45, 66, 0.1);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-top: 5px solid var(--danger);
+        }
+
+        h1 {
+            font-family: 'Lora', serif;
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--danger);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .exercise-area {
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .question {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        button.option-btn {
+            background-color: var(--white);
+            border: 2px solid var(--accent);
+            color: var(--text-main);
+            padding: 12px 20px;
+            margin: 8px 0;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+        }
+
+        button.option-btn:hover {
+            background-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        button.option-btn.correct {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: var(--white);
+        }
+
+        button.option-btn.wrong {
+            background-color: var(--danger);
+            border-color: var(--danger);
+            color: var(--white);
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 15px;
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Nunito', sans-serif;
+            margin-bottom: 15px;
+            text-align: center;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        .blank-input {
+            width: auto;
+            min-width: 100px;
+            display: inline-block;
+            margin: 0 10px;
+            padding: 8px;
+            border-bottom: 2px solid var(--danger);
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            border-radius: 0;
+            background-color: transparent;
+        }
+
+        .action-btn {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+            box-shadow: 0 4px 15px rgba(43, 45, 66, 0.3);
+        }
+
+        .action-btn:hover {
+            background-color: #171824;
+        }
+
+        .scramble-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .scramble-word {
+            background: var(--accent);
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            color: var(--text-main);
+        }
+        
+        .scramble-word.selected {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .answer-dropzone {
+            min-height: 50px;
+            border: 2px dashed var(--secondary);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 10px;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            height: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Crime Vocab Master</h1>
+    <div class="subtitle">"Góc nhìn sắc bén, lập luận đanh thép."</div>
+    
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="exercise-area" id="exerciseArea">
+        </div>
+
+    <div class="feedback" id="feedbackText"></div>
+    <button class="action-btn" id="nextBtn" style="display: none;" onclick="nextQuestion()">Tiếp tục ➔</button>
+</div>
+
+<script>
+    // FULL DATA TỪ BẢNG CRIME
+    const vocabData = [
+        // Causes of crime
+        { en: "a lack of moral education", vn: "sự thiếu giáo dục đạo đức" },
+        { en: "poor upbringing", vn: "sự nuôi dạy kém" },
+        { en: "social inequality", vn: "bất bình đẳng xã hội" },
+        { en: "peer pressure", vn: "áp lực từ bạn bè" },
+        { en: "a breakdown of social values", vn: "sự suy thoái các giá trị xã hội" },
+        { en: "lack of respect for authority", vn: "thiếu tôn trọng luật pháp hoặc chính quyền" },
+        { en: "economic deprivation", vn: "sự thiếu thốn về kinh tế" },
+        { en: "exposure to violence", vn: "tiếp xúc thường xuyên với bạo lực" },
+        { en: "a sense of alienation", vn: "cảm giác bị xa lánh khỏi xã hội" },
+        { en: "antisocial tendencies", vn: "khuynh hướng phản xã hội" },
+        { en: "a lack of proper education", vn: "thiếu giáo dục đúng đắn" },
+        { en: "poor moral upbringing", vn: "sự giáo dục đạo đức kém" },
+        { en: "family breakdown", vn: "gia đình tan vỡ" },
+        { en: "unemployment and poverty", vn: "thất nghiệp và nghèo đói" },
+        { en: "negative influence of the media", vn: "ảnh hưởng tiêu cực của truyền thông" },
+        { en: "a decline in social values", vn: "sự suy giảm giá trị đạo đức" },
+        { en: "lack of parental supervision", vn: "thiếu sự giám sát của cha mẹ" },
+        { en: "limited access to education and opportunities", vn: "thiếu cơ hội và giáo dục" },
+        { en: "commit a criminal offence", vn: "thực hiện hành vi phạm tội" },
+        { en: "lawbreakers offenders criminals", vn: "người vi phạm pháp luật" },
+        { en: "anti-social behaviour", vn: "hành vi phản xã hội" },
+        { en: "a lack of respect for social norms", vn: "thiếu tôn trọng chuẩn mực xã hội" },
+        { en: "juvenile delinquency", vn: "tội phạm vị thành niên" },
+        { en: "repeat offenders", vn: "tội phạm tái phạm" },
+        { en: "violent crime", vn: "tội phạm bạo lực" },
+        { en: "petty crime", vn: "tội phạm vặt" },
+        { en: "criminal tendencies", vn: "khuynh hướng phạm tội" },
+        { en: "a threat to public safety", vn: "mối đe dọa an toàn xã hội" },
+
+        // Punishment and prison
+        { en: "serve a prison sentence", vn: "chấp hành án tù" },
+        { en: "a custodial sentence", vn: "án giam giữ" },
+        { en: "behind bars", vn: "trong tù" },
+        { en: "a deterrent effect", vn: "tác dụng răn đe" },
+        { en: "harsh punishment", vn: "hình phạt nghiêm khắc" },
+        { en: "long-term incarceration", vn: "giam giữ dài hạn" },
+        { en: "the severity of punishment", vn: "mức độ nghiêm khắc của hình phạt" },
+        { en: "overcrowded prisons", vn: "nhà tù quá tải" },
+        { en: "a punitive approach", vn: "cách tiếp cận mang tính trừng phạt" },
+        { en: "lengthy prison sentences", vn: "án tù dài hạn" },
+        { en: "the deterrent effect of prison", vn: "tác dụng răn đe của nhà tù" },
+        { en: "lock offenders behind bars", vn: "tống tội phạm vào tù" },
+        { en: "fixed punishments", vn: "hình phạt cố định" },
+        { en: "capital punishment", vn: "án tử hình" },
+        { en: "the justice system", vn: "hệ thống tư pháp" },
+        { en: "a one-size-fits-all punishment", vn: "hình phạt áp dụng đồng loạt" },
+
+        // Education and crime prevention
+        { en: "crime prevention measures", vn: "biện pháp phòng ngừa tội phạm" },
+        { en: "early intervention", vn: "can thiệp sớm" },
+        { en: "access to quality education", vn: "tiếp cận giáo dục chất lượng" },
+        { en: "instill moral values", vn: "bồi dưỡng giá trị đạo đức" },
+        { en: "address the root causes of crime", vn: "giải quyết nguyên nhân gốc rễ" },
+        { en: "reduce crime rates", vn: "giảm tỷ lệ tội phạm" },
+        { en: "educational reform", vn: "cải cách giáo dục" },
+        { en: "youth-oriented programs", vn: "chương trình hướng đến thanh thiếu niên" },
+        { en: "prevent individuals from turning to crime", vn: "ngăn con người sa vào tội phạm" },
+
+        // Alternative solutions (Rehabilitation)
+        { en: "rehabilitation rather than punishment", vn: "cải tạo thay vì trừng phạt" },
+        { en: "provide offenders with education and skills", vn: "trang bị giáo dục và kỹ năng cho phạm nhân" },
+        { en: "community service", vn: "lao động công ích" },
+        { en: "vocational training programmes", vn: "chương trình đào tạo nghề" },
+        { en: "rehabilitative measures", vn: "biện pháp cải tạo" },
+        { en: "reintegrate offenders into society", vn: "tái hòa nhập cộng đồng" },
+        { en: "reform the criminal justice system", vn: "cải cách hệ thống tư pháp" },
+        { en: "reduce the likelihood of reoffending", vn: "giảm nguy cơ tái phạm" },
+        { en: "alternative forms of punishment", vn: "các hình phạt thay thế" },
+        { en: "rehabilitation programs", vn: "chương trình cải tạo" },
+        { en: "productive members of society", vn: "thành viên có ích cho xã hội" },
+        { en: "make use of offenders talents", vn: "tận dụng tài năng của người phạm tội" },
+        { en: "rehabilitative rather than punitive", vn: "mang tính cải tạo hơn trừng phạt" },
+        { en: "reduce reoffending", vn: "giảm tái phạm" },
+        { en: "social reintegration", vn: "tái hòa nhập xã hội" },
+        { en: "give offenders a second chance", vn: "cho người phạm tội cơ hội thứ hai" },
+
+        // Justice and flexibility
+        { en: "take individual circumstances into account", vn: "xét đến hoàn cảnh cá nhân" },
+        { en: "the motivation behind the crime", vn: "động cơ phạm tội" },
+        { en: "a fair and proportionate punishment", vn: "hình phạt công bằng và tương xứng" },
+        { en: "judicial discretion", vn: "quyền linh hoạt của thẩm phán" },
+        { en: "mitigating factors", vn: "tình tiết giảm nhẹ" },
+        { en: "aggravating factors", vn: "tình tiết tăng nặng" },
+        { en: "ensure justice is served", vn: "đảm bảo công lý được thực thi" },
+        { en: "balance punishment with rehabilitation", vn: "cân bằng trừng phạt và cải tạo" },
+        { en: "moral responsibility", vn: "trách nhiệm đạo đức" },
+        { en: "maintain social order", vn: "duy trì trật tự xã hội" }
+    ];
+
+    let currentItem = {};
+    let currentIndex = 0;
+    const totalQuestions = 20; 
+    let currentScrambleWords = [];
+    let blankWordData = { word: '', fullEn: '' };
+
+    const exerciseArea = document.getElementById('exerciseArea');
+    const feedbackText = document.getElementById('feedbackText');
+    const nextBtn = document.getElementById('nextBtn');
+    const progressFill = document.getElementById('progressFill');
+
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function shuffleArray(array) {
+        let newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
+
+    function updateProgress() {
+        const percent = (currentIndex / totalQuestions) * 100;
+        progressFill.style.width = `${percent}%`;
+    }
+
+    // RESET SESSION DÀNH RIÊNG CHO GOOGLE SITES
+    function resetSession() {
+        currentIndex = 0;
+        startExercise();
+    }
+
+    function startExercise() {
+        if (currentIndex >= totalQuestions) {
+            exerciseArea.innerHTML = `
+                <h2 style="font-family: 'Lora', serif; color: var(--primary);">Case Closed! ⚖️</h2>
+                <p>Xuất sắc! Bạn đã thu thập xong hệ thống từ vựng Crime. Cứ giữ vững tinh thần này, Đồ án 2 và Writing Task 2 sẽ cực kỳ bùng nổ!</p>
+                <button class="action-btn" onclick="resetSession()">Luyện tiếp Session mới</button>
+            `;
+            feedbackText.innerHTML = "";
+            nextBtn.style.display = "none";
+            updateProgress();
+            return;
+        }
+
+        feedbackText.innerHTML = "";
+        nextBtn.style.display = "none";
+        currentItem = getRandomItem(vocabData);
+        updateProgress();
+
+        const type = Math.floor(Math.random() * 5) + 1;
+        
+        switch(type) {
+            case 1: renderMultipleChoice(); break;
+            case 2: renderTyping(); break;
+            case 3: renderMatching(); break;
+            case 4: renderUnscramble(); break;
+            case 5: renderFillInBlank(); break;
+        }
+    }
+
+    function renderMultipleChoice() {
+        let options = [currentItem];
+        while(options.length < 4) {
+            let randomOpt = getRandomItem(vocabData);
+            if(!options.find(o => o.en === randomOpt.en)) options.push(randomOpt);
+        }
+        options = shuffleArray(options);
+
+        let html = `<div class="question">Nghĩa của cụm từ: <br><span style="color:var(--primary); font-family: 'Lora', serif; font-size: 26px;">"${currentItem.en}"</span> là gì?</div>`;
+        options.forEach(opt => {
+            html += `<button class="option-btn" onclick="checkAnswer(this, '${opt.vn.replace(/'/g, "\\'")}', '${currentItem.vn.replace(/'/g, "\\'")}')">${opt.vn}</button>`;
+        });
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderTyping() {
+        exerciseArea.innerHTML = `
+            <div class="question">Viết cụm từ tiếng Anh cho:<br><span style="color:var(--primary); font-size: 22px;">"${currentItem.vn}"</span></div>
+            <input type="text" id="typeInput" placeholder="Gõ tiếng Anh vào đây..." onkeypress="handleEnter(event, checkTyping)">
+            <button class="action-btn" onclick="checkTyping()">Kiểm tra</button>
+        `;
+        setTimeout(() => document.getElementById('typeInput').focus(), 100);
+    }
+
+    function renderMatching() {
+        let options = [currentItem];
+        while(options.length < 4) {
+            let randomOpt = getRandomItem(vocabData);
+            if(!options.find(o => o.vn === randomOpt.vn)) options.push(randomOpt);
+        }
+        options = shuffleArray(options);
+
+        let html = `<div class="question">Chọn tiếng Anh chuẩn cho:<br><span style="color:var(--primary); font-size: 22px;">"${currentItem.vn}"</span></div>`;
+        options.forEach(opt => {
+            html += `<button class="option-btn" onclick="checkAnswer(this, '${opt.en.replace(/'/g, "\\'")}', '${currentItem.en.replace(/'/g, "\\'")}')">${opt.en}</button>`;
+        });
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderUnscramble() {
+        const words = shuffleArray(currentItem.en.split(' '));
+        currentScrambleWords = [];
+        
+        let html = `
+            <div class="question">Xếp từ thành cụm hoàn chỉnh:<br><span style="color:var(--text-light); font-size: 18px;">(${currentItem.vn})</span></div>
+            <div class="answer-dropzone" id="dropzone"></div>
+            <div class="scramble-container" id="scrambleWords">
+        `;
+        
+        words.forEach((word, index) => {
+            html += `<div class="scramble-word" id="sw-${index}" onclick="selectScrambleWord('${word.replace(/'/g, "\\'")}', ${index})">${word}</div>`;
+        });
+        
+        html += `</div><button class="action-btn" onclick="checkScramble()">Kiểm tra</button><button class="action-btn" style="background:#e9ecef; color:#495057; margin-left:10px;" onclick="resetScramble()">Làm lại</button>`;
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderFillInBlank() {
+        const words = currentItem.en.split(' ');
+        if(words.length < 2) { 
+            renderMultipleChoice();
+            return; 
+        }
+        const blankIndex = Math.floor(Math.random() * words.length);
+        blankWordData.word = words[blankIndex];
+        blankWordData.fullEn = currentItem.en;
+        
+        let displayWords = [...words];
+        displayWords[blankIndex] = `<input type="text" id="blankInput" class="blank-input" onkeypress="handleEnter(event, checkBlank)">`;
+        
+        exerciseArea.innerHTML = `
+            <div class="question">Điền từ còn thiếu vào cụm sau:<br><span style="color:var(--text-light); font-size: 18px;">(${currentItem.vn})</span></div>
+            <div style="font-size: 22px; font-weight: 600; margin-bottom: 20px;">
+                ${displayWords.join(' ')}
+            </div>
+            <button class="action-btn" onclick="checkBlank()">Kiểm tra</button>
+        `;
+        setTimeout(() => document.getElementById('blankInput').focus(), 100);
+    }
+
+    function selectScrambleWord(word, index) {
+        document.getElementById(`sw-${index}`).classList.add('selected');
+        currentScrambleWords.push({word, index});
+        renderDropzone();
+    }
+
+    function renderDropzone() {
+        const dropzone = document.getElementById('dropzone');
+        dropzone.innerHTML = currentScrambleWords.map(item => `<div class="scramble-word" style="background:var(--primary); color:white">${item.word}</div>`).join('');
+    }
+
+    function resetScramble() {
+        currentScrambleWords = [];
+        renderDropzone();
+        document.querySelectorAll('.scramble-word').forEach(el => el.classList.remove('selected'));
+    }
+
+    function checkScramble() {
+        const answer = currentScrambleWords.map(item => item.word).join(' ');
+        if(answer === currentItem.en) showFeedback(true);
+        else showFeedback(false, currentItem.en);
+    }
+
+    function checkBlank() {
+        const input = document.getElementById('blankInput').value.trim().toLowerCase();
+        const cleanInput = input.replace(/[.,'()]/g, "");
+        const cleanWord = blankWordData.word.toLowerCase().replace(/[.,'()]/g, "");
+        
+        if(cleanInput === cleanWord) showFeedback(true);
+        else showFeedback(false, blankWordData.fullEn);
+    }
+
+    function handleEnter(e, checkFunction) {
+        if(e.key === 'Enter') checkFunction();
+    }
+
+    function checkAnswer(btn, selected, correct) {
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(b => b.disabled = true);
+        
+        if(selected === correct) {
+            btn.classList.add('correct');
+            showFeedback(true);
+        } else {
+            btn.classList.add('wrong');
+            btns.forEach(b => {
+                if(b.innerText === correct) b.classList.add('correct');
+            });
+            showFeedback(false, correct);
+        }
+    }
+
+    function checkTyping() {
+        const input = document.getElementById('typeInput').value.trim().toLowerCase();
+        const cleanInput = input.replace(/[.,'()]/g, "");
+        const cleanTarget = currentItem.en.toLowerCase().replace(/[.,'()]/g, "");
+
+        if(cleanInput === cleanTarget) showFeedback(true);
+        else showFeedback(false, currentItem.en);
+    }
+
+    function showFeedback(isCorrect, correctAnswer = "") {
+        if(isCorrect) {
+            feedbackText.innerHTML = `<span style="color: #2B2D42;">Chính xác! Lập luận đanh thép và logic. 🛡️</span>`;
+        } else {
+            feedbackText.innerHTML = `<span style="color: #D90429;">Sai mất rồi. Cụm từ đúng là: <b>${correctAnswer}</b></span>`;
+        }
+        nextBtn.style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        startExercise();
+    }
+
+    window.onload = startExercise;
+
+</script>
+</body>
+</html>
