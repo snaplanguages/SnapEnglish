@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 6: Maps | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        snapBrand: '#4F46E5', // Indigo-600
+                        snapAccent: '#F472B6', // Pink-400
+                        snapLight: '#EEF2FF', // Indigo-50
+                    },
+                    fontFamily: {
+                        sans: ['"Be Vietnam Pro"', 'sans-serif'],
+                        mono: ['"SFMono-Regular"', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #F8FAFC; color: #334155; }
+        h1, h2, h3, h4, h5 { font-weight: 700; }
+        .card { background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); padding: 1.5rem; margin-bottom: 2rem; border-top: 5px solid #4F46E5; }
+        @media (min-width: 768px) { .card { padding: 2.5rem; } }
+        
+        /* Interactive Inputs */
+        .input-blank { border: none; border-bottom: 2px dashed #94A3B8; background: transparent; padding: 2px 5px; text-align: center; color: #4F46E5; font-weight: 600; outline: none; transition: all 0.3s; min-width: 100px; display: inline-block; }
+        .input-blank:focus { border-bottom-color: #F472B6; background-color: #FDF2F8; }
+        .correct { border-bottom-color: #22C55E !important; color: #16A34A; background-color: #F0FDF4; }
+        .incorrect { border-bottom-color: #EF4444 !important; color: #DC2626; background-color: #FEF2F2; }
+        
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; margin-bottom: 1rem; }
+        th, td { border: 1px solid #E2E8F0; padding: 12px; text-align: left; }
+        th { background-color: #EEF2FF; color: #4F46E5; font-weight: 700; text-align: center; }
+        
+        .hint-box { display: none; background-color: #F0FDF4; border-left: 4px solid #22C55E; padding: 1rem; margin-top: 1rem; border-radius: 4px; }
+        .brand-text { background: linear-gradient(to right, #4F46E5, #F472B6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .formula-box { background-color: #EEF2FF; border-left: 4px solid #4F46E5; padding: 1rem; border-radius: 0.5rem; font-family: monospace; font-size: 1.05rem; color: #3730A3; font-weight: bold; margin: 1rem 0; }
+
+        /* Map CSS Mockups */
+        .map-container { position: relative; border: 4px solid #334155; border-radius: 12px; padding: 10px; background: #fff; overflow: hidden; font-size: 0.8rem; font-weight: 600; text-align: center; }
+        .compass { position: absolute; top: 10px; left: 10px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10px; color: #475569; }
+        .compass::before { content: 'N'; position: absolute; top: 0; }
+        .compass::after { content: 'S'; position: absolute; bottom: 0; }
+        .compass span::before { content: 'W'; position: absolute; left: 0; }
+        .compass span::after { content: 'E'; position: absolute; right: 0; }
+        .compass-lines { position: absolute; width: 100%; height: 2px; background: #94A3B8; top: 50%; left: 0; transform: translateY(-50%); }
+        .compass-lines::after { content: ''; position: absolute; height: 100%; width: 2px; background: #94A3B8; left: 50%; top: 0; transform: translateX(-50%) rotate(90deg); }
+    </style>
+</head>
+<body class="antialiased leading-relaxed">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold brand-text tracking-wide flex items-center gap-2">
+                <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                SnapEnglish
+            </div>
+            <nav class="text-sm md:text-base text-gray-500 font-semibold hidden md:block">FROM BASICS TO BAND 6.0</nav>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 md:px-6 py-10">
+
+        <div class="text-center mb-12">
+            <span class="px-4 py-1 rounded-full bg-pink-100 text-pink-600 font-bold text-sm tracking-widest mb-4 inline-block">LESSON 06</span>
+            <h1 class="text-3xl md:text-5xl font-bold text-indigo-900 mb-4">TASK 1 - MAPS (BẢN ĐỒ)</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">Chuyên sâu vào biểu đồ Bản đồ: Phương pháp xử lý, từ vựng chỉ vị trí, phương hướng và sự thay đổi.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8 mb-10">
+            <div class="card !border-t-pink-400">
+                <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-pink-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    TỔNG QUAN
+                </h2>
+                <div class="space-y-3 text-gray-700">
+                    <p>Trong phần thi IELTS Writing Task 1, ngoài các dạng bài yêu cầu so sánh sự thay đổi hoặc sự khác biệt giữa các loại dữ liệu số, dạng <strong>Bản đồ (Maps)</strong> cũng xuất hiện khá thường xuyên.</p>
+                    <p>Dạng bài này thường cung cấp bản đồ của một khu vực, hoặc mặt cắt mặt bằng của một công trình, và yêu cầu người viết miêu tả lại vị trí và sự thay đổi của các thành tố có trong bản đồ.</p>
+                </div>
+            </div>
+            <div class="card">
+                <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-indigo-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                    NỘI DUNG BÀI HỌC
+                </h2>
+                <p class="mb-3 text-gray-700">Bài học này giúp người học:</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>Nắm chắc phương pháp để xử lý từng phần của dạng bài bản đồ.</li>
+                    <li>Hiểu và vận dụng từ vựng chỉ <strong>vị trí</strong>.</li>
+                    <li>Hiểu và vận dụng từ vựng chỉ <strong>sự thay đổi</strong>.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card bg-gray-50 border-none">
+            <h2 class="text-2xl font-bold mb-6 text-indigo-800">MỘT SỐ DẠNG BÀI BẢN ĐỒ THƯỜNG GẶP</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="font-bold text-lg text-pink-600 mb-2">I. DẠNG MỘT BẢN ĐỒ</h3>
+                    <p class="text-gray-700 mb-4">Thường xuất hiện dưới dạng bản đồ đơn, các đề bài của nhóm này thường đưa ra sự thay đổi có thể xảy ra trong tương lai của một khu vực, như vị trí được đề xuất của một công trình, hay một con đường mới.</p>
+                    <p class="text-gray-700 italic">Tuy nhiên, vì dạng bài này rất hiếm khi xuất hiện trong bài thi IELTS, Bài học 6 sẽ tập trung vào dạng có nhiều hơn hai bản đồ.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg text-indigo-600 mb-2">II. DẠNG HAI BẢN ĐỒ TRỞ LÊN</h3>
+                    <p class="text-gray-700 mb-4">Thường có hai bản đồ trở lên, dạng bài này yêu cầu ta chỉ ra những thay đổi của một địa điểm ở hai năm khác nhau.</p>
+                    <p class="text-gray-700">Địa điểm này có thể là một thành phố hoặc thị trấn, mặt bằng của một công trình, cũng có thể là của một khu vực ngoài trời.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="text-2xl font-bold mb-6 text-indigo-800">TỪ VỰNG CHO DẠNG BÀI BẢN ĐỒ</h2>
+            
+            <h3 class="font-bold text-lg text-pink-600 mb-4">I. TỪ VỰNG CHỈ VỊ TRÍ VÀ PHƯƠNG HƯỚNG</h3>
+            
+            <div class="flex flex-col md:flex-row gap-8 items-center mb-8 bg-indigo-50 p-6 rounded-xl">
+                <div class="relative w-48 h-48 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-indigo-200">
+                    <div class="absolute top-2 font-bold text-indigo-800">North (Bắc)</div>
+                    <div class="absolute bottom-2 font-bold text-indigo-800">South (Nam)</div>
+                    <div class="absolute right-2 font-bold text-indigo-800">East (Đông)</div>
+                    <div class="absolute left-2 font-bold text-indigo-800">West (Tây)</div>
+                    <div class="absolute top-6 right-6 text-xs text-pink-600 font-bold rotate-45">North-east</div>
+                    <div class="absolute top-6 left-6 text-xs text-pink-600 font-bold -rotate-45">North-west</div>
+                    <div class="absolute bottom-6 right-6 text-xs text-pink-600 font-bold -rotate-45">South-east</div>
+                    <div class="absolute bottom-6 left-6 text-xs text-pink-600 font-bold rotate-45">South-west</div>
+                    <div class="w-full h-1 bg-gray-300 absolute"></div>
+                    <div class="h-full w-1 bg-gray-300 absolute"></div>
+                    <div class="w-full h-1 bg-gray-200 absolute rotate-45"></div>
+                    <div class="w-full h-1 bg-gray-200 absolute -rotate-45"></div>
+                    <div class="w-3 h-3 bg-indigo-600 rounded-full z-10"></div>
+                </div>
+                <div class="flex-1 space-y-4">
+                    <div class="bg-white p-4 rounded shadow-sm border border-gray-200">
+                        <p class="text-gray-700 font-medium">Nếu hai đối tượng <strong>cùng nằm trong một vùng</strong>, ta dùng giới từ <span class="text-pink-600 font-bold">on / in</span>:</p>
+                        <p class="font-mono text-indigo-700 mt-1 bg-indigo-50 inline-block p-1 rounded">→ A is on the east side / in the east of B.</p>
+                    </div>
+                    <div class="bg-white p-4 rounded shadow-sm border border-gray-200">
+                        <p class="text-gray-700 font-medium">Nếu hai đối tượng <strong>không nằm trong cùng một vùng</strong>, ta dùng giới từ <span class="text-pink-600 font-bold">to</span>:</p>
+                        <p class="font-mono text-indigo-700 mt-1 bg-indigo-50 inline-block p-1 rounded">→ C is to the east of B.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto mb-8">
+                <table class="text-center">
+                    <tbody>
+                        <tr>
+                            <td class="font-semibold text-indigo-800 bg-indigo-50 w-1/3">Top left-hand corner<br><span class="text-sm font-normal text-gray-500">(góc trên trái)</span></td>
+                            <td class="font-semibold text-indigo-800 bg-indigo-100 w-1/3">Top<br><span class="text-sm font-normal text-gray-500">(trên)</span></td>
+                            <td class="font-semibold text-indigo-800 bg-indigo-50 w-1/3">Top right-hand corner<br><span class="text-sm font-normal text-gray-500">(góc trên phải)</span></td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-indigo-800 bg-white">Left-hand side<br><span class="text-sm font-normal text-gray-500">(bên trái)</span></td>
+                            <td class="font-bold text-pink-600 bg-pink-50">Middle / Center<br><span class="text-sm font-normal text-gray-500">(giữa)</span></td>
+                            <td class="font-semibold text-indigo-800 bg-white">Right-hand side<br><span class="text-sm font-normal text-gray-500">(bên phải)</span></td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-indigo-800 bg-indigo-50">Bottom left-hand corner<br><span class="text-sm font-normal text-gray-500">(góc dưới trái)</span></td>
+                            <td class="font-semibold text-indigo-800 bg-indigo-100">Bottom / rear<br><span class="text-sm font-normal text-gray-500">(dưới / phía sau)</span></td>
+                            <td class="font-semibold text-indigo-800 bg-indigo-50">Bottom right-hand corner<br><span class="text-sm font-normal text-gray-500">(góc dưới phải)</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="font-bold text-indigo-700 mb-4 uppercase">Exercise 1: Look at the map. Fill in the gaps</h3>
+            
+            <div class="flex flex-col lg:flex-row gap-8 mb-6 items-center">
+                <div class="map-container w-full lg:w-1/2 h-64 bg-gray-100">
+                    <div class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full px-2">Entrance</div>
+                    <div class="absolute top-0 left-0 w-full h-1/4 bg-red-400 flex items-center justify-center text-white text-lg tracking-widest border border-red-500">Fiction</div>
+                    <div class="absolute right-0 top-1/4 w-1/4 h-1/2 bg-red-400 flex items-center justify-center text-white border border-red-500">Fiction</div>
+                    <div class="absolute left-4 top-1/3 w-1/3 h-12 bg-amber-100 border-2 border-gray-400 rounded flex items-center justify-center">Travel</div>
+                    <div class="absolute left-10 top-1/2 w-1/4 h-10 bg-white border-2 border-gray-400 rounded flex items-center justify-center text-xs">New books</div>
+                    <div class="absolute bottom-0 left-0 w-1/4 h-16 bg-green-400 border border-green-500 flex items-center justify-center text-center leading-tight">Service<br>desk</div>
+                    <div class="absolute bottom-0 left-1/3 w-1/2 h-16 bg-white border border-gray-400 flex items-center justify-center">Non-fiction</div>
+                    <div class="absolute left-1/2 top-1/3 w-6 h-24 bg-red-400 border border-red-600 rounded flex items-center justify-center"><span class="rotate-90 text-white text-xs">Art</span></div>
+                    <div class="absolute left-[60%] top-1/3 w-6 h-24 bg-red-400 border border-red-600 rounded flex items-center justify-center"><span class="rotate-90 text-white text-xs">Hobbies</span></div>
+                    <div class="absolute left-[70%] top-1/3 w-6 h-24 bg-red-400 border border-red-600 rounded flex items-center justify-center"><span class="rotate-90 text-white text-xs">Cookery</span></div>
+                    <div class="absolute top-2 left-2 text-xl font-bold text-gray-800">2000</div>
+                </div>
+
+                <div class="w-full lg:w-1/2 bg-yellow-50 p-4 border-l-4 border-yellow-500 rounded text-sm text-yellow-800 shadow-sm">
+                    <p class="font-bold mb-1">Mẹo:</p>
+                    <p><strong>middle</strong> là nằm giữa bên trong một địa điểm (giữa một căn phòng) còn <strong>between</strong> có nghĩa là nằm giữa hai đối tượng (giữa cái tủ và cái bàn).</p>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mb-6 p-4 bg-gray-50 rounded-lg justify-center text-sm font-semibold text-indigo-700">
+                <span class="px-2 py-1 bg-white border rounded shadow-sm">near</span>
+                <span class="px-2 py-1 bg-white border rounded shadow-sm">in the middle</span>
+                <span class="px-2 py-1 bg-white border rounded shadow-sm">opposite</span>
+                <span class="px-2 py-1 bg-white border rounded shadow-sm">between</span>
+                <span class="px-2 py-1 bg-white border rounded shadow-sm">perpendicular (vuông góc)</span>
+                <span class="px-2 py-1 bg-white border rounded shadow-sm">left-hand side</span>
+                <span class="px-2 py-1 bg-white border rounded shadow-sm">parallel (song song)</span>
+                <span class="px-2 py-1 bg-white border rounded shadow-sm">rear</span>
+            </div>
+
+            <div class="space-y-4 text-gray-700 leading-relaxed text-base bg-white p-6 border border-indigo-100 rounded-xl" id="ex1-map">
+                <p>In 2000, most of the (1) <input type="text" class="input-blank w-24" data-ans="rear"> of the bookstore was solely reserved for a section of fiction books. This section was (2) <input type="text" class="input-blank w-32" data-ans="perpendicular"> to another fiction book area, which was on the (3) <input type="text" class="input-blank w-32" data-ans="right-hand side|right hand side">. (4) <input type="text" class="input-blank w-32" data-ans="in the middle">, there were three (5) <input type="text" class="input-blank w-24" data-ans="parallel"> shelves displaying cookery, hobbies, and art books. Travel books are located (6) <input type="text" class="input-blank w-24" data-ans="between"> the fiction and the new books section. (7) <input type="text" class="input-blank w-24" data-ans="opposite"> fiction books, on the right hand side, visitors can find the non-fiction section which was (8) <input type="text" class="input-blank w-24" data-ans="near"> the service desk.</p>
+                <div class="mt-4 text-right">
+                    <button onclick="checkInputs('ex1-map')" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded shadow transition-all">Kiểm tra Đáp án</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card !border-t-pink-400">
+            <h3 class="font-bold text-lg text-pink-600 mb-4">II. TỪ VỰNG CHỈ SỰ THAY ĐỔI</h3>
+            
+            <div class="overflow-x-auto mb-8">
+                <table class="text-sm">
+                    <thead class="bg-pink-50 text-pink-900">
+                        <tr>
+                            <th class="w-1/5">Đối tượng</th>
+                            <th class="w-1/4">Sự thay đổi</th>
+                            <th class="w-1/5">Nghĩa</th>
+                            <th>Ví dụ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="4" class="font-bold text-gray-800 align-middle bg-gray-50">Các tòa nhà, đường sá<br><span class="font-normal text-xs">(Buildings, roads)</span></td>
+                            <td class="font-semibold text-indigo-700">be built / constructed</td>
+                            <td>được xây lên</td>
+                            <td class="italic">A power plant was constructed to the east of the mine.</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-indigo-700">be converted (into something)</td>
+                            <td>được biến đổi thành...</td>
+                            <td class="italic">The playground was converted into a large car park.</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-indigo-700">be replaced (by something) <br><br> be moved (to somewhere)</td>
+                            <td>được thế chỗ bởi ... <br><br> được di dời tới ...</td>
+                            <td class="italic">The garden was replaced by a large car park. <br><br> The student hall was moved to the east of the university.</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-pink-600">be demolished</td>
+                            <td>bị dỡ bỏ</td>
+                            <td class="italic">The warehouse was demolished and replaced by a garage.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="overflow-x-auto mb-8">
+                <table class="text-sm">
+                    <thead class="bg-green-50 text-green-900">
+                        <tr>
+                            <th class="w-1/5">Đối tượng</th>
+                            <th class="w-1/4">Sự thay đổi</th>
+                            <th class="w-1/5">Nghĩa</th>
+                            <th>Ví dụ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="2" class="font-bold text-gray-800 align-middle bg-gray-50">Cây cối / rừng<br><span class="font-normal text-xs">(Trees / Forest)</span><br><br>Tiện nghi<br><span class="font-normal text-xs">(Amenities)</span></td>
+                            <td class="font-semibold text-indigo-700">be cut down, be chopped down <br><br> be planted <br><br> be established <br><br> be expanded <br><br> be added</td>
+                            <td>bị chặt hạ (để dành chỗ cho) <br><br> được trồng <br> được xây dựng <br><br> được mở rộng <br><br> được thêm vào</td>
+                            <td class="italic">The forest on the western end of the island was chopped down. <br><br> Many palms were planted around the villa. <br><br> A kindergarten was established at the corner... <br><br> The cinema was expanded... <br><br> A vending machine was added...</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-indigo-700">be opened up</td>
+                            <td>được mở / khai trương</td>
+                            <td class="italic">A new theme park was opened up opposite the shopping mall.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="font-bold text-indigo-700 mb-4 uppercase">Exercise 2: Look at the maps. Fill in the gaps</h3>
+            
+            <div class="flex flex-col lg:flex-row gap-4 mb-6">
+                 <div class="map-container w-full lg:w-1/2 h-48 bg-gray-100 text-xs">
+                    <div class="absolute top-0 left-0 w-full h-1/5 bg-red-400 flex items-center justify-center text-white font-bold">Fiction</div>
+                    <div class="absolute right-0 top-1/5 w-1/4 h-full bg-red-400 flex items-center justify-center text-white font-bold">Fiction</div>
+                    <div class="absolute left-2 top-1/4 w-1/3 h-8 bg-amber-100 border border-gray-400 flex items-center justify-center">Travel</div>
+                    <div class="absolute left-6 top-1/2 w-1/4 h-8 bg-white border border-gray-400 flex items-center justify-center">New books</div>
+                    <div class="absolute bottom-0 left-0 w-1/4 h-10 bg-green-400 border border-green-500 flex items-center justify-center text-center">Service<br>desk</div>
+                    <div class="absolute bottom-0 left-1/3 w-1/2 h-10 bg-white border border-gray-400 flex items-center justify-center">Non-fiction</div>
+                    <div class="absolute top-1 left-2 text-sm font-bold text-gray-800">2000</div>
+                </div>
+                <div class="map-container w-full lg:w-1/2 h-48 bg-gray-100 text-xs">
+                    <div class="absolute top-0 left-0 w-1/4 h-1/5 bg-red-400 border-r border-red-500 flex items-center justify-center text-white">Art</div>
+                    <div class="absolute top-0 left-1/4 w-1/4 h-1/5 bg-red-400 border-r border-red-500 flex items-center justify-center text-white">Hobbies</div>
+                    <div class="absolute top-0 left-2/4 w-1/4 h-1/5 bg-red-400 border-r border-red-500 flex items-center justify-center text-white">Cookery</div>
+                    <div class="absolute top-0 right-0 w-1/4 h-1/5 bg-red-400 flex items-center justify-center text-white">Fiction</div>
+                    
+                    <div class="absolute right-0 top-1/5 w-1/4 h-1/2 bg-white flex items-center justify-center border-l border-b border-gray-400">Non-fiction</div>
+                    <div class="absolute left-2 top-1/4 w-1/3 h-8 bg-amber-100 border border-gray-400 flex items-center justify-center">Travel</div>
+                    <div class="absolute left-6 top-1/2 w-1/4 h-8 bg-white border border-gray-400 flex items-center justify-center">New books</div>
+                    <div class="absolute bottom-0 left-0 w-1/4 h-10 bg-green-400 border border-green-500 flex items-center justify-center text-center">Service<br>desk</div>
+                    <div class="absolute bottom-0 left-1/3 w-2/3 h-12 bg-white border-t border-l border-gray-400 flex items-center justify-center font-bold">Cafe</div>
+                    
+                    <div class="absolute left-1/2 top-1/4 w-8 h-4 border border-gray-400 rounded-full flex items-center justify-center">Table</div>
+                    <div class="absolute left-1/2 top-1/2 w-8 h-4 border border-gray-400 rounded-full flex items-center justify-center">Table</div>
+                    
+                    <div class="absolute top-1 left-2 text-sm font-bold text-white z-10 drop-shadow">NOW</div>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mb-6 p-4 bg-gray-50 rounded-lg justify-center text-sm font-semibold text-pink-600">
+                <span class="px-2 py-1 bg-white border rounded">added</span>
+                <span class="px-2 py-1 bg-white border rounded">relocated</span>
+                <span class="px-2 py-1 bg-white border rounded">converted</span>
+                <span class="px-2 py-1 bg-white border rounded">made smaller</span>
+                <span class="px-2 py-1 bg-white border rounded">moved to</span>
+                <span class="px-2 py-1 bg-white border rounded">demolished</span>
+                <span class="px-2 py-1 bg-white border rounded">expanded</span>
+                <span class="px-2 py-1 bg-white border rounded">remained the same</span>
+                <span class="px-2 py-1 bg-white border rounded">make way for</span>
+            </div>
+
+            <div class="space-y-4 text-gray-700 leading-relaxed text-sm md:text-base bg-white p-6 border border-pink-100 rounded-xl" id="ex2-map">
+                <p>1. At present, the fiction section on the left-hand side has been (1) <input type="text" class="input-blank w-32" data-ans="made smaller"> to (2) <input type="text" class="input-blank w-32" data-ans="make way for"> three other book genres, namely art, hobbies, and cookery.</p>
+                <p>2. As these books have been (3) <input type="text" class="input-blank w-32" data-ans="relocated|moved to"> here, their three previous book shelves in the middle of the book store were (4) <input type="text" class="input-blank w-32" data-ans="demolished"> and four sets of tables were (5) <input type="text" class="input-blank w-32" data-ans="added">.</p>
+                <p>3. The non-fiction books have been (6) <input type="text" class="input-blank w-32" data-ans="moved to|relocated"> the area of the old fiction shelf at the rear and the location has been (7) <input type="text" class="input-blank w-32" data-ans="converted"> into a café.</p>
+                <p>4. The service desk has been (8) <input type="text" class="input-blank w-32" data-ans="expanded"> to cater to more visitors.</p>
+                <p>5. Finally, the shelves displaying travel books and new books have (9) <input type="text" class="input-blank w-40" data-ans="remained the same"> throughout this period.</p>
+                <div class="mt-4 text-right">
+                    <button onclick="checkInputs('ex2-map')" class="px-6 py-2 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded shadow transition-all">Kiểm tra Đáp án</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-gray-50 border-none">
+            <h2 class="text-2xl font-bold mb-6 text-indigo-800 border-b pb-2">CÁCH VIẾT MỞ BÀI VÀ TỔNG QUAN</h2>
+            
+            <h3 class="font-bold text-pink-600 mb-4 uppercase">Bước 1: Phân tích đề</h3>
+            <p class="mb-4 text-gray-700">Đối với dạng bản đồ, ta còn cần tìm từ vựng để <strong>paraphrase</strong> cho các đối tượng (như các công trình, đường sá, hay cây cối) đã được cho sẵn trên bản đồ.</p>
+            
+            <div class="overflow-x-auto mb-8 bg-white rounded-lg shadow-sm border border-gray-200">
+                <table class="m-0 text-sm">
+                    <tbody>
+                        <tr>
+                            <td class="font-bold bg-indigo-50 w-1/4">Countryside</td>
+                            <td class="w-1/4">Rural area</td>
+                            <td class="font-bold bg-indigo-50 w-1/4">Dual carriageway</td>
+                            <td class="w-1/4">Highway / divided highway</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold bg-indigo-50">Shop</td>
+                            <td>Store</td>
+                            <td class="font-bold bg-indigo-50">Bus station</td>
+                            <td>Bus stop</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold bg-indigo-50">Housing</td>
+                            <td>Accommodation / Housing area</td>
+                            <td class="font-bold bg-indigo-50">Pedestrians only</td>
+                            <td>Pedestrian precinct / zone</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold bg-indigo-50">Car park</td>
+                            <td>Parking lot</td>
+                            <td class="font-bold bg-indigo-50">Shopping center</td>
+                            <td>Shopping mall</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="font-bold text-pink-600 mb-4 uppercase">Bước 2: Viết Mở Bài</h3>
+            <div class="formula-box text-center">Graph name + V (present simple) + what + where + when</div>
+            
+            <div class="overflow-x-auto mt-4 mb-8 bg-white rounded-lg shadow-sm border border-gray-200">
+                <table class="m-0 text-sm">
+                    <thead class="bg-indigo-50">
+                        <tr>
+                            <th></th>
+                            <th>GRAPH NAME</th>
+                            <th>VERB</th>
+                            <th>WHAT / WHERE</th>
+                            <th>WHEN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-bold bg-gray-50 text-center">Đề bài</td>
+                            <td>The maps</td>
+                            <td>show</td>
+                            <td>the center of a small town called Islip</td>
+                            <td>in 2010 and 2015.</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold bg-pink-50 text-pink-700 text-center">Viết lại<br>(paraphrase)</td>
+                            <td class="bg-pink-50 font-semibold text-indigo-900">The maps / The diagrams</td>
+                            <td class="bg-pink-50 font-semibold text-indigo-900">illustrate / compare</td>
+                            <td class="bg-pink-50 font-semibold text-indigo-900">the layout/changes of the town center of Islip <br><i>- how Islip town center changed /developed</i></td>
+                            <td class="bg-pink-50 font-semibold text-indigo-900">between 2010 and 2015.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="font-bold text-indigo-700 mb-2">CÁCH VIẾT TỔNG QUAN</h3>
+            <p class="mb-4 text-gray-700">Khi viết phần tổng quan cho dạng bài bản đồ, ta cần chỉ ra hai thành tố: <strong>sự thay đổi chung nhất</strong> và <strong>yếu tố thay đổi rõ rệt nhất</strong>.</p>
+            
+            <div class="space-y-4 mb-8">
+                <div class="bg-white border border-indigo-100 rounded-xl p-5 shadow-sm">
+                    <h4 class="font-bold text-indigo-600 mb-2">I. SỰ THAY ĐỔI CHUNG NHẤT</h4>
+                    <p class="font-mono text-sm bg-indigo-50 p-2 rounded text-indigo-900 mb-1">Overall, [location] was totally / completely transformed.</p>
+                    <p class="font-mono text-sm bg-indigo-50 p-2 rounded text-indigo-900">In general, [location] witnessed dramatic/major/significant changes.</p>
+                </div>
+                
+                <div class="bg-white border border-pink-100 rounded-xl p-5 shadow-sm">
+                    <h4 class="font-bold text-pink-600 mb-2">II. YẾU TỐ THAY ĐỔI RÕ RỆT NHẤT</h4>
+                    <ul class="list-disc pl-5 text-sm space-y-2 text-gray-700">
+                        <li><strong>Nhiều cơ sở hạ tầng hơn:</strong> In addition, some new facilities were built.</li>
+                        <li><strong>Khu vực rộng hơn:</strong> Furthermore, the location was expanded.</li>
+                        <li><strong>Nhiều nhà ở hơn:</strong> Furthermore, more housing was provided.</li>
+                        <li><strong>Nhiều cây xanh hơn:</strong> In addition, the location became more environmentally-friendly.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="bg-indigo-50 p-6 rounded-xl border-l-4 border-indigo-500 shadow-sm">
+                <h4 class="font-bold text-indigo-900 mb-2">Ví dụ Tổng quan (Thị trấn Islip):</h4>
+                <p class="text-sm text-gray-800 italic mb-2">- Thay đổi chung: Completely transformed<br>- Rõ rệt nhất: Cơ sở hạ tầng mới (bus, mall) & nhiều nhà ở (new housing).</p>
+                <p class="font-bold text-indigo-700">➡ Overall, the town of Islip was completely transformed. In addition, some new facilities were built and more housing was provided.</p>
+            </div>
+        </div>
+
+        <div class="card !border-t-pink-400">
+            <h2 class="text-2xl font-bold mb-6 text-pink-600">CÁCH VIẾT THÂN BÀI & SAMPLE ESSAY</h2>
+            
+            <h3 class="font-bold text-lg text-indigo-700 mb-3">I. SẮP XẾP NỘI DUNG</h3>
+            <p class="mb-4 text-gray-700">Cách chia bố cục đơn giản nhất là <strong>mỗi đoạn thân bài viết về một bản đồ</strong>.</p>
+            <div class="grid md:grid-cols-2 gap-4 mb-6">
+                <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+                    <p class="font-bold text-indigo-900">THÂN BÀI 1: Viết về bản đồ thứ nhất (Quá khứ).</p>
+                    <p class="text-sm text-gray-700 mt-2">Sử dụng <strong>Thì quá khứ đơn</strong>. Trình tự: Lấy điểm mốc (đường chính) → Miêu tả phía Bắc → Phía Nam.</p>
+                </div>
+                <div class="bg-pink-50 p-4 rounded-lg border border-pink-100">
+                    <p class="font-bold text-pink-900">THÂN BÀI 2: Viết về bản đồ thứ hai (Hiện tại/Tương lai).</p>
+                    <p class="text-sm text-gray-700 mt-2">Dùng <strong>Thì hiện tại hoàn thành / Quá khứ đơn</strong> tùy mốc thời gian. Miêu tả sự thay đổi theo trình tự tương tự thân bài 1.</p>
+                </div>
+            </div>
+
+            <div class="bg-yellow-50 text-yellow-800 p-4 rounded-lg border border-yellow-200 text-sm mb-8 shadow-sm">
+                <p><strong>Lưu ý Ngữ pháp:</strong> Về cấu trúc câu, ta thường cần sử dụng <strong>Câu bị động (Passive Voice)</strong> vì chủ thể gây ra hành động (con người) thường không được nhắc tới.</p>
+                <p class="mt-1 font-mono">Ví dụ: The main road <strong>was converted</strong> into a pedestrian precinct.</p>
+            </div>
+
+            <h3 class="font-bold text-lg text-indigo-700 mb-4">II. SAMPLE ESSAY: ISLIP TOWN CENTER</h3>
+            
+            <div class="flex flex-col lg:flex-row gap-6 mb-8">
+                <div class="map-container w-full lg:w-1/2 h-64 bg-green-50">
+                    <div class="absolute top-2 w-full text-center text-gray-500 font-bold">Countryside</div>
+                    <div class="absolute top-1/4 w-full h-8 bg-red-500 flex items-center justify-center text-white border-y border-red-700">Shops</div>
+                    <div class="absolute top-[35%] w-full h-6 bg-gray-300 flex items-center justify-center text-gray-700 text-xs">Main road</div>
+                    <div class="absolute top-[45%] w-3/4 left-[10%] h-8 bg-red-500 flex items-center justify-center text-white border-y border-red-700">Shops</div>
+                    
+                    <div class="absolute left-[10%] top-[45%] w-2 h-1/3 bg-gray-300 rounded-bl-xl border-l border-b border-gray-400"></div>
+                    <div class="absolute left-[10%] bottom-[20%] w-1/4 h-2 bg-gray-300 border-t border-b border-gray-400"></div>
+                    
+                    <div class="absolute right-[15%] top-[45%] w-2 h-1/4 bg-gray-300"></div>
+                    
+                    <div class="absolute bottom-[10%] left-[15%] w-20 h-10 bg-amber-100 border border-gray-400 flex items-center justify-center text-xs">School</div>
+                    <div class="absolute bottom-[20%] right-[10%] w-24 h-16 bg-green-400 border border-green-600 flex items-center justify-center text-xs">Park</div>
+                    
+                    <div class="absolute top-[60%] w-full text-center text-gray-500 font-bold text-xs">Housing</div>
+                    <div class="absolute bottom-2 w-full text-center text-gray-500 font-bold text-xs">Housing</div>
+                    
+                    <div class="absolute bottom-2 right-2 bg-white px-2 py-1 border font-bold">2010</div>
+                </div>
+
+                <div class="map-container w-full lg:w-1/2 h-64 bg-green-50">
+                    <div class="absolute top-[10%] left-[5%] w-[90%] h-[80%] border-[4px] border-double border-gray-400 rounded-[3rem]"></div>
+                    <div class="absolute top-1/2 left-0 w-[5%] h-6 bg-gray-300 -translate-y-1/2"></div>
+                    <div class="absolute top-1/2 right-0 w-[5%] h-6 bg-gray-300 -translate-y-1/2"></div>
+                    
+                    <div class="absolute top-[15%] left-[20%] w-16 h-12 bg-white border border-gray-400 flex flex-col items-center justify-center text-[10px] leading-tight">Bus<br>station</div>
+                    <div class="absolute top-[15%] left-[40%] w-20 h-12 bg-white border border-gray-400 flex flex-col items-center justify-center text-[10px] leading-tight">Shopping<br>center</div>
+                    <div class="absolute top-[15%] left-[65%] w-12 h-12 bg-white border border-gray-400 flex flex-col items-center justify-center text-[10px] leading-tight">Car<br>park</div>
+                    
+                    <div class="absolute top-[45%] w-3/4 left-[12.5%] h-8 bg-red-500 flex items-center justify-center text-white border border-red-700 z-10 text-xs">Shops (Pedestrian)</div>
+                    
+                    <div class="absolute bottom-[10%] left-[15%] w-20 h-10 bg-amber-100 border border-gray-400 flex items-center justify-center text-xs z-10">School</div>
+                    <div class="absolute bottom-[20%] right-[12%] w-12 h-8 bg-green-400 border border-green-600 flex items-center justify-center text-xs z-10">Park</div>
+                    
+                    <div class="absolute top-[25%] right-[15%] text-[10px] font-bold">New housing</div>
+                    <div class="absolute bottom-[25%] right-[30%] text-[10px] font-bold">New housing</div>
+                    
+                    <div class="absolute bottom-2 right-2 bg-white px-2 py-1 border font-bold z-20">2015</div>
+                </div>
+            </div>
+
+            <div class="bg-white border-2 border-indigo-100 p-6 md:p-8 rounded-xl shadow-sm text-gray-800 leading-loose font-serif text-base md:text-lg">
+                <p class="mb-4"><span class="text-pink-500 font-bold mr-1">(1)</span> The maps illustrate the layout of the town center of Islip between 2010 and 2015.</p>
+                
+                <p class="mb-4"><span class="text-pink-500 font-bold mr-1">(2)</span> Overall, the town of Islip was completely transformed with new facilities built and more housing provided.</p>
+                
+                <p class="mb-4"><span class="text-pink-500 font-bold mr-1">(3)</span> In 2010, there was a main road running from east to west across the center of Islip. The road was lined with two rows of stores. <span class="text-pink-500 font-bold mr-1">(4)</span> The northern side of the main road was a rural area. <span class="text-pink-500 font-bold mr-1">(5)</span> On the opposite side, there were two parallel housing areas. A school was located to the left of these accommodations, while a park stood on the right. Both the school and the park were connected to the main road by side roads.</p>
+                
+                <p><span class="text-pink-500 font-bold mr-1">(6)</span> Five years later, the most notable change was the construction of a highway circling the town. The main road was converted into a pedestrian precinct and <span class="text-pink-500 font-bold mr-1">(7)</span> the stores to the north of it were demolished. In their place, a bus stop and a parking lot were built with a newly constructed shopping mall in the middle. Near the shopping mall, there was also a new housing area, which can be accessed via a minor road from the divided highway. <span class="text-pink-500 font-bold mr-1">(8)</span> More accommodations were also built to the south of the pedestrian zone. The park was made smaller to make way for this development while the school on the left remained the same.</p>
+            </div>
+            
+            <div class="mt-6 overflow-x-auto rounded-lg shadow-sm border border-gray-200">
+                <table class="m-0 text-sm">
+                    <thead class="bg-indigo-50">
+                        <tr><th>WORD</th><th>MEANING</th><th>EXAMPLE SENTENCES</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="font-bold text-indigo-800">Layout (n)</td><td>Sơ đồ, bố cục</td><td>The new layout will relieve the burden of traffic on the town centre.</td></tr>
+                        <tr><td class="font-bold text-indigo-800">Facility (n)</td><td>Cơ sở vật chất</td><td>The resort has a wide range of facilities for young and old alike.</td></tr>
+                        <tr><td class="font-bold text-indigo-800">Row (n)</td><td>Hàng ngang</td><td>Future additions will include a row of shops along the south side.</td></tr>
+                        <tr><td class="font-bold text-indigo-800">Pedestrian precinct</td><td>Khu vực cho người đi bộ</td><td>A car cannot be taken into a pedestrian precinct.</td></tr>
+                        <tr><td class="font-bold text-pink-600">Line (v)</td><td>Viền / bao quanh</td><td>Crowds lined the streets to watch the race.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card relative overflow-hidden bg-white">
+            <h2 class="text-2xl md:text-3xl font-bold mb-8 text-indigo-900 text-center uppercase tracking-wide border-b-2 border-indigo-200 pb-4 inline-block mx-auto">Comprehensive Practice</h2>
+            
+            <h3 class="font-bold text-lg text-pink-600 mb-4 flex items-center gap-2">
+                <span class="bg-pink-100 text-pink-600 w-8 h-8 flex items-center justify-center rounded text-sm">I</span>
+                COASTAL PARK (TRANSLATION)
+            </h3>
+            
+            <div class="grid md:grid-cols-2 gap-6 text-sm mb-10">
+                <div class="bg-gray-50 p-4 border border-gray-200 rounded-lg">
+                    <p class="font-bold text-indigo-700 mb-2">Body 1: Before development</p>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="italic text-gray-600 mb-1">1. Trước khi phát triển, có một con đường chạy từ khu vực phía đông sang khu vực phía tây.</p>
+                            <textarea class="w-full p-2 border rounded focus:ring-1 focus:ring-indigo-500 outline-none" rows="2">Before development, there was a road running from east to west.</textarea>
+                        </div>
+                        <div>
+                            <p class="italic text-gray-600 mb-1">2. Con đường này được kết nối với hai nông trại ở trung tâm thông qua một con đường phụ.</p>
+                            <textarea class="w-full p-2 border rounded focus:ring-1 focus:ring-indigo-500 outline-none" rows="2">This road was connected to two farm buildings in the center of the area via a side road.</textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-pink-50 p-4 border border-pink-200 rounded-lg">
+                    <p class="font-bold text-pink-700 mb-2">Body 2: After development</p>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="italic text-gray-600 mb-1">3. Hiện tại, con đường vẫn không thay đổi, nhưng các trang trại đã được thay thế bằng một bãi đậu xe.</p>
+                            <textarea class="w-full p-2 border rounded focus:ring-1 focus:ring-pink-500 outline-none" rows="2">Currently, the road remains unchanged, but the farms were replaced by a car park.</textarea>
+                        </div>
+                        <div>
+                            <p class="italic text-gray-600 mb-1">4. Một quán cà phê mới cũng được thành lập giữa nơi này và đường chính.</p>
+                            <textarea class="w-full p-2 border rounded focus:ring-1 focus:ring-pink-500 outline-none" rows="2">A new cafe was also established between this place and the main road.</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="font-bold text-lg text-indigo-700 mb-4 flex items-center gap-2">
+                <span class="bg-indigo-100 text-indigo-700 w-8 h-8 flex items-center justify-center rounded text-sm">II</span>
+                ART GALLERY - WRITE FULL ESSAY
+            </h3>
+            
+            <p class="text-gray-700 mb-4">Hãy xem lại outline chi tiết trên bản PDF (Trang 98-99) để hoàn thành bài viết cho biểu đồ Art Gallery 2005 vs Now.</p>
+            
+            <div class="bg-white border-2 border-indigo-100 p-6 rounded-xl shadow-sm text-gray-800 leading-loose font-serif text-base mb-6">
+                <p class="font-bold text-pink-600 mb-2 border-b pb-1">Gợi ý phần Outline Body 2 (Now):</p>
+                <ul class="list-disc pl-5 space-y-1 text-sm text-gray-700">
+                    <li><strong>Wheelchair ramp:</strong> added outside - lead to entrance</li>
+                    <li><strong>Reception desk:</strong> moved middle of Grand hall - convenient for visitors</li>
+                    <li><strong>Lift:</strong> constructed - next to Stairs</li>
+                    <li><strong>Exhibition rooms 1-3:</strong> right-hand side stayed the same</li>
+                    <li><strong>West wing:</strong> most noticeable change (Cafe -> Gallery shop; Gallery office -> demolished for Vending machine; Exhibition room 4 -> divided into Children's Area & Temporary Exhibition)</li>
+                </ul>
+            </div>
+            
+            <textarea class="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none min-h-[300px]" placeholder="The plans illustrate how the first floor of an art gallery..."></textarea>
+        </div>
+
+    </main>
+
+    <footer class="bg-indigo-900 text-white text-center py-8 mt-12 border-t-4 border-pink-500">
+        <p class="font-heading font-bold text-xl mb-2 tracking-wide">SnapEnglish</p>
+        <p class="text-sm text-indigo-300 font-medium mb-1">IELTS Writing Journey - Từ Cơ Bản Đến Band 6.0</p>
+    </footer>
+
+    <script>
+        function checkInputs(containerId) {
+            let container = document.getElementById(containerId);
+            let inputs = container.querySelectorAll('.input-blank');
+            inputs.forEach(input => {
+                let ansString = input.getAttribute('data-ans').toLowerCase();
+                let validAnswers = ansString.split('|'); 
+                let val = input.value.toLowerCase().trim();
+                
+                input.classList.remove('correct', 'incorrect');
+                if (val !== '') {
+                    if (validAnswers.includes(val)) {
+                        input.classList.add('correct');
+                    } else {
+                        input.classList.add('incorrect');
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
