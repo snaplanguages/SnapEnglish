@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media | SnapEnglish</title>
+   <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F8F6FA;
+            --primary: #5E3A8C; /* Tím thạch anh sâu sắc, sáng tạo */
+            --secondary: #9B7EBD;
+            --accent: #E8E2F1;
+            --text-main: #2D2A32;
+            --text-light: #7B7584;
+            --white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--white);
+            max-width: 600px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(94, 58, 140, 0.08);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-top: 5px solid var(--primary);
+        }
+
+        h1 {
+            font-family: 'Lora', serif;
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--secondary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .exercise-area {
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .question {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        button.option-btn {
+            background-color: var(--white);
+            border: 2px solid var(--accent);
+            color: var(--text-main);
+            padding: 12px 20px;
+            margin: 8px 0;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+        }
+
+        button.option-btn:hover {
+            background-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        button.option-btn.correct {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: var(--white);
+        }
+
+        button.option-btn.wrong {
+            background-color: #D46A84;
+            border-color: #D46A84;
+            color: var(--white);
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 15px;
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Nunito', sans-serif;
+            margin-bottom: 15px;
+            text-align: center;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        .blank-input {
+            width: auto;
+            min-width: 100px;
+            display: inline-block;
+            margin: 0 10px;
+            padding: 8px;
+            border-bottom: 2px solid var(--primary);
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            border-radius: 0;
+            background-color: transparent;
+        }
+
+        .action-btn {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+            box-shadow: 0 4px 15px rgba(94, 58, 140, 0.3);
+        }
+
+        .action-btn:hover {
+            background-color: #47296D;
+        }
+
+        .scramble-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .scramble-word {
+            background: var(--accent);
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            color: var(--text-main);
+        }
+        
+        .scramble-word.selected {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .answer-dropzone {
+            min-height: 50px;
+            border: 2px dashed var(--secondary);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 10px;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            height: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Media Vocab Master</h1>
+    <div class="subtitle">"Làm chủ truyền thông, định hướng tư duy."</div>
+    
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="exercise-area" id="exerciseArea">
+        </div>
+
+    <div class="feedback" id="feedbackText"></div>
+    <button class="action-btn" id="nextBtn" style="display: none;" onclick="nextQuestion()">Tiếp tục ➔</button>
+</div>
+
+<script>
+    // FULL DATA TỪ BẢNG MEDIA
+    const vocabData = [
+        // News media and information sources
+        { en: "mass media", vn: "truyền thông đại chúng" },
+        { en: "mainstream media outlets", vn: "các kênh truyền thông chính thống" },
+        { en: "digital news platforms", vn: "nền tảng tin tức số" },
+        { en: "online news consumption", vn: "việc tiêu thụ tin tức trực tuyến" },
+        { en: "real-time updates", vn: "cập nhật theo thời gian thực" },
+        { en: "24-hour news cycle", vn: "chu kỳ tin tức 24/7" },
+        { en: "a primary source of information", vn: "nguồn thông tin chính" },
+        { en: "media coverage", vn: "mức độ/việc đưa tin của truyền thông" },
+        { en: "information overload", vn: "quá tải thông tin" },
+        { en: "to keep the public informed", vn: "giúp công chúng được cập nhật thông tin" },
+        { en: "instant access to information", vn: "tiếp cận thông tin tức thì" },
+        { en: "online news platforms", vn: "nền tảng tin tức trực tuyến" },
+        { en: "digital journalism", vn: "báo chí kỹ thuật số" },
+        { en: "replace traditional media", vn: "thay thế truyền thông truyền thống" },
+        { en: "user-generated content", vn: "nội dung do người dùng tạo ra" },
+        { en: "algorithm-driven content", vn: "nội dung do thuật toán chi phối" },
+        { en: "spread misinformation", vn: "lan truyền thông tin sai lệch" },
+        { en: "undermine the credibility of news", vn: "làm suy giảm độ tin cậy của tin tức" },
+
+        // Advertising and marketing influence
+        { en: "advertising campaigns", vn: "chiến dịch quảng cáo" },
+        { en: "persuasive techniques", vn: "kỹ thuật thuyết phục" },
+        { en: "brand awareness", vn: "nhận diện thương hiệu" },
+        { en: "consumer manipulation", vn: "thao túng người tiêu dùng" },
+        { en: "commercial interests", vn: "lợi ích thương mại" },
+        { en: "to boost sales figures", vn: "thúc đẩy doanh số" },
+        { en: "target audience", vn: "đối tượng khách hàng mục tiêu" },
+        { en: "marketing strategies", vn: "chiến lược tiếp thị" },
+        { en: "psychological appeal", vn: "sự tác động tâm lý" },
+        { en: "profit-driven advertising", vn: "quảng cáo vì lợi nhuận" },
+        { en: "commercial manipulation", vn: "sự thao túng mang tính thương mại" },
+        { en: "fuel a culture of materialism", vn: "nuôi dưỡng văn hóa vật chất" },
+        { en: "blur the line between needs and wants", vn: "làm mờ ranh giới giữa nhu cầu và mong muốn" },
+
+        // Consumerism and social values
+        { en: "materialistic values", vn: "giá trị vật chất" },
+        { en: "artificial needs", vn: "nhu cầu nhân tạo" },
+        { en: "impulsive buying behavior", vn: "hành vi mua sắm bốc đồng" },
+        { en: "status symbols", vn: "biểu tượng địa vị" },
+        { en: "consumer culture", vn: "văn hóa tiêu dùng" },
+        { en: "to shape public preferences", vn: "định hình thị hiếu công chúng" },
+        { en: "overconsumption", vn: "tiêu dùng quá mức" },
+        { en: "a sense of dissatisfaction", vn: "cảm giác không hài lòng" },
+        { en: "unrealistic expectations", vn: "kỳ vọng phi thực tế" },
+        { en: "to measure success by professions", vn: "đo thành công bằng vật chất" },
+        { en: "stimulate consumer demand", vn: "kích thích nhu cầu tiêu dùng" },
+        { en: "drive purchasing decisions", vn: "thúc đẩy quyết định mua hàng" },
+        { en: "appeal to consumers' emotions", vn: "đánh vào cảm xúc người tiêu dùng" },
+        { en: "promote brand loyalty", vn: "thúc đẩy lòng trung thành với thương hiệu" },
+
+        // Social media and digital communication
+        { en: "social networking platforms", vn: "nền tảng mạng xã hội" },
+        { en: "to stay connected with others", vn: "giữ liên lạc với người khác" },
+        { en: "instant communication", vn: "giao tiếp tức thời" },
+        { en: "viral content", vn: "nội dung lan truyền nhanh" },
+        { en: "to spread information rapidly", vn: "lan truyền thông tin nhanh chóng" },
+        { en: "echo chambers", vn: "môi trường thông tin một chiều" },
+        { en: "misinformation and fake news", vn: "tin giả và thông tin sai lệch" },
+        { en: "digital literacy", vn: "hiểu biết kỹ thuật số" },
+        { en: "to raise public awareness of", vn: "nâng cao nhận thức cộng đồng" },
+        { en: "shape public opinion", vn: "định hình dư luận xã hội" },
+        { en: "exert a profound influence on", vn: "gây ảnh hưởng sâu sắc đến" },
+        { en: "set the public agenda", vn: "định hướng vấn đề xã hội được quan tâm" },
+        { en: "influence people's perceptions", vn: "tác động đến cách nhìn nhận của công chúng" },
+        { en: "inform and educate the public", vn: "cung cấp thông tin và giáo dục cộng đồng" },
+        { en: "shape social values and norms", vn: "định hình giá trị và chuẩn mực xã hội" },
+
+        // Media impact on children and youth
+        { en: "advertisements targeting children", vn: "quảng cáo nhắm vào trẻ em" },
+        { en: "impressionable minds", vn: "tâm trí dễ bị ảnh hưởng" },
+        { en: "consumer habits at an early age", vn: "thói quen tiêu dùng từ sớm" },
+        { en: "pester power", vn: "khả năng trẻ gây áp lực đòi mua" },
+        { en: "unhealthy consumption patterns", vn: "mô hình tiêu dùng không lành mạnh" },
+        { en: "exposure to commercial messages", vn: "tiếp xúc thông điệp thương mại" },
+        { en: "parental supervision", vn: "sự giám sát của phụ huynh" },
+        { en: "to regulate advertising content", vn: "kiểm soát nội dung quảng cáo" },
+        { en: "ethical concerns", vn: "các vấn đề đạo đức" },
+        { en: "long-term psychological effects", vn: "ảnh hưởng tâm lý lâu dài" },
+        { en: "distort body image", vn: "bóp méo hình ảnh cơ thể" },
+        { en: "create unrealistic expectations", vn: "tạo ra kỳ vọng phi thực tế" },
+        { en: "erode self-esteem", vn: "làm xói mòn sự tự tin" },
+        { en: "promote unhealthy comparisons", vn: "thúc đẩy sự so sánh không lành mạnh" },
+        { en: "foster dissatisfaction with one's life", vn: "gây bất mãn với cuộc sống bản thân" },
+        { en: "encourage comformity", vn: "khuyến khích sự đồng nhất, rập khuôn" },
+        { en: "discourage individuality", vn: "làm giảm tính cá nhân" },
+        { en: "manipulate vulnerable groups", vn: "thao túng các nhóm dễ bị tổn thương" },
+        { en: "exploit children's naivety", vn: "lợi dụng sự ngây thơ của trẻ em" },
+        { en: "prioritize profit over ethics", vn: "đặt lợi nhuận lên trên đạo đức" },
+
+        // Objectivity, control and responsibility of media
+        { en: "media bias", vn: "thiên vị truyền thông" },
+        { en: "editorial independence", vn: "tính độc lập biên tập" },
+        { en: "to distort reality", vn: "bóp méo thực tế" },
+        { en: "public accountability", vn: "trách nhiệm với công chúng" },
+        { en: "ethical journalism", vn: "báo chí có đạo đức" },
+        { en: "to regulate media content", vn: "kiểm soát nội dung truyền thông" },
+        { en: "freedom of the press", vn: "tự do báo chí" },
+        { en: "government intervention", vn: "sự can thiệp của chính phủ" },
+        { en: "balanced reporting", vn: "đưa tin cân bằng" },
+        { en: "to safeguard public interests", vn: "bảo vệ lợi ích công chúng" },
+        { en: "impose strict regulations on", vn: "áp đặt quy định nghiêm ngặt lên" },
+        { en: "media censorship", vn: "kiểm duyệt truyền thông" },
+        { en: "ethical standards in advertising", vn: "chuẩn mực đạo đức trong quảng cáo" },
+        { en: "protect vulnerable audiences", vn: "bảo vệ nhóm đối tượng dễ tổn thương" },
+        { en: "regulate children-oriented advertisements", vn: "kiểm soát quảng cáo hướng tới trẻ em" },
+        { en: "ensure responsible journalism", vn: "đảm bảo báo chí có trách nhiệm" },
+        { en: "prevent misleading content", vn: "ngăn chặn nội dung gây hiểu lầm" },
+        { en: "strike a balance between freedom and control", vn: "cân bằng giữa tự do và kiểm soát" },
+        { en: "tighten media regulations", vn: "siết chặt quy định truyền thông" },
+
+        // Traditional and modern media
+        { en: "declining readership", vn: "lượng độc giả suy ngẫm" },
+        { en: "fall out of favor", vn: "mất dần sự ưa chuộng" },
+        { en: "print media industry", vn: "ngành báo chí in ấn" },
+        { en: "struggle to remain relevant", vn: "chật vật để giữ tính thời sự" },
+        { en: "face fierce competition from online media", vn: "đối mặt cạnh tranh khốc liệt từ truyền thông online" },
+        { en: "outdated mode of information delivery", vn: "cách truyền tải thông tin lỗi thời" },
+        { en: "adapt to digital transformation", vn: "thích nghi với chuyển đổi số" },
+        { en: "retain loyal readers", vn: "giữ chân độc giả trung thành" },
+        { en: "cost-effective alternative", vn: "giải pháp thay thế tiết kiệm chi phí" },
+        { en: "the inevitable decline of print media", vn: "sự suy tàn không thể tránh khỏi của báo in" }
+    ];
+
+    let currentItem = {};
+    let currentIndex = 0;
+    const totalQuestions = 20; 
+    let currentScrambleWords = [];
+    let blankWordData = { word: '', fullEn: '' };
+
+    const exerciseArea = document.getElementById('exerciseArea');
+    const feedbackText = document.getElementById('feedbackText');
+    const nextBtn = document.getElementById('nextBtn');
+    const progressFill = document.getElementById('progressFill');
+
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function shuffleArray(array) {
+        let newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
+
+    function updateProgress() {
+        const percent = (currentIndex / totalQuestions) * 100;
+        progressFill.style.width = `${percent}%`;
+    }
+
+    // RESET SESSION CHO GOOGLE SITES
+    function resetSession() {
+        currentIndex = 0;
+        startExercise();
+    }
+
+    function startExercise() {
+        if (currentIndex >= totalQuestions) {
+            exerciseArea.innerHTML = `
+                <h2 style="font-family: 'Lora', serif; color: var(--primary);">Broadcast Complete! 📡</h2>
+                <p>Xuất sắc! Bạn đã "bắt sóng" thành công toàn bộ từ vựng Media sắc bén nhất. Áp dụng ngay vào essay để tối đa hóa band điểm nhé!</p>
+                <button class="action-btn" onclick="resetSession()">Luyện tiếp Session mới</button>
+            `;
+            feedbackText.innerHTML = "";
+            nextBtn.style.display = "none";
+            updateProgress();
+            return;
+        }
+
+        feedbackText.innerHTML = "";
+        nextBtn.style.display = "none";
+        currentItem = getRandomItem(vocabData);
+        updateProgress();
+
+        const type = Math.floor(Math.random() * 5) + 1;
+        
+        switch(type) {
+            case 1: renderMultipleChoice(); break;
+            case 2: renderTyping(); break;
+            case 3: renderMatching(); break;
+            case 4: renderUnscramble(); break;
+            case 5: renderFillInBlank(); break;
+        }
+    }
+
+    function renderMultipleChoice() {
+        let options = [currentItem];
+        while(options.length < 4) {
+            let randomOpt = getRandomItem(vocabData);
+            if(!options.find(o => o.en === randomOpt.en)) options.push(randomOpt);
+        }
+        options = shuffleArray(options);
+
+        let html = `<div class="question">Nghĩa của cụm từ: <br><span style="color:var(--primary); font-family: 'Lora', serif; font-size: 26px;">"${currentItem.en}"</span> là gì?</div>`;
+        options.forEach(opt => {
+            html += `<button class="option-btn" onclick="checkAnswer(this, '${opt.vn.replace(/'/g, "\\'")}', '${currentItem.vn.replace(/'/g, "\\'")}')">${opt.vn}</button>`;
+        });
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderTyping() {
+        exerciseArea.innerHTML = `
+            <div class="question">Viết cụm từ tiếng Anh cho:<br><span style="color:var(--primary); font-size: 22px;">"${currentItem.vn}"</span></div>
+            <input type="text" id="typeInput" placeholder="Gõ tiếng Anh vào đây..." onkeypress="handleEnter(event, checkTyping)">
+            <button class="action-btn" onclick="checkTyping()">Kiểm tra</button>
+        `;
+        setTimeout(() => document.getElementById('typeInput').focus(), 100);
+    }
+
+    function renderMatching() {
+        let options = [currentItem];
+        while(options.length < 4) {
+            let randomOpt = getRandomItem(vocabData);
+            if(!options.find(o => o.vn === randomOpt.vn)) options.push(randomOpt);
+        }
+        options = shuffleArray(options);
+
+        let html = `<div class="question">Chọn tiếng Anh chuẩn cho:<br><span style="color:var(--primary); font-size: 22px;">"${currentItem.vn}"</span></div>`;
+        options.forEach(opt => {
+            html += `<button class="option-btn" onclick="checkAnswer(this, '${opt.en.replace(/'/g, "\\'")}', '${currentItem.en.replace(/'/g, "\\'")}')">${opt.en}</button>`;
+        });
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderUnscramble() {
+        const words = shuffleArray(currentItem.en.split(' '));
+        currentScrambleWords = [];
+        
+        let html = `
+            <div class="question">Xếp từ thành cụm hoàn chỉnh:<br><span style="color:var(--text-light); font-size: 18px;">(${currentItem.vn})</span></div>
+            <div class="answer-dropzone" id="dropzone"></div>
+            <div class="scramble-container" id="scrambleWords">
+        `;
+        
+        words.forEach((word, index) => {
+            html += `<div class="scramble-word" id="sw-${index}" onclick="selectScrambleWord('${word.replace(/'/g, "\\'")}', ${index})">${word}</div>`;
+        });
+        
+        html += `</div><button class="action-btn" onclick="checkScramble()">Kiểm tra</button><button class="action-btn" style="background:#e9ecef; color:#495057; margin-left:10px;" onclick="resetScramble()">Làm lại</button>`;
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderFillInBlank() {
+        const words = currentItem.en.split(' ');
+        if(words.length < 2) { 
+            renderMultipleChoice();
+            return; 
+        }
+        const blankIndex = Math.floor(Math.random() * words.length);
+        blankWordData.word = words[blankIndex];
+        blankWordData.fullEn = currentItem.en;
+        
+        let displayWords = [...words];
+        displayWords[blankIndex] = `<input type="text" id="blankInput" class="blank-input" onkeypress="handleEnter(event, checkBlank)">`;
+        
+        exerciseArea.innerHTML = `
+            <div class="question">Điền từ còn thiếu vào cụm sau:<br><span style="color:var(--text-light); font-size: 18px;">(${currentItem.vn})</span></div>
+            <div style="font-size: 22px; font-weight: 600; margin-bottom: 20px;">
+                ${displayWords.join(' ')}
+            </div>
+            <button class="action-btn" onclick="checkBlank()">Kiểm tra</button>
+        `;
+        setTimeout(() => document.getElementById('blankInput').focus(), 100);
+    }
+
+    function selectScrambleWord(word, index) {
+        document.getElementById(`sw-${index}`).classList.add('selected');
+        currentScrambleWords.push({word, index});
+        renderDropzone();
+    }
+
+    function renderDropzone() {
+        const dropzone = document.getElementById('dropzone');
+        dropzone.innerHTML = currentScrambleWords.map(item => `<div class="scramble-word" style="background:var(--primary); color:white">${item.word}</div>`).join('');
+    }
+
+    function resetScramble() {
+        currentScrambleWords = [];
+        renderDropzone();
+        document.querySelectorAll('.scramble-word').forEach(el => el.classList.remove('selected'));
+    }
+
+    function checkScramble() {
+        const answer = currentScrambleWords.map(item => item.word).join(' ');
+        if(answer === currentItem.en) showFeedback(true);
+        else showFeedback(false, currentItem.en);
+    }
+
+    function checkBlank() {
+        const input = document.getElementById('blankInput').value.trim().toLowerCase();
+        const cleanInput = input.replace(/[.,'"]/g, "");
+        const cleanWord = blankWordData.word.toLowerCase().replace(/[.,'"]/g, "");
+        
+        if(cleanInput === cleanWord) showFeedback(true);
+        else showFeedback(false, blankWordData.fullEn);
+    }
+
+    function handleEnter(e, checkFunction) {
+        if(e.key === 'Enter') checkFunction();
+    }
+
+    function checkAnswer(btn, selected, correct) {
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(b => b.disabled = true);
+        
+        if(selected === correct) {
+            btn.classList.add('correct');
+            showFeedback(true);
+        } else {
+            btn.classList.add('wrong');
+            btns.forEach(b => {
+                if(b.innerText === correct) b.classList.add('correct');
+            });
+            showFeedback(false, correct);
+        }
+    }
+
+    function checkTyping() {
+        const input = document.getElementById('typeInput').value.trim().toLowerCase();
+        const cleanInput = input.replace(/[.,'"]/g, "");
+        const cleanTarget = currentItem.en.toLowerCase().replace(/[.,'"]/g, "");
+
+        if(cleanInput === cleanTarget) showFeedback(true);
+        else showFeedback(false, currentItem.en);
+    }
+
+    function showFeedback(isCorrect, correctAnswer = "") {
+        if(isCorrect) {
+            feedbackText.innerHTML = `<span style="color: #5E3A8C;">Chính xác! Tư duy lập luận rất bén. 🎥</span>`;
+        } else {
+            feedbackText.innerHTML = `<span style="color: #D46A84;">Chưa chuẩn rồi. Đáp án đúng là: <b>${correctAnswer}</b></span>`;
+        }
+        nextBtn.style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        startExercise();
+    }
+
+    window.onload = startExercise;
+
+</script>
+</body>
+</html>
