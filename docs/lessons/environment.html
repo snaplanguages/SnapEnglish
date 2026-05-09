@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environment | SnapEnglish</title>
+  
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F4F7F5;
+            --primary: #4C7A5D; /* Màu xanh lá rừng mướt mắt */
+            --secondary: #8CB398;
+            --accent: #D9E5DF;
+            --text-main: #2C3E32;
+            --text-light: #6B8072;
+            --white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--white);
+            max-width: 600px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(76, 122, 93, 0.08);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-family: 'Lora', serif;
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .exercise-area {
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .question {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        button.option-btn {
+            background-color: var(--white);
+            border: 2px solid var(--accent);
+            color: var(--text-main);
+            padding: 12px 20px;
+            margin: 8px 0;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+        }
+
+        button.option-btn:hover {
+            background-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        button.option-btn.correct {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: var(--white);
+        }
+
+        button.option-btn.wrong {
+            background-color: #D66853;
+            border-color: #D66853;
+            color: var(--white);
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 15px;
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Nunito', sans-serif;
+            margin-bottom: 15px;
+            text-align: center;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        .blank-input {
+            width: auto;
+            min-width: 100px;
+            display: inline-block;
+            margin: 0 10px;
+            padding: 8px;
+            border-bottom: 2px solid var(--primary);
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            border-radius: 0;
+            background-color: transparent;
+        }
+
+        .action-btn {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+            box-shadow: 0 4px 15px rgba(76, 122, 93, 0.3);
+        }
+
+        .action-btn:hover {
+            background-color: #385E46;
+        }
+
+        .scramble-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .scramble-word {
+            background: var(--accent);
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            color: var(--text-main);
+        }
+        
+        .scramble-word.selected {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .answer-dropzone {
+            min-height: 50px;
+            border: 2px dashed var(--secondary);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 10px;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            height: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Environment Vocab Master</h1>
+    <div class="subtitle">"Bảo vệ trái đất, nâng tầm bài viết."</div>
+    
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="exercise-area" id="exerciseArea">
+        </div>
+
+    <div class="feedback" id="feedbackText"></div>
+    <button class="action-btn" id="nextBtn" style="display: none;" onclick="nextQuestion()">Tiếp tục ➔</button>
+</div>
+
+<script>
+    // FULL DATA TỪ BẢNG ENVIRONMENT
+    const vocabData = [
+        // Vấn đề và sự suy thoái môi trường
+        { en: "environmental degradation", vn: "sự suy thoái môi trường" },
+        { en: "ecological imbalance", vn: "mất cân bằng sinh thái" },
+        { en: "irreversible damage", vn: "thiệt hại không thể phục hồi" },
+        { en: "depletion of natural resources", vn: "sự cạn kiệt tài nguyên thiên nhiên" },
+        { en: "loss of biodiversity", vn: "mất đa dạng sinh học" },
+        { en: "habitat destruction", vn: "phá hủy môi trường sống" },
+        { en: "carbon footprint", vn: "lượng khí thải carbon" },
+        { en: "toxic emissions", vn: "khí thải độc hại" },
+        { en: "widespread contamination", vn: "ô nhiễm trên diện rộng" },
+        { en: "environmental deterioration", vn: "sự xuống cấp của môi trường" },
+        { en: "ecosystem imbalance", vn: "mất cân bằng hệ sinh thái" },
+        { en: "threats to public health", vn: "mối đe dọa tới sức khỏe cộng đồng" },
+        { en: "degradation of natural habitats", vn: "suy thoái môi trường sống tự nhiên" },
+        { en: "natural habitats are destroyed", vn: "môi trường sống tự nhiên bị phá hủy" },
+        { en: "alarming rate of resource depletion", vn: "tốc độ cạn kiệt tài nguyên đáng báo động" },
+        { en: "marine pollution", vn: "ô nhiễm biển" },
+        { en: "long-term environmental consequences", vn: "hệ quả môi trường lâu dài" },
+
+        // Nguyên nhân từ con người
+        { en: "overconsumption of resources", vn: "tiêu thụ tài nguyên quá mức" },
+        { en: "mass production of consumer goods", vn: "sản xuất hàng tiêu dùng hàng loạt" },
+        { en: "throwaway culture", vn: "văn hóa dùng rồi bỏ" },
+        { en: "unchecked industrial expansion", vn: "công nghiệp phát triển không kiểm soát" },
+        { en: "reliance on fossil fuels", vn: "phụ thuộc vào nhiên liệu hóa thạch" },
+        { en: "unsustainable lifestyles", vn: "lối sống không bền vững" },
+        { en: "urban sprawl", vn: "đô thị hóa lan rộng thiếu quy hoạch" },
+        { en: "intensive farming practices", vn: "canh tác thâm canh quá mức" },
+        { en: "overexploitation of nature", vn: "khai thác thiên nhiên quá mức" },
+        { en: "short-term economic gains", vn: "lợi ích kinh tế ngắn hạn" },
+        { en: "overconsumption of natural resources", vn: "tiêu thụ quá mức tài nguyên thiên nhiên" },
+        { en: "fossil-fuel dependency", vn: "sự phụ thuộc vào nhiên liệu hóa thạch" },
+        { en: "rapid urbanisation", vn: "đô thị hóa nhanh chóng" },
+        { en: "short-term economic priorities", vn: "ưu tiên lợi ích kinh tế ngắn hạn" },
+        { en: "lack of environmental awareness", vn: "thiếu nhận thức về môi trường" },
+        { en: "poor waste-management systems", vn: "hệ thống quản lý rác thải kém" },
+        { en: "population pressure", vn: "áp lực dân số" },
+        { en: "environmentally irresponsible behaviour", vn: "hành vi thiếu trách nhiệm với môi trường" },
+        { en: "excessive use of plastic packaging", vn: "lạm dụng bao bì nhựa" },
+        { en: "intensive agricultural practices", vn: "nông nghiệp thâm canh" },
+        { en: "raising living standards", vn: "mức sống ngày càng tăng" },
+        { en: "growing demand for energy and water", vn: "nhu cầu năng lượng và nước tăng cao" },
+
+        // Biến đổi khí hậu
+        { en: "climate-related disasters", vn: "thảm họa liên quan đến khí hậu" },
+        { en: "rising global temperatures", vn: "nhiệt độ toàn cầu tăng" },
+        { en: "melting polar ice caps", vn: "băng tan ở hai cực" },
+        { en: "extreme weather events", vn: "hiện tượng thời tiết cực đoan" },
+        { en: "sea-level rise", vn: "mực nước biển dâng" },
+        { en: "long-term climatic shifts", vn: "biến đổi khí hậu dài hạn" },
+        { en: "greenhouse gas emissions", vn: "khí nhà kính" },
+        { en: "carbon-intensive industries", vn: "ngành công nghiệp thải carbon cao" },
+        { en: "climate resilience", vn: "khả năng thích ứng với biến đổi khí hậu" },
+        { en: "mitigating climate change", vn: "giảm thiểu biến đổi khí hậu" },
+        { en: "the greenhouse effect", vn: "hiệu ứng nhà kính" },
+        { en: "climate adaptation strategies", vn: "chiến lược thích ứng với biến đổi khí hậu" },
+        { en: "climate mitigation measures", vn: "biện pháp giảm nhẹ biến đổi khí hậu" },
+        { en: "low-carbon economy", vn: "nền kinh tế ít carbon" },
+
+        // Rác thải và ô nhiễm
+        { en: "plastic-laden waste", vn: "rác thải chứa nhiều nhựa" },
+        { en: "non-biodegradable materials", vn: "vật liệu không phân hủy sinh học" },
+        { en: "microplastics", vn: "vi nhựa" },
+        { en: "landfill overflow", vn: "bãi chôn lấp quá tải" },
+        { en: "illegal dumping", vn: "đổ rác trái phép" },
+        { en: "waste management systems", vn: "hệ thống quản lý rác thải" },
+        { en: "air and water pollution", vn: "ô nhiễm không khí và nước" },
+        { en: "pollution-related illnesses", vn: "bệnh tật do ô nhiễm" },
+        { en: "environmental hazards", vn: "mối nguy hại môi trường" },
+        { en: "plastic pollution in marine ecosystems", vn: "ô nhiễm nhựa trong hệ sinh thái biển" },
+        { en: "long-term economic consequences", vn: "hệ quả kinh tế lâu dài" },
+        { en: "exhaustion of finite resources", vn: "cạn kiệt tài nguyên hữu hạn" },
+        { en: "plastic waste accumulation", vn: "tích tụ rác thải nhựa" },
+        { en: "single-use plastics", vn: "nhựa dùng một lần" },
+        { en: "waste disposal systems", vn: "hệ thống xử lý rác thải" },
+        { en: "toxic substances leaching into the soil", vn: "chất độc ngấm vào đất" },
+
+        // Nước và tài nguyên
+        { en: "water scarcity", vn: "khan hiếm nước" },
+        { en: "soaring demand for freshwater", vn: "nhu cầu nước ngọt tăng vọt" },
+        { en: "unequal distribution of water", vn: "phân bổ nước không đồng đều" },
+        { en: "overuse of groundwater", vn: "khai thác nước ngầm quá mức" },
+        { en: "resource-intensive industries", vn: "ngành tiêu tốn nhiều tài nguyên" },
+        { en: "renewable vs non-renewable resources", vn: "tài nguyên tái tạo và không tái tạo" },
+        { en: "resource depletion crisis", vn: "khủng hoảng cạn kiệt tài nguyên" },
+        { en: "water-efficient technologies", vn: "công nghệ tiết kiệm nước" },
+        { en: "sustainable water management", vn: "quản lý nước bền vững" },
+        { en: "clean water accessibility", vn: "khả năng tiếp cận nước sạch" },
+        { en: "freshwater scarcity", vn: "khan hiếm nước ngọt" },
+        { en: "finite natural resources", vn: "tài nguyên thiên nhiên hữu hạn" },
+        { en: "renewable energy sources", vn: "nguồn năng lượng tái tạo" },
+        { en: "water-intensive industries", vn: "ngành công nghiệp tiêu thụ nhiều nước" },
+        { en: "over-extraction of groundwater", vn: "khai thác nước ngầm quá mức" },
+        { en: "energy security", vn: "an ninh năng lượng" },
+        { en: "resource conservation", vn: "bảo tồn tài nguyên" },
+        { en: "sustainable resource management", vn: "quản lý tài nguyên bền vững" },
+        { en: "alternative energy solutions", vn: "giải pháp năng lượng thay thế" },
+        { en: "equitable access to clean water", vn: "tiếp cận công bằng nguồn nước sạch" },
+
+        // Giải pháp
+        { en: "adopt sustainable practices", vn: "áp dụng các phương thức bền vững" },
+        { en: "transition to renewable energy sources", vn: "chuyển sang năng lượng tái tạo" },
+        { en: "implement stricter environmental regulations", vn: "áp dụng quy định môi trường nghiêm ngặt hơn" },
+        { en: "promote environmentally friendly lifestyles", vn: "thúc đẩy lối sống thân thiện môi trường" },
+        { en: "invest in green technologies", vn: "đầu tư vào công nghệ xanh" },
+        { en: "enhance public awareness campaigns", vn: "tăng cường chiến dịch nâng cao nhận thức" },
+        { en: "encourage recycling and reuse", vn: "khuyến khích tái chế và tái sử dụng" },
+        { en: "protect vulnerable ecosystems", vn: "bảo vệ các hệ sinh thái dễ tổn thương" },
+        { en: "reduce carbon emissions", vn: "cắt giảm khí thải carbon" },
+        { en: "adopt a circular economy model", vn: "áp dụng mô hình kinh tế tuần hoàn" },
+        { en: "stringent environmental regulations", vn: "quy định môi trường nghiêm ngặt" },
+        { en: "impose heavy fines on polluters", vn: "phạt nặng bên gây ô nhiễm" },
+        { en: "polluter-pays principle", vn: "nguyên tắc người gây ô nhiễm phải trả giá" },
+        { en: "carbon pricing", vn: "định giá carbon" },
+        { en: "carbon tax", vn: "thuế carbon" },
+        { en: "investment in renewable energy", vn: "đầu tư năng lượng tái tạo" },
+        { en: "nationwide recycling schemes", vn: "chương trình tái chế toàn quốc" },
+        { en: "subsidies for green technologies", vn: "trợ cấp công nghệ xanh" },
+        { en: "long-term environmental strategies", vn: "chiến lược môi trường dài hạn" },
+        { en: "international cooperation", vn: "hợp tác quốc tế" },
+        { en: "public awareness campaigns", vn: "chiến dịch nâng cao nhận thức" },
+
+        // Trách nhiệm
+        { en: "government intervention is essential", vn: "sự can thiệp của chính phủ là cần thiết" },
+        { en: "introduce punitive measures", vn: "đưa ra các biện pháp trừng phạt" },
+        { en: "enforce environmental legislation", vn: "thực thi luật bảo vệ môi trường" },
+        { en: "impose pollution taxes", vn: "đánh thuế ô nhiễm" },
+        { en: "hold polluters accountable", vn: "buộc bên gây ô nhiễm chịu trách nhiệm" },
+        { en: "individual actions collectively matter", vn: "hành động cá nhân cộng lại tạo ra khác biệt" },
+        { en: "shared responsibility", vn: "trách nhiệm chung" },
+        { en: "grassroots environmental movements", vn: "phong trào môi trường từ cộng đồng" },
+        { en: "lead by example", vn: "làm gương" },
+        { en: "without individual participation, policies remain ineffective", vn: "nếu không có cá nhân tham gia, chính sách sẽ kém hiệu quả" },
+        { en: "adopt eco-friendly habits", vn: "áp dụng thói quen thân thiện môi trường" },
+        { en: "reduce one's carbon footprint", vn: "giảm lượng khí thải cá nhân" },
+        { en: "responsible consumption", vn: "tiêu dùng có trách nhiệm" },
+        { en: "cut down on single-use plastics", vn: "giảm nhựa dùng một lần" },
+        { en: "opt for public transportation", vn: "chọn phương tiện công cộng" },
+        { en: "conserve water and energy", vn: "tiết kiệm nước và năng lượng" },
+        { en: "make environmentally conscious choices", vn: "lựa chọn có ý thức môi trường" },
+        { en: "grassroots environmental actions", vn: "hành động môi trường từ cộng đồng" },
+        { en: "voluntary lifestyle changes", vn: "thay đổi lối sống tự nguyện" },
+        { en: "collective individual effort", vn: "nỗ lực cá nhân mang tính tập thể" }
+    ];
+
+    let currentItem = {};
+    let currentIndex = 0;
+    const totalQuestions = 20; 
+    let currentScrambleWords = [];
+    let blankWordData = { word: '', fullEn: '' };
+
+    const exerciseArea = document.getElementById('exerciseArea');
+    const feedbackText = document.getElementById('feedbackText');
+    const nextBtn = document.getElementById('nextBtn');
+    const progressFill = document.getElementById('progressFill');
+
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function shuffleArray(array) {
+        let newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
+
+    function updateProgress() {
+        const percent = (currentIndex / totalQuestions) * 100;
+        progressFill.style.width = `${percent}%`;
+    }
+
+    // RESET SESSION DÀNH RIÊNG CHO GOOGLE SITES
+    function resetSession() {
+        currentIndex = 0;
+        startExercise();
+    }
+
+    function startExercise() {
+        if (currentIndex >= totalQuestions) {
+            exerciseArea.innerHTML = `
+                <h2 style="font-family: 'Lora', serif; color: var(--primary);">Nhiệm vụ Xanh hoàn tất!</h2>
+                <p>Quá xuất sắc! Bạn đã "dọn dẹp" xong session từ vựng Môi trường. Tiếp tục giữ vững phong độ này nhé!</p>
+                <button class="action-btn" onclick="resetSession()">Luyện tiếp Session mới</button>
+            `;
+            feedbackText.innerHTML = "";
+            nextBtn.style.display = "none";
+            updateProgress();
+            return;
+        }
+
+        feedbackText.innerHTML = "";
+        nextBtn.style.display = "none";
+        currentItem = getRandomItem(vocabData);
+        updateProgress();
+
+        const type = Math.floor(Math.random() * 5) + 1;
+        
+        switch(type) {
+            case 1: renderMultipleChoice(); break;
+            case 2: renderTyping(); break;
+            case 3: renderMatching(); break;
+            case 4: renderUnscramble(); break;
+            case 5: renderFillInBlank(); break;
+        }
+    }
+
+    function renderMultipleChoice() {
+        let options = [currentItem];
+        while(options.length < 4) {
+            let randomOpt = getRandomItem(vocabData);
+            if(!options.find(o => o.en === randomOpt.en)) options.push(randomOpt);
+        }
+        options = shuffleArray(options);
+
+        let html = `<div class="question">Nghĩa của cụm từ: <br><span style="color:var(--primary); font-family: 'Lora', serif; font-size: 26px;">"${currentItem.en}"</span> là gì?</div>`;
+        options.forEach(opt => {
+            html += `<button class="option-btn" onclick="checkAnswer(this, '${opt.vn.replace(/'/g, "\\'")}', '${currentItem.vn.replace(/'/g, "\\'")}')">${opt.vn}</button>`;
+        });
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderTyping() {
+        exerciseArea.innerHTML = `
+            <div class="question">Viết cụm từ tiếng Anh cho:<br><span style="color:var(--primary); font-size: 22px;">"${currentItem.vn}"</span></div>
+            <input type="text" id="typeInput" placeholder="Gõ tiếng Anh vào đây..." onkeypress="handleEnter(event, checkTyping)">
+            <button class="action-btn" onclick="checkTyping()">Kiểm tra</button>
+        `;
+        setTimeout(() => document.getElementById('typeInput').focus(), 100);
+    }
+
+    function renderMatching() {
+        let options = [currentItem];
+        while(options.length < 4) {
+            let randomOpt = getRandomItem(vocabData);
+            if(!options.find(o => o.vn === randomOpt.vn)) options.push(randomOpt);
+        }
+        options = shuffleArray(options);
+
+        let html = `<div class="question">Chọn tiếng Anh chuẩn cho:<br><span style="color:var(--primary); font-size: 22px;">"${currentItem.vn}"</span></div>`;
+        options.forEach(opt => {
+            html += `<button class="option-btn" onclick="checkAnswer(this, '${opt.en.replace(/'/g, "\\'")}', '${currentItem.en.replace(/'/g, "\\'")}')">${opt.en}</button>`;
+        });
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderUnscramble() {
+        const words = shuffleArray(currentItem.en.split(' '));
+        currentScrambleWords = [];
+        
+        let html = `
+            <div class="question">Xếp từ thành cụm hoàn chỉnh:<br><span style="color:var(--text-light); font-size: 18px;">(${currentItem.vn})</span></div>
+            <div class="answer-dropzone" id="dropzone"></div>
+            <div class="scramble-container" id="scrambleWords">
+        `;
+        
+        words.forEach((word, index) => {
+            html += `<div class="scramble-word" id="sw-${index}" onclick="selectScrambleWord('${word.replace(/'/g, "\\'")}', ${index})">${word}</div>`;
+        });
+        
+        html += `</div><button class="action-btn" onclick="checkScramble()">Kiểm tra</button><button class="action-btn" style="background:#e9ecef; color:#495057; margin-left:10px;" onclick="resetScramble()">Làm lại</button>`;
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderFillInBlank() {
+        const words = currentItem.en.split(' ');
+        if(words.length < 2) { 
+            renderMultipleChoice();
+            return; 
+        }
+        const blankIndex = Math.floor(Math.random() * words.length);
+        blankWordData.word = words[blankIndex];
+        blankWordData.fullEn = currentItem.en;
+        
+        let displayWords = [...words];
+        displayWords[blankIndex] = `<input type="text" id="blankInput" class="blank-input" onkeypress="handleEnter(event, checkBlank)">`;
+        
+        exerciseArea.innerHTML = `
+            <div class="question">Điền từ còn thiếu vào cụm sau:<br><span style="color:var(--text-light); font-size: 18px;">(${currentItem.vn})</span></div>
+            <div style="font-size: 22px; font-weight: 600; margin-bottom: 20px;">
+                ${displayWords.join(' ')}
+            </div>
+            <button class="action-btn" onclick="checkBlank()">Kiểm tra</button>
+        `;
+        setTimeout(() => document.getElementById('blankInput').focus(), 100);
+    }
+
+    function selectScrambleWord(word, index) {
+        document.getElementById(`sw-${index}`).classList.add('selected');
+        currentScrambleWords.push({word, index});
+        renderDropzone();
+    }
+
+    function renderDropzone() {
+        const dropzone = document.getElementById('dropzone');
+        dropzone.innerHTML = currentScrambleWords.map(item => `<div class="scramble-word" style="background:var(--primary); color:white">${item.word}</div>`).join('');
+    }
+
+    function resetScramble() {
+        currentScrambleWords = [];
+        renderDropzone();
+        document.querySelectorAll('.scramble-word').forEach(el => el.classList.remove('selected'));
+    }
+
+    function checkScramble() {
+        const answer = currentScrambleWords.map(item => item.word).join(' ');
+        if(answer === currentItem.en) showFeedback(true);
+        else showFeedback(false, currentItem.en);
+    }
+
+    function checkBlank() {
+        const input = document.getElementById('blankInput').value.trim().toLowerCase();
+        // Loại bỏ dấu câu để mượt hơn
+        const cleanInput = input.replace(/[.,'"]/g, "");
+        const cleanWord = blankWordData.word.toLowerCase().replace(/[.,'"]/g, "");
+        
+        if(cleanInput === cleanWord) showFeedback(true);
+        else showFeedback(false, blankWordData.fullEn);
+    }
+
+    function handleEnter(e, checkFunction) {
+        if(e.key === 'Enter') checkFunction();
+    }
+
+    function checkAnswer(btn, selected, correct) {
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(b => b.disabled = true);
+        
+        if(selected === correct) {
+            btn.classList.add('correct');
+            showFeedback(true);
+        } else {
+            btn.classList.add('wrong');
+            btns.forEach(b => {
+                if(b.innerText === correct) b.classList.add('correct');
+            });
+            showFeedback(false, correct);
+        }
+    }
+
+    function checkTyping() {
+        const input = document.getElementById('typeInput').value.trim().toLowerCase();
+        const cleanInput = input.replace(/[.,'"]/g, "");
+        const cleanTarget = currentItem.en.toLowerCase().replace(/[.,'"]/g, "");
+
+        if(cleanInput === cleanTarget) showFeedback(true);
+        else showFeedback(false, currentItem.en);
+    }
+
+    function showFeedback(isCorrect, correctAnswer = "") {
+        if(isCorrect) {
+            feedbackText.innerHTML = `<span style="color: #4C7A5D;">Chuẩn xanh! 🌱 Lập luận rất nét.</span>`;
+        } else {
+            feedbackText.innerHTML = `<span style="color: #D66853;">Chưa chính xác. Trồng thêm cây từ vựng này nhé: <b>${correctAnswer}</b></span>`;
+        }
+        nextBtn.style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        startExercise();
+    }
+
+    window.onload = startExercise;
+
+</script>
+</body>
+</html>
