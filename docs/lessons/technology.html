@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technology | SnapEnglish</title>
+   <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F0F4F8;
+            --primary: #2A4B7C; /* Xanh Tech sâu sắc */
+            --secondary: #5B8DB8;
+            --accent: #E1E8F0;
+            --text-main: #2C3E50;
+            --text-light: #7F8C8D;
+            --white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--white);
+            max-width: 600px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(42, 75, 124, 0.08);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-family: 'Lora', serif;
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .exercise-area {
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .question {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        button.option-btn {
+            background-color: var(--white);
+            border: 2px solid var(--accent);
+            color: var(--text-main);
+            padding: 12px 20px;
+            margin: 8px 0;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+        }
+
+        button.option-btn:hover {
+            background-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        button.option-btn.correct {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: var(--white);
+        }
+
+        button.option-btn.wrong {
+            background-color: #E05D5D;
+            border-color: #E05D5D;
+            color: var(--white);
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 15px;
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Nunito', sans-serif;
+            margin-bottom: 15px;
+            text-align: center;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        .blank-input {
+            width: auto;
+            min-width: 100px;
+            display: inline-block;
+            margin: 0 10px;
+            padding: 8px;
+            border-bottom: 2px solid var(--primary);
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            border-radius: 0;
+            background-color: transparent;
+        }
+
+        .action-btn {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+            box-shadow: 0 4px 15px rgba(42, 75, 124, 0.3);
+        }
+
+        .action-btn:hover {
+            background-color: #1A3459;
+        }
+
+        .scramble-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .scramble-word {
+            background: var(--accent);
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            color: var(--text-main);
+        }
+        
+        .scramble-word.selected {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .answer-dropzone {
+            min-height: 50px;
+            border: 2px dashed var(--secondary);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 10px;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            height: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Tech Vocab Master</h1>
+    <div class="subtitle">"Làm chủ kỷ nguyên số, bứt phá Writing Task 2."</div>
+    
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="exercise-area" id="exerciseArea">
+        </div>
+
+    <div class="feedback" id="feedbackText"></div>
+    <button class="action-btn" id="nextBtn" style="display: none;" onclick="nextQuestion()">Tiếp tục ➔</button>
+</div>
+
+<script>
+    // FULL DATA TỪ BẢNG TECHNOLOGY
+    const vocabData = [
+        // Công nghệ chung và đời sống
+        { en: "rapid technological advancement", vn: "sự phát triển công nghệ nhanh chóng" },
+        { en: "the digital era", vn: "kỷ nguyên số" },
+        { en: "technological innovation", vn: "đổi mới công nghệ" },
+        { en: "cutting-edge technology", vn: "công nghệ tiên tiến hàng đầu" },
+        { en: "the widespread adoption of technology", vn: "việc áp dụng công nghệ rộng rãi" },
+        { en: "technology-driven society", vn: "xã hội được dẫn dắt bởi công nghệ" },
+        { en: "technological progress has transformed daily life", vn: "tiến bộ công nghệ đã thay đổi đời sống" },
+        { en: "the proliferation of digital devices", vn: "sự bùng nổ của các thiết bị số" },
+        { en: "transform the way people live and work", vn: "thay đổi cách con người sống và làm việc" },
+        { en: "enhance overall quality of life", vn: "nâng cao chất lượng cuộc sống tổng thể" },
+        { en: "bring about profound changes", vn: "mang lại những thay đổi sâu sắc" },
+        { en: "streamline daily tasks", vn: "đơn giản hóa các công việc hằng ngày" },
+        { en: "reduce the burden of manual labour", vn: "giảm gánh nặng lao động tay chân" },
+        { en: "make life more convenient and efficient", vn: "khiến cuộc sống tiện lợi và hiệu quả hơn" },
+        { en: "become an indispensable part of modern life", vn: "trở thành phần không thể thiếu của cuộc sống hiện đại" },
+        { en: "reshape human lifestyles", vn: "tái định hình lối sống con người" },
+        { en: "improve efficiency and productivity", vn: "cải thiện hiệu suất và năng suất" },
+        { en: "save time and effort", vn: "tiết kiệm thời gian và công sức" },
+        { en: "increase convenience and accessibility", vn: "tăng sự tiện lợi và khả năng tiếp cận" },
+        { en: "reduce human workload", vn: "giảm khối lượng công việc cho con người" },
+        { en: "promote economic growth", vn: "thúc đẩy tăng trưởng kinh tế" },
+        { en: "provide greater flexibility", vn: "mang lại sự linh hoạt cao hơn" },
+        { en: "widen the digital divide", vn: "làm gia tăng khoảng cách số" },
+        { en: "over-reliance on technology", vn: "sự phụ thuộc quá mức vào công nghệ" },
+        { en: "pose threats to privacy", vn: "gây ra nguy cơ xâm phạm quyền riêng tư" },
+        { en: "lead to job displacement", vn: "dẫn đến mất việc làm" },
+        { en: "undermine traditional skills", vn: "làm suy yếu các kỹ năng truyền thống" },
+        { en: "social isolation", vn: "sự cô lập xã hội" },
+        { en: "diminish face-to-face interaction", vn: "làm giảm giao tiếp trực tiếp" },
+        { en: "raise ethical concerns", vn: "đặt ra các vấn đề đạo đức" },
+        { en: "bridge the generation gap", vn: "thu hẹp khoảng cách thế hệ" },
+        { en: "improve access to healthcare services", vn: "cải thiện tiếp cận y tế" },
+        { en: "combat loneliness and isolation", vn: "chống lại sự cô đơn" },
+        { en: "user-friendly interfaces", vn: "giao diện thân thiện với người dùng" },
+        { en: "digital literacy programs", vn: "chương trình nâng cao kỹ thuật số" },
+        { en: "fear of new technology", vn: "nỗi sợ công nghệ mới" },
+        { en: "encourage gradual adoption", vn: "khuyến khích tiếp cận dần dần" },
+        { en: "provide technical support", vn: "cung cấp hỗ trợ kỹ thuật" },
+
+        // Giao tiếp và các mối quan hệ
+        { en: "digital communication platforms", vn: "nền tảng giao tiếp số" },
+        { en: "instant connectivity", vn: "kết nối tức thì" },
+        { en: "virtual relationships", vn: "các mối quan hệ ảo" },
+        { en: "superficial interactions", vn: "tương tác hời hợt" },
+        { en: "face-to-face social skills", vn: "kỹ năng giao tiếp trực tiếp" },
+        { en: "a decline in meaningful communication", vn: "sự suy giảm giao tiếp có chiều sâu" },
+        { en: "strengthen long-distance relationships", vn: "củng cố quan hệ xa cách" },
+        { en: "communication barriers across generations", vn: "rào cản giao tiếp giữa các thế hệ" },
+        { en: "facilitate instant communication", vn: "tạo điều kiện giao tiếp tức thời" },
+        { en: "maintain social connections", vn: "duy trì các mối quan hệ xã hội" },
+        { en: "lack of face-to-face interaction", vn: "thiếu tương tác trực tiếp" },
+        { en: "weaken interpersonal communication skills", vn: "làm suy yếu kỹ năng giao tiếp cá nhân" },
+        { en: "build and sustain relationships online", vn: "xây dựng và duy trì quan hệ trực tuyến" },
+        { en: "virtual interaction replaces physical presence", vn: "tương tác ảo thay thế sự hiện diện thực" },
+        { en: "communicate at the click of a button", vn: "giao tiếp chỉ bằng một cú nhấp chuột" },
+
+        // Giáo dục và công nghệ
+        { en: "online learning platforms", vn: "nền tảng học trực tuyến" },
+        { en: "distance education", vn: "giáo dục từ xa" },
+        { en: "self-paced learning", vn: "học theo tiến độ cá nhân" },
+        { en: "lack of direct supervision", vn: "thiếu sự giám sát trực tiếp" },
+        { en: "equal access to education", vn: "tiếp cận giáo dục bình đẳng" },
+        { en: "interactive digital materials", vn: "tài liệu số tương tác" },
+        { en: "traditional classroom setting", vn: "môi trường lớp học truyền thống" },
+        { en: "academic discipline and motivation", vn: "tính kỷ luật và động lực học tập" },
+        { en: "expand access to education", vn: "mở rộng cơ hội tiếp cận giáo dục" },
+        { en: "distance learning platforms", vn: "nền tảng học từ xa" },
+        { en: "acquire knowledge independently", vn: "tự tiếp thu kiến thức" },
+        { en: "replace traditional classroom settings", vn: "thay thế mô hình lớp học truyền thống" },
+        { en: "encourage lifelong learning", vn: "khuyến khích học tập suốt đời" },
+        { en: "reduce geographical barriers", vn: "giảm rào cản địa lý" },
+        { en: "digital literacy skills", vn: "kỹ năng hiểu biết công nghệ số" },
+        { en: "a decline in reading and writing proficiency", vn: "sự suy giảm khả năng đọc viết" },
+
+        // Việc làm và Tự động hóa
+        { en: "automation of manual labor", vn: "tự động hóa lao động tay chân" },
+        { en: "replace human workers", vn: "thay thế người lao động" },
+        { en: "create new employment opportunities", vn: "tạo ra cơ hội việc làm mới" },
+        { en: "require workforce retraining", vn: "đòi hỏi đào tạo lại lực lượng lao động" },
+        { en: "increase workplace safety", vn: "tăng độ an toàn nơi làm việc" },
+        { en: "high-skilled vs low-skilled jobs", vn: "việc làm tay nghề cao và thấp" },
+        { en: "reshape the labor market", vn: "tái cấu trúc thị trường lao động" },
+        { en: "technological unemployment", vn: "thất nghiệp do công nghệ" },
+        { en: "automate repetitive tasks", vn: "tự động hóa các công việc lặp lại" },
+        { en: "replace human labour", vn: "thay thế lao động con người" },
+        { en: "minimize human error", vn: "giảm thiểu sai sót của con người" },
+        { en: "pose a threat to employment", vn: "đe dọa việc làm" },
+        { en: "carry out physically demanding work", vn: "thực hiện công việc nặng nhọc" },
+        { en: "free people up for more creative tasks", vn: "giải phóng con người cho công việc sáng tạo" },
+
+        // Nghệ thuật vs Khoa học - AI
+        { en: "express human emotions and values", vn: "thể hiện cảm xúc và giá trị con người" },
+        { en: "reflect cultural identity", vn: "phản ánh bản sắc văn hóa" },
+        { en: "offer moral and philosophical insights", vn: "mang lại góc nhìn đạo đức và triết học" },
+        { en: "nurture creativity and imagination", vn: "nuôi dưỡng sáng tạo và trí tưởng tượng" },
+        { en: "address the human condition", vn: "đề cập bản chất con người" },
+        { en: "cannot be quantified by data", vn: "không thể đo lường bằng dữ liệu" },
+        { en: "complement scientific progress", vn: "bổ trợ cho tiến bộ khoa học" },
+        { en: "autonomous vehicles", vn: "phương tiện tự lái" },
+        { en: "reduce traffic accidents", vn: "giảm tai nạn giao thông" },
+        { en: "eliminate human-related driving errors", vn: "loại bỏ lỗi do con người gây ra" },
+        { en: "improve road safety", vn: "cải thiện an toàn giao thông" },
+        { en: "raise ethical and legal concerns", vn: "làm dấy lên lo ngại về đạo đức và pháp lý" },
+        { en: "revolutionize the transportation system", vn: "cách mạng hóa hệ thống giao thông" },
+        { en: "gain public trust", vn: "giành được lòng tin của công chúng" },
+        { en: "technology is still in its infancy", vn: "công nghệ vẫn đang trong giai đoạn sơ khai" }
+    ];
+
+    let currentItem = {};
+    let currentIndex = 0;
+    const totalQuestions = 20; 
+    let currentScrambleWords = [];
+    let blankWordData = { word: '', fullEn: '' };
+
+    const exerciseArea = document.getElementById('exerciseArea');
+    const feedbackText = document.getElementById('feedbackText');
+    const nextBtn = document.getElementById('nextBtn');
+    const progressFill = document.getElementById('progressFill');
+
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function shuffleArray(array) {
+        let newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
+
+    function updateProgress() {
+        const percent = (currentIndex / totalQuestions) * 100;
+        progressFill.style.width = `${percent}%`;
+    }
+
+    // RESET SESSION DÀNH RIÊNG CHO GOOGLE SITES
+    function resetSession() {
+        currentIndex = 0;
+        startExercise();
+    }
+
+    function startExercise() {
+        if (currentIndex >= totalQuestions) {
+            exerciseArea.innerHTML = `
+                <h2 style="font-family: 'Lora', serif; color: var(--primary);">System Upgraded!</h2>
+                <p>Tuyệt vời! Dữ liệu từ vựng Technology đã được cài đặt sâu vào bộ nhớ của bạn. Hãy duy trì thói quen học hàng tuần nhé!</p>
+                <button class="action-btn" onclick="resetSession()">Luyện tiếp Session mới</button>
+            `;
+            feedbackText.innerHTML = "";
+            nextBtn.style.display = "none";
+            updateProgress();
+            return;
+        }
+
+        feedbackText.innerHTML = "";
+        nextBtn.style.display = "none";
+        currentItem = getRandomItem(vocabData);
+        updateProgress();
+
+        const type = Math.floor(Math.random() * 5) + 1;
+        
+        switch(type) {
+            case 1: renderMultipleChoice(); break;
+            case 2: renderTyping(); break;
+            case 3: renderMatching(); break;
+            case 4: renderUnscramble(); break;
+            case 5: renderFillInBlank(); break;
+        }
+    }
+
+    function renderMultipleChoice() {
+        let options = [currentItem];
+        while(options.length < 4) {
+            let randomOpt = getRandomItem(vocabData);
+            if(!options.find(o => o.en === randomOpt.en)) options.push(randomOpt);
+        }
+        options = shuffleArray(options);
+
+        let html = `<div class="question">Nghĩa của cụm từ: <br><span style="color:var(--primary); font-family: 'Lora', serif; font-size: 26px;">"${currentItem.en}"</span> là gì?</div>`;
+        options.forEach(opt => {
+            html += `<button class="option-btn" onclick="checkAnswer(this, '${opt.vn.replace(/'/g, "\\'")}', '${currentItem.vn.replace(/'/g, "\\'")}')">${opt.vn}</button>`;
+        });
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderTyping() {
+        exerciseArea.innerHTML = `
+            <div class="question">Viết cụm từ tiếng Anh cho:<br><span style="color:var(--secondary); font-size: 22px;">"${currentItem.vn}"</span></div>
+            <input type="text" id="typeInput" placeholder="Gõ tiếng Anh vào đây..." onkeypress="handleEnter(event, checkTyping)">
+            <button class="action-btn" onclick="checkTyping()">Kiểm tra</button>
+        `;
+        setTimeout(() => document.getElementById('typeInput').focus(), 100);
+    }
+
+    function renderMatching() {
+        let options = [currentItem];
+        while(options.length < 4) {
+            let randomOpt = getRandomItem(vocabData);
+            if(!options.find(o => o.vn === randomOpt.vn)) options.push(randomOpt);
+        }
+        options = shuffleArray(options);
+
+        let html = `<div class="question">Chọn tiếng Anh chuẩn cho:<br><span style="color:var(--primary); font-size: 22px;">"${currentItem.vn}"</span></div>`;
+        options.forEach(opt => {
+            html += `<button class="option-btn" onclick="checkAnswer(this, '${opt.en.replace(/'/g, "\\'")}', '${currentItem.en.replace(/'/g, "\\'")}')">${opt.en}</button>`;
+        });
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderUnscramble() {
+        const words = shuffleArray(currentItem.en.split(' '));
+        currentScrambleWords = [];
+        
+        let html = `
+            <div class="question">Xếp từ thành cụm hoàn chỉnh:<br><span style="color:var(--text-light); font-size: 18px;">(${currentItem.vn})</span></div>
+            <div class="answer-dropzone" id="dropzone"></div>
+            <div class="scramble-container" id="scrambleWords">
+        `;
+        
+        words.forEach((word, index) => {
+            html += `<div class="scramble-word" id="sw-${index}" onclick="selectScrambleWord('${word.replace(/'/g, "\\'")}', ${index})">${word}</div>`;
+        });
+        
+        html += `</div><button class="action-btn" onclick="checkScramble()">Kiểm tra</button><button class="action-btn" style="background:#e9ecef; color:#495057; margin-left:10px;" onclick="resetScramble()">Làm lại</button>`;
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderFillInBlank() {
+        const words = currentItem.en.split(' ');
+        if(words.length < 2) { 
+            renderMultipleChoice();
+            return; 
+        }
+        const blankIndex = Math.floor(Math.random() * words.length);
+        blankWordData.word = words[blankIndex];
+        blankWordData.fullEn = currentItem.en;
+        
+        let displayWords = [...words];
+        displayWords[blankIndex] = `<input type="text" id="blankInput" class="blank-input" onkeypress="handleEnter(event, checkBlank)">`;
+        
+        exerciseArea.innerHTML = `
+            <div class="question">Điền từ còn thiếu vào cụm sau:<br><span style="color:var(--text-light); font-size: 18px;">(${currentItem.vn})</span></div>
+            <div style="font-size: 22px; font-weight: 600; margin-bottom: 20px;">
+                ${displayWords.join(' ')}
+            </div>
+            <button class="action-btn" onclick="checkBlank()">Kiểm tra</button>
+        `;
+        setTimeout(() => document.getElementById('blankInput').focus(), 100);
+    }
+
+    function selectScrambleWord(word, index) {
+        document.getElementById(`sw-${index}`).classList.add('selected');
+        currentScrambleWords.push({word, index});
+        renderDropzone();
+    }
+
+    function renderDropzone() {
+        const dropzone = document.getElementById('dropzone');
+        dropzone.innerHTML = currentScrambleWords.map(item => `<div class="scramble-word" style="background:var(--primary); color:white">${item.word}</div>`).join('');
+    }
+
+    function resetScramble() {
+        currentScrambleWords = [];
+        renderDropzone();
+        document.querySelectorAll('.scramble-word').forEach(el => el.classList.remove('selected'));
+    }
+
+    function checkScramble() {
+        const answer = currentScrambleWords.map(item => item.word).join(' ');
+        if(answer === currentItem.en) showFeedback(true);
+        else showFeedback(false, currentItem.en);
+    }
+
+    function checkBlank() {
+        const input = document.getElementById('blankInput').value.trim().toLowerCase();
+        const cleanInput = input.replace(/[.,'"]/g, "");
+        const cleanWord = blankWordData.word.toLowerCase().replace(/[.,'"]/g, "");
+        
+        if(cleanInput === cleanWord) showFeedback(true);
+        else showFeedback(false, blankWordData.fullEn);
+    }
+
+    function handleEnter(e, checkFunction) {
+        if(e.key === 'Enter') checkFunction();
+    }
+
+    function checkAnswer(btn, selected, correct) {
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(b => b.disabled = true);
+        
+        if(selected === correct) {
+            btn.classList.add('correct');
+            showFeedback(true);
+        } else {
+            btn.classList.add('wrong');
+            btns.forEach(b => {
+                if(b.innerText === correct) b.classList.add('correct');
+            });
+            showFeedback(false, correct);
+        }
+    }
+
+    function checkTyping() {
+        const input = document.getElementById('typeInput').value.trim().toLowerCase();
+        const cleanInput = input.replace(/[.,'"]/g, "");
+        const cleanTarget = currentItem.en.toLowerCase().replace(/[.,'"]/g, "");
+
+        if(cleanInput === cleanTarget) showFeedback(true);
+        else showFeedback(false, currentItem.en);
+    }
+
+    function showFeedback(isCorrect, correctAnswer = "") {
+        if(isCorrect) {
+            feedbackText.innerHTML = `<span style="color: #2A4B7C;">Chính xác! Lập luận bén như AI. 🤖</span>`;
+        } else {
+            feedbackText.innerHTML = `<span style="color: #E05D5D;">Lỗi xử lý. Đáp án đúng là: <b>${correctAnswer}</b></span>`;
+        }
+        nextBtn.style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        startExercise();
+    }
+
+    window.onload = startExercise;
+
+</script>
+</body>
+</html>
