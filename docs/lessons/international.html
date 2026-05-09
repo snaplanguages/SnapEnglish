@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> International | SnapEnglish</title>
+   <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F0F8FA;
+            --primary: #1A5F7A; /* Xanh Đại dương sâu thẳm */
+            --secondary: #57C5B6; /* Xanh lam ngọc */
+            --accent: #E2F6F8;
+            --text-main: #22333B;
+            --text-light: #5E6E7A;
+            --white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--white);
+            max-width: 600px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(26, 95, 122, 0.08);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-top: 5px solid var(--primary);
+        }
+
+        h1 {
+            font-family: 'Lora', serif;
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--secondary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .exercise-area {
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .question {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        button.option-btn {
+            background-color: var(--white);
+            border: 2px solid var(--accent);
+            color: var(--text-main);
+            padding: 12px 20px;
+            margin: 8px 0;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+        }
+
+        button.option-btn:hover {
+            background-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        button.option-btn.correct {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: var(--white);
+        }
+
+        button.option-btn.wrong {
+            background-color: #E26D5C;
+            border-color: #E26D5C;
+            color: var(--white);
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 15px;
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Nunito', sans-serif;
+            margin-bottom: 15px;
+            text-align: center;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        .blank-input {
+            width: auto;
+            min-width: 100px;
+            display: inline-block;
+            margin: 0 10px;
+            padding: 8px;
+            border-bottom: 2px solid var(--primary);
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            border-radius: 0;
+            background-color: transparent;
+        }
+
+        .action-btn {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+            box-shadow: 0 4px 15px rgba(26, 95, 122, 0.3);
+        }
+
+        .action-btn:hover {
+            background-color: #104256;
+        }
+
+        .scramble-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .scramble-word {
+            background: var(--accent);
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            color: var(--text-main);
+        }
+        
+        .scramble-word.selected {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .answer-dropzone {
+            min-height: 50px;
+            border: 2px dashed var(--secondary);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 10px;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            height: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>International Vocab</h1>
+    <div class="subtitle">"Vươn tầm thế giới, giải quyết vấn đề toàn cầu."</div>
+    
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="exercise-area" id="exerciseArea">
+        </div>
+
+    <div class="feedback" id="feedbackText"></div>
+    <button class="action-btn" id="nextBtn" style="display: none;" onclick="nextQuestion()">Tiếp tục ➔</button>
+</div>
+
+<script>
+    // FULL DATA TỪ BẢNG INTERNATIONAL
+    const vocabData = [
+        // International cooperation and global governance
+        { en: "international cooperation", vn: "sự hợp tác quốc tế" },
+        { en: "multilateral agreements", vn: "các hiệp định đa phương" },
+        { en: "cross-border collaboration", vn: "hợp tác xuyên biên giới" },
+        { en: "collective global effort", vn: "nỗ lực toàn cầu mang tính tập thể" },
+        { en: "shared international responsibility", vn: "trách nhiệm chung của các quốc gia" },
+        { en: "global governance frameworks", vn: "khuôn khổ quản trị toàn cầu" },
+        { en: "joint problem-solving mechanisms", vn: "cơ chế giải quyết vấn đề chung" },
+        { en: "international consensus", vn: "sự đồng thuận quốc tế" },
+        { en: "diplomatic coordination", vn: "sự phối hợp ngoại giao" },
+        { en: "transnational challenges", vn: "những thách thức mang tính xuyên quốc gia" },
+        { en: "joint action among nations", vn: "hành động phối hợp giữa các quốc gia" },
+        { en: "coordinated international response", vn: "phản ứng quốc tế có phối hợp" },
+        { en: "intergovernmental organizations", vn: "các tổ chức liên chính phủ" },
+        { en: "a unified global approach", vn: "cách tiếp cận toàn cầu thống nhất" },
+
+        // Environmental protection and sustainability
+        { en: "environmental degradation", vn: "sự suy thoái môi trường" },
+        { en: "climate change mitigation", vn: "giảm thiểu biến đổi khí hậu" },
+        { en: "sustainable development goals (SDGs)", vn: "các mục tiêu phát triển bền vững" },
+        { en: "ecosystem preservation", vn: "bảo tồn hệ sinh thái" },
+        { en: "carbon emissions reduction", vn: "cắt giảm khí thải carbon" },
+        { en: "global environmental crisis", vn: "khủng hoảng môi trường toàn cầu" },
+        { en: "natural resource depletion", vn: "cạn kiệt tài nguyên thiên nhiên" },
+        { en: "environmentally responsible practices", vn: "các hoạt động thân thiện với môi trường" },
+        { en: "long-term ecological balance", vn: "cân bằng sinh thái dài hạn" },
+        { en: "irreversible environmental damage", vn: "tổn hại môi trường không thể đảo ngược" },
+        { en: "environmental protection", vn: "bảo vệ môi trường" },
+        { en: "sustainable development", vn: "phát triển bền vững" },
+        { en: "global environmental challenges", vn: "thách thức môi trường toàn cầu" },
+        { en: "biodiversity conservation", vn: "bảo tồn đa dạng sinh học" },
+        { en: "transboundary pollution", vn: "ô nhiễm xuyên biên giới" },
+        { en: "green international initiatives", vn: "các sáng kiến quốc tế xanh" },
+
+        // International business and economic benefits
+        { en: "global trade expansion", vn: "mở rộng thương mại toàn cầu" },
+        { en: "economic integration", vn: "hội nhập kinh tế" },
+        { en: "foreign direct investment (FDI)", vn: "đầu tư trực tiếp nước ngoài" },
+        { en: "international supply chains", vn: "chuỗi cung ứng quốc tế" },
+        { en: "cross-border commerce", vn: "thương mại xuyên quốc gia" },
+        { en: "economic interdependence", vn: "sự phụ thuộc lẫn nhau về kinh tế" },
+        { en: "market access opportunities", vn: "cơ hội tiếp cận thị trường" },
+        { en: "boost economic growth", vn: "thúc đẩy tăng trưởng kinh tế" },
+        { en: "financial cooperation", vn: "hợp tác tài chính" },
+        { en: "profit-driven motives", vn: "động cơ vì lợi nhuận" },
+        { en: "international trade expansion", vn: "mở rộng thương mại quốc tế" },
+        { en: "global economic integration", vn: "hội nhập kinh tế toàn cầu" },
+        { en: "cross-border investment", vn: "đầu tư xuyên quốc gia" },
+        { en: "multinational corporations", vn: "các tập đoàn đa quốc gia" },
+        { en: "economic growth and prosperity", vn: "tăng trưởng và thịnh vượng kinh tế" },
+        { en: "access to international markets", vn: "tiếp cận thị trường quốc tế" },
+        { en: "competitive global economy", vn: "nền kinh tế toàn cầu cạnh tranh" },
+        { en: "trade liberalization", vn: "tự do hóa thương mại" },
+        { en: "boost national revenues", vn: "thúc đẩy nguồn thu quốc gia" },
+
+        // International aid and development assistance
+        { en: "financial aid", vn: "viện trợ tài chính" },
+        { en: "humanitarian assistance", vn: "hỗ trợ nhân đạo" },
+        { en: "development aid", vn: "viện trợ phát triển" },
+        { en: "capacity-building support", vn: "hỗ trợ nâng cao năng lực" },
+        { en: "technical expertise", vn: "chuyên môn kỹ thuật" },
+        { en: "knowledge transfer", vn: "chuyển giao tri thức" },
+        { en: "infrastructure development", vn: "phát triển cơ sở hạ tầng" },
+        { en: "long-term self-sufficiency", vn: "tự chủ lâu dài" },
+        { en: "dependency on aid", vn: "sự phụ thuộc vào viện trợ" },
+        { en: "sustainable economic growth", vn: "tăng trưởng kinh tế bền vững" },
+        { en: "practical assistance", vn: "hỗ trợ thực tiễn" },
+        { en: "knowledge and skill transfer", vn: "chuyển giao kiến thức và kỹ năng" },
+        { en: "sustainable aid solutions", vn: "giải pháp viện trợ bền vững" },
+        { en: "institutional reform guidance", vn: "tư vấn cải cách thể chế" },
+        { en: "policy guidance", vn: "tư vấn chính sách" },
+        { en: "institutional reform", vn: "cải cách thể chế" },
+        { en: "governance capacity", vn: "năng lực quản trị" },
+        { en: "skills training programs", vn: "chương trình đào tạo kỹ năng" },
+        { en: "technology transfer", vn: "chuyển giao công nghệ" },
+        { en: "effective implementation", vn: "triển khai hiệu quả" },
+        { en: "structural problems", vn: "vấn đề mang tính cơ cấu" },
+        { en: "evidence-based solutions", vn: "giải pháp dựa trên bằng chứng" },
+        { en: "address root causes", vn: "giải quyết tận gốc vấn đề" },
+
+        // International tourism and global impacts
+        { en: "mass tourism", vn: "du lịch đại trà" },
+        { en: "cultural erosion", vn: "mai một văn hóa" },
+        { en: "environmental strain", vn: "áp lực lên môi trường" },
+        { en: "overcrowded destinations", vn: "điểm đến quá tải" },
+        { en: "local infrastructure pressure", vn: "áp lực lên hạ tầng địa phương" },
+        { en: "economic benefits for locals", vn: "lợi ích kinh tế cho người dân địa phương" },
+        { en: "responsible tourism", vn: "du lịch có trách nhiệm" },
+        { en: "tourism management policies", vn: "chính sách quản lý du lịch" },
+        { en: "negative externalities", vn: "tác động tiêu cực gián tiếp" },
+        { en: "balance economic gains with preservation", vn: "cân bằng lợi ích kinh tế và bảo tồn" },
+        { en: "raise public awareness", vn: "nâng cao nhận thức cộng đồng" },
+        { en: "draw global attention to", vn: "thu hút sự chú ý toàn cầu" },
+        { en: "media-driven campaigns", vn: "chiến dịch truyền thông" },
+        { en: "celebrity endorsement", vn: "sự ủng hộ của người nổi tiếng" },
+        { en: "oversimplify complex issues", vn: "đơn giản hóa quá mức vấn đề phức tạp" },
+        { en: "emotional appeal", vn: "sự kêu gọi cảm xúc" },
+        { en: "public engagement", vn: "sự tham gia của công chúng" },
+        { en: "undermine seriousness", vn: "làm giảm mức độ nghiêm trọng" },
+        { en: "short-term publicity", vn: "sự chú ý ngắn hạn" },
+        { en: "mobilize international support", vn: "huy động sự ủng hộ quốc tế" },
+        { en: "international tourism industry", vn: "ngành du lịch quốc tế" },
+        { en: "over-tourism", vn: "du lịch quá tải" },
+        { en: "local community displacement", vn: "người dân địa phương bị đẩy đi" },
+        { en: "attract media attention", vn: "thu hút sự chú ý của truyền thống" },
+        { en: "distract from the real causes", vn: "làm lệch trọng tâm nguyên nhân thực sự" },
+        { en: "pressing global issues", vn: "các vấn đề toàn cầu cấp bách" },
+        { en: "humanitarian crises", vn: "khủng hoảng nhân đạo" },
+        { en: "pandemics and public health threats", vn: "đại dịch và nguy cơ y tế" },
+        { en: "poverty alleviation", vn: "xóa đói giảm nghèo" },
+        { en: "food insecurity", vn: "mất an ninh lương thực" },
+        { en: "natural disasters", vn: "thiên tai" },
+        { en: "global inequality", vn: "bất bình đẳng toàn cầu" },
+        { en: "forced migration", vn: "di cư bắt buộc" },
+        { en: "conflict resolution", vn: "giải quyết xung đột" },
+        { en: "issues beyond national borders", vn: "vấn đề vượt ngoài biên giới quốc gia" }
+    ];
+
+    let currentItem = {};
+    let currentIndex = 0;
+    const totalQuestions = 20; 
+    let currentScrambleWords = [];
+    let blankWordData = { word: '', fullEn: '' };
+
+    const exerciseArea = document.getElementById('exerciseArea');
+    const feedbackText = document.getElementById('feedbackText');
+    const nextBtn = document.getElementById('nextBtn');
+    const progressFill = document.getElementById('progressFill');
+
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function shuffleArray(array) {
+        let newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
+
+    function updateProgress() {
+        const percent = (currentIndex / totalQuestions) * 100;
+        progressFill.style.width = `${percent}%`;
+    }
+
+    // RESET SESSION CHO GOOGLE SITES
+    function resetSession() {
+        currentIndex = 0;
+        startExercise();
+    }
+
+    function startExercise() {
+        if (currentIndex >= totalQuestions) {
+            exerciseArea.innerHTML = `
+                <h2 style="font-family: 'Lora', serif; color: var(--primary);">Global Mission Accomplished! 🌍</h2>
+                <p>Xuất sắc! Bạn đã trang bị xong bộ từ vựng Quốc tế chuyên sâu. Hãy tự tin áp dụng vào bài thi và cả trong thực tế nhé!</p>
+                <button class="action-btn" onclick="resetSession()">Luyện tiếp Session mới</button>
+            `;
+            feedbackText.innerHTML = "";
+            nextBtn.style.display = "none";
+            updateProgress();
+            return;
+        }
+
+        feedbackText.innerHTML = "";
+        nextBtn.style.display = "none";
+        currentItem = getRandomItem(vocabData);
+        updateProgress();
+
+        const type = Math.floor(Math.random() * 5) + 1;
+        
+        switch(type) {
+            case 1: renderMultipleChoice(); break;
+            case 2: renderTyping(); break;
+            case 3: renderMatching(); break;
+            case 4: renderUnscramble(); break;
+            case 5: renderFillInBlank(); break;
+        }
+    }
+
+    function renderMultipleChoice() {
+        let options = [currentItem];
+        while(options.length < 4) {
+            let randomOpt = getRandomItem(vocabData);
+            if(!options.find(o => o.en === randomOpt.en)) options.push(randomOpt);
+        }
+        options = shuffleArray(options);
+
+        let html = `<div class="question">Nghĩa của cụm từ: <br><span style="color:var(--primary); font-family: 'Lora', serif; font-size: 26px;">"${currentItem.en}"</span> là gì?</div>`;
+        options.forEach(opt => {
+            html += `<button class="option-btn" onclick="checkAnswer(this, '${opt.vn.replace(/'/g, "\\'")}', '${currentItem.vn.replace(/'/g, "\\'")}')">${opt.vn}</button>`;
+        });
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderTyping() {
+        exerciseArea.innerHTML = `
+            <div class="question">Viết cụm từ tiếng Anh cho:<br><span style="color:var(--primary); font-size: 22px;">"${currentItem.vn}"</span></div>
+            <input type="text" id="typeInput" placeholder="Gõ tiếng Anh vào đây..." onkeypress="handleEnter(event, checkTyping)">
+            <button class="action-btn" onclick="checkTyping()">Kiểm tra</button>
+        `;
+        setTimeout(() => document.getElementById('typeInput').focus(), 100);
+    }
+
+    function renderMatching() {
+        let options = [currentItem];
+        while(options.length < 4) {
+            let randomOpt = getRandomItem(vocabData);
+            if(!options.find(o => o.vn === randomOpt.vn)) options.push(randomOpt);
+        }
+        options = shuffleArray(options);
+
+        let html = `<div class="question">Chọn tiếng Anh chuẩn cho:<br><span style="color:var(--primary); font-size: 22px;">"${currentItem.vn}"</span></div>`;
+        options.forEach(opt => {
+            html += `<button class="option-btn" onclick="checkAnswer(this, '${opt.en.replace(/'/g, "\\'")}', '${currentItem.en.replace(/'/g, "\\'")}')">${opt.en}</button>`;
+        });
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderUnscramble() {
+        const words = shuffleArray(currentItem.en.split(' '));
+        currentScrambleWords = [];
+        
+        let html = `
+            <div class="question">Xếp từ thành cụm hoàn chỉnh:<br><span style="color:var(--text-light); font-size: 18px;">(${currentItem.vn})</span></div>
+            <div class="answer-dropzone" id="dropzone"></div>
+            <div class="scramble-container" id="scrambleWords">
+        `;
+        
+        words.forEach((word, index) => {
+            html += `<div class="scramble-word" id="sw-${index}" onclick="selectScrambleWord('${word.replace(/'/g, "\\'")}', ${index})">${word}</div>`;
+        });
+        
+        html += `</div><button class="action-btn" onclick="checkScramble()">Kiểm tra</button><button class="action-btn" style="background:#e9ecef; color:#495057; margin-left:10px;" onclick="resetScramble()">Làm lại</button>`;
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderFillInBlank() {
+        const words = currentItem.en.split(' ');
+        if(words.length < 2) { 
+            renderMultipleChoice();
+            return; 
+        }
+        const blankIndex = Math.floor(Math.random() * words.length);
+        blankWordData.word = words[blankIndex];
+        blankWordData.fullEn = currentItem.en;
+        
+        let displayWords = [...words];
+        displayWords[blankIndex] = `<input type="text" id="blankInput" class="blank-input" onkeypress="handleEnter(event, checkBlank)">`;
+        
+        exerciseArea.innerHTML = `
+            <div class="question">Điền từ còn thiếu vào cụm sau:<br><span style="color:var(--text-light); font-size: 18px;">(${currentItem.vn})</span></div>
+            <div style="font-size: 22px; font-weight: 600; margin-bottom: 20px;">
+                ${displayWords.join(' ')}
+            </div>
+            <button class="action-btn" onclick="checkBlank()">Kiểm tra</button>
+        `;
+        setTimeout(() => document.getElementById('blankInput').focus(), 100);
+    }
+
+    function selectScrambleWord(word, index) {
+        document.getElementById(`sw-${index}`).classList.add('selected');
+        currentScrambleWords.push({word, index});
+        renderDropzone();
+    }
+
+    function renderDropzone() {
+        const dropzone = document.getElementById('dropzone');
+        dropzone.innerHTML = currentScrambleWords.map(item => `<div class="scramble-word" style="background:var(--primary); color:white">${item.word}</div>`).join('');
+    }
+
+    function resetScramble() {
+        currentScrambleWords = [];
+        renderDropzone();
+        document.querySelectorAll('.scramble-word').forEach(el => el.classList.remove('selected'));
+    }
+
+    function checkScramble() {
+        const answer = currentScrambleWords.map(item => item.word).join(' ');
+        if(answer === currentItem.en) showFeedback(true);
+        else showFeedback(false, currentItem.en);
+    }
+
+    function checkBlank() {
+        const input = document.getElementById('blankInput').value.trim().toLowerCase();
+        const cleanInput = input.replace(/[.,'()]/g, "");
+        const cleanWord = blankWordData.word.toLowerCase().replace(/[.,'()]/g, "");
+        
+        if(cleanInput === cleanWord) showFeedback(true);
+        else showFeedback(false, blankWordData.fullEn);
+    }
+
+    function handleEnter(e, checkFunction) {
+        if(e.key === 'Enter') checkFunction();
+    }
+
+    function checkAnswer(btn, selected, correct) {
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(b => b.disabled = true);
+        
+        if(selected === correct) {
+            btn.classList.add('correct');
+            showFeedback(true);
+        } else {
+            btn.classList.add('wrong');
+            btns.forEach(b => {
+                if(b.innerText === correct) b.classList.add('correct');
+            });
+            showFeedback(false, correct);
+        }
+    }
+
+    function checkTyping() {
+        const input = document.getElementById('typeInput').value.trim().toLowerCase();
+        const cleanInput = input.replace(/[.,'()]/g, "");
+        const cleanTarget = currentItem.en.toLowerCase().replace(/[.,'()]/g, "");
+
+        if(cleanInput === cleanTarget) showFeedback(true);
+        else showFeedback(false, currentItem.en);
+    }
+
+    function showFeedback(isCorrect, correctAnswer = "") {
+        if(isCorrect) {
+            feedbackText.innerHTML = `<span style="color: #1A5F7A;">Chính xác! Tầm nhìn rất vĩ mô. 🌐</span>`;
+        } else {
+            feedbackText.innerHTML = `<span style="color: #E26D5C;">Chưa chuẩn rồi. Đáp án đúng là: <b>${correctAnswer}</b></span>`;
+        }
+        nextBtn.style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        startExercise();
+    }
+
+    window.onload = startExercise;
+
+</script>
+</body>
+</html>
