@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Health | SnapEnglish</title>
+   <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F4FAFC;
+            --primary: #2A9D8F; /* Xanh y tế / Xanh cổ vịt */
+            --secondary: #8AB17D; /* Xanh xô thơm */
+            --accent: #E9F5F1;
+            --text-main: #264653; /* Xanh navy đậm */
+            --text-light: #6C7A89;
+            --white: #FFFFFF;
+            --danger: #E76F51; /* Đỏ cam cho câu sai */
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--white);
+            max-width: 600px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(42, 157, 143, 0.1);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-top: 5px solid var(--primary);
+        }
+
+        h1 {
+            font-family: 'Lora', serif;
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .exercise-area {
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .question {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        button.option-btn {
+            background-color: var(--white);
+            border: 2px solid var(--accent);
+            color: var(--text-main);
+            padding: 12px 20px;
+            margin: 8px 0;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+        }
+
+        button.option-btn:hover {
+            background-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        button.option-btn.correct {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: var(--white);
+        }
+
+        button.option-btn.wrong {
+            background-color: var(--danger);
+            border-color: var(--danger);
+            color: var(--white);
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 15px;
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Nunito', sans-serif;
+            margin-bottom: 15px;
+            text-align: center;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        .blank-input {
+            width: auto;
+            min-width: 100px;
+            display: inline-block;
+            margin: 0 10px;
+            padding: 8px;
+            border-bottom: 2px solid var(--primary);
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            border-radius: 0;
+            background-color: transparent;
+        }
+
+        .action-btn {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+            box-shadow: 0 4px 15px rgba(42, 157, 143, 0.3);
+        }
+
+        .action-btn:hover {
+            background-color: #21867A;
+        }
+
+        .scramble-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .scramble-word {
+            background: var(--accent);
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            color: var(--text-main);
+        }
+        
+        .scramble-word.selected {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .answer-dropzone {
+            min-height: 50px;
+            border: 2px dashed var(--secondary);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 10px;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            height: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Health Vocab Master</h1>
+    <div class="subtitle">"Sức khỏe là vàng, từ vựng là vũ khí."</div>
+    
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="exercise-area" id="exerciseArea">
+        </div>
+
+    <div class="feedback" id="feedbackText"></div>
+    <button class="action-btn" id="nextBtn" style="display: none;" onclick="nextQuestion()">Tiếp tục ➔</button>
+</div>
+
+<script>
+    // FULL DATA TỪ BẢNG HEALTH
+    const vocabData = [
+        // General health and well-being
+        { en: "overall well-being", vn: "sức khỏe tổng thể (thể chất + tinh thần)" },
+        { en: "physical and mental health", vn: "sức khỏe thể chất và tinh thần" },
+        { en: "a healthy lifestyle", vn: "lối sống lành mạnh" },
+        { en: "quality of life", vn: "chất lượng cuộc sống" },
+        { en: "life expectancy", vn: "tuổi thọ trung bình" },
+        { en: "health-conscious individuals", vn: "những người có ý thức về sức khỏe" },
+        { en: "maintain good health", vn: "duy trì sức khỏe tốt" },
+        { en: "health-related issues", vn: "các vấn đề liên quan đến sức khỏe" },
+        { en: "long-term health consequences", vn: "hệ quả sức khỏe lâu dài" },
+        { en: "preventable diseases", vn: "bệnh có thể phòng tránh" },
+        { en: "health outcomes", vn: "kết quả/ảnh hưởng về sức khỏe" },
+        { en: "well-balanced lifestyle", vn: "lối sống cân bằng" },
+        { en: "deterioration in health", vn: "sự suy giảm sức khỏe" },
+        { en: "public well-being", vn: "phúc lợi/sức khỏe cộng đồng" },
+        { en: "lead a sedentary lifestyle", vn: "sống ít vận động" },
+        { en: "lead a healthy lifestyle", vn: "duy trì lối sống lành mạnh" },
+        { en: "public health concerns", vn: "mối lo về sức khỏe cộng đồng" },
+        { en: "health awareness", vn: "nhận thức về sức khỏe" },
+        { en: "health literacy", vn: "hiểu biết về sức khỏe" },
+        { en: "preventive healthcare", vn: "chăm sóc y tế phòng ngừa" },
+        { en: "take a toll on health", vn: "gây tổn hại nghiêm trọng đến sức khỏe" },
+
+        // Diet, nutrition and eating habits
+        { en: "a balanced diet", vn: "chế độ ăn cân bằng" },
+        { en: "nutritional value", vn: "giá trị dinh dưỡng" },
+        { en: "high-calorie food", vn: "thực phẩm nhiều calo" },
+        { en: "processed food", vn: "thực phẩm chế biến sẵn" },
+        { en: "junk food consumption", vn: "việc tiêu thụ đồ ăn nhanh" },
+        { en: "unhealthy eating habits", vn: "thói quen ăn uống không lành mạnh" },
+        { en: "excessive sugar intake", vn: "nạp quá nhiều đường" },
+        { en: "food additives and preservatives", vn: "phụ gia và chất bảo quản" },
+        { en: "organic produce", vn: "nông sản hữu cơ" },
+        { en: "locally sourced food", vn: "thực phẩm có nguồn gốc địa phương" },
+        { en: "nutrient deficiency", vn: "thiếu hụt dưỡng chất" },
+        { en: "overeating habits", vn: "thói quen ăn quá nhiều" },
+        { en: "plant-based diet", vn: "chế độ ăn dựa trên thực vật" },
+        { en: "diet-related illnesses", vn: "bệnh liên quan đến ăn uống" },
+        { en: "promote healthier eating patterns", vn: "thúc đẩy thói quen ăn uống lành mạnh" },
+        { en: "food addiction", vn: "nghiện đồ ăn" },
+        { en: "overconsumption", vn: "tiêu thụ quá mức" },
+        { en: "obesity rates", vn: "tỷ lệ béo phì" },
+        { en: "food safety standards", vn: "tiêu chuẩn an toàn thực phẩm" },
+        { en: "ethical consumption", vn: "tiêu dùng có đạo đức" },
+        { en: "moderation is key", vn: "điều độ là yếu tố then chốt" },
+
+        // Obesity, fitness, and physical activity
+        { en: "a lack of physical activity", vn: "thiếu vận động" },
+        { en: "declining fitness levels", vn: "thể lực suy giảm" },
+        { en: "weight-related problems", vn: "vấn đề liên quan đến cân nặng" },
+        { en: "regular exercise routines", vn: "thói quen tập luyện đều đặn" },
+        { en: "outdoor recreational activities", vn: "hoạt động giải trí ngoài trời" },
+        { en: "build physical endurance", vn: "tăng sức bền" },
+        { en: "improve cardiovascular health", vn: "cải thiện sức khỏe tim mạch" },
+        { en: "sports participation", vn: "sự tham gia thể thao" },
+        { en: "access to sports facilities", vn: "khả năng tiếp cận cơ sở thể thao" },
+        { en: "physically inactive population", vn: "dân số ít vận động" },
+        { en: "encourage an active lifestyle", vn: "khuyến khích lối sống năng động" },
+        { en: "exercise-induced benefits", vn: "lợi ích từ vận động" },
+        { en: "combat obesity", vn: "chống béo phì" },
+        { en: "fitness awareness campaigns", vn: "chiến dịch nâng cao nhận thức thể chất" },
+        { en: "engage in physical activity", vn: "tham gia hoạt động thể chất" },
+        { en: "regular exericse", vn: "tập thể dục thường xuyên" }, // Giữ nguyên từ tài liệu (có thể là typo của exercise)
+        { en: "outdoor pursuits", vn: "hoạt động ngoài trời" },
+        { en: "boost physical fitness", vn: "nâng cao thể lực" },
+        { en: "improve stamina and endurance", vn: "cải thiện sức bền" },
+        { en: "sports facilities", vn: "cơ sở thể thao" },
+        { en: "exercise infrastructure", vn: "cơ sở hạ tầng tập luyện" },
+        { en: "promote an active lifestyle", vn: "thúc đẩy lối sống năng động" },
+        { en: "enhance physical performance", vn: "nâng cao khả năng vận động" },
+        { en: "team sports", vn: "thể thao đồng đội" },
+        { en: "recreational activities", vn: "hoạt động giải trí" },
+        { en: "health benefits outweight the risks", vn: "lợi ích sức khỏe vượt trội rủi ro" },
+        { en: "build discipline and resilience", vn: "xây dựng kỷ luật và sự bền bỉ" },
+        { en: "a lack of motivation", vn: "thiếu động lực" },
+
+        // Medical treatment and healthcare
+        { en: "conventional medical treatment", vn: "điều trị y học truyền thống" },
+        { en: "alternative medicine", vn: "y học thay thế" },
+        { en: "medical professionals", vn: "chuyên gia y tế" },
+        { en: "professional medical advice", vn: "lời khuyên y tế chuyên môn" },
+        { en: "self-diagnosis", vn: "tự chẩn đoán" },
+        { en: "evidence-based medicine", vn: "y học dựa trên bằng chứng" },
+        { en: "healthcare services", vn: "dịch vụ chăm sóc sức khỏe" },
+        { en: "medical supervision", vn: "sự giám sát y tế" },
+        { en: "treatment effectiveness", vn: "hiệu quả điều trị" },
+        { en: "side effects", vn: "tác dụng phụ" },
+        { en: "long-term treatment risks", vn: "rủi ro điều trị dài hạn" },
+        { en: "misleading health claims", vn: "quảng cáo y tế gây hiểu lầm" },
+        { en: "medical consultation", vn: "tư vấn y khoa" },
+        { en: "patient safety", vn: "an toàn cho bệnh nhân" },
+        { en: "healthcare accessibility", vn: "khả năng tiếp cận y tế" },
+        { en: "cosmetic surgery", vn: "phẩu thuật thẩm mỹ" },
+        { en: "body image issues", vn: "vấn đề về hình ảnh cơ thể" },
+        { en: "social pressure", vn: "áp lực xã hội" },
+        { en: "scientifically proven", vn: "được chứng minh khoa học" },
+        { en: "health regulations", vn: "quy định về sức khỏe" },
+        { en: "government intervention", vn: "sự can thiệp của chính phủ" },
+        { en: "advertising restrictions", vn: "hạn chế quảng cáo" },
+        { en: "risk-benefit analysis", vn: "phân tích lợi ích-rủi ro" },
+        { en: "pose a threat to public health", vn: "gây nguy hại cho sức khỏe cộng đồng" },
+        { en: "cosmetic surgery procedures", vn: "các ca phẫu thuật thẩm mỹ" },
+        { en: "physical appearance", vn: "ngoại hình" },
+        { en: "body image concerns", vn: "lo ngại về hình thể" },
+        { en: "beauty standards", vn: "chuẩn mực sắc đẹp" },
+        { en: "enhance one's appearance", vn: "cải thiện ngoại hình" },
+        { en: "boost self-confidence", vn: "tăng sự tự tin" },
+        { en: "psychological well-being", vn: "sức khỏe tâm lý" },
+        { en: "appearance-related anxiety", vn: "lo âu về ngoại hình" },
+        { en: "short-term satisfaction", vn: "sự hài lòng ngắn hạn" },
+        { en: "potential health risks", vn: "rủi ro sức khỏe tiềm ẩn" },
+        { en: "unnecessary medical procedures", vn: "can thiệp y tế không cần thiết" },
+        { en: "media influence", vn: "ảnh hưởng từ truyền thông" },
+        { en: "cosmetic enhancement trend", vn: "xu hướng làm đẹp" },
+        { en: "mental health implications", vn: "hệ quả về sức khỏe tinh thần" },
+
+        // Government policy and public health
+        { en: "public health policy", vn: "chính sách y tế công cộng" },
+        { en: "restrict unhealthy products", vn: "hạn chế sản phẩm không lành mạnh" },
+        { en: "ban harmful advertising", vn: "cấm quảng cáo có hại" },
+        { en: "health education programs", vn: "chương trình giáo dục sức khỏe" },
+        { en: "preventive measures", vn: "biện pháp phòng ngừa" },
+        { en: "regular food industries", vn: "kiểm soát ngành thực phẩm" },
+        { en: "consumer protection", vn: "bảo vệ người tiêu dùng" },
+        { en: "public health campaigns", vn: "chiến dịch y tế cộng đồng" },
+        { en: "policy effectiveness", vn: "hiệu quả chính sách" },
+        { en: "health inequality", vn: "bất bình đẳng sức khỏe" },
+        { en: "collective responsibility", vn: "trách nhiệm chung" }
+    ];
+
+    let currentItem = {};
+    let currentIndex = 0;
+    const totalQuestions = 20; 
+    let currentScrambleWords = [];
+    let blankWordData = { word: '', fullEn: '' };
+
+    const exerciseArea = document.getElementById('exerciseArea');
+    const feedbackText = document.getElementById('feedbackText');
+    const nextBtn = document.getElementById('nextBtn');
+    const progressFill = document.getElementById('progressFill');
+
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function shuffleArray(array) {
+        let newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
+
+    function updateProgress() {
+        const percent = (currentIndex / totalQuestions) * 100;
+        progressFill.style.width = `${percent}%`;
+    }
+
+    // RESET SESSION DÀNH RIÊNG CHO GOOGLE SITES
+    function resetSession() {
+        currentIndex = 0;
+        startExercise();
+    }
+
+    function startExercise() {
+        if (currentIndex >= totalQuestions) {
+            exerciseArea.innerHTML = `
+                <h2 style="font-family: 'Lora', serif; color: var(--primary);">Health Check: Passed! 🩺</h2>
+                <p>Xuất sắc! Bạn đã thu nạp thành công bộ từ vựng Sức khỏe. Sẵn sàng viết những bài essay thật sâu sắc và logic nhé!</p>
+                <button class="action-btn" onclick="resetSession()">Luyện tiếp Session mới</button>
+            `;
+            feedbackText.innerHTML = "";
+            nextBtn.style.display = "none";
+            updateProgress();
+            return;
+        }
+
+        feedbackText.innerHTML = "";
+        nextBtn.style.display = "none";
+        currentItem = getRandomItem(vocabData);
+        updateProgress();
+
+        const type = Math.floor(Math.random() * 5) + 1;
+        
+        switch(type) {
+            case 1: renderMultipleChoice(); break;
+            case 2: renderTyping(); break;
+            case 3: renderMatching(); break;
+            case 4: renderUnscramble(); break;
+            case 5: renderFillInBlank(); break;
+        }
+    }
+
+    function renderMultipleChoice() {
+        let options = [currentItem];
+        while(options.length < 4) {
+            let randomOpt = getRandomItem(vocabData);
+            if(!options.find(o => o.en === randomOpt.en)) options.push(randomOpt);
+        }
+        options = shuffleArray(options);
+
+        let html = `<div class="question">Nghĩa của cụm từ: <br><span style="color:var(--primary); font-family: 'Lora', serif; font-size: 26px;">"${currentItem.en}"</span> là gì?</div>`;
+        options.forEach(opt => {
+            html += `<button class="option-btn" onclick="checkAnswer(this, '${opt.vn.replace(/'/g, "\\'")}', '${currentItem.vn.replace(/'/g, "\\'")}')">${opt.vn}</button>`;
+        });
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderTyping() {
+        exerciseArea.innerHTML = `
+            <div class="question">Viết cụm từ tiếng Anh cho:<br><span style="color:var(--text-main); font-size: 22px;">"${currentItem.vn}"</span></div>
+            <input type="text" id="typeInput" placeholder="Gõ tiếng Anh vào đây..." onkeypress="handleEnter(event, checkTyping)">
+            <button class="action-btn" onclick="checkTyping()">Kiểm tra</button>
+        `;
+        setTimeout(() => document.getElementById('typeInput').focus(), 100);
+    }
+
+    function renderMatching() {
+        let options = [currentItem];
+        while(options.length < 4) {
+            let randomOpt = getRandomItem(vocabData);
+            if(!options.find(o => o.vn === randomOpt.vn)) options.push(randomOpt);
+        }
+        options = shuffleArray(options);
+
+        let html = `<div class="question">Chọn tiếng Anh chuẩn cho:<br><span style="color:var(--primary); font-size: 22px;">"${currentItem.vn}"</span></div>`;
+        options.forEach(opt => {
+            html += `<button class="option-btn" onclick="checkAnswer(this, '${opt.en.replace(/'/g, "\\'")}', '${currentItem.en.replace(/'/g, "\\'")}')">${opt.en}</button>`;
+        });
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderUnscramble() {
+        const words = shuffleArray(currentItem.en.split(' '));
+        currentScrambleWords = [];
+        
+        let html = `
+            <div class="question">Xếp từ thành cụm hoàn chỉnh:<br><span style="color:var(--text-light); font-size: 18px;">(${currentItem.vn})</span></div>
+            <div class="answer-dropzone" id="dropzone"></div>
+            <div class="scramble-container" id="scrambleWords">
+        `;
+        
+        words.forEach((word, index) => {
+            html += `<div class="scramble-word" id="sw-${index}" onclick="selectScrambleWord('${word.replace(/'/g, "\\'")}', ${index})">${word}</div>`;
+        });
+        
+        html += `</div><button class="action-btn" onclick="checkScramble()">Kiểm tra</button><button class="action-btn" style="background:#DEE2E6; color:var(--text-main); margin-left:10px;" onclick="resetScramble()">Làm lại</button>`;
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderFillInBlank() {
+        const words = currentItem.en.split(' ');
+        if(words.length < 2) { 
+            renderMultipleChoice();
+            return; 
+        }
+        const blankIndex = Math.floor(Math.random() * words.length);
+        blankWordData.word = words[blankIndex];
+        blankWordData.fullEn = currentItem.en;
+        
+        let displayWords = [...words];
+        displayWords[blankIndex] = `<input type="text" id="blankInput" class="blank-input" onkeypress="handleEnter(event, checkBlank)">`;
+        
+        exerciseArea.innerHTML = `
+            <div class="question">Điền từ còn thiếu vào cụm sau:<br><span style="color:var(--text-light); font-size: 18px;">(${currentItem.vn})</span></div>
+            <div style="font-size: 22px; font-weight: 600; margin-bottom: 20px;">
+                ${displayWords.join(' ')}
+            </div>
+            <button class="action-btn" onclick="checkBlank()">Kiểm tra</button>
+        `;
+        setTimeout(() => document.getElementById('blankInput').focus(), 100);
+    }
+
+    function selectScrambleWord(word, index) {
+        document.getElementById(`sw-${index}`).classList.add('selected');
+        currentScrambleWords.push({word, index});
+        renderDropzone();
+    }
+
+    function renderDropzone() {
+        const dropzone = document.getElementById('dropzone');
+        dropzone.innerHTML = currentScrambleWords.map(item => `<div class="scramble-word" style="background:var(--primary); color:white">${item.word}</div>`).join('');
+    }
+
+    function resetScramble() {
+        currentScrambleWords = [];
+        renderDropzone();
+        document.querySelectorAll('.scramble-word').forEach(el => el.classList.remove('selected'));
+    }
+
+    function checkScramble() {
+        const answer = currentScrambleWords.map(item => item.word).join(' ');
+        if(answer === currentItem.en) showFeedback(true);
+        else showFeedback(false, currentItem.en);
+    }
+
+    function checkBlank() {
+        const input = document.getElementById('blankInput').value.trim().toLowerCase();
+        const cleanInput = input.replace(/[.,'()]/g, "");
+        const cleanWord = blankWordData.word.toLowerCase().replace(/[.,'()]/g, "");
+        
+        if(cleanInput === cleanWord) showFeedback(true);
+        else showFeedback(false, blankWordData.fullEn);
+    }
+
+    function handleEnter(e, checkFunction) {
+        if(e.key === 'Enter') checkFunction();
+    }
+
+    function checkAnswer(btn, selected, correct) {
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(b => b.disabled = true);
+        
+        if(selected === correct) {
+            btn.classList.add('correct');
+            showFeedback(true);
+        } else {
+            btn.classList.add('wrong');
+            btns.forEach(b => {
+                if(b.innerText === correct) b.classList.add('correct');
+            });
+            showFeedback(false, correct);
+        }
+    }
+
+    function checkTyping() {
+        const input = document.getElementById('typeInput').value.trim().toLowerCase();
+        const cleanInput = input.replace(/[.,'()]/g, "");
+        const cleanTarget = currentItem.en.toLowerCase().replace(/[.,'()]/g, "");
+
+        if(cleanInput === cleanTarget) showFeedback(true);
+        else showFeedback(false, currentItem.en);
+    }
+
+    function showFeedback(isCorrect, correctAnswer = "") {
+        if(isCorrect) {
+            feedbackText.innerHTML = `<span style="color: #2A9D8F;">Chính xác! Từ vựng rất "khỏe mạnh". 🩺</span>`;
+        } else {
+            feedbackText.innerHTML = `<span style="color: #E76F51;">Sai rồi. Kê đơn lại nhé: <b>${correctAnswer}</b></span>`;
+        }
+        nextBtn.style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        startExercise();
+    }
+
+    window.onload = startExercise;
+
+</script>
+</body>
+</html>
