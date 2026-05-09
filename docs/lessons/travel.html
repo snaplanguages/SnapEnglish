@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel | SnapEnglish</title>
+   <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FDF8F5;
+            --primary: #E07A5F; /* Cam hoàng hôn */
+            --secondary: #F4F1DE;
+            --accent: #F2CC8F;
+            --text-main: #3D405B; /* Xanh Navy đậm */
+            --text-light: #81B29A;
+            --white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--white);
+            max-width: 600px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(61, 64, 91, 0.08);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-top: 5px solid var(--primary);
+        }
+
+        h1 {
+            font-family: 'Lora', serif;
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .exercise-area {
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .question {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        button.option-btn {
+            background-color: var(--white);
+            border: 2px solid var(--accent);
+            color: var(--text-main);
+            padding: 12px 20px;
+            margin: 8px 0;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+        }
+
+        button.option-btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        button.option-btn.correct {
+            background-color: var(--text-main);
+            border-color: var(--text-main);
+            color: var(--white);
+        }
+
+        button.option-btn.wrong {
+            background-color: #E07A5F;
+            border-color: #E07A5F;
+            color: var(--white);
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 15px;
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Nunito', sans-serif;
+            margin-bottom: 15px;
+            text-align: center;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        .blank-input {
+            width: auto;
+            min-width: 100px;
+            display: inline-block;
+            margin: 0 10px;
+            padding: 8px;
+            border-bottom: 2px solid var(--text-main);
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            border-radius: 0;
+            background-color: transparent;
+        }
+
+        .action-btn {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+            box-shadow: 0 4px 15px rgba(224, 122, 95, 0.3);
+        }
+
+        .action-btn:hover {
+            background-color: #C66249;
+        }
+
+        .scramble-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .scramble-word {
+            background: var(--secondary);
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            color: var(--text-main);
+            border: 1px solid var(--accent);
+        }
+        
+        .scramble-word.selected {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .answer-dropzone {
+            min-height: 50px;
+            border: 2px dashed var(--text-light);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 10px;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            height: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Travel Vocab Master</h1>
+    <div class="subtitle">"Mở rộng tầm nhìn, chinh phục điểm IELTS."</div>
+    
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="exercise-area" id="exerciseArea">
+        </div>
+
+    <div class="feedback" id="feedbackText"></div>
+    <button class="action-btn" id="nextBtn" style="display: none;" onclick="nextQuestion()">Tiếp tục ➔</button>
+</div>
+
+<script>
+    // FULL DATA TỪ BẢNG TRAVEL
+    const vocabData = [
+        // Types and trends in Tourism
+        { en: "space tourism", vn: "du lịch vũ trụ" },
+        { en: "mass tourism", vn: "du lịch đại trà" },
+        { en: "sustainable tourism", vn: "du lịch bền vững" },
+        { en: "eco-friendly travel", vn: "du lịch thân thiện với môi trường" },
+        { en: "responsible tourism", vn: "du lịch có trách nhiệm" },
+        { en: "cultural tourism", vn: "du lịch văn hóa" },
+        { en: "luxury travel experiences", vn: "trải nghiệm du lịch cao cấp" },
+        { en: "budget travel options", vn: "các lựa chọn du lịch giá rẻ" },
+        { en: "long-haul air travel", vn: "các chuyến bay đường dài" },
+        { en: "tourism-driven economy", vn: "nền kinh tế phụ thuộc vào du lịch" },
+        { en: "commercial space travel", vn: "du hành vũ trụ mang tính thương mại" },
+        { en: "eco-tourism", vn: "du lịch sinh thái" },
+        { en: "budget travel", vn: "du lịch tiết kiệm" },
+        { en: "long-haul travel", vn: "du lịch đường dài" },
+        { en: "low-cost air travel", vn: "hàng không giá rẻ" },
+        { en: "once-in-a-lifetime experience", vn: "trải nghiệm có một không hai" },
+        { en: "travel boom", vn: "sự bùng nổ du lịch" },
+
+        // Benefits of Travel
+        { en: "broaden one's horizons", vn: "mở rộng tầm nhìn" },
+        { en: "promote cross-cultural understanding", vn: "thúc đẩy sự hiểu biết liên văn hóa" },
+        { en: "boost the local economy", vn: "thúc đẩy kinh tế địa phương" },
+        { en: "create employment opportunities", vn: "tạo cơ hội việc làm" },
+        { en: "enhance global connectivity", vn: "tăng cường kết nối toàn cầu" },
+        { en: "facilitate cultural exchange", vn: "tạo điều kiện cho giao lưu văn hóa" },
+        { en: "provide educational value", vn: "mang lại giá trị giáo dục" },
+        { en: "raise international awareness", vn: "nâng cao nhận thức quốc tế" },
+        { en: "improve quality of life", vn: "cải thiện chất lượng cuộc sống" },
+        { en: "generate substantial revenue", vn: "tạo ra nguồn thu đáng kể" },
+        { en: "generate employment opportunities", vn: "tạo cơ hội việc làm" },
+        { en: "culture exchange", vn: "giao lưu văn hóa" },
+        { en: "foster mutual understanding", vn: "thúc đẩy sự thấu hiểu lẫn nhau" },
+        { en: "stimulate regional development", vn: "kích thích phát triển khu vực" },
+        { en: "enhance international cooperation", vn: "tăng cường hợp tác quốc tế" },
+        { en: "promote national identity", vn: "quảng bá bản sắc dân tộc" },
+        { en: "personal growth and independence", vn: "phát triển cá nhân và tính tự lập" },
+        { en: "access to global opportunities", vn: "tiếp cận cơ hội toàn cầu" },
+
+        // Negative impacts
+        { en: "environmental degradation", vn: "suy thoái môi trường" },
+        { en: "carbon emissions from air travel", vn: "khí thải carbon từ hàng không" },
+        { en: "overcrowding at tourist attractions", vn: "quá tải tại điểm du lịch" },
+        { en: "commercialisation of culture", vn: "thương mại hóa văn hóa" },
+        { en: "damage historical sites", vn: "gây hư hại di tích" },
+        { en: "put pressure on local infrastructure", vn: "gây áp lực lên hạ tầng địa phương" },
+        { en: "disrupt local lifestyles", vn: "làm xáo trộn lối sống địa phương" },
+        { en: "widen social inequality", vn: "làm gia tăng bất bình đẳng xã hội" },
+        { en: "unsustainable development", vn: "phát triển không bền vững" },
+        { en: "exploit natural resources", vn: "khai thác tài nguyên quá mức" },
+        { en: "carbon footprint", vn: "lượng khí thải carbon" },
+        { en: "overcrowding", vn: "tình trạng quá tải du khách" },
+        { en: "cultural erosion", vn: "mai một văn hóa" },
+        { en: "strain on local infrastructure", vn: "áp lực lên cơ sở hạ tầng" },
+        { en: "exploitation of local resources", vn: "khai thác tài nguyên quá mức" },
+        { en: "elitist form of travel", vn: "hình thức du lịch dành cho giới giàu" },
+        { en: "unsustainable tourism practices", vn: "hoạt động du lịch không bền vững" },
+
+        // Tourists' behaviour
+        { en: "respect local customs", vn: "tôn trọng phong tục địa phương" },
+        { en: "adhere to social norms", vn: "tuân thủ chuẩn mực xã hội" },
+        { en: "cultural sensitivity", vn: "sự nhạy cảm văn hóa" },
+        { en: "behave appropriately", vn: "cư xử đúng mực" },
+        { en: "minimise environmental impact", vn: "giảm thiểu tác động môi trường" },
+        { en: "preserve cultural heritage", vn: "bảo tồn di sản văn hóa" },
+        { en: "be mindful of local traditions", vn: "ý thức về truyền thống địa phương" },
+        { en: "responsible consumption", vn: "tiêu dùng có trách nhiệm" },
+        { en: "ethical travel practices", vn: "thực hành du lịch có đạo đức" },
+        { en: "set a good example for others", vn: "làm gương cho người khác" },
+        { en: "preserve local culture", vn: "bảo tồn văn hóa địa phương" },
+        { en: "protect natural heritage", vn: "bảo vệ di sản thiên nhiên" },
+        { en: "ethical travel behaviour", vn: "hành vi du lịch có đạo đức" },
+        { en: "community-based tourism", vn: "du lịch gắn với cộng đồng" },
+        { en: "raise tourists' awareness", vn: "nâng cao nhận thức du khách" },
+        { en: "balance economic growth with conservation", vn: "cân bằng tăng trưởng và bảo tồn" },
+
+        // Locals and cultural sites
+        { en: "local residents", vn: "cư dân địa phương" },
+        { en: "a sense of cultural ownership", vn: "cảm giác làm chủ văn hóa" },
+        { en: "public engagement", vn: "sự tham gia của công chúng" },
+        { en: "cultural identity", vn: "bản sắc văn hóa" },
+        { en: "heritage conservation", vn: "bảo tồn di sản" },
+        { en: "educational programmes", vn: "các chương trình giáo dục" },
+        { en: "subsidised admission fees", vn: "vé vào cửa được trợ giá" },
+        { en: "community involvement", vn: "sự tham gia của cộng đồng" },
+        { en: "accessible to all social groups", vn: "dễ tiếp cận với mọi tầng lớp" },
+        { en: "historical landmarks", vn: "địa danh lịch sử" },
+        { en: "cultural heritage sites", vn: "các địa điểm di sản văn hóa" },
+        { en: "admission fees", vn: "phí vào cửa" },
+        { en: "free public access", vn: "tiếp cận miễn phí cho công chúng" },
+        { en: "educational value", vn: "giá trị giáo dục" },
+        { en: "tourist-oriented attractions", vn: "điểm tham quan phục vụ khách du lịch" },
+        { en: "local engagement", vn: "sự tham gia của người dân địa phương" },
+        { en: "cultural appreciation", vn: "sự trân trọng văn hóa" },
+        { en: "interactive exhibitions", vn: "triển lãm tương tác" },
+        { en: "financial sustainability", vn: "tính bền vững về tài chính" },
+
+        // Giáo dục - gap year - phát triển cá nhân
+        { en: "take a gap year", vn: "nghỉ một năm trước đại học" },
+        { en: "gain practical experience", vn: "tích lũy kinh nghiệm thực tế" },
+        { en: "develop life skills", vn: "phát triển kỹ năng sống" },
+        { en: "become more independent", vn: "trở nên tự lập hơn" },
+        { en: "improve employability", vn: "nâng cao khả năng xin việc" },
+        { en: "gain a global perspective", vn: "có góc nhìn toàn cầu" },
+        { en: "step outside one's comfort zone", vn: "bước ra khỏi vùng an toàn" },
+        { en: "broaden cultural exposure", vn: "mở rộng tiếp xúc văn hóa" },
+        { en: "delay academic progression", vn: "trì hoãn con đường học tập" },
+        { en: "lack academic discipline", vn: "thiếu kỷ luật học tập" }
+    ];
+
+    let currentItem = {};
+    let currentIndex = 0;
+    const totalQuestions = 20; 
+    let currentScrambleWords = [];
+    let blankWordData = { word: '', fullEn: '' };
+
+    const exerciseArea = document.getElementById('exerciseArea');
+    const feedbackText = document.getElementById('feedbackText');
+    const nextBtn = document.getElementById('nextBtn');
+    const progressFill = document.getElementById('progressFill');
+
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function shuffleArray(array) {
+        let newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
+
+    function updateProgress() {
+        const percent = (currentIndex / totalQuestions) * 100;
+        progressFill.style.width = `${percent}%`;
+    }
+
+    // RESET SESSION DÀNH RIÊNG CHO GOOGLE SITES
+    function resetSession() {
+        currentIndex = 0;
+        startExercise();
+    }
+
+    function startExercise() {
+        if (currentIndex >= totalQuestions) {
+            exerciseArea.innerHTML = `
+                <h2 style="font-family: 'Lora', serif; color: var(--primary);">Landing Successful! 🛬</h2>
+                <p>Tuyệt vời! Bạn đã hoàn thành chuyến bay ngôn ngữ với chủ đề Travel. Hãy tiếp tục học tập và ứng dụng linh hoạt vào bài viết nhé!</p>
+                <button class="action-btn" onclick="resetSession()">Luyện tiếp Session mới</button>
+            `;
+            feedbackText.innerHTML = "";
+            nextBtn.style.display = "none";
+            updateProgress();
+            return;
+        }
+
+        feedbackText.innerHTML = "";
+        nextBtn.style.display = "none";
+        currentItem = getRandomItem(vocabData);
+        updateProgress();
+
+        const type = Math.floor(Math.random() * 5) + 1;
+        
+        switch(type) {
+            case 1: renderMultipleChoice(); break;
+            case 2: renderTyping(); break;
+            case 3: renderMatching(); break;
+            case 4: renderUnscramble(); break;
+            case 5: renderFillInBlank(); break;
+        }
+    }
+
+    function renderMultipleChoice() {
+        let options = [currentItem];
+        while(options.length < 4) {
+            let randomOpt = getRandomItem(vocabData);
+            if(!options.find(o => o.en === randomOpt.en)) options.push(randomOpt);
+        }
+        options = shuffleArray(options);
+
+        let html = `<div class="question">Nghĩa của cụm từ: <br><span style="color:var(--text-main); font-family: 'Lora', serif; font-size: 26px;">"${currentItem.en}"</span> là gì?</div>`;
+        options.forEach(opt => {
+            html += `<button class="option-btn" onclick="checkAnswer(this, '${opt.vn.replace(/'/g, "\\'")}', '${currentItem.vn.replace(/'/g, "\\'")}')">${opt.vn}</button>`;
+        });
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderTyping() {
+        exerciseArea.innerHTML = `
+            <div class="question">Viết cụm từ tiếng Anh cho:<br><span style="color:var(--primary); font-size: 22px;">"${currentItem.vn}"</span></div>
+            <input type="text" id="typeInput" placeholder="Gõ tiếng Anh vào đây..." onkeypress="handleEnter(event, checkTyping)">
+            <button class="action-btn" onclick="checkTyping()">Kiểm tra</button>
+        `;
+        setTimeout(() => document.getElementById('typeInput').focus(), 100);
+    }
+
+    function renderMatching() {
+        let options = [currentItem];
+        while(options.length < 4) {
+            let randomOpt = getRandomItem(vocabData);
+            if(!options.find(o => o.vn === randomOpt.vn)) options.push(randomOpt);
+        }
+        options = shuffleArray(options);
+
+        let html = `<div class="question">Chọn tiếng Anh chuẩn cho:<br><span style="color:var(--primary); font-size: 22px;">"${currentItem.vn}"</span></div>`;
+        options.forEach(opt => {
+            html += `<button class="option-btn" onclick="checkAnswer(this, '${opt.en.replace(/'/g, "\\'")}', '${currentItem.en.replace(/'/g, "\\'")}')">${opt.en}</button>`;
+        });
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderUnscramble() {
+        const words = shuffleArray(currentItem.en.split(' '));
+        currentScrambleWords = [];
+        
+        let html = `
+            <div class="question">Xếp từ thành cụm hoàn chỉnh:<br><span style="color:var(--text-light); font-size: 18px;">(${currentItem.vn})</span></div>
+            <div class="answer-dropzone" id="dropzone"></div>
+            <div class="scramble-container" id="scrambleWords">
+        `;
+        
+        words.forEach((word, index) => {
+            html += `<div class="scramble-word" id="sw-${index}" onclick="selectScrambleWord('${word.replace(/'/g, "\\'")}', ${index})">${word}</div>`;
+        });
+        
+        html += `</div><button class="action-btn" onclick="checkScramble()">Kiểm tra</button><button class="action-btn" style="background:var(--secondary); color:var(--text-main); margin-left:10px;" onclick="resetScramble()">Làm lại</button>`;
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderFillInBlank() {
+        const words = currentItem.en.split(' ');
+        if(words.length < 2) { 
+            renderMultipleChoice();
+            return; 
+        }
+        const blankIndex = Math.floor(Math.random() * words.length);
+        blankWordData.word = words[blankIndex];
+        blankWordData.fullEn = currentItem.en;
+        
+        let displayWords = [...words];
+        displayWords[blankIndex] = `<input type="text" id="blankInput" class="blank-input" onkeypress="handleEnter(event, checkBlank)">`;
+        
+        exerciseArea.innerHTML = `
+            <div class="question">Điền từ còn thiếu vào cụm sau:<br><span style="color:var(--text-light); font-size: 18px;">(${currentItem.vn})</span></div>
+            <div style="font-size: 22px; font-weight: 600; margin-bottom: 20px;">
+                ${displayWords.join(' ')}
+            </div>
+            <button class="action-btn" onclick="checkBlank()">Kiểm tra</button>
+        `;
+        setTimeout(() => document.getElementById('blankInput').focus(), 100);
+    }
+
+    function selectScrambleWord(word, index) {
+        document.getElementById(`sw-${index}`).classList.add('selected');
+        currentScrambleWords.push({word, index});
+        renderDropzone();
+    }
+
+    function renderDropzone() {
+        const dropzone = document.getElementById('dropzone');
+        dropzone.innerHTML = currentScrambleWords.map(item => `<div class="scramble-word" style="background:var(--text-main); color:white">${item.word}</div>`).join('');
+    }
+
+    function resetScramble() {
+        currentScrambleWords = [];
+        renderDropzone();
+        document.querySelectorAll('.scramble-word').forEach(el => el.classList.remove('selected'));
+    }
+
+    function checkScramble() {
+        const answer = currentScrambleWords.map(item => item.word).join(' ');
+        if(answer === currentItem.en) showFeedback(true);
+        else showFeedback(false, currentItem.en);
+    }
+
+    function checkBlank() {
+        const input = document.getElementById('blankInput').value.trim().toLowerCase();
+        const cleanInput = input.replace(/[.,'()]/g, "");
+        const cleanWord = blankWordData.word.toLowerCase().replace(/[.,'()]/g, "");
+        
+        if(cleanInput === cleanWord) showFeedback(true);
+        else showFeedback(false, blankWordData.fullEn);
+    }
+
+    function handleEnter(e, checkFunction) {
+        if(e.key === 'Enter') checkFunction();
+    }
+
+    function checkAnswer(btn, selected, correct) {
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(b => b.disabled = true);
+        
+        if(selected === correct) {
+            btn.classList.add('correct');
+            showFeedback(true);
+        } else {
+            btn.classList.add('wrong');
+            btns.forEach(b => {
+                if(b.innerText === correct) b.classList.add('correct');
+            });
+            showFeedback(false, correct);
+        }
+    }
+
+    function checkTyping() {
+        const input = document.getElementById('typeInput').value.trim().toLowerCase();
+        const cleanInput = input.replace(/[.,'()]/g, "");
+        const cleanTarget = currentItem.en.toLowerCase().replace(/[.,'()]/g, "");
+
+        if(cleanInput === cleanTarget) showFeedback(true);
+        else showFeedback(false, currentItem.en);
+    }
+
+    function showFeedback(isCorrect, correctAnswer = "") {
+        if(isCorrect) {
+            feedbackText.innerHTML = `<span style="color: #3D405B;">Chính xác! Lập luận mượt mà. 🌅</span>`;
+        } else {
+            feedbackText.innerHTML = `<span style="color: #E07A5F;">Chưa chuẩn rồi. Đáp án đúng là: <b>${correctAnswer}</b></span>`;
+        }
+        nextBtn.style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        startExercise();
+    }
+
+    window.onload = startExercise;
+
+</script>
+</body>
+</html>
