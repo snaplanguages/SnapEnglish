@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job & Work | SnapEnglish</title>
+   <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F4F6F7;
+            --primary: #2C3E50; /* Xanh Slate chuyên nghiệp */
+            --secondary: #95A5A6; 
+            --accent: #EAECEE;
+            --text-main: #1C2833;
+            --text-light: #5D6D7E;
+            --white: #FFFFFF;
+            --highlight: #E67E22; /* Cam Hổ phách làm điểm nhấn */
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--white);
+            max-width: 600px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(44, 62, 80, 0.1);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-top: 5px solid var(--highlight);
+        }
+
+        h1 {
+            font-family: 'Lora', serif;
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--highlight);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .exercise-area {
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .question {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        button.option-btn {
+            background-color: var(--white);
+            border: 2px solid var(--accent);
+            color: var(--text-main);
+            padding: 12px 20px;
+            margin: 8px 0;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+        }
+
+        button.option-btn:hover {
+            background-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        button.option-btn.correct {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: var(--white);
+        }
+
+        button.option-btn.wrong {
+            background-color: var(--highlight);
+            border-color: var(--highlight);
+            color: var(--white);
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 15px;
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Nunito', sans-serif;
+            margin-bottom: 15px;
+            text-align: center;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        .blank-input {
+            width: auto;
+            min-width: 100px;
+            display: inline-block;
+            margin: 0 10px;
+            padding: 8px;
+            border-bottom: 2px solid var(--highlight);
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            border-radius: 0;
+            background-color: transparent;
+        }
+
+        .action-btn {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+            box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
+        }
+
+        .action-btn:hover {
+            background-color: #1A252F;
+        }
+
+        .scramble-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .scramble-word {
+            background: var(--accent);
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            color: var(--text-main);
+        }
+        
+        .scramble-word.selected {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .answer-dropzone {
+            min-height: 50px;
+            border: 2px dashed var(--secondary);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 10px;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            height: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Job & Work Vocab</h1>
+    <div class="subtitle">"Đầu tư kỹ năng, kiến tạo sự nghiệp."</div>
+    
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="exercise-area" id="exerciseArea">
+        </div>
+
+    <div class="feedback" id="feedbackText"></div>
+    <button class="action-btn" id="nextBtn" style="display: none;" onclick="nextQuestion()">Tiếp tục ➔</button>
+</div>
+
+<script>
+    // FULL DATA TỪ BẢNG JOB/WORK
+    const vocabData = [
+        // Job types and career paths
+        { en: "full-time employment", vn: "việc làm toàn thời gian" },
+        { en: "part-time work", vn: "việc bán thời gian" },
+        { en: "temporary job", vn: "công việc tạm thời" },
+        { en: "permanent position", vn: "vị trí lâu dài" },
+        { en: "freelance worker", vn: "người làm việc tự do" },
+        { en: "career switch", vn: "chuyển hướng nghề nghiệp" },
+        { en: "climb the career ladder", vn: "thăng tiến trong sự nghiệp" },
+        { en: "dead-end job", vn: "công việc không có tương lai" },
+        { en: "a stable career path", vn: "lộ trình nghề nghiệp ổn định" },
+        { en: "a flexible working arrangement", vn: "hình thức làm việc linh hoạt" },
+        { en: "job-hopping", vn: "nhảy việc liên tục" },
+        { en: "professional occupation", vn: "nghề nghiệp chuyên môn cao" },
+        { en: "blue-collar jobs", vn: "lao động tay chân" },
+        { en: "white-collar jobs", vn: "lao động văn phòng" },
+        { en: "gig economy", vn: "nền kinh tế việc làm ngắn hạn" },
+        { en: "a lifelong career", vn: "nghề nghiệp gắn bó lâu dài" },
+        { en: "career trajectory", vn: "lộ trình nghề nghiệp" },
+        { en: "career prospects", vn: "triển vọng nghề nghiệp" },
+        { en: "career advancement", vn: "thăng tiến nghề nghiệp" },
+        { en: "pursue one's passion", vn: "theo đuổi đam mê" },
+        { en: "realistic career choices", vn: "lựa chọn nghề thực tế" },
+        { en: "long-term job security", vn: "sự ổn định lâu dài" },
+        { en: "a stepping stone to sth", vn: "bước đệm cho tương lai" },
+        { en: "job mismatch", vn: "công việc không phù hợp năng lực" },
+        { en: "ambition-driven", vn: "định hướng bởi tham vọng" },
+        { en: "follow in someone's footstep", vn: "nối nghiệp" },
+        { en: "work one's way up", vn: "leo lên từ vị trí thấp" },
+        { en: "occupational mobility", vn: "khả năng thay đổi nghề" },
+
+        // Salary, income and financial issues
+        { en: "competitive salary", vn: "mức lương cạnh tranh" },
+        { en: "earn a decent living", vn: "kiếm sống ổn định" },
+        { en: "income inequality", vn: "bất bình đẳng thu nhập" },
+        { en: "pay gap", vn: "khoảng cách lương" },
+        { en: "financial security", vn: "sự ổn định tài chính" },
+        { en: "make ends meet", vn: "đủ sống qua ngày" },
+        { en: "highly paid", vn: "được trả lương cao" },
+        { en: "salary disparity", vn: "sự chênh lệch lương" },
+        { en: "performance-based pay", vn: "lương theo hiệu suất" },
+        { en: "executive compensation", vn: "lương lãnh đạo" },
+        { en: "a fair wage", vn: "mức lương công bằng" },
+        { en: "economic pressure", vn: "áp lực kinh tế" },
+        { en: "cost of living", vn: "chi phí sinh hoạt" },
+        { en: "financial incentive", vn: "động lực tài chính" },
+        { en: "employee benefits package", vn: "gói phúc lợi" },
+        { en: "paid annual leave", vn: "nghỉ phép có lương" },
+        { en: "job-related perks", vn: "đãi ngộ thêm" },
+        { en: "economic productivity", vn: "năng suất kinh tế" },
+        { en: "wage stagnation", vn: "tiền lương không tăng" },
+        { en: "financial stability", vn: "ổn định tài chính" },
+        { en: "salary increment", vn: "tăng lương" },
+        { en: "financial independence", vn: "tự chủ tài chính" },
+
+        // Job satisfaction and well-being
+        { en: "job satisfaction", vn: "sự hài lòng trong công việc" },
+        { en: "a sense of fulfillment", vn: "cảm giác viên mãn" },
+        { en: "workplace well-being", vn: "phúc lợi nơi làm việc" },
+        { en: "mental health at work", vn: "sức khỏe tinh thần khi làm việc" },
+        { en: "feel valued at work", vn: "được coi trọng" },
+        { en: "job security", vn: "sự ổn định công việc" },
+        { en: "a positive working environment", vn: "môi trường làm việc tích cực" },
+        { en: "work-related stress", vn: "căng thẳng do công việc" },
+        { en: "burnout", vn: "kiệt sức vì công việc" },
+        { en: "job autonomy", vn: "quyền tự chủ trong công việc" },
+        { en: "recognition and appreciation", vn: "sự ghi nhận" },
+        { en: "intrinsic motivation", vn: "động lực nội tại" },
+        { en: "career satisfaction", vn: "sự hài lòng nghề nghiệp" },
+        { en: "overall quality of life", vn: "chất lượng cuộc sống tổng thể" },
+        { en: "a healthy work culture", vn: "văn hóa làm việc lành mạnh" },
+
+        // Working conditions and workplace issues
+        { en: "working conditions", vn: "điều kiện làm việc" },
+        { en: "workload pressure", vn: "áp lực khối lượng công việc" },
+        { en: "long working hours", vn: "giờ làm việc kéo dài" },
+        { en: "job insecurity", vn: "bất ổn việc làm" },
+        { en: "workplace flexibility", vn: "sự linh hoạt nơi làm việc" },
+        { en: "a toxic work environment", vn: "môi trường làm việc độc hại" },
+        { en: "employee burnout", vn: "kiệt sức nghề nghiệp" },
+        { en: "fair workload distribution", vn: "phân bổ công việc công bằng" },
+        { en: "occupational stress", vn: "căng thẳng nghề nghiệp" },
+        { en: "workplace hierarchy", vn: "hệ thống cấp bậc" },
+        { en: "employee well-being", vn: "phúc lợi tinh thần nhân viên" },
+        { en: "job demands", vn: "yêu cầu công việc" },
+        { en: "safe and healthy working environment", vn: "môi trường làm việc an toàn" },
+        { en: "workplace discrimination", vn: "phân biệt đối xử nơi làm việc" },
+
+        // Work-life balance and working hours
+        { en: "work-life balance", vn: "cân bằng công việc và cuộc sống" },
+        { en: "a shorter working week", vn: "tuần làm việc ngắn hơn" },
+        { en: "overtime work", vn: "làm thêm giờ" },
+        { en: "spend quality time with family", vn: "dành thời gian chất lượng cho gia đình" },
+        { en: "take annual leave", vn: "nghỉ phép năm" },
+        { en: "burn the candle at both ends", vn: "làm việc quá sức" },
+        { en: "a demanding job", vn: "công việc đòi hỏi cao" },
+        { en: "flexible working hours", vn: "giờ làm linh hoạt" },
+        { en: "maintain personal relationships", vn: "duy trì các mối quan hệ cá nhân" },
+        { en: "a four-day workweek", vn: "tuần làm việc 4 ngày" },
+        { en: "work encroaches on personal life", vn: "công việc lấn át đời sống riêng" },
+        { en: "achieve a healthy balance", vn: "đạt được sự cân bằng lành mạnh" },
+        { en: "quality downtime", vn: "thời gian nghỉ ngơi chất lượng" },
+        { en: "family commitments", vn: "trách nhiệm gia đình" },
+        { en: "time off work", vn: "thời gian nghỉ" },
+        { en: "personal fulfilment", vn: "sự thỏa mãn cá nhân" },
+        { en: "overcommit to work", vn: "quá tập trung vào công việc" },
+        { en: "prioritise personal life", vn: "ưu tiên đời sống cá nhân" },
+
+        // Technology, training and future of work
+        { en: "technological advancement", vn: "tiến bộ công nghệ" },
+        { en: "automation and AI", vn: "tự động hóa và trí tuệ nhân tạo" },
+        { en: "digital skills", vn: "kỹ năng số" },
+        { en: "online training programmes", vn: "chương trình đào tạo trực tuyến" },
+        { en: "virtual meetings", vn: "họp trực tuyến" },
+        { en: "adapt to new technology", vn: "thích nghi công nghệ mới" },
+        { en: "enhance employability", vn: "nâng cao khả năng xin việc" },
+        { en: "a tech-savvy workforce", vn: "lực lượng lao động rành công nghệ" },
+        { en: "job displacement", vn: "mất việc do công nghệ" },
+        { en: "upskill and reskill", vn: "nâng cao và học lại kỹ năng" },
+        { en: "remote working", vn: "làm việc từ xa" },
+        { en: "digital divide", vn: "khoảng cách công nghệ" },
+        { en: "future job prospects", vn: "triển vọng việc làm tương lai" },
+        { en: "stay relevant in the job market", vn: "giữ được giá trị trên thị trường lao động" },
+        { en: "labour market demands", vn: "nhu cầu thị trường lao động" },
+        { en: "workplace innovation", vn: "đổi mới nơi làm việc" },
+        { en: "future-proof skills", vn: "kỹ năng bền vững tương lai" },
+        { en: "adapt to workplace changes", vn: "thích nghi thay đổi công việc" },
+
+        // Attitudes, values and career choices
+        { en: "career aspirations", vn: "khát vọng nghề nghiệp" },
+        { en: "realistic expectations", vn: "kỳ vọng thực tế" },
+        { en: "personal ambition", vn: "tham vọng cá nhân" },
+        { en: "job stability vs job satisfaction", vn: "ổn định với hài lòng" },
+        { en: "long-term career planning", vn: "hoạch định lâu dài" },
+        { en: "make informed career choices", vn: "lựa chọn nghề nghiệp có cân nhắc" },
+        { en: "parental pressure", vn: "áp lực từ gia đình" },
+        { en: "social expectations", vn: "kỳ vọng xã hội" },
+        { en: "a risk-averse mindset", vn: "tư duy ngại rủi ro" },
+        { en: "take career risks", vn: "chấp nhận rủi ro nghề nghiệp" },
+        { en: "define success differently", vn: "định nghĩa thành công khác nhau" },
+        { en: "personal values", vn: "giá trị cá nhân" },
+        { en: "career fulfillment over money", vn: "thỏa mãn hơn tiền bạc" },
+        { en: "a pragmatic approach to work", vn: "cách tiếp cận thực tế với công việc" }
+    ];
+
+    let currentItem = {};
+    let currentIndex = 0;
+    const totalQuestions = 20; 
+    let currentScrambleWords = [];
+    let blankWordData = { word: '', fullEn: '' };
+
+    const exerciseArea = document.getElementById('exerciseArea');
+    const feedbackText = document.getElementById('feedbackText');
+    const nextBtn = document.getElementById('nextBtn');
+    const progressFill = document.getElementById('progressFill');
+
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function shuffleArray(array) {
+        let newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
+
+    function updateProgress() {
+        const percent = (currentIndex / totalQuestions) * 100;
+        progressFill.style.width = `${percent}%`;
+    }
+
+    // RESET SESSION DÀNH RIÊNG CHO GOOGLE SITES
+    function resetSession() {
+        currentIndex = 0;
+        startExercise();
+    }
+
+    function startExercise() {
+        if (currentIndex >= totalQuestions) {
+            exerciseArea.innerHTML = `
+                <h2 style="font-family: 'Lora', serif; color: var(--primary);">Nhiệm vụ Hoàn tất! 💼</h2>
+                <p>Tuyệt vời! Bạn đã mở khóa trọn bộ từ vựng chủ đề Job & Work. Chúc bạn đạt kết quả xuất sắc trong Đồ án 2 và bứt phá ngoạn mục với IELTS Writing Task 2 nhé!</p>
+                <button class="action-btn" onclick="resetSession()">Luyện tiếp Session mới</button>
+            `;
+            feedbackText.innerHTML = "";
+            nextBtn.style.display = "none";
+            updateProgress();
+            return;
+        }
+
+        feedbackText.innerHTML = "";
+        nextBtn.style.display = "none";
+        currentItem = getRandomItem(vocabData);
+        updateProgress();
+
+        const type = Math.floor(Math.random() * 5) + 1;
+        
+        switch(type) {
+            case 1: renderMultipleChoice(); break;
+            case 2: renderTyping(); break;
+            case 3: renderMatching(); break;
+            case 4: renderUnscramble(); break;
+            case 5: renderFillInBlank(); break;
+        }
+    }
+
+    function renderMultipleChoice() {
+        let options = [currentItem];
+        while(options.length < 4) {
+            let randomOpt = getRandomItem(vocabData);
+            if(!options.find(o => o.en === randomOpt.en)) options.push(randomOpt);
+        }
+        options = shuffleArray(options);
+
+        let html = `<div class="question">Nghĩa của cụm từ: <br><span style="color:var(--primary); font-family: 'Lora', serif; font-size: 26px;">"${currentItem.en}"</span> là gì?</div>`;
+        options.forEach(opt => {
+            html += `<button class="option-btn" onclick="checkAnswer(this, '${opt.vn.replace(/'/g, "\\'")}', '${currentItem.vn.replace(/'/g, "\\'")}')">${opt.vn}</button>`;
+        });
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderTyping() {
+        exerciseArea.innerHTML = `
+            <div class="question">Viết cụm từ tiếng Anh cho:<br><span style="color:var(--highlight); font-size: 22px;">"${currentItem.vn}"</span></div>
+            <input type="text" id="typeInput" placeholder="Gõ tiếng Anh vào đây..." onkeypress="handleEnter(event, checkTyping)">
+            <button class="action-btn" onclick="checkTyping()">Kiểm tra</button>
+        `;
+        setTimeout(() => document.getElementById('typeInput').focus(), 100);
+    }
+
+    function renderMatching() {
+        let options = [currentItem];
+        while(options.length < 4) {
+            let randomOpt = getRandomItem(vocabData);
+            if(!options.find(o => o.vn === randomOpt.vn)) options.push(randomOpt);
+        }
+        options = shuffleArray(options);
+
+        let html = `<div class="question">Chọn tiếng Anh chuẩn cho:<br><span style="color:var(--primary); font-size: 22px;">"${currentItem.vn}"</span></div>`;
+        options.forEach(opt => {
+            html += `<button class="option-btn" onclick="checkAnswer(this, '${opt.en.replace(/'/g, "\\'")}', '${currentItem.en.replace(/'/g, "\\'")}')">${opt.en}</button>`;
+        });
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderUnscramble() {
+        const words = shuffleArray(currentItem.en.split(' '));
+        currentScrambleWords = [];
+        
+        let html = `
+            <div class="question">Xếp từ thành cụm hoàn chỉnh:<br><span style="color:var(--text-light); font-size: 18px;">(${currentItem.vn})</span></div>
+            <div class="answer-dropzone" id="dropzone"></div>
+            <div class="scramble-container" id="scrambleWords">
+        `;
+        
+        words.forEach((word, index) => {
+            html += `<div class="scramble-word" id="sw-${index}" onclick="selectScrambleWord('${word.replace(/'/g, "\\'")}', ${index})">${word}</div>`;
+        });
+        
+        html += `</div><button class="action-btn" onclick="checkScramble()">Kiểm tra</button><button class="action-btn" style="background:var(--secondary); color:var(--white); margin-left:10px;" onclick="resetScramble()">Làm lại</button>`;
+        exerciseArea.innerHTML = html;
+    }
+
+    function renderFillInBlank() {
+        const words = currentItem.en.split(' ');
+        if(words.length < 2) { 
+            renderMultipleChoice();
+            return; 
+        }
+        const blankIndex = Math.floor(Math.random() * words.length);
+        blankWordData.word = words[blankIndex];
+        blankWordData.fullEn = currentItem.en;
+        
+        let displayWords = [...words];
+        displayWords[blankIndex] = `<input type="text" id="blankInput" class="blank-input" onkeypress="handleEnter(event, checkBlank)">`;
+        
+        exerciseArea.innerHTML = `
+            <div class="question">Điền từ còn thiếu vào cụm sau:<br><span style="color:var(--text-light); font-size: 18px;">(${currentItem.vn})</span></div>
+            <div style="font-size: 22px; font-weight: 600; margin-bottom: 20px;">
+                ${displayWords.join(' ')}
+            </div>
+            <button class="action-btn" onclick="checkBlank()">Kiểm tra</button>
+        `;
+        setTimeout(() => document.getElementById('blankInput').focus(), 100);
+    }
+
+    function selectScrambleWord(word, index) {
+        document.getElementById(`sw-${index}`).classList.add('selected');
+        currentScrambleWords.push({word, index});
+        renderDropzone();
+    }
+
+    function renderDropzone() {
+        const dropzone = document.getElementById('dropzone');
+        dropzone.innerHTML = currentScrambleWords.map(item => `<div class="scramble-word" style="background:var(--primary); color:white">${item.word}</div>`).join('');
+    }
+
+    function resetScramble() {
+        currentScrambleWords = [];
+        renderDropzone();
+        document.querySelectorAll('.scramble-word').forEach(el => el.classList.remove('selected'));
+    }
+
+    function checkScramble() {
+        const answer = currentScrambleWords.map(item => item.word).join(' ');
+        if(answer === currentItem.en) showFeedback(true);
+        else showFeedback(false, currentItem.en);
+    }
+
+    function checkBlank() {
+        const input = document.getElementById('blankInput').value.trim().toLowerCase();
+        const cleanInput = input.replace(/[.,'()]/g, "");
+        const cleanWord = blankWordData.word.toLowerCase().replace(/[.,'()]/g, "");
+        
+        if(cleanInput === cleanWord) showFeedback(true);
+        else showFeedback(false, blankWordData.fullEn);
+    }
+
+    function handleEnter(e, checkFunction) {
+        if(e.key === 'Enter') checkFunction();
+    }
+
+    function checkAnswer(btn, selected, correct) {
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(b => b.disabled = true);
+        
+        if(selected === correct) {
+            btn.classList.add('correct');
+            showFeedback(true);
+        } else {
+            btn.classList.add('wrong');
+            btns.forEach(b => {
+                if(b.innerText === correct) b.classList.add('correct');
+            });
+            showFeedback(false, correct);
+        }
+    }
+
+    function checkTyping() {
+        const input = document.getElementById('typeInput').value.trim().toLowerCase();
+        const cleanInput = input.replace(/[.,'()]/g, "");
+        const cleanTarget = currentItem.en.toLowerCase().replace(/[.,'()]/g, "");
+
+        if(cleanInput === cleanTarget) showFeedback(true);
+        else showFeedback(false, currentItem.en);
+    }
+
+    function showFeedback(isCorrect, correctAnswer = "") {
+        if(isCorrect) {
+            feedbackText.innerHTML = `<span style="color: #2C3E50;">Chính xác! Tư duy rất chuyên nghiệp. 💼</span>`;
+        } else {
+            feedbackText.innerHTML = `<span style="color: #E67E22;">Lỗi nhỏ rồi. Đáp án đúng là: <b>${correctAnswer}</b></span>`;
+        }
+        nextBtn.style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        startExercise();
+    }
+
+    window.onload = startExercise;
+
+</script>
+</body>
+</html>
