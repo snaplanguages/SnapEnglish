@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 4: Dynamic Charts (Pie) | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        snapBrand: '#4F46E5', // Indigo-600
+                        snapAccent: '#F472B6', // Pink-400
+                        snapLight: '#EEF2FF', // Indigo-50
+                    },
+                    fontFamily: {
+                        sans: ['"Be Vietnam Pro"', 'sans-serif'],
+                        mono: ['"SFMono-Regular"', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #F8FAFC; color: #334155; }
+        h1, h2, h3, h4, h5 { font-weight: 700; }
+        .card { background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); padding: 1.5rem; margin-bottom: 2rem; border-top: 5px solid #4F46E5; }
+        @media (min-width: 768px) { .card { padding: 2rem; } }
+        
+        /* Interactive Inputs */
+        .input-blank { border: none; border-bottom: 2px dashed #94A3B8; background: transparent; padding: 2px 5px; text-align: center; color: #4F46E5; font-weight: 600; outline: none; transition: all 0.3s; min-width: 80px; display: inline-block; }
+        .input-blank:focus { border-bottom-color: #F472B6; background-color: #FDF2F8; }
+        .correct { border-bottom-color: #22C55E !important; color: #16A34A; background-color: #F0FDF4; }
+        .incorrect { border-bottom-color: #EF4444 !important; color: #DC2626; background-color: #FEF2F2; }
+        
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; margin-bottom: 1rem; }
+        th, td { border: 1px solid #E2E8F0; padding: 10px; text-align: left; }
+        th { background-color: #EEF2FF; color: #4F46E5; font-weight: 700; text-align: center; }
+        
+        .hint-box { display: none; background-color: #F0FDF4; border-left: 4px solid #22C55E; padding: 1rem; margin-top: 1rem; border-radius: 4px; }
+        .brand-text { background: linear-gradient(to right, #4F46E5, #F472B6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .formula-box { background-color: #EEF2FF; border-left: 4px solid #4F46E5; padding: 1rem; border-radius: 0.5rem; font-family: monospace; font-size: 1rem; color: #3730A3; font-weight: bold; margin: 1rem 0; }
+    </style>
+</head>
+<body class="antialiased leading-relaxed">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 md:px-6 py-3 flex justify-between items-center">
+            <div class="text-2xl font-bold brand-text tracking-wide flex items-center gap-2">
+                <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                SnapEnglish
+            </div>
+            <nav class="text-sm md:text-base text-gray-500 font-semibold hidden md:block">FROM BASICS TO BAND 6.0</nav>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 md:px-6 py-8">
+
+        <div class="text-center mb-10">
+            <span class="px-4 py-1 rounded-full bg-pink-100 text-pink-600 font-bold text-sm tracking-widest mb-3 inline-block">LESSON 04</span>
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-indigo-900 mb-4">TASK 1 - DYNAMIC CHARTS (PIE)</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">Chinh phục biểu đồ tròn 3 mốc thời gian: Xử lý số liệu phần trăm linh hoạt và cấu trúc bài luận hoàn chỉnh.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mb-10">
+            <div class="card !border-t-pink-400">
+                <h2 class="text-xl md:text-2xl font-bold mb-4 flex items-center gap-2 text-pink-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                    TỔNG QUAN
+                </h2>
+                <div class="text-gray-700 text-sm md:text-base">
+                    <p class="mb-2">Là một trong số bốn dạng bài cơ bản của phần biểu đồ động, các dạng bài <strong>Biểu đồ tròn (Pie Charts)</strong> lại có điểm đặc biệt hơn các kiểu biểu đồ khác.</p>
+                    <p>Thường thể hiện số liệu dưới dạng phần trăm của một tổng, dạng bài biểu đồ tròn đòi hỏi chúng ta có khả năng xử lý số liệu linh hoạt và khéo léo hơn.</p>
+                </div>
+            </div>
+            <div class="card">
+                <h2 class="text-xl md:text-2xl font-bold mb-4 flex items-center gap-2 text-indigo-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                    NỘI DUNG BÀI HỌC
+                </h2>
+                <p class="mb-2 text-gray-700 font-medium text-sm md:text-base">Bài học này tập trung vào dạng bài biểu đồ tròn có ba mốc thời gian. Sau bài học này, người học có thể:</p>
+                <ul class="list-disc pl-5 space-y-1 text-gray-700 text-sm md:text-base">
+                    <li>Nắm được các từ vựng về chủ đề Chi tiêu (Finance).</li>
+                    <li>Biết cách đưa ra và miêu tả số liệu dạng phần trăm và phân số.</li>
+                    <li>Sử dụng được cấu trúc câu 1 chủ thể - 3 thời gian.</li>
+                    <li>Biết cách nhóm thông tin cho dạng biểu đồ tròn có ba mốc thời gian.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card bg-gray-50 border-none">
+            <h2 class="text-xl md:text-2xl font-bold mb-6 text-indigo-800 text-center">MỘT SỐ DẠNG BÀI BIỂU ĐỒ TRÒN 3 MỐC THỜI GIAN THƯỜNG GẶP</h2>
+            
+            <div class="bg-white p-4 rounded-xl shadow-sm mb-6 border border-gray-200">
+                <h3 class="text-center font-bold text-gray-800 mb-4 text-sm md:text-base">Diagram 1: The three pie charts below show the changes in annual spending by local authorities in Someland in 1980, 1990 and 2000</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="relative h-48 w-full"><canvas id="d1_1980"></canvas></div>
+                    <div class="relative h-48 w-full"><canvas id="d1_1990"></canvas></div>
+                    <div class="relative h-48 w-full"><canvas id="d1_2000"></canvas></div>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl shadow-sm mb-6 border-l-4 border-indigo-500">
+                <h3 class="text-center font-bold text-indigo-900 mb-4 text-sm md:text-base">ĐỀ BÀI CHÍNH<br>Diagram 4: The charts show the distribution of money on music in Northern Ireland</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="relative h-48 w-full"><canvas id="d4_2005"></canvas></div>
+                    <div class="relative h-48 w-full"><canvas id="d4_2008"></canvas></div>
+                    <div class="relative h-48 w-full"><canvas id="d4_2011"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="text-xl md:text-2xl font-bold mb-4 text-indigo-800">TÌM TỪ VỰNG CHỦ ĐỀ</h2>
+            <h3 class="font-bold text-pink-600 mb-4 flex items-center gap-2">
+                EXERCISE 1: FILL IN THE GAPS WITH THE GIVEN WORDS
+            </h3>
+            
+            <div class="flex flex-wrap justify-center gap-3 mb-6 p-4 bg-indigo-50 rounded-lg">
+                <span class="px-3 py-1 bg-white border border-indigo-200 rounded text-indigo-700 font-semibold shadow-sm text-sm">allocated</span>
+                <span class="px-3 py-1 bg-white border border-indigo-200 rounded text-indigo-700 font-semibold shadow-sm text-sm">funds to</span>
+                <span class="px-3 py-1 bg-white border border-indigo-200 rounded text-indigo-700 font-semibold shadow-sm text-sm">allocation of money</span>
+                <span class="px-3 py-1 bg-white border border-pink-200 rounded text-pink-600 font-semibold shadow-sm text-sm">expenditure</span>
+                <span class="px-3 py-1 bg-white border border-pink-200 rounded text-pink-600 font-semibold shadow-sm text-sm">budget</span>
+                <span class="px-3 py-1 bg-white border border-pink-200 rounded text-pink-600 font-semibold shadow-sm text-sm">distributed</span>
+                <span class="px-3 py-1 bg-white border border-indigo-200 rounded text-indigo-700 font-semibold shadow-sm text-sm">overtaken</span>
+                <span class="px-3 py-1 bg-white border border-pink-200 rounded text-pink-600 font-semibold shadow-sm text-sm">expenses</span>
+                <span class="px-3 py-1 bg-white border border-indigo-200 rounded text-indigo-700 font-semibold shadow-sm text-sm">spending</span>
+                <span class="px-3 py-1 bg-white border border-indigo-200 rounded text-indigo-700 font-semibold shadow-sm text-sm">fund</span>
+            </div>
+
+            <div class="space-y-4 text-gray-700 leading-relaxed text-sm md:text-base" id="ex1-container">
+                <p>1. The <input type="text" class="input-blank" data-ans="allocation of money"> for the project was based on the estimated costs and benefits.</p>
+                <p>2. The directors <input type="text" class="input-blank" data-ans="allocated|distributed"> <input type="text" class="input-blank" data-ans="funds to"> different departments according to their needs and priorities.</p>
+                <p>3. The profits were <input type="text" class="input-blank" data-ans="distributed"> to the shareholders in proportion to their shares.</p>
+                <p>4. The government increased its <input type="text" class="input-blank" data-ans="expenditure|spending"> on health in the last quarter.</p>
+                <p>5. The total <input type="text" class="input-blank" data-ans="budget|expenditure|expenses"> for the trip was $2,000, which included travel, accommodation, and food.</p>
+                <p>6. The company reduced its <input type="text" class="input-blank" data-ans="expenses"> by cutting down on staff and office space.</p>
+                <p>7. The charity received a generous <input type="text" class="input-blank" data-ans="fund"> from a wealthy donor to support its activities.</p>
+                <p>8. The family had a tight <input type="text" class="input-blank" data-ans="budget"> and had to save money for their children's education.</p>
+                <p>9. China has <input type="text" class="input-blank" data-ans="overtaken"> the US as the world's largest economy in terms of purchasing power.</p>
+            </div>
+            <div class="mt-4 text-center md:text-right">
+                <button onclick="checkInputs('ex1-container')" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded shadow transition-all">Kiểm tra Đáp án</button>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mb-10">
+            <div class="card !mb-0">
+                <h2 class="text-xl font-bold mb-4 text-indigo-800 border-b pb-2">CÁCH VIẾT MỞ BÀI</h2>
+                <div class="formula-box text-sm text-center">Graph name + V (present simple) + what + where + when</div>
+                
+                <h3 class="font-bold text-pink-600 mb-2 mt-4">EXERCISE 2: COMPLETE THE TABLE (For Diagram 4)</h3>
+                <div class="overflow-x-auto text-sm mb-4">
+                    <table id="ex2-container">
+                        <tr><td class="font-bold bg-indigo-50 w-1/3">1. Graph name</td><td><input type="text" class="w-full border-b focus:border-indigo-500 outline-none" placeholder="..."></td></tr>
+                        <tr><td class="font-bold bg-indigo-50">2. What</td><td><input type="text" class="w-full border-b focus:border-indigo-500 outline-none" placeholder="..."></td></tr>
+                        <tr><td class="font-bold bg-indigo-50">3. Where</td><td><input type="text" class="w-full border-b focus:border-indigo-500 outline-none" placeholder="..."></td></tr>
+                        <tr><td class="font-bold bg-indigo-50">4. When</td><td><input type="text" class="w-full border-b focus:border-indigo-500 outline-none" placeholder="..."></td></tr>
+                        <tr><td class="font-bold bg-indigo-50">5. Category</td><td><input type="text" class="w-full border-b focus:border-indigo-500 outline-none" placeholder="..."></td></tr>
+                        <tr><td class="font-bold bg-indigo-50">6. Measurement</td><td><input type="text" class="w-full border-b focus:border-indigo-500 outline-none" placeholder="..."></td></tr>
+                    </table>
+                </div>
+
+                <h3 class="font-bold text-pink-600 mb-2">EXERCISE 3: WRITE INTRO FOR DIAGRAM 1</h3>
+                <textarea class="w-full p-2 border border-gray-300 rounded text-sm h-20 focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="The pie charts illustrate..."></textarea>
+                
+                <button onclick="toggleHint('hint-intro')" class="text-xs font-bold text-pink-500 mt-2 underline">Xem gợi ý</button>
+                <div id="hint-intro" class="hint-box text-xs">
+                    <strong>Ex2:</strong> 1. The three pie charts, 2. the distribution of money on music, 3. in Northern Ireland, 4. in 2005, 2008 and 2011, 5. CD, Concerts, Digital, Other, 6. percentage.<br>
+                    <strong>Ex3:</strong> The three pie charts compare the changes in annual expenditure by local authorities in Someland in three different years: 1980, 1990 and 2000.
+                </div>
+            </div>
+
+            <div class="card !mb-0 !border-t-pink-400">
+                <h2 class="text-xl font-bold mb-4 text-pink-600 border-b pb-2">CÁCH VIẾT TỔNG QUAN</h2>
+                <p class="text-sm font-bold text-gray-700 mb-1">Câu 1 – XU HƯỚNG (TĂNG/GIẢM):</p>
+                <div class="formula-box text-sm mt-0">Overall, A witnessed an upward trend while B and C decreased.</div>
+                
+                <p class="text-sm font-bold text-gray-700 mb-1">Câu 2 – ĐẶC ĐIỂM NỔI BẬT:</p>
+                <div class="formula-box text-sm mt-0">[Highlight] + was seen / recorded in + [category]</div>
+
+                <div class="bg-gray-50 p-3 rounded border border-gray-200 text-sm my-4">
+                    <p class="font-bold text-indigo-800 mb-1">Phân tích Diagram 4 (Music):</p>
+                    <ul class="list-disc pl-5 mb-2">
+                        <li><strong>Xu hướng:</strong> Digital downloads tăng; CDs & concerts giảm.</li>
+                        <li><strong>Nổi bật:</strong> <2008: CDs cao nhất. >2008: digital cao nhất (overtake).</li>
+                    </ul>
+                    <p class="italic">➡ Overall, digital downloads spending witnessed an upward trend, while that of CDs and concerts decreased. Additionally, the highest figure was recorded in the proportion of money on CDs in 2005 and 2008, but it was overtaken by digital downloads in 2011.</p>
+                </div>
+
+                <h3 class="font-bold text-indigo-600 mb-2">EXERCISE 4: WRITE AN OVERVIEW FOR DIAGRAM 1</h3>
+                <textarea class="w-full p-2 border border-gray-300 rounded text-sm h-20 focus:ring-1 focus:ring-pink-500 outline-none" placeholder="Overall, ..."></textarea>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="text-2xl font-bold mb-6 text-indigo-800">CÁCH VIẾT THÂN BÀI</h2>
+            
+            <h3 class="font-bold text-lg text-pink-600 mb-2">I. CÁCH CHIA ĐOẠN</h3>
+            <p class="mb-4 text-gray-700 text-sm md:text-base">Thông tin của biểu đồ tròn có thể được nhóm theo các hạng mục, trong đó, <strong>hạng mục có chênh lệch tăng/giảm lớn nhất nên được đề cập ở thân bài 1</strong>. Với Diagram 4 (Music):</p>
+            <ul class="space-y-2 mb-6 text-sm md:text-base">
+                <li class="bg-indigo-50 p-3 rounded-lg border border-indigo-100"><strong>THÂN BÀI 1:</strong> Nhóm xu hướng có chênh lệch giảm cao nhất và số liệu cao nhất - CDs, concerts.</li>
+                <li class="bg-pink-50 p-3 rounded-lg border border-pink-100"><strong>THÂN BÀI 2:</strong> Nhóm xu hướng tăng và hạng mục còn lại - digital downloads, other sources.</li>
+            </ul>
+
+            <h3 class="font-bold text-lg text-pink-600 mb-2">II. SỐ LIỆU PHẦN TRĂM & PHÂN SỐ</h3>
+            <p class="mb-4 text-gray-700 text-sm md:text-base">Với biểu đồ có số liệu phần trăm, ta nên đa dạng hóa cách trình bày số liệu bằng cách sử dụng linh hoạt phần trăm, phân số và các cụm từ miêu tả.</p>
+
+            <div class="overflow-x-auto mb-4 rounded-lg border border-gray-200 shadow-sm">
+                <table class="m-0 text-sm md:text-base">
+                    <thead class="bg-indigo-50">
+                        <tr>
+                            <th class="w-1/4">Phần trăm</th>
+                            <th class="w-1/3">Phân số (fraction)</th>
+                            <th>Cụm từ miêu tả (phrase)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="font-bold text-center">10%</td><td>A tenth</td><td rowspan="6" class="align-middle">
+                            • A minor / modest percentage<br>
+                            • A slight 20%<br>
+                            • A considerable percentage
+                        </td></tr>
+                        <tr><td class="font-bold text-center">20%</td><td>A fifth</td></tr>
+                        <tr><td class="font-bold text-center">25%</td><td>A fourth / a quarter</td></tr>
+                        <tr><td class="font-bold text-center">33%</td><td>A third</td></tr>
+                        <tr><td class="font-bold text-center">50%</td><td>A half</td></tr>
+                        <tr><td class="font-bold text-center">66%</td><td>Two-thirds</td></tr>
+                        <tr class="bg-gray-50"><td class="font-bold text-center">75%</td><td>Three-fourths / three quarters</td><td>A considerable + [data]</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="bg-yellow-50 text-yellow-800 p-4 rounded-lg border border-yellow-200 text-sm mb-6 flex items-start gap-3">
+                <svg class="w-6 h-6 shrink-0 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div>
+                    <p><strong>Mẹo:</strong> Với số liệu khó đổi sang phân số, ta có thể sử dụng phân số sát số liệu nhất, rồi thêm các từ làm tròn (about, around, just over, nearly) (ví dụ: có thể miêu tả 23% là <em>about a fifth</em> hoặc <em>just under a quarter</em>).</p>
+                    <p class="mt-2 font-bold text-indigo-700">Các động từ chỉ "chiếm": Account for / Comprise / Make up.</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 md:p-6 rounded-xl border border-gray-200">
+                <h4 class="font-bold text-indigo-800 mb-4">EXERCISE 5: FILL IN THE GAPS WITH A SUITABLE FRACTION OR PHRASE (Based on Diagram 1)</h4>
+                <div class="space-y-4 text-sm md:text-base leading-loose" id="ex5-container">
+                    <p>1. <input type="text" class="input-blank w-32" data-ans="A third|About a third"> of expenditure was spent on higher education in Someland in 1980. (35%)</p>
+                    <p>2. K-12 education accounted for <input type="text" class="input-blank w-32" data-ans="a quarter|a fourth"> of total expenses in Someland in 1980 before decreasing to <input type="text" class="input-blank w-24" data-ans="a fifth"> a decade later. (25% -> 20%)</p>
+                    <p>3. Starting at <input type="text" class="input-blank w-32" data-ans="around a sixth|about 16%"> in 1980, transportation cost decreased by <input type="text" class="input-blank w-24" data-ans="6%"> from 1980 to 1990. (16% -> 10%)</p>
+                    <p>4. A <input type="text" class="input-blank w-48" data-ans="minor percentage|modest percentage"> increase was recorded in the figure for health and human resources. (6% use a phrase)</p>
+                    <p>5. Environmental services and other expenses accounted for similar figures, at around <input type="text" class="input-blank w-32" data-ans="a tenth">. (10% use a phrase)</p>
+                </div>
+                <div class="mt-4 text-right">
+                    <button onclick="checkInputs('ex5-container')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded shadow text-sm">Kiểm tra Ex 5</button>
+                </div>
+            </div>
+
+            <div class="mt-8 border-l-4 border-pink-500 pl-4">
+                <p class="font-bold text-gray-800 mb-2">Ngoài ra, số liệu còn được đưa dưới dạng so sánh gấp lần trong câu miêu tả xu hướng:</p>
+                <div class="bg-indigo-50 p-3 rounded font-mono text-sm text-indigo-900 inline-block mb-2">
+                    S + experienced/recorded + (a) + [số lần] increase/growth<br>
+                    S + increased/grew/dropped + by [số lần]
+                </div>
+                <p class="text-sm text-gray-700 italic">Ví dụ: Digital downloads increased by approximately four times in 2008.</p>
+                <p class="text-sm text-gray-700 font-bold mt-2">Các từ chỉ số lần: two-fold, two times, four times...</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="text-2xl font-bold mb-6 text-indigo-800">III. CHUẨN BỊ DÀN BÀI & IV. VIẾT BÀI (Diagram 4: Music)</h2>
+            
+            <div class="overflow-x-auto mb-6 rounded-lg shadow-sm border border-gray-200">
+                <table class="m-0 text-sm">
+                    <thead class="bg-indigo-50">
+                        <tr>
+                            <th>Hạng mục</th>
+                            <th>Thời gian</th>
+                            <th>Xu hướng</th>
+                            <th>Số liệu</th>
+                            <th>Đặc điểm / Cấu trúc (Vocabulary)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="bg-gray-100 font-bold"><td colspan="5">Thân bài 1: Các hạng mục có xu hướng giảm</td></tr>
+                        <tr>
+                            <td rowspan="2" class="font-semibold bg-white align-middle">CDs</td>
+                            <td>2005-2008</td><td>decline</td><td>by 1/5</td>
+                            <td rowspan="2" class="align-middle bg-white">considerable 61% (2005)<br>comprise, before V-ing</td>
+                        </tr>
+                        <tr><td>2008-2011</td><td>decline</td><td>> 1/4</td></tr>
+                        <tr>
+                            <td rowspan="2" class="font-semibold bg-white align-middle">Concerts</td>
+                            <td>2005-2008</td><td>decrease</td><td>by 6%</td>
+                            <td rowspan="2" class="align-middle bg-white">~31% (2005) second most popular</td>
+                        </tr>
+                        <tr><td>2008-2011</td><td>increase</td><td>28%</td></tr>
+                        
+                        <tr class="bg-gray-100 font-bold"><td colspan="5">Thân bài 2: Các hạng mục có xu hướng tăng / không đổi</td></tr>
+                        <tr>
+                            <td class="font-semibold bg-white">Other</td>
+                            <td>2005-2011</td><td>same</td><td>2%</td>
+                            <td>tiny amount</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold bg-white">Digital</td>
+                            <td>2005-2008</td><td>increase</td><td>> 4 times</td>
+                            <td>6% start, modest figure before S+V</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="bg-white border-2 border-indigo-100 p-5 md:p-8 rounded-xl shadow-sm text-gray-800 leading-loose font-serif text-base md:text-lg">
+                <p class="mb-4"><sup class="text-pink-500 font-bold mr-1">(1)</sup>The pie charts compare the allocation of money to different forms of music in three years in Northern Ireland.</p>
+                <p class="mb-4"><sup class="text-pink-500 font-bold mr-1">(2)</sup>Overall, digital downloads spending witnessed an upward trend, while CDs and concerts decreased. <sup class="text-pink-500 font-bold mr-1">(3)</sup>Additionally, the highest figure was recorded in the proportion of money spent on CDs in the initial two years, but it was overtaken by digital downloads in 2011.</p>
+                <p class="mb-4"><sup class="text-pink-500 font-bold mr-1">(4)</sup>In detail, the percentage of money allocated to CDs comprised a considerable 61% in 2005 before declining by a fifth in 2008 and dropping further to only over a fourth in 2011. <sup class="text-pink-500 font-bold mr-1">(5)</sup>Similarly, although concerts were the second most popular music expenditure, at around 31% of total music expenditures in 2005, this spending decreased by a slight 6% in 2008. <sup class="text-pink-500 font-bold mr-1">(6)</sup>Concerts then increased in popularity and reached 28% in the final year.</p>
+                <p><sup class="text-pink-500 font-bold mr-1">(7)</sup>In contrast, at about 2%, a tiny amount of expenditure was distributed to other music sources in the whole period. <sup class="text-pink-500 font-bold mr-1">(8)</sup>Digital downloads also started at a modest figure, 6% before its figure increased by approximately four times in 2008. <sup class="text-pink-500 font-bold mr-1">(9)</sup>After three years, an extra 16% of the proportion of the money was allocated to digital downloads.</p>
+            </div>
+            
+            <div class="mt-6 flex flex-wrap gap-2 text-sm">
+                <span class="px-2 py-1 bg-pink-100 text-pink-700 rounded font-bold">Vocabulary:</span>
+                <span class="px-2 py-1 border rounded bg-white">Overtake (Vượt qua)</span>
+                <span class="px-2 py-1 border rounded bg-white">Allocate (Trợ cấp, chi phân)</span>
+                <span class="px-2 py-1 border rounded bg-white">Distribute (Phân phát, chia)</span>
+                <span class="px-2 py-1 border rounded bg-white">Expenditure (Chi phí)</span>
+                <span class="px-2 py-1 border rounded bg-white">Initial (Ban đầu)</span>
+                <span class="px-2 py-1 border rounded bg-white">Approximately (Tương đương/Xấp xỉ)</span>
+            </div>
+        </div>
+
+        <div class="card relative overflow-hidden bg-gradient-to-b from-white to-gray-50">
+            <h2 class="text-2xl md:text-3xl font-bold mb-8 text-indigo-900 text-center uppercase tracking-wide border-b-2 border-pink-400 pb-4 inline-block mx-auto">Comprehensive Practice</h2>
+            
+            <div class="grid lg:grid-cols-2 gap-8 mb-10">
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                    <h3 class="font-bold text-indigo-700 mb-4 flex items-center gap-2">
+                        <span class="bg-indigo-100 text-indigo-700 w-6 h-6 flex items-center justify-center rounded text-xs">I</span>
+                        FILL IN THE GAPS (Word Form)
+                    </h3>
+                    <div class="space-y-4 text-sm text-gray-700" id="comp-1">
+                        <p>1. The number of dog walks per month stood at 5 times before <input type="text" class="input-blank" data-ans="initially"> increasing to 12 times. <em>(initial)</em></p>
+                        <p>2. The <input type="text" class="input-blank" data-ans="percentage"> of dog lovers has been increasing over the past decade. <em>(percent)</em></p>
+                        <p>3. $20,000 more money was <input type="text" class="input-blank" data-ans="allocated"> to pet care products in 2022. <em>(allocation)</em></p>
+                        <p>4. A <input type="text" class="input-blank" data-ans="considerable"> 70% of parents declined getting a pet before ending up owning multiple pets. <em>(consider)</em></p>
+                        <p>5. The <input type="text" class="input-blank" data-ans="expenditure"> on pet food declined by half in 2012. <em>(expend)</em></p>
+                        <p>6. The <input type="text" class="input-blank" data-ans="expenditure"> on acquiring border collies has increased four times between 2010 and 2015. <em>(expend)</em></p>
+                        <p>7. <input type="text" class="input-blank" data-ans="Comprising"> 68% of the total, food was the largest expenditure for all pet owners. <em>(comprise)</em></p>
+                        <p>8. The percentage increased by <input type="text" class="input-blank" data-ans="four"> times after 3 years. <em>(fourth)</em></p>
+                    </div>
+                    <button onclick="checkInputs('comp-1')" class="mt-3 px-4 py-1 bg-indigo-600 text-white rounded text-xs">Check I</button>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                    <h3 class="font-bold text-pink-600 mb-4 flex items-center gap-2">
+                        <span class="bg-pink-100 text-pink-600 w-6 h-6 flex items-center justify-center rounded text-xs">II</span>
+                        PUT WORDS IN CORRECT COLUMN
+                    </h3>
+                    <div class="flex flex-wrap gap-2 mb-4 text-xs">
+                        <span class="p-1 border bg-gray-50 rounded">a third</span>
+                        <span class="p-1 border bg-gray-50 rounded">the proportion of</span>
+                        <span class="p-1 border bg-gray-50 rounded">a tenth</span>
+                        <span class="p-1 border bg-gray-50 rounded">account for</span>
+                        <span class="p-1 border bg-gray-50 rounded">make up</span>
+                        <span class="p-1 border bg-gray-50 rounded">a minor percentage</span>
+                        <span class="p-1 border bg-gray-50 rounded">one fifth</span>
+                        <span class="p-1 border bg-gray-50 rounded">the percentage of</span>
+                        <span class="p-1 border bg-gray-50 rounded">constitute</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 text-sm text-center font-semibold text-gray-700">
+                        <div class="border-b-2 border-indigo-400 pb-1">Phrase</div>
+                        <div class="border-b-2 border-pink-400 pb-1">Verb</div>
+                        <div class="border-b-2 border-yellow-400 pb-1">Fraction</div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 text-xs mt-2" id="col-sort">
+                        <div class="space-y-1">
+                            <input type="text" class="w-full border rounded p-1 text-center" data-ans="the proportion of">
+                            <input type="text" class="w-full border rounded p-1 text-center" data-ans="a minor percentage">
+                            <input type="text" class="w-full border rounded p-1 text-center" data-ans="the percentage of">
+                        </div>
+                        <div class="space-y-1">
+                            <input type="text" class="w-full border rounded p-1 text-center" data-ans="account for">
+                            <input type="text" class="w-full border rounded p-1 text-center" data-ans="make up">
+                            <input type="text" class="w-full border rounded p-1 text-center" data-ans="constitute">
+                        </div>
+                        <div class="space-y-1">
+                            <input type="text" class="w-full border rounded p-1 text-center" data-ans="a third">
+                            <input type="text" class="w-full border rounded p-1 text-center" data-ans="a tenth">
+                            <input type="text" class="w-full border rounded p-1 text-center" data-ans="one fifth">
+                        </div>
+                    </div>
+                    <button onclick="checkSort()" class="mt-3 px-4 py-1 bg-pink-600 text-white rounded text-xs">Check II (Đánh đúng từ vào ô)</button>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm mb-10">
+                <h3 class="font-bold text-indigo-700 mb-4 flex items-center gap-2">
+                    <span class="bg-indigo-100 text-indigo-700 w-6 h-6 flex items-center justify-center rounded text-xs">B</span>
+                    FILL IN THE GAPS (Percentage of single men)
+                </h3>
+                <div class="flex flex-col md:flex-row gap-6 items-center">
+                    <div class="w-full md:w-1/2 relative h-48"><canvas id="chartMen"></canvas></div>
+                    <div class="w-full md:w-1/2 text-sm leading-relaxed" id="comp-b">
+                        <p>In 2000, (1) <input type="text" class="input-blank" data-ans="the percentage of|the proportion of"> single men in Vietnam and China (2) <input type="text" class="input-blank" data-ans="stood at"> about 5% while America started at (3) <input type="text" class="input-blank" data-ans="a tenth|10%">. (4) <input type="text" class="input-blank" data-ans="The figure for"> all countries remained at (5) <input type="text" class="input-blank" data-ans="a similar level|the same"> in the next year before increasing dramatically to end at around 25% for Vietnam, nearly (6) <input type="text" class="input-blank" data-ans="a fifth|20%"> for the US, and 15% lower for China.</p>
+                        <button onclick="checkInputs('comp-b')" class="mt-3 px-4 py-1 bg-indigo-600 text-white rounded text-xs">Check B</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl border-l-4 border-pink-500 shadow-sm mb-10">
+                <h3 class="font-bold text-pink-600 mb-4 text-lg">IV. BOOKS DATA (Diagram 3)</h3>
+                
+                <h4 class="font-bold text-sm mb-2 mt-4 text-gray-800">A. MATCH WORDS TO DEFINITIONS</h4>
+                <div class="grid md:grid-cols-2 gap-4 text-xs mb-6">
+                    <div class="space-y-2">
+                        <p>1. genre <input type="text" class="border rounded w-8 text-center" placeholder="h"></p>
+                        <p>2. sale <input type="text" class="border rounded w-8 text-center" placeholder="g"></p>
+                        <p>3. revenue <input type="text" class="border rounded w-8 text-center" placeholder="e"></p>
+                        <p>4. income <input type="text" class="border rounded w-8 text-center" placeholder="c"></p>
+                    </div>
+                    <div class="space-y-2">
+                        <p>5. biography <input type="text" class="border rounded w-8 text-center" placeholder="b"></p>
+                        <p>6. popularity <input type="text" class="border rounded w-8 text-center" placeholder="f"></p>
+                        <p>7. tendency <input type="text" class="border rounded w-8 text-center" placeholder="a"></p>
+                        <p>8. fiction <input type="text" class="border rounded w-8 text-center" placeholder="d"></p>
+                    </div>
+                </div>
+
+                <h4 class="font-bold text-sm mb-2 text-gray-800">C. REARRANGE THE SENTENCES (1 to 9)</h4>
+                <p class="text-xs text-gray-600 mb-2 italic">Read the sentences on page 67 of the PDF. Group them into Body 1 and Body 2.</p>
+                <div class="flex gap-4">
+                    <input type="text" class="border p-2 rounded w-full" placeholder="Type sequence (e.g., 7,1,3,4,6...)">
+                    <button onclick="toggleHint('hint-rearrange')" class="bg-pink-600 text-white px-4 rounded text-sm whitespace-nowrap">Xem Gợi ý</button>
+                </div>
+                <div id="hint-rearrange" class="hint-box text-sm">
+                    <strong>Body 1 (Adult Fiction & Children Fiction):</strong> 7, 1, 5<br>
+                    <strong>Body 2 (Others, Biography, Travel):</strong> 2, 9, 4, 6, 8, 3<br>
+                    <em>(Lưu ý: Cách sắp xếp có thể linh hoạt dựa vào logic nối câu của bạn).</em>
+                </div>
+            </div>
+
+            <div class="bg-indigo-50 p-5 rounded-xl border border-indigo-200 shadow-sm">
+                <h3 class="font-bold text-indigo-900 mb-4 text-lg">V. COMPLETE THE ESSAY (Diagram 5: UK School Spending)</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-6">
+                    <div class="relative h-40 w-full"><canvas id="d5_1981"></canvas></div>
+                    <div class="relative h-40 w-full"><canvas id="d5_1991"></canvas></div>
+                    <div class="relative h-40 w-full"><canvas id="d5_2001"></canvas></div>
+                </div>
+
+                <div class="space-y-4">
+                    <textarea class="w-full p-3 rounded border border-indigo-300 h-24 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="A. Write Introduction and Overview..."></textarea>
+                    
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex-1">
+                            <p class="text-xs font-bold text-gray-600 mb-1">Outline Body 1: Wages (Teacher: 40% -> 50% -> 45%. Other: 28% -> 22% -> 15%)</p>
+                            <textarea class="w-full p-3 rounded border border-indigo-300 h-32 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="B. Write Body 1..."></textarea>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-xs font-bold text-gray-600 mb-1">Outline Body 2: Remaining (Insurance x4 to 8%. Resources 15->20->9. Furniture 15->5->23)</p>
+                            <textarea class="w-full p-3 rounded border border-indigo-300 h-32 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="C. Write Body 2..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer class="bg-indigo-900 text-white text-center py-8 mt-8 border-t-4 border-pink-500">
+        <p class="font-heading font-bold text-xl mb-2 tracking-wide">SnapEnglish</p>
+        <p class="text-sm text-indigo-300 font-medium mb-1">IELTS Writing Journey - Từ Cơ Bản Đến Band 6.0</p>
+        </footer>
+
+    <script>
+        // Check input logic
+        function checkInputs(containerId) {
+            let container = document.getElementById(containerId);
+            let inputs = container.querySelectorAll('.input-blank');
+            inputs.forEach(input => {
+                let ansString = input.getAttribute('data-ans').toLowerCase();
+                let validAnswers = ansString.split('|'); 
+                let val = input.value.toLowerCase().trim();
+                
+                input.classList.remove('correct', 'incorrect');
+                if (val !== '') {
+                    if (validAnswers.includes(val)) {
+                        input.classList.add('correct');
+                    } else {
+                        input.classList.add('incorrect');
+                    }
+                }
+            });
+        }
+
+        // Specific check for column sorting (Part II)
+        function checkSort() {
+            let container = document.getElementById('col-sort');
+            let inputs = container.querySelectorAll('input');
+            inputs.forEach(input => {
+                let ans = input.getAttribute('data-ans').toLowerCase();
+                let val = input.value.toLowerCase().trim();
+                input.style.backgroundColor = (val === ans) ? '#F0FDF4' : (val !== '' ? '#FEF2F2' : 'transparent');
+                input.style.borderColor = (val === ans) ? '#22C55E' : (val !== '' ? '#EF4444' : '#E2E8F0');
+            });
+        }
+
+        function toggleHint(id) {
+            let el = document.getElementById(id);
+            el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+        }
+
+        // --- Chart.js Configurations ---
+        Chart.defaults.font.family = '"Be Vietnam Pro", sans-serif';
+        const pieOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: {size: 10} } } } };
+
+        // Helper to draw pie charts
+        function createPie(id, labels, data, colors, titleText) {
+            new Chart(document.getElementById(id), {
+                type: 'pie',
+                data: { labels: labels, datasets: [{ data: data, backgroundColor: colors }] },
+                options: { ...pieOptions, plugins: { ...pieOptions.plugins, title: {display: true, text: titleText, font: {size: 14}} } }
+            });
+        }
+
+        // Diagram 1 Colors
+        const d1Colors = ['#FDE047', '#3B82F6', '#22C55E', '#D1D5DB', '#EF4444', '#1E3A8A'];
+        const d1Labels = ['Higher Ed', 'K-12 Ed', 'Transport', 'Health & Human', 'Environ.', 'Other'];
+        createPie('d1_1980', d1Labels, [35, 25, 16, 14, 4, 6], d1Colors, '1980');
+        createPie('d1_1990', d1Labels, [45, 20, 6, 20, 5, 4], d1Colors, '1990');
+        createPie('d1_2000', d1Labels, [40, 18, 22, 10, 9, 1], d1Colors, '2000');
+
+        // Diagram 4 (Music) Colors - Main Focus
+        const d4Colors = ['#A3E635', '#FB923C', '#9CA3AF', '#FACC15'];
+        const d4Labels = ['CD', 'Concerts', 'Digital downloads', 'Other sources'];
+        createPie('d4_2005', d4Labels, [61, 31, 6, 2], d4Colors, '2005');
+        createPie('d4_2008', d4Labels, [45, 25, 28, 2], d4Colors, '2008');
+        createPie('d4_2011', d4Labels, [26, 28, 44, 2], d4Colors, '2011');
+
+        // Diagram 5 (UK School)
+        const d5Colors = ['#3B82F6', '#F97316', '#D1D5DB', '#FDE047', '#38BDF8'];
+        const d5Labels = ["Teacher's salaries", "Furniture & equipment", "Resources", "Other worker's salaries", "Insurance"];
+        createPie('d5_1981', d5Labels, [40, 15, 15, 28, 2], d5Colors, '1981');
+        createPie('d5_1991', d5Labels, [50, 5, 20, 22, 3], d5Colors, '1991');
+        createPie('d5_2001', d5Labels, [45, 23, 9, 15, 8], d5Colors, '2001');
+
+        // Line Chart for "Single Men" (Practice B)
+        new Chart(document.getElementById('chartMen'), {
+            type: 'line',
+            data: {
+                labels: ['2000', '2005', '2010', '2015', '2020'],
+                datasets: [
+                    { label: 'America', data: [10, 9, 13, 15, 19], borderColor: '#3B82F6', tension: 0.3 },
+                    { label: 'Vietnam', data: [5, 5, 10, 15, 25], borderColor: '#F97316', tension: 0.3 },
+                    { label: 'China', data: [5, 6, 10, 9, 5], borderColor: '#D1D5DB', tension: 0.3 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: {legend: {position: 'bottom'}} }
+        });
+    </script>
+</body>
+</html>
