@@ -332,7 +332,13 @@
                 </div>
             </div>
             <div class="example-box" id="md-ex">"As a baby he was abandoned by his mother."</div>
+            <button class="btn" id="btn-toggle-others" style="background: var(--bg-body); color: var(--primary); font-size: 15px; padding: 10px; margin: 16px 0 8px 0; border: 2px solid var(--border); width: 100%;" onclick="toggleOtherMeanings()">
+                <i class="fa-solid fa-layer-group"></i> Xem các từ loại / nghĩa khác
+            </button>
+            
+            <div id="other-meanings-list" style="display: none; flex-direction: column; gap: 12px; margin-bottom: 20px; max-height: 250px; overflow-y: auto; padding-right: 5px;"></div>
             <button class="btn btn-primary" onclick="openSaveToDeckModal()" style="font-size: 18px; padding: 16px;"><i class="fa-solid fa-plus"></i> Thêm vào Bộ từ vựng</button>
+            
         </div>
     </div>
 
@@ -631,16 +637,34 @@ async function fetchChineseTranslation(word) {
                 const highlightRegex = new RegExp(`(${query})`, 'gi');
                 const highlightedEx = exampleText.replace(highlightRegex, `<span style="color: var(--primary); font-weight: 900;">$1</span>`);
 
-               
+                // GOM LẠI CÁC NGHĨA PHỤ KHÁC
+                let otherMeanings = [];
+                firstEntry.meanings.forEach(m => {
+                    let pOS = m.partOfSpeech;
+                    m.definitions.forEach(d => {
+                        // Bỏ qua cái nghĩa chính mà mình đã lấy ở trên
+                        if (m === targetMeaning && d === targetDef) return;
+                        otherMeanings.push({
+                            pos: pOS,
+                            en: d.definition,
+                            ex: d.example ? d.example.replace(highlightRegex, `<span style="color: var(--primary); font-weight: 900;">$1</span>`) : ""
+                        });
+                    });
+                });
+
+                // Chỉ lấy tối đa 5 nghĩa phụ phổ biến nhất cho đỡ dài
+                otherMeanings = otherMeanings.slice(0, 5);
+
                 const realWordData = {
                     word: firstEntry.word,
                     ipa: ipaText,
-                    pos: exactPos, // Lấy duy nhất 1 từ loại
-                    en: exactDefinition, // Định nghĩa chuẩn của từ loại đó
+                    pos: exactPos, 
+                    en: exactDefinition, 
                     vi: viTranslate,
                     zh: zhData.text,
                     pinyin: zhData.pinyin,
-                    ex: highlightedEx // Ví dụ chuẩn của từ loại đó
+                    ex: highlightedEx,
+                    otherMeanings: otherMeanings // Lưu danh sách nghĩa phụ vào đây
                 };
 
                 resultsBox.innerHTML = '';
@@ -685,16 +709,49 @@ async function fetchChineseTranslation(word) {
             document.getElementById('md-en').innerText = wordData.en;
             document.getElementById('md-vi').innerText = wordData.vi;
             document.getElementById('md-zh').innerText = wordData.zh;
-            
-            // Hiện Pinyin nếu có
             document.getElementById('md-pinyin').innerText = wordData.pinyin ? `(${wordData.pinyin})` : '';
             document.getElementById('md-ex').innerHTML = wordData.ex;
+
+            // XỬ LÝ GIAO DIỆN CÁC NGHĨA KHÁC
+            const otherList = document.getElementById('other-meanings-list');
+            const btnToggle = document.getElementById('btn-toggle-others');
+            
+            if (wordData.otherMeanings && wordData.otherMeanings.length > 0) {
+                btnToggle.style.display = 'block';
+                otherList.style.display = 'none'; // Mặc định ẩn
+                btnToggle.innerHTML = '<i class="fa-solid fa-layer-group"></i> Xem các từ loại / nghĩa khác';
+                
+                // Đổ dữ liệu HTML cho danh sách nghĩa phụ
+                otherList.innerHTML = wordData.otherMeanings.map(m => `
+                    <div style="background: #F8FAFC; padding: 14px; border-radius: 12px; border-left: 4px solid var(--primary-light);">
+                        <div style="font-size: 12px; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 6px;">${m.pos}</div>
+                        <div style="font-size: 16px; font-weight: 700; color: var(--text-dark);">${m.en}</div>
+                        ${m.ex ? `<div style="font-size: 15px; font-style: italic; color: var(--text-muted); margin-top: 8px;">"${m.ex}"</div>` : ''}
+                    </div>
+                `).join('');
+            } else {
+                btnToggle.style.display = 'none'; // Ẩn nút nếu không có nghĩa phụ
+                otherList.style.display = 'none';
+            }
 
             window.playNativeAudio(wordData.word, 'en-US'); 
             document.getElementById('btn-play-audio').onclick = () => window.playNativeAudio(wordData.word, 'en-US');
             document.getElementById('btn-play-zh').onclick = () => window.playNativeAudio(wordData.zh, 'zh-CN');
 
             document.getElementById('word-modal').style.display = 'flex';
+        }
+
+        // Hàm bật/tắt danh sách nghĩa phụ
+        window.toggleOtherMeanings = function() {
+            const list = document.getElementById('other-meanings-list');
+            const btn = document.getElementById('btn-toggle-others');
+            if (list.style.display === 'none') {
+                list.style.display = 'flex';
+                btn.innerHTML = '<i class="fa-solid fa-chevron-up"></i> Ẩn bớt';
+            } else {
+                list.style.display = 'none';
+                btn.innerHTML = '<i class="fa-solid fa-layer-group"></i> Xem các từ loại / nghĩa khác';
+            }
         }
        window.playNativeAudio = function(text, lang = 'en-US') {
             if (!text) return;
