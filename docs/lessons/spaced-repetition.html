@@ -847,9 +847,6 @@ window.deleteWordFromDeck = async function(event, deckId, wordId) {
             });
         }
 
-        // ==========================================
-        //  LOGIC HỌC & ĐÁNH MÁY (SPACED REPETITION)
-        // ==========================================
         let dueCards = [];
         let currentStudyCard = null;
 
@@ -1062,7 +1059,7 @@ window.deleteWordFromDeck = async function(event, deckId, wordId) {
             const wordToSave = {
                 ...currentViewingWord,
                 id: "w_" + Date.now(),
-                repetitions: 0, // MẶC ĐỊNH LEVEL LÀ 0 (CHƯA HỌC)
+                repetitions: 0, 
                 nextReview: Date.now()
             };
 
@@ -1076,46 +1073,39 @@ window.deleteWordFromDeck = async function(event, deckId, wordId) {
             window.closeModal('save-deck-modal');
             
             window.renderDecksView(); 
-            await syncData(); // ĐỒNG BỘ LÊN CLOUD
+            await syncData(); 
         }
-// ==========================================
-        // HỆ THỐNG THÔNG BÁO NHẮC NHỞ HỌC TẬP 🔔
-        // ==========================================
-        
+
         window.checkAndNotifyDueCards = function() {
             if (!appData || !appData.decks) return;
 
             let dueCount = 0;
             const now = Date.now();
             
-            // Đếm tổng số từ vựng đã đến giờ ôn (nextReview <= giờ hiện tại)
             appData.decks.forEach(deck => {
                 const toReview = deck.words.filter(w => !w.nextReview || w.nextReview <= now);
                 dueCount += toReview.length;
             });
 
             if (dueCount > 0) {
-                // Nếu đã được cấp quyền, hiển thị thông báo hệ thống
+              
                 if (Notification.permission === "granted") {
                     const notif = new Notification("Đến giờ ôn tập rồi nè! 🧠", {
                         body: `Bạn đang có ${dueCount} từ vựng mốc meo chờ bạn ôn lại đó. Vào học ngay thôi!!! ✨`,
-                        icon: "ảnh.png", // Thay bằng link ảnh logo của bạn nếu cần
+                        icon: "ảnh.png", 
                         badge: "ảnh.png",
-                        requireInteraction: true // Giữ thông báo trên màn hình đến khi user tắt
+                        requireInteraction: true 
                     });
 
-                    // Bấm vào thông báo thì tự động mở tab Học
                     notif.onclick = function(event) {
-                        event.preventDefault(); // Ngăn hành vi mặc định
-                        window.focus(); // Gọi tab web sáng lên
+                        event.preventDefault();
+                        window.focus(); 
                         window.switchTab('study-view', document.querySelectorAll('.nav-item')[2]);
                         notif.close();
                     };
                 }
             }
         }
-
-        // Xin quyền gửi thông báo khi user vừa vào web
         window.requestNotificationPermission = async function() {
             if (!("Notification" in window)) {
                 console.log("Trình duyệt này không hỗ trợ Notification API.");
@@ -1128,8 +1118,6 @@ window.deleteWordFromDeck = async function(event, deckId, wordId) {
                 }
             }
         }
-
-        // Cài đặt đồng hồ: Cứ mỗi 1 tiếng (3600000 mili-giây) sẽ check và nhắc nhở 1 lần
         setInterval(window.checkAndNotifyDueCards, 3600000);
     </script>
 </body>
