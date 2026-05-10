@@ -89,6 +89,15 @@
         .deck-list-item.selected { background: var(--primary); color: white; border-color: var(--primary); }
         .new-deck-input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin-top: 16px; outline: none; }
         .new-deck-input:focus { border-color: var(--primary); }
+        /* TOAST NOTIFICATIONS */
+.toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+.toast { background: var(--white); border-left: 4px solid var(--primary); padding: 16px 24px; border-radius: 8px; box-shadow: var(--shadow-lg); font-weight: 500; display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease forwards; transform: translateX(100%); opacity: 0; }
+.toast.error { border-left-color: var(--danger); }
+.toast.error i { color: var(--danger); }
+.toast i { color: var(--primary); font-size: 20px; }
+.toast.fade-out { animation: fadeOut 0.3s ease forwards; }
+@keyframes slideIn { to { transform: translateX(0); opacity: 1; } }
+@keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
     </style>
 </head>
 <body>
@@ -128,42 +137,50 @@
             <div class="decks-grid" id="decks-grid">
                 </div>
         </section>
-
-       <section id="study-view" class="view-section">
-    <div style="max-width: 600px; margin: 40px auto; text-align: center;">
-        <h2 style="margin-bottom: 10px;">Ôn tập: <span id="study-deck-name" style="color: var(--primary);">Chưa chọn bộ</span></h2>
-        <p style="color: var(--text-muted); margin-bottom: 30px;">Số thẻ cần ôn hôm nay: <strong id="due-cards-count">0</strong></p>
-
-        <div id="study-empty" style="display: block;">
-            <i class="fa-solid fa-mug-hot" style="font-size: 64px; color: #CBD5E1; margin-bottom: 20px;"></i>
-            <h3 style="color: var(--text-muted);">Bạn đã hoàn thành mục tiêu hôm nay!</h3>
-            <button class="btn btn-primary" style="margin: 20px auto; width: auto;" onclick="switchTab('decks-view', document.querySelectorAll('.nav-item')[1])">Quay lại Bộ từ vựng</button>
+<section id="deck-detail-view" class="view-section">
+    <button class="btn" style="margin-bottom: 20px; background: white; border: 1px solid var(--border);" onclick="switchTab('decks-view', document.querySelectorAll('.nav-item')[1])">
+        <i class="fa-solid fa-arrow-left"></i> Quay lại
+    </button>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <h2 id="detail-deck-title">Tên Bộ Bài</h2>
+        <button class="btn btn-primary" style="width: auto; margin: 0;" onclick="toggleSortMode()">
+            <i class="fa-solid fa-sort"></i> Sắp xếp: <span id="sort-label">Mới nhất</span>
+        </button>
+    </div>
+    <div id="deck-words-list" style="display: flex; flex-direction: column; gap: 12px;">
         </div>
+</section>
+       <div id="study-setup" style="text-align: center; margin-top: 50px;">
+    <h2>Chọn bộ bài để học</h2>
+    <div id="study-deck-list" style="max-width: 400px; margin: 20px auto; display: flex; flex-direction: column; gap: 10px;">
+        </div>
+</div>
 
-        <div id="study-card-area" style="display: none;">
-            <div style="background: white; border-radius: 16px; padding: 40px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); min-height: 300px; display: flex; flex-direction: column; justify-content: center;">
-                
-                <h1 id="study-word" style="font-size: 48px; font-weight: 800; color: var(--text-dark); margin-bottom: 10px;">word</h1>
-                <p id="study-ipa" style="color: var(--text-muted); font-size: 18px; font-family: monospace; margin-bottom: 20px;">/wɜːd/</p>
-                <button class="btn btn-primary" id="btn-show-answer" style="margin: auto auto 0 auto; width: 80%;" onclick="showAnswer()">Hiển thị đáp án</button>
+<div id="study-session" style="display: none; max-width: 600px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+        <span id="study-progress">Từ còn lại: 0</span>
+        <button class="btn" style="padding: 8px; background: white; border: 1px solid var(--border);" onclick="endStudySession()">Thoát</button>
+    </div>
 
-                <div id="study-back-side" style="display: none; border-top: 1px dashed var(--border); margin-top: 20px; padding-top: 20px; text-align: left;">
-                    <div style="font-size: 14px; color: var(--primary); font-weight: 700; text-transform: uppercase; margin-bottom: 8px;" id="study-pos">noun</div>
-                    <p style="font-size: 20px; font-weight: 600; margin-bottom: 10px;" id="study-vi">Từ vựng</p>
-                    <p style="font-size: 16px; color: var(--text-muted); font-style: italic; margin-bottom: 20px;" id="study-ex">"This is an example."</p>
-                    
-                    <div style="display: flex; gap: 10px; justify-content: space-between;">
-                        <button class="btn" style="flex: 1; background: #FEE2E2; color: #EF4444;" onclick="gradeCard('again')">Lại (1p)</button>
-                        <button class="btn" style="flex: 1; background: #FFEDD5; color: #F97316;" onclick="gradeCard('hard')">Khó</button>
-                        <button class="btn" style="flex: 1; background: #DCFCE7; color: #10B981;" onclick="gradeCard('good')">Tốt</button>
-                        <button class="btn" style="flex: 1; background: #DBEAFE; color: #3B82F6;" onclick="gradeCard('easy')">Dễ</button>
-                    </div>
-                </div>
+    <div id="flashcard-front" style="background: white; padding: 60px 20px; text-align: center; border-radius: 16px; box-shadow: var(--shadow-md); border: 2px solid var(--border); cursor: pointer;" onclick="flipCard()">
+        <h1 id="study-word" style="font-size: 48px; color: var(--primary); margin-bottom: 10px;">word</h1>
+        <div id="study-ipa" style="color: var(--text-muted); font-family: monospace;">/wɜːd/</div>
+        <p style="margin-top: 40px; color: var(--text-muted); font-size: 14px;">(Nhấn vào thẻ để xem đáp án)</p>
+    </div>
 
-            </div>
+    <div id="flashcard-back" style="background: white; padding: 30px; text-align: center; border-radius: 16px; box-shadow: var(--shadow-md); border: 2px solid var(--border); display: none; margin-top: 20px;">
+        <h3 id="study-vi" style="font-size: 24px; margin-bottom: 10px;">từ vựng</h3>
+        <p id="study-en" style="color: var(--text-muted); margin-bottom: 20px;">definition</p>
+        <div id="study-ex" class="example-box" style="text-align: left; margin-bottom: 30px;">example</div>
+        
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button class="btn" style="background: #FEE2E2; color: #DC2626; flex: 1;" onclick="scoreCard(0)">Lại (0)</button>
+            <button class="btn" style="background: #FEF3C7; color: #D97706; flex: 1;" onclick="scoreCard(1)">Khó (1)</button>
+            <button class="btn" style="background: #E0E7FF; color: #4F46E5; flex: 1;" onclick="scoreCard(2)">Tốt (2)</button>
+            <button class="btn" style="background: #D1FAE5; color: #059669; flex: 1;" onclick="scoreCard(3)">Dễ (3)</button>
         </div>
     </div>
-</section>
+</div>
     </main>
 
     <div class="modal-overlay" id="word-modal">
@@ -219,7 +236,7 @@
             <button class="btn btn-primary" onclick="confirmSaveWord()">Xác nhận Lưu</button>
         </div>
     </div>
-
+<div class="toast-container" id="toast-container"></div>
     <script>
         // --- 1. STATE MANAGEMENT ---
         let appData = {
@@ -240,13 +257,105 @@
         };
 
         // --- 3. UI CONTROLLERS ---
-        function switchTab(tabId, el) {
-            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            el.classList.add('active');
-            if(tabId === 'decks-view') renderDecksView();
-        }
+       let learningQueue = [];
+let currentStudyWord = null;
+
+// Ghi đè lại hàm switchTab để render danh sách bộ bài bên tab Học
+const originalSwitchTab = switchTab;
+switchTab = function(tabId, el) {
+    originalSwitchTab(tabId, el);
+    if(tabId === 'study-view') initStudySetup();
+};
+
+function initStudySetup() {
+    document.getElementById('study-setup').style.display = 'block';
+    document.getElementById('study-session').style.display = 'none';
+    const list = document.getElementById('study-deck-list');
+    list.innerHTML = '';
+    
+    appData.decks.forEach(deck => {
+        // Lọc những từ cần ôn (đơn giản hoá: lấy tất cả để demo, thực tế cần filter nextReview <= Date.now())
+        const wordsToReview = deck.words; 
+        list.innerHTML += `
+            <button class="btn" style="background: white; border: 1px solid var(--border); display: flex; justify-content: space-between;" onclick="startStudySession('${deck.id}')">
+                <span>${deck.name}</span>
+                <span style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px;">${wordsToReview.length} từ</span>
+            </button>
+        `;
+    });
+}
+
+function startStudySession(deckId) {
+    const deck = appData.decks.find(d => d.id === deckId);
+    learningQueue = [...deck.words]; // Copy array
+    
+    if(learningQueue.length === 0) {
+        showToast("Bộ bài này không có từ nào để ôn tập!", "error");
+        return;
+    }
+
+    document.getElementById('study-setup').style.display = 'none';
+    document.getElementById('study-session').style.display = 'block';
+    nextCard();
+}
+
+function nextCard() {
+    if(learningQueue.length === 0) {
+        showToast("Tuyệt vời! Bạn đã hoàn thành phiên ôn tập.");
+        endStudySession();
+        return;
+    }
+    
+    document.getElementById('study-progress').innerText = `Còn lại: ${learningQueue.length}`;
+    currentStudyWord = learningQueue[0];
+    
+    // Set UI
+    document.getElementById('study-word').innerText = currentStudyWord.word;
+    document.getElementById('study-ipa').innerText = currentStudyWord.ipa;
+    document.getElementById('study-vi').innerText = currentStudyWord.vi;
+    document.getElementById('study-en').innerText = currentStudyWord.en;
+    document.getElementById('study-ex').innerHTML = currentStudyWord.ex;
+    
+    document.getElementById('flashcard-front').style.display = 'block';
+    document.getElementById('flashcard-back').style.display = 'none';
+}
+
+function flipCard() {
+    document.getElementById('flashcard-front').style.display = 'none';
+    document.getElementById('flashcard-back').style.display = 'block';
+}
+
+function scoreCard(score) {
+    // Luồng logic SRS đơn giản 5 cấp độ (0 đến 5)
+    if(currentStudyWord.srsLevel === undefined) currentStudyWord.srsLevel = 0;
+
+    if (score === 0) { // Again
+        currentStudyWord.srsLevel = 0;
+        // Đẩy xuống cuối hàng đợi để học lại ngay trong session này
+        learningQueue.push(learningQueue.shift()); 
+        nextCard();
+        return;
+    } else if (score === 1) { // Hard
+        currentStudyWord.srsLevel = Math.max(0, currentStudyWord.srsLevel - 1);
+    } else if (score === 2) { // Good
+        currentStudyWord.srsLevel = Math.min(5, currentStudyWord.srsLevel + 1);
+    } else if (score === 3) { // Easy
+        currentStudyWord.srsLevel = 5;
+    }
+
+    // Gỡ từ khỏi hàng đợi vì đã trả lời tốt
+    learningQueue.shift();
+    
+    // Lưu lại srsLevel vào data tổng (Trong thực tế bạn sẽ update database ở đây)
+    // Tính toán nextReview thực tế (ví dụ: cấp 1 = 1 ngày, cấp 2 = 3 ngày...) bỏ qua trong demo này
+    
+    nextCard();
+}
+
+function endStudySession() {
+    document.getElementById('study-setup').style.display = 'block';
+    document.getElementById('study-session').style.display = 'none';
+}
 
         function closeModal(id) {
             document.getElementById(id).style.display = 'none';
@@ -290,33 +399,57 @@ async function handleSearch() {
             return;
         }
 
-        const engData = await engRes.json();
-        const firstEntry = engData[0];
-        const firstMeaning = firstEntry.meanings[0];
-        const firstDefinition = firstMeaning.definitions[0];
+    // --- Bắt đầu từ đoạn: const engData = await engRes.json(); ---
+const engData = await engRes.json();
+const firstEntry = engData[0];
 
-        // Lấy IPA (ưu tiên lấy IPA có sẵn trong mảng phonetics)
-        let ipaText = "N/A";
-        const phoneticObj = firstEntry.phonetics.find(p => p.text);
-        if (phoneticObj) ipaText = phoneticObj.text;
-        else if (firstEntry.phonetic) ipaText = firstEntry.phonetic;
+// 1. Quét để gom nhóm các loại từ (noun, verb, adj...)
+let allPos = [];
+let exampleText = "Không có ví dụ cho từ này.";
+let firstDefinitionText = "";
 
-        // 2. Song song gọi API dịch sang Tiếng Việt và Tiếng Trung
-        const [viTranslate, zhTranslate] = await Promise.all([
-            fetchTranslation(query, 'vi'),
-            fetchTranslation(query, 'zh-CN')
-        ]);
+firstEntry.meanings.forEach((meaning, index) => {
+    allPos.push(meaning.partOfSpeech);
+    
+    // Lấy definition đầu tiên tìm thấy
+    if(index === 0) firstDefinitionText = meaning.definitions[0].definition;
+    
+    // Quét tìm ví dụ đầu tiên có sẵn
+    if (exampleText === "Không có ví dụ cho từ này.") {
+        const defWithEx = meaning.definitions.find(d => d.example);
+        if (defWithEx) exampleText = defWithEx.example;
+    }
+});
 
-        // 3. Đóng gói dữ liệu chuẩn hoá
-        const realWordData = {
-            word: firstEntry.word,
-            ipa: ipaText,
-            pos: firstMeaning.partOfSpeech,
-            en: firstDefinition.definition,
-            vi: viTranslate,
-            zh: zhTranslate,
-            ex: firstDefinition.example || "Không có ví dụ cho từ này."
-        };
+const uniquePos = [...new Set(allPos)].join(", "); // Ví dụ: "noun, verb"
+
+// Lấy IPA
+let ipaText = "N/A";
+const phoneticObj = firstEntry.phonetics.find(p => p.text);
+if (phoneticObj) ipaText = phoneticObj.text;
+else if (firstEntry.phonetic) ipaText = firstEntry.phonetic;
+
+// Gọi API dịch
+const [viTranslate, zhTranslate] = await Promise.all([
+    fetchTranslation(query, 'vi'),
+    fetchTranslation(query, 'zh-CN')
+]);
+
+// 2. Highlight từ vựng trong câu ví dụ (Không phân biệt hoa thường)
+const highlightRegex = new RegExp(`(${query})`, 'gi');
+const highlightedEx = exampleText.replace(highlightRegex, `<span style="background: #D1FAE5; color: var(--primary); font-weight: 700; padding: 2px 4px; border-radius: 4px;">$1</span>`);
+
+// Đóng gói dữ liệu
+const realWordData = {
+    word: firstEntry.word,
+    ipa: ipaText,
+    pos: uniquePos, // Đã hiển thị nhiều loại từ
+    en: firstDefinitionText,
+    vi: viTranslate,
+    zh: zhTranslate,
+    ex: highlightedEx // Đã chứa mã HTML highlight
+};
+// --- Giữ nguyên phần render kết quả phía dưới ---
 
         // 4. Render kết quả ra màn hình
         resultsBox.innerHTML = '';
@@ -336,6 +469,22 @@ async function handleSearch() {
         resultsBox.innerHTML = '<div class="result-item" style="color: var(--danger); justify-content: center;">Lỗi kết nối máy chủ. Vui lòng thử lại!</div>';
     }
 }
+        function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+    
+    const icon = type === 'success' ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-exclamation"></i>';
+    toast.innerHTML = `${icon} <span>${message}</span>`;
+    
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+// Từ nay thay vì alert("..."), hãy gọi showToast("...", "success" hoặc "error")
 function showWordDetail(wordData) {
     currentViewingWord = wordData;
     document.getElementById('search-results').style.display = 'none';
@@ -379,22 +528,89 @@ function playNativeAudio(text, lang = 'en') {
     audio.onended = () => {
         btnPlay.style.color = originalColor;
     };
-}
-        // --- 6. DECK MANAGEMENT LOGIC ---
-        function renderDecksView() {
+}let currentDetailDeckId = null;
+let sortMode = 'time'; // 'time', 'az', 'za'
+
+// Cập nhật lại giao diện lưới Deck
+function renderDecksView() {
     const grid = document.getElementById('decks-grid');
     grid.innerHTML = '';
     appData.decks.forEach(deck => {
-        // Đếm xem bộ này có bao nhiêu từ đến hạn ôn tập
-        const now = Date.now();
-        const dueCount = deck.words.filter(w => !w.nextReview || w.nextReview <= now).length;
-
         grid.innerHTML += `
-            <div class="deck-card" onclick="startStudySession('${deck.id}')"> <div class="deck-title">${deck.name}</div>
-                <div class="deck-stats">
-                    <span style="color: var(--text-dark); font-weight: 600;">${deck.words.length} thẻ</span> • 
-                    <span style="color: ${dueCount > 0 ? 'var(--primary)' : 'var(--text-muted)'}">${dueCount} cần ôn</span>
+            <div class="deck-card" onclick="openDeckDetail('${deck.id}')">
+                <div style="display: flex; justify-content: space-between;">
+                    <div class="deck-title">${deck.name}</div>
+                    <div style="display:flex; gap: 8px;">
+                        <i class="fa-solid fa-pen" style="color: var(--text-muted); cursor: pointer;" onclick="renameDeck(event, '${deck.id}')"></i>
+                        <i class="fa-solid fa-trash" style="color: var(--danger); cursor: pointer;" onclick="deleteDeck(event, '${deck.id}')"></i>
+                    </div>
                 </div>
+                <div class="deck-stats">${deck.words.length} thẻ từ vựng</div>
+            </div>
+        `;
+    });
+}
+
+function renameDeck(event, deckId) {
+    event.stopPropagation(); // Ngăn click nhầm vào mở deck
+    const deck = appData.decks.find(d => d.id === deckId);
+    const newName = prompt("Nhập tên mới cho bộ từ vựng:", deck.name);
+    if (newName && newName.trim() !== "") {
+        deck.name = newName.trim();
+        renderDecksView();
+        showToast("Đã đổi tên bộ bài thành công!");
+    }
+}
+
+function deleteDeck(event, deckId) {
+    event.stopPropagation();
+    if (confirm("Bạn có chắc chắn muốn xóa bộ từ vựng này không?")) {
+        appData.decks = appData.decks.filter(d => d.id !== deckId);
+        renderDecksView();
+        showToast("Đã xóa bộ bài!", "error");
+    }
+}
+
+// Mở chi tiết bộ bài
+function openDeckDetail(deckId) {
+    currentDetailDeckId = deckId;
+    document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+    document.getElementById('deck-detail-view').classList.add('active');
+    renderDeckWords();
+}
+
+function toggleSortMode() {
+    if (sortMode === 'time') { sortMode = 'az'; document.getElementById('sort-label').innerText = "A-Z"; }
+    else if (sortMode === 'az') { sortMode = 'za'; document.getElementById('sort-label').innerText = "Z-A"; }
+    else { sortMode = 'time'; document.getElementById('sort-label').innerText = "Mới nhất"; }
+    renderDeckWords();
+}
+
+function renderDeckWords() {
+    const deck = appData.decks.find(d => d.id === currentDetailDeckId);
+    document.getElementById('detail-deck-title').innerText = deck.name;
+    const list = document.getElementById('deck-words-list');
+    list.innerHTML = '';
+    
+    // Copy array để sort không ảnh hưởng gốc
+    let displayWords = [...deck.words]; 
+    if (sortMode === 'az') displayWords.sort((a, b) => a.word.localeCompare(b.word));
+    if (sortMode === 'za') displayWords.sort((a, b) => b.word.localeCompare(a.word));
+    // sortMode === 'time' (nguyên bản là theo thời gian thêm vào)
+
+    if(displayWords.length === 0) {
+        list.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 40px;">Bộ bài này chưa có từ nào.</p>';
+        return;
+    }
+
+    displayWords.forEach(w => {
+        list.innerHTML += `
+            <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong style="font-size: 18px;">${w.word}</strong> <span style="font-size: 12px; color: var(--text-muted); margin-left: 8px;">${w.pos}</span>
+                    <div style="color: var(--text-muted); font-size: 14px;">${w.vi}</div>
+                </div>
+                <div style="font-size: 12px; background: #E2E8F0; padding: 4px 8px; border-radius: 4px;">Level ${w.srsLevel || 0}</div>
             </div>
         `;
     });
