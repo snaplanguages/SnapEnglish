@@ -661,13 +661,27 @@
             document.getElementById('word-modal').style.display = 'flex';
         }
 
-        window.playNativeAudio = function(text, lang = 'en') {
+       window.playNativeAudio = function(text, lang = 'en-US') {
             if (!text) return;
-            const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=tw-ob&q=${encodeURIComponent(text)}`;
-            const audio = new Audio(audioUrl);
-            audio.play().catch(e => console.log("Audio play error", e));
+            
+            // Sử dụng Web Speech API có sẵn của trình duyệt (ổn định, không bị chặn)
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Dừng âm thanh cũ nếu đang đọc dở
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Chuẩn hóa mã ngôn ngữ
+                if (lang === 'en') lang = 'en-US';
+                if (lang === 'zh') lang = 'zh-CN';
+                
+                utterance.lang = lang;
+                utterance.rate = 0.9; // Tốc độ đọc chậm lại một chút cho dễ nghe
+                utterance.pitch = 1;  // Độ cao của giọng
+                
+                window.speechSynthesis.speak(utterance);
+            } else {
+                showToast("Trình duyệt của bạn không hỗ trợ phát âm thanh 😢", "error");
+            }
         }
-
         let currentDetailDeckId = null;
         let sortMode = 'time';
 
