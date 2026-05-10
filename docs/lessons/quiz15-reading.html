@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passage 3 Test 5 | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Theme Chuyên nghiệp - Xanh Đại dương nhạt */
+            --primary: #0284c7; 
+            --primary-dark: #0369a1; 
+            --accent: #bae6fd;
+            --bg-body: #f0f9ff;
+            --bg-pane: #ffffff;
+            --text-main: #1e293b;
+            --text-light: #64748b;
+            --border-color: #e0f2fe;
+            --highlight-color: #fef08a;
+            --correct: #16a34a;
+            --wrong: #dc2626;
+            --exp-bg: #f0fdf4;
+            --header-h: 70px;
+            --footer-h: 80px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            font-size: 16px;
+        }
+
+        /* --- OVERLAY & MODAL --- */
+        #setupOverlay, .custom-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        .setup-modal, .custom-modal {
+            background: white; padding: 35px; border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(2, 132, 199, 0.15);
+            width: 90%; max-width: 500px; text-align: center;
+            border: 2px solid var(--accent);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 90vh; overflow-y: auto;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .setup-modal h2, .custom-modal h2 { color: var(--primary-dark); font-size: 24px; margin-top: 0; font-weight: 700; }
+        .mode-btn {
+            display: block; width: 100%; padding: 14px; margin: 12px 0;
+            border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer;
+            transition: 0.3s; font-family: inherit;
+        }
+        .mode-practice { background: #fef2f2; color: #b91c1c; border: 2px solid #fecaca; }
+        .mode-practice:hover, .mode-practice.selected { background: #ef4444; color: white; border-color: #ef4444; }
+        .mode-mock { background: #f0f9ff; color: var(--primary-dark); border: 2px solid #bae6fd; }
+        .mode-mock:hover, .mode-mock.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        .mode-history { background: #f8fafc; color: #475569; border: 2px solid #cbd5e1; }
+        .mode-history:hover { background: #e2e8f0; border-color: #94a3b8; color: #1e293b; }
+        
+        #timeInputBox { display: none; margin: 20px 0; }
+        #timeInput { 
+            width: 90px; padding: 8px; font-size: 16px; text-align: center; 
+            border: 2px solid #cbd5e1; border-radius: 8px; font-family: inherit; outline: none;
+            color: var(--primary-dark); font-weight: bold;
+        }
+        #timeInput:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2); }
+        
+        .start-btn {
+            background: var(--primary); color: white; border: none; padding: 12px 30px;
+            border-radius: 30px; font-size: 16px; font-weight: 600; cursor: pointer;
+            margin-top: 15px; transition: 0.3s; display: none; box-shadow: 0 5px 15px rgba(2, 132, 199, 0.3);
+        }
+        .start-btn:hover { transform: translateY(-2px); }
+
+        .modal-actions { display: flex; gap: 15px; margin-top: 20px; justify-content: center; }
+        .btn-cancel, .btn-confirm {
+            padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 15px; cursor: pointer; transition: 0.2s; font-family: inherit; flex: 1; border: none;
+        }
+        .btn-cancel { background: #f1f5f9; color: #475569; border: 2px solid #cbd5e1; }
+        .btn-cancel:hover { background: #e2e8f0; }
+        .btn-confirm { background: var(--primary); color: white; box-shadow: 0 4px 0 var(--primary-dark); }
+        .btn-confirm:active { transform: translateY(4px); box-shadow: none; }
+
+        /* Lịch sử Table */
+        .table-wrapper { width: 100%; overflow-x: auto; border-radius: 10px; border: 1px solid var(--border-color); margin-top: 15px; }
+        #historyTable { width: 100%; border-collapse: collapse; min-width: 400px; background: white;}
+        #historyTable th { background: #f1f5f9; color: var(--primary-dark); padding: 12px; font-weight: 600; font-size: 14px;}
+        #historyTable td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 14px; vertical-align: middle;}
+        #historyTable tr:hover { background: #f8fafc; }
+
+        /* --- HEADER --- */
+        header {
+            height: var(--header-h); background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; z-index: 100;
+        }
+        
+        .brand { font-size: 20px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+        .brand span { background: var(--primary); color: white; padding: 4px 8px; border-radius: 8px; font-size: 14px; }
+
+        .tab-container { display: flex; background: #f1f5f9; padding: 4px; border-radius: 20px; gap: 4px; overflow-x: auto;}
+        .tab-btn {
+            border: none; background: transparent; padding: 8px 18px; font-size: 15px;
+            font-family: inherit; font-weight: 600; color: var(--text-light);
+            cursor: pointer; border-radius: 15px; transition: all 0.3s; white-space: nowrap;
+        }
+        .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+
+        .controls { display: flex; gap: 15px; align-items: center; }
+        .timer-box { 
+            font-family: monospace; font-weight: 700; color: #b91c1c; 
+            background: #fef2f2; padding: 8px 15px; border-radius: 10px; font-size: 18px; border: 1px solid #fecaca;
+        }
+        .btn-submit { 
+            background: var(--primary); color: white; border: none; padding: 8px 20px; 
+            border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s;
+            font-family: inherit; box-shadow: 0 3px 0 var(--primary-dark); white-space: nowrap;
+        }
+        .btn-submit:active { transform: translateY(3px); box-shadow: none; }
+
+        /* --- LAYOUT --- */
+        .container { 
+            display: flex; 
+            height: calc(100vh - var(--header-h) - var(--footer-h)); 
+            width: 100%;
+        }
+
+        .pane {
+            flex: 1; padding: 30px 40px; overflow-y: auto;
+            position: relative; scroll-behavior: smooth;
+        }
+        .pane-left { 
+            background: #fff; border-right: 2px solid var(--border-color); 
+            font-size: 16px; line-height: 1.7; text-align: justify; color: #334155;
+        }
+        .pane-right { background: #f8fafc; }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* --- CONTENT STYLES --- */
+        .passage-title { text-align: center; color: var(--primary-dark); margin-bottom: 20px; border-bottom: 2px dashed var(--accent); padding-bottom: 12px; font-size: 24px; font-weight: 700;}
+        .paragraph { margin-bottom: 18px; }
+        .paragraph-label { color: var(--primary); font-weight: 700; font-size: 1.05em; margin-right: 5px; }
+        
+        .passage-content, .question-group { display: none; animation: fadeIn 0.3s; }
+        .passage-content.active, .question-group.active { display: block; }
+        .question-group { padding-bottom: 40px; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* EVIDENCE HIGHLIGHTS */
+        .ev-box { 
+            padding: 1px 3px; border-radius: 4px; 
+            transition: all 0.4s ease; 
+            border: 2px solid transparent;
+            background-color: transparent;
+            color: inherit;
+        }
+        .ev-box.focus-blink {
+            border-color: var(--primary-dark) !important;
+            transform: scale(1.02); 
+            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.2) !important; 
+            background-color: var(--highlight-color) !important;
+            z-index: 10; position: relative;
+        }
+
+        /* --- QUESTIONS UI --- */
+        .question-section { padding: 20px; border: 1px solid var(--border-color); background: #fff; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);}
+        .instruction { color: var(--primary-dark); font-weight: 600; margin-bottom: 15px; font-size: 15px; background: #e0f2fe; padding: 12px; border-radius: 8px; border-left: 4px solid var(--primary);}
+
+        .q-row { display: flex; align-items: baseline; margin-bottom: 15px; font-size: 15px; }
+        .q-num { font-weight: bold; min-width: 30px; color: var(--primary); }
+        .q-content { flex: 1; line-height: 1.7; }
+
+        .input-gap {
+            display: inline-block; width: 140px; height: 32px;
+            border: 2px solid #cbd5e1; border-radius: 6px; 
+            text-align: center; font-weight: 600; color: var(--primary-dark);
+            font-size: 15px; margin: 0 5px; vertical-align: middle; transition: 0.2s; font-family: inherit;
+        }
+        .input-gap:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15); }
+
+        select.input-select {
+            padding: 6px 10px; border: 2px solid #cbd5e1; border-radius: 6px;
+            font-size: 15px; cursor: pointer; font-weight: 500; color: var(--text-main); outline: none; margin-top: 6px; margin-right: 8px; font-family: inherit;
+        }
+        select.input-select:focus { border-color: var(--primary); }
+
+        .mcq-item { margin-bottom: 20px; }
+        .mcq-question { font-weight: 600; margin-bottom: 10px; font-size: 15px; display: flex; align-items: baseline;}
+        .mcq-option { display: block; padding: 10px; cursor: pointer; border-radius: 8px; margin-bottom: 5px; border: 1px solid transparent; transition: 0.2s; font-size: 15px;}
+        .mcq-option:hover { background: #f8fafc; border-color: #cbd5e1; }
+        .mcq-option input { margin-right: 10px; transform: scale(1.1);}
+
+        /* --- EXPLANATION BOX --- */
+        .exp-box {
+            display: none; background: #fff;
+            border: 2px solid var(--border-color); border-left: 5px solid var(--primary);
+            padding: 15px; margin-top: 10px; margin-bottom: 15px; border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.08); 
+            animation: slideUp 0.3s ease-out;
+        }
+        .exp-box.show { display: block; }
+        .exp-title { 
+            font-weight: 700; color: var(--primary-dark); font-size: 16px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px dashed var(--border-color); padding-bottom: 8px; margin-bottom: 10px;
+        }
+        .locate-btn {
+            background: #e0f2fe; border: 1px solid var(--accent); color: var(--primary-dark);
+            padding: 4px 10px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 13px; transition: 0.2s; font-family: inherit;
+        }
+        .locate-btn:hover { background: var(--primary); color: white; }
+        
+        .exp-section { margin-bottom: 10px; font-size: 15px; line-height: 1.5; color: #334155; }
+        .exp-label { font-weight: 600; color: var(--primary-dark); display: inline-block; white-space: nowrap; margin-bottom: 5px; }
+        .exp-translate { background: #f8fafc; padding: 8px; border-radius: 4px; border-left: 3px solid #cbd5e1; font-style: italic; margin-top: 4px; }
+        .exp-keywords { background: #fffbeb; padding: 8px; border-radius: 4px; border: 1px dashed #fde68a; margin-top: 4px;}
+        .exp-detail { margin-top: 4px; }
+        .exp-keyword-match { color: #b45309; font-weight: 600; }
+
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* --- FOOTER --- */
+        footer {
+            height: var(--footer-h); background: #fff; border-top: 1px solid var(--border-color);
+            display: flex; align-items: center; padding: 0 20px; gap: 15px; z-index: 100;
+        }
+        .palette-scroller { flex: 1; display: flex; gap: 8px; overflow-x: auto; padding: 8px 0; align-items: center;}
+        .nav-dot {
+            min-width: 36px; height: 36px; border: 2px solid #e2e8f0; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold;
+            cursor: pointer; color: #94a3b8; background: white; transition: 0.2s; flex-shrink: 0;
+        }
+        .nav-dot.done { background: #e0f2fe; color: var(--primary-dark); border-color: var(--accent); }
+        .nav-dot:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* HIGHLIGHT MENU */
+        .highlight { background-color: var(--highlight-color); cursor: pointer; border-radius: 2px; padding: 1px 0;}
+        #ctxMenu {
+            position: absolute; display: none; background: white; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12); border-radius: 8px; 
+            font-size: 14px; z-index: 99999; border: 1px solid #eee; min-width: 140px; overflow: hidden;
+        }
+        #ctxMenu button {
+            background: none; border: none; padding: 10px 15px; 
+            width: 100%; text-align: left; cursor: pointer; display: block; font-weight: 600; color: #444; font-family: inherit;
+        }
+        #ctxMenu button:hover { background: #f8fafc; color: var(--primary-dark); }
+        #ctxMenu button.delete:hover { background: #fef2f2; color: var(--wrong); }
+
+        .feedback { display: inline-block; font-weight: bold; font-size: 15px; margin-left: 8px; }
+        .correct { color: var(--correct); }
+        .wrong { color: var(--wrong); }
+
+        @media (max-width: 768px) {
+            .container { flex-direction: column; }
+            .pane { height: 50%; padding: 20px; }
+            .pane-left { border-right: none; border-bottom: 2px solid var(--border-color); }
+            header { padding: 10px; height: auto; flex-wrap: wrap; gap: 10px;}
+            .tab-container { width: 100%; order: 3; justify-content: space-between;}
+            .controls { order: 2; }
+            .setup-modal { padding: 25px 20px; }
+            .input-gap { width: 100%; margin: 5px 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="setupOverlay">
+    <div class="setup-modal" id="setupContent">
+        <h2>Chào mừng đến với Reading Library ✨</h2>
+        <p style="font-size: 15px; color: #64748b; margin-bottom: 20px;">Hôm nay bạn muốn rèn luyện theo cách nào?</p>
+        
+        <button class="mode-btn mode-practice" onclick="selectMode('practice')">🎯 Luyện Tập</button>
+        <button class="mode-btn mode-mock" onclick="selectMode('mock')">🏆 Thi Thử (20 Phút)</button>
+        <button class="mode-btn mode-history" onclick="openHistoryTab()">🕒 Xem Lịch Sử</button>
+        
+        <div id="timeInputBox">
+            <label style="font-size: 15px; font-weight: bold; color: #475569;">Cài đặt thời gian (phút): </label>
+            <input type="number" id="timeInput" value="20" min="5" max="60">
+        </div>
+        
+        <button class="start-btn" id="startBtn" onclick="askReady()">Sẵn sàng (OK)</button>
+    </div>
+
+    <div class="setup-modal" id="historyContent" style="display: none;">
+        <h2>Lịch Sử Làm Bài</h2>
+        <div id="historyLoading" style="text-align: center; color: var(--text-light); margin: 15px 0;">Đang tải dữ liệu...</div>
+        
+        <div class="table-wrapper">
+            <table id="historyTable">
+                <thead>
+                    <tr>
+                        <th>Ngày làm</th>
+                        <th>Kết quả</th>
+                        <th>Band</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody"></tbody>
+            </table>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="btn-cancel" style="width: auto;" onclick="backToMenu()">Quay lại Menu</button>
+        </div>
+    </div>
+</div>
+
+<div id="startConfirmOverlay" class="custom-overlay" style="display: none;">
+    <div class="custom-modal">
+        <h2>Xác nhận bắt đầu</h2>
+        <p id="startConfirmMsg" style="font-size: 15px; color: #475569; margin-bottom: 15px; white-space: pre-line;"></p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeStartConfirmModal()">Huỷ</button>
+            <button class="btn-confirm" onclick="startTestActual()">OK</button>
+        </div>
+    </div>
+</div>
+
+<header>
+    <div class="brand">
+        <span>SnapEnglish</span> Test 5 - Passage 3
+    </div>
+    
+    <div class="tab-container">
+        <button class="tab-btn active">Passage 3</button>
+    </div>
+
+    <div class="controls">
+        <div class="timer-box">⏱ <span id="timer">00:00</span></div>
+        <button class="btn-submit" id="btnSubmitMain" onclick="submitTest(true)">NỘP BÀI</button>
+    </div>
+</header>
+
+<div class="container" id="mainContainer">
+    
+    <div class="pane pane-left" id="passagePane">
+        
+        <div id="text-p3" class="passage-content active">
+            <h2 class="passage-title">Children and Playing</h2>
+            <p class="paragraph"><span class="paragraph-label">A.</span> Childhood is in every sense a preparation for adulthood, both in terms of physical and mental maturation. It is an essential stepping stone that allows all young people to adjust optimally to the requirements that collective expectations and rules set for any adult individual, to both integrate, exploit and enjoy living within society. By definition, <span id="ev-32" class="ev-box">individuals who fail to meet these criteria are classified as anti-social</span> or in some way incapable of coping with societal expectations and therefore unlikely to experience a positive quality of life. Aspects of human brain maturation continue from birth until into the late teens. During this long developmental period, a child <span id="ev-35" class="ev-box">will learn from interactions with parents, siblings, relations, peers and teachers, and will have both positive and negative emotional experiences</span> due to these and other life events. Not only is this a phase of intense adaptation and information gathering, but the process of maturation is organised so as to structure it progressively in the most effective way. Of course, a child is strongly influenced by being taught by other individuals, but each child also has at their disposal a highly effective, self-help tuition kit that is present for all children. This is play.</p>
+
+            <p class="paragraph"><span class="paragraph-label">B.</span> Play is a fundamental behaviour of juveniles in all species of birds and mammals. While adults can also show it, although at a much-reduced frequency, <span id="ev-36" class="ev-box">they often give the impression that it is an attractive, but wasteful expression of leisure</span> that only the young with minimal responsibilities can indulge in. In truth, it is this play of youth that prepares an individual in an important variety of ways for adulthood. While the building blocks for brain development are created before birth, <span id="ev-29" class="ev-box">the brain is only about 25 per cent complete at birth.</span> The brain maturation process continues during the first two decades of life, although of course, brain networks can continue to adapt in the light of experience throughout the whole of an individual's life. The types of play that humans exhibit change during the various maturational stages of the brain.</p>
+
+            <p class="paragraph"><span class="paragraph-label">C.</span> Between birth and year one, play during this period involves practice of the movement and sensory systems with interest in patterns, colours and sounds, exploring textures, grasping objects and performing simple actions with them. <span id="ev-27" class="ev-box">Play is highly repetitive</span>, like a form of practice. Over the next two years or so, examples of pretend play are seen, indicating that individuals are capable of symbolic thought. The brain's specialised language production and comprehension regions develop, as language communication expands rapidly. Language is also played with in rhymes and songs and 'silly' sounds, and pretend characters can talk, express emotions and perform actions. <span id="ev-30" class="ev-box">Between ages three and eight, play becomes more elaborate and extensive. Children engage in complex theme play involving roles</span>, scripts and costumes. By the age of six, <span id="ev-37" class="ev-box">games with rules become a pervasive play activity, as well as rule negotiations and discussion of "fairness". Both co-operation and competition occur in these games, as well as in spontaneously invented ones. Through this kind of play, children demonstrate extensive symbolic thought capacities and the ability to self-regulate and explain their own behaviour.</span> From ages eight to fourteen, play becomes increasingly sophisticated and symbolic, with pretend themes often carrying on for months. Symbolic board and computer games are also popular. At this stage, many children will have been introduced to adult-controlled more organised games, such as sport, which require greater control of motor, social and cognitive processes.</p>
+
+            <p class="paragraph"><span class="paragraph-label">D.</span> While young animals of most species show mainly relatively simple forms of play up to the age of puberty, it is notable that <span id="ev-33" class="ev-box">the species that tend to have the most complex life styles engage in play the most and with the most sophisticated repertoire.</span> This naturally includes non-human primates and particularly the great apes, where quite complex forms of social and object play are seen. Dolphins are also notable in the range and complexity of the games they play. It has been claimed that captive bottle nosed dolphins can show 317 distinct forms of play behaviour. One of these is blowing bubbles and catching them in the mouth before they reach the surface. To add interest and competition, <span id="ev-28" class="ev-box">they can apparently make the task more and more difficult by releasing the bubbles closer and closer to the surface</span> or modifying swimming style while the bubbles are released.</p>
+
+            <p class="paragraph"><span class="paragraph-label">E.</span> Amongst mammals other than humans, it is the species that rely on their group hunting skills that show the greatest amount of play behaviour as juveniles. <span id="ev-34" class="ev-box">Hunting species also seem happy to play with objects</span>, presumably because they represent practice for catching and manipulating prey. Apart from developing sensorimotor dexterity, these play interactions also <span id="ev-38" class="ev-box">help to sort out dominance relationships and promote social alliances and cohesion in the group, though not with outsiders to the group.</span> Play for all species is a key adaptive tool for survival and therefore, like all-important behaviour, its expression is linked to brain dopamine reward systems.</p>
+
+            <p class="paragraph"><span class="paragraph-label">F.</span> Play deprivation can have a significant effect in humans. <span id="ev-39" class="ev-box">Children who have been deprived of play are likely to have been neglected in many other ways.</span> The effects can include an <span id="ev-31" class="ev-box">inability to make friends and socialise, leading to an isolated childhood and adolescence, which in turn can lead to a lonely and isolated adulthood, with individuals unable to understand their own or other's emotions.</span> A childhood without adequate play experiences can lead to a lack of physical skills and abilities, which often leads to obesity and poor health, and a lack of confidence in one's own abilities.</p>
+        </div>
+
+    </div>
+
+    <div class="pane pane-right" id="questionPane">
+        
+        <div id="q-group-3" class="question-group active">
+            <div class="question-section">
+                <div class="instruction">Questions 27-34: The text has 6 paragraphs A - F. Which paragraph contains the following information?</div>
+                
+                <div class="q-row" id="q-row-27">
+                    <span class="q-num">27.</span>
+                    <span class="q-content">The earliest forms of human play are often very repetitive.
+                        <select class="input-select" id="ans-27" onchange="updateNav(27)">
+                            <option value="">Select...</option>
+                            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                        </select>
+                        <span id="fb-27" class="feedback"></span>
+                    </span>
+                </div>
+                <div id="exp-27"></div>
+
+                <div class="q-row" id="q-row-28">
+                    <span class="q-num">28.</span>
+                    <span class="q-content">Some animals consciously like making their play games more challenging.
+                        <select class="input-select" id="ans-28" onchange="updateNav(28)">
+                            <option value="">Select...</option>
+                            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                        </select>
+                        <span id="fb-28" class="feedback"></span>
+                    </span>
+                </div>
+                <div id="exp-28"></div>
+
+                <div class="q-row" id="q-row-29">
+                    <span class="q-num">29.</span>
+                    <span class="q-content">A newborn baby's brain is only about a quarter developed.
+                        <select class="input-select" id="ans-29" onchange="updateNav(29)">
+                            <option value="">Select...</option>
+                            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                        </select>
+                        <span id="fb-29" class="feedback"></span>
+                    </span>
+                </div>
+                <div id="exp-29"></div>
+
+                <div class="q-row" id="q-row-30">
+                    <span class="q-num">30.</span>
+                    <span class="q-content">Children will often start to engage in role-playing after the age of three.
+                        <select class="input-select" id="ans-30" onchange="updateNav(30)">
+                            <option value="">Select...</option>
+                            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                        </select>
+                        <span id="fb-30" class="feedback"></span>
+                    </span>
+                </div>
+                <div id="exp-30"></div>
+
+                <div class="q-row" id="q-row-31">
+                    <span class="q-num">31.</span>
+                    <span class="q-content">Children who miss out on adequate play can experience emotional problems.
+                        <select class="input-select" id="ans-31" onchange="updateNav(31)">
+                            <option value="">Select...</option>
+                            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                        </select>
+                        <span id="fb-31" class="feedback"></span>
+                    </span>
+                </div>
+                <div id="exp-31"></div>
+
+                <div class="q-row" id="q-row-32">
+                    <span class="q-num">32.</span>
+                    <span class="q-content">People who fail to adapt to social expectations of behavior can be seen as being anti-social.
+                        <select class="input-select" id="ans-32" onchange="updateNav(32)">
+                            <option value="">Select...</option>
+                            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                        </select>
+                        <span id="fb-32" class="feedback"></span>
+                    </span>
+                </div>
+                <div id="exp-32"></div>
+
+                <div class="q-row" id="q-row-33">
+                    <span class="q-num">33.</span>
+                    <span class="q-content">The animals that have the most complex lives also have the more complex play routines.
+                        <select class="input-select" id="ans-33" onchange="updateNav(33)">
+                            <option value="">Select...</option>
+                            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                        </select>
+                        <span id="fb-33" class="feedback"></span>
+                    </span>
+                </div>
+                <div id="exp-33"></div>
+
+                <div class="q-row" id="q-row-34">
+                    <span class="q-num">34.</span>
+                    <span class="q-content">Animals that hunt like to play with objects.
+                        <select class="input-select" id="ans-34" onchange="updateNav(34)">
+                            <option value="">Select...</option>
+                            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                        </select>
+                        <span id="fb-34" class="feedback"></span>
+                    </span>
+                </div>
+                <div id="exp-34"></div>
+            </div>
+
+            <div class="question-section">
+                <div class="instruction">Questions 35-40: Choose the correct letter A, B, C or D.</div>
+                
+                <div class="mcq-item" id="q-row-35">
+                    <div class="mcq-question"><span class="q-num" style="margin-top:-2px;">35.</span> Children's interaction with parents is</div>
+                    <label class="mcq-option"><input type="radio" name="mcq-35" value="A" onchange="updateNav(35)"> A. initially better experienced with both parents present.</label>
+                    <label class="mcq-option"><input type="radio" name="mcq-35" value="B" onchange="updateNav(35)"> B. not always a positive experience.</label>
+                    <label class="mcq-option"><input type="radio" name="mcq-35" value="C" onchange="updateNav(35)"> C. never to be avoided.</label>
+                    <label class="mcq-option"><input type="radio" name="mcq-35" value="D" onchange="updateNav(35)"> D. always a positive experience.</label>
+                    <span id="fb-35" class="feedback"></span>
+                    <div id="exp-35"></div>
+                </div>
+
+                <div class="mcq-item" id="q-row-36">
+                    <div class="mcq-question"><span class="q-num" style="margin-top:-2px;">36.</span> Adults often display that</div>
+                    <label class="mcq-option"><input type="radio" name="mcq-36" value="A" onchange="updateNav(36)"> A. play is a waste of time for them.</label>
+                    <label class="mcq-option"><input type="radio" name="mcq-36" value="B" onchange="updateNav(36)"> B. play is still an everyday part of their lives.</label>
+                    <label class="mcq-option"><input type="radio" name="mcq-36" value="C" onchange="updateNav(36)"> C. play is something to do with their children.</label>
+                    <label class="mcq-option"><input type="radio" name="mcq-36" value="D" onchange="updateNav(36)"> D. play is something that should be done with increased frequency.</label>
+                    <span id="fb-36" class="feedback"></span>
+                    <div id="exp-36"></div>
+                </div>
+
+                <div class="mcq-item" id="q-row-37">
+                    <div class="mcq-question"><span class="q-num" style="margin-top:-2px;">37.</span> When children first start to play games with rules,</div>
+                    <label class="mcq-option"><input type="radio" name="mcq-37" value="A" onchange="updateNav(37)"> A. they develop the ability to cheat.</label>
+                    <label class="mcq-option"><input type="radio" name="mcq-37" value="B" onchange="updateNav(37)"> B. they develop the ability to plan ahead.</label>
+                    <label class="mcq-option"><input type="radio" name="mcq-37" value="C" onchange="updateNav(37)"> C. they develop the ability to justify their actions.</label>
+                    <label class="mcq-option"><input type="radio" name="mcq-37" value="D" onchange="updateNav(37)"> D. they develop the ability to choose teams.</label>
+                    <span id="fb-37" class="feedback"></span>
+                    <div id="exp-37"></div>
+                </div>
+
+                <div class="mcq-item" id="q-row-38">
+                    <div class="mcq-question"><span class="q-num" style="margin-top:-2px;">38.</span> Play routines for hunting animals do not help them</div>
+                    <label class="mcq-option"><input type="radio" name="mcq-38" value="A" onchange="updateNav(38)"> A. develop the ability to chase prey.</label>
+                    <label class="mcq-option"><input type="radio" name="mcq-38" value="B" onchange="updateNav(38)"> B. develop social relationships with animals outside their group.</label>
+                    <label class="mcq-option"><input type="radio" name="mcq-38" value="C" onchange="updateNav(38)"> C. develop social relationships within their group.</label>
+                    <label class="mcq-option"><input type="radio" name="mcq-38" value="D" onchange="updateNav(38)"> D. develop coordination.</label>
+                    <span id="fb-38" class="feedback"></span>
+                    <div id="exp-38"></div>
+                </div>
+
+                <div class="mcq-item" id="q-row-39">
+                    <div class="mcq-question"><span class="q-num" style="margin-top:-2px;">39.</span> Children deprived of play are liable to</div>
+                    <label class="mcq-option"><input type="radio" name="mcq-39" value="A" onchange="updateNav(39)"> A. be entrepreneurs.</label>
+                    <label class="mcq-option"><input type="radio" name="mcq-39" value="B" onchange="updateNav(39)"> B. have older siblings.</label>
+                    <label class="mcq-option"><input type="radio" name="mcq-39" value="C" onchange="updateNav(39)"> C. be smaller.</label>
+                    <label class="mcq-option"><input type="radio" name="mcq-39" value="D" onchange="updateNav(39)"> D. have often suffered some form of neglect.</label>
+                    <span id="fb-39" class="feedback"></span>
+                    <div id="exp-39"></div>
+                </div>
+
+                <div class="mcq-item" id="q-row-40">
+                    <div class="mcq-question"><span class="q-num" style="margin-top:-2px;">40.</span> What is the writer's purpose in Reading Passage 3?</div>
+                    <label class="mcq-option"><input type="radio" name="mcq-40" value="A" onchange="updateNav(40)"> A. To explain the problems faced by children who do not experience enough play.</label>
+                    <label class="mcq-option"><input type="radio" name="mcq-40" value="B" onchange="updateNav(40)"> B. To analyse the different types of play games experienced by humans and animals.</label>
+                    <label class="mcq-option"><input type="radio" name="mcq-40" value="C" onchange="updateNav(40)"> C. To assess the role and importance of play in humans and animals.</label>
+                    <label class="mcq-option"><input type="radio" name="mcq-40" value="D" onchange="updateNav(40)"> D. To discuss the role of the child psychiatrist in recommending different play games for children.</label>
+                    <span id="fb-40" class="feedback"></span>
+                    <div id="exp-40"></div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="confirmOverlay" class="custom-overlay" style="display:none;">
+    <div class="custom-modal">
+        <h2>Xác nhận nộp bài</h2>
+        <p style="font-size: 15px; color: #475569; margin-bottom: 20px;">Bạn có chắc chắn muốn nộp bài để xem đáp án và giải thích chi tiết không?</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeConfirmModal()">Quay lại</button>
+            <button class="btn-confirm" onclick="executeSubmit()">Nộp bài</button>
+        </div>
+    </div>
+</div>
+
+<div id="resultOverlay" class="custom-overlay" style="display:none;">
+    <div class="custom-modal">
+        <h2 id="resultTitle">🎉 Kết Quả Bài Thi</h2>
+        <div style="font-size: 64px; font-weight: 800; color: var(--primary); margin: 20px 0; letter-spacing: -2px;" id="scoreDisplay">0/14</div>
+        <div style="font-size: 24px; font-weight: 800; color: var(--correct); margin-bottom: 25px; background: #ecfdf5; display: inline-block; padding: 12px 30px; border-radius: 20px; border: 2px solid #a7f3d0;" id="bandDisplay">Band: 0.0</div>
+        <button class="btn-confirm" style="width: 100%;" onclick="closeResultModal()">Xem giải thích chi tiết</button>
+    </div>
+</div>
+<div id="deleteConfirmOverlay" class="custom-overlay" style="display:none;">
+    <div class="custom-modal">
+        <h2>Xác nhận xóa</h2>
+        <p style="font-size: 15px; color: #475569; margin-bottom: 20px;">Bạn có chắc chắn muốn xóa bài làm này khỏi lịch sử không? Hành động này không thể hoàn tác.</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeDeleteModal()">Quay lại</button>
+            <button class="btn-confirm" style="background: var(--wrong); box-shadow: 0 4px 0 #b91c1c;" onclick="executeDelete()">Xóa</button>
+        </div>
+    </div>
+</div>
+<div id="ctxMenu">
+    <button onclick="doHighlight()">🖍 Highlight</button>
+    <button onclick="removeHighlight()" class="delete">🗑 Xóa Highlight</button>
+</div>
+
+<footer>
+    <div style="font-size:13px; font-weight:bold; color:#64748b; text-transform:uppercase;">Điều hướng:</div>
+    <div class="palette-scroller" id="navPalette"></div>
+</footer>
+
+<script>
+    // --- STATE & DATA ---
+    let currentMode = '';
+    let testDuration = 0; 
+    let timerInterval = null;
+    let isSubmitted = false;
+    
+    const START_Q = 27;
+    const END_Q = 40;
+    const TOTAL_QUESTIONS = 14;
+
+    // --- SETUP MODAL LOGIC ---
+    function selectMode(mode) {
+        currentMode = mode;
+        document.querySelector('.mode-practice').classList.toggle('selected', mode === 'practice');
+        document.querySelector('.mode-mock').classList.toggle('selected', mode === 'mock');
+        
+        document.getElementById('timeInputBox').style.display = (mode === 'practice') ? 'block' : 'none';
+        document.getElementById('startBtn').style.display = 'inline-block';
+    }
+
+    function openHistoryTab() {
+        document.getElementById('setupContent').style.display = 'none';
+        document.getElementById('historyContent').style.display = 'block';
+        if(window.taiLichSuIELTS) window.taiLichSuIELTS();
+    }
+
+    function backToMenu() {
+        document.getElementById('historyContent').style.display = 'none';
+        document.getElementById('setupContent').style.display = 'block';
+    }
+
+    function askReady() {
+        let confirmMsg = currentMode === 'mock' 
+            ? "Bạn chọn Thi Thử (20 phút).\nBạn đã sẵn sàng bước vào bài làm chưa?" 
+            : `Bạn chọn Luyện Tập (${document.getElementById('timeInput').value} phút).\nBạn đã sẵn sàng chưa?`;
+            
+        document.getElementById('startConfirmMsg').innerText = confirmMsg;
+        document.getElementById('startConfirmOverlay').style.display = 'flex';
+    }
+
+    function closeStartConfirmModal() { document.getElementById('startConfirmOverlay').style.display = 'none'; }
+
+    function startTestActual() {
+        document.getElementById('startConfirmOverlay').style.display = 'none';
+        let minutes = (currentMode === 'mock') ? 20 : parseInt(document.getElementById('timeInput').value);
+        if(isNaN(minutes) || minutes < 1) minutes = 20;
+        testDuration = minutes * 60;
+        
+        document.getElementById('setupOverlay').style.display = 'none';
+        startTimer();
+    }
+
+    const correctAnswers = {
+        27: "C", 28: "D", 29: "B", 30: "C", 31: "F", 32: "A", 33: "D", 34: "E",
+        35: "B", 36: "A", 37: "C", 38: "B", 39: "D", 40: "C"
+    };
+
+    const explanations = {
+        27: { translation: "Các hình thức vui chơi sớm nhất của con người thường rất lặp đi lặp lại.", keywords: "<span class='exp-keyword-match'>earliest forms = Between birth and year one</span><br><span class='exp-keyword-match'>repetitive = Play is highly repetitive</span>", exp: "Đoạn C nhắc đến giai đoạn từ khi sinh ra đến 1 tuổi, trẻ em chơi bằng cách thực hành các thao tác cơ bản: 'Play is highly repetitive, like a form of practice.'", colorClass: "ev-27" },
+        28: { translation: "Một số loài động vật có ý thức muốn làm cho trò chơi của chúng khó hơn.", keywords: "<span class='exp-keyword-match'>make games more challenging = make the task more and more difficult</span>", exp: "Đoạn D ví dụ về cá heo mũi chai, chúng nhả bong bóng rồi cố bắt lại, và có thể chủ động 'make the task more and more difficult' (làm thử thách khó hơn).", colorClass: "ev-28" },
+        29: { translation: "Não bộ của trẻ sơ sinh mới chỉ phát triển khoảng một phần tư.", keywords: "<span class='exp-keyword-match'>quarter developed = 25 per cent complete</span>", exp: "Đoạn B ghi rõ: 'the brain is only about 25 per cent complete at birth.'", colorClass: "ev-29" },
+        30: { translation: "Trẻ em thường sẽ bắt đầu tham gia vào trò chơi nhập vai sau 3 tuổi.", keywords: "<span class='exp-keyword-match'>role-playing = play involving roles</span><br><span class='exp-keyword-match'>after age of three = Between ages three and eight</span>", exp: "Đoạn C nêu: 'Between ages three and eight... Children engage in complex theme play involving roles...'", colorClass: "ev-30" },
+        31: { translation: "Trẻ em thiếu thốn vui chơi đầy đủ có thể gặp các vấn đề về cảm xúc.", keywords: "<span class='exp-keyword-match'>emotional problems = unable to understand their own or other's emotions</span>", exp: "Đoạn F cho thấy trẻ thiếu vui chơi sẽ gặp khó khăn khi kết bạn, bị cô lập, và lớn lên 'unable to understand their own or other's emotions' (không hiểu cảm xúc).", colorClass: "ev-31" },
+        32: { translation: "Những người không thích nghi được với kỳ vọng xã hội về hành vi có thể bị coi là phản xã hội.", keywords: "<span class='exp-keyword-match'>fail to adapt to social expectations = incapable of coping with societal expectations</span><br><span class='exp-keyword-match'>anti-social = classified as anti-social</span>", exp: "Đoạn A định nghĩa những cá nhân không đáp ứng được những tiêu chí kỳ vọng xã hội (incapable of coping with societal expectations) bị phân loại là phản xã hội (anti-social).", colorClass: "ev-32" },
+        33: { translation: "Động vật có cuộc sống phức tạp nhất cũng có những chu trình vui chơi phức tạp hơn.", keywords: "<span class='exp-keyword-match'>complex lives = most complex life styles</span><br><span class='exp-keyword-match'>complex play routines = most sophisticated repertoire</span>", exp: "Đoạn D nhận xét: 'the species that tend to have the most complex life styles engage in play the most and with the most sophisticated repertoire.'", colorClass: "ev-33" },
+        34: { translation: "Động vật săn mồi thích chơi với các đồ vật.", keywords: "<span class='exp-keyword-match'>Animals that hunt = Hunting species</span><br><span class='exp-keyword-match'>play with objects = happy to play with objects</span>", exp: "Đoạn E xác nhận: 'Hunting species also seem happy to play with objects...'", colorClass: "ev-34" },
+        35: { translation: "B. không phải lúc nào cũng là một trải nghiệm tích cực.", keywords: "<span class='exp-keyword-match'>interaction with parents = learn from interactions with parents</span><br><span class='exp-keyword-match'>not always positive = will have both positive and negative emotional experiences</span>", exp: "Đoạn A cho biết trẻ em sẽ học từ tương tác với cha mẹ, người thân... và sẽ có 'both positive and negative emotional experiences' (cả trải nghiệm tích cực và tiêu cực).", colorClass: "ev-35" },
+        36: { translation: "A. vui chơi là một sự lãng phí thời gian đối với họ.", keywords: "<span class='exp-keyword-match'>waste of time = wasteful expression of leisure</span>", exp: "Đoạn B mô tả người lớn thường mang lại ấn tượng rằng vui chơi là một hình thức 'wasteful expression of leisure' (sự thể hiện rảnh rỗi lãng phí).", colorClass: "ev-36" },
+        37: { translation: "C. chúng phát triển khả năng giải thích hành động của mình.", keywords: "<span class='exp-keyword-match'>start to play games with rules = games with rules become a pervasive play activity</span><br><span class='exp-keyword-match'>justify their actions = ability to... explain their own behaviour</span>", exp: "Đoạn C nhắc đến trò chơi có luật lệ, nhờ đó trẻ em thể hiện khả năng tự điều chỉnh và 'explain their own behaviour' (giải thích/biện minh cho hành vi của mình).", colorClass: "ev-37" },
+        38: { translation: "B. phát triển các mối quan hệ xã hội với các loài động vật bên ngoài nhóm của chúng.", keywords: "<span class='exp-keyword-match'>do not help = though not with outsiders to the group</span>", exp: "Đoạn E nói rằng các tương tác vui chơi giúp thúc đẩy các liên minh xã hội trong nhóm, 'though not with outsiders to the group' (tuy nhiên KHÔNG với người ngoài nhóm).", colorClass: "ev-38" },
+        39: { translation: "D. thường đã phải chịu đựng một dạng bỏ bê nào đó.", keywords: "<span class='exp-keyword-match'>deprived of play are liable to = deprived of play are likely to have been</span><br><span class='exp-keyword-match'>suffered neglect = neglected in many other ways</span>", exp: "Đoạn F mở đầu với câu: 'Children who have been deprived of play are likely to have been neglected in many other ways.'", colorClass: "ev-39" },
+        40: { translation: "C. Để đánh giá vai trò và tầm quan trọng của việc vui chơi ở người và động vật.", keywords: "Toàn bài đọc", exp: "Bài văn (từ đoạn A-F) lần lượt phân tích cách não bộ phát triển, các giai đoạn vui chơi ở trẻ em, sự vui chơi phức tạp ở các động vật có vú, và hậu quả của việc thiếu vui chơi. Mục tiêu là đánh giá tầm quan trọng cốt lõi của 'vui chơi'.", colorClass: "ev-40" }
+    };
+
+    window.onload = function() {
+        renderPalette();
+        document.getElementById('setupOverlay').style.display = 'flex';
+    }
+
+    function renderPalette() {
+        const nav = document.getElementById("navPalette");
+        for (let i = START_Q; i <= END_Q; i++) {
+            let dot = document.createElement("div");
+            dot.className = "nav-dot"; dot.id = `nav-${i}`; dot.innerText = i;
+            dot.onclick = () => scrollToQuestion(i);
+            nav.appendChild(dot);
+        }
+    }
+
+    function scrollToQuestion(id) {
+        setTimeout(() => {
+            let targetId = `q-row-${id}`;
+            let el = document.getElementById(targetId);
+            if(el) {
+                el.scrollIntoView({behavior:"smooth", block:"center"});
+                el.style.backgroundColor = "var(--highlight-color)";
+                setTimeout(() => el.style.backgroundColor = "", 1000);
+            }
+        }, 100);
+    }
+
+    function updateNav(id) {
+        let nav = document.getElementById(`nav-${id}`);
+        if (!nav) return;
+        
+        let val = "";
+        if (id >= 35 && id <= 40) { // MCQs (Radio)
+            let checked = document.querySelector(`input[name="mcq-${id}"]:checked`);
+            if (checked) val = checked.value;
+        } else { // Matching (Select)
+            let el = document.getElementById(`ans-${id}`);
+            if (el) val = el.value;
+        }
+        
+        if (val && val.trim() !== "") nav.classList.add("done");
+        else nav.classList.remove("done");
+    }
+
+    function startTimer() {
+        let display = document.getElementById("timer");
+        timerInterval = setInterval(function () {
+            let m = Math.floor(testDuration / 60);
+            let s = testDuration % 60;
+            display.textContent = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+            if (--testDuration < 0) { clearInterval(timerInterval); executeSubmit(); }
+        }, 1000);
+    }
+
+    function submitTest(manual) {
+        if (isSubmitted) return;
+        if (manual) document.getElementById('confirmOverlay').style.display = 'flex';
+        else executeSubmit();
+    }
+
+    function closeConfirmModal() { document.getElementById('confirmOverlay').style.display = 'none'; }
+    function closeResultModal() { document.getElementById('resultOverlay').style.display = 'none'; }
+
+    // Hàm tính Band điểm IELTS Reading (chuẩn hóa tỷ lệ trên 40 câu)
+    window.calculateIeltsBand = function(correct, total) {
+        let normalizedCorrect = (correct / total) * 40;
+        if (normalizedCorrect >= 39) return 9.0;
+        if (normalizedCorrect >= 37) return 8.5;
+        if (normalizedCorrect >= 35) return 8.0;
+        if (normalizedCorrect >= 33) return 7.5;
+        if (normalizedCorrect >= 30) return 7.0;
+        if (normalizedCorrect >= 27) return 6.5;
+        if (normalizedCorrect >= 23) return 6.0;
+        if (normalizedCorrect >= 19) return 5.5;
+        if (normalizedCorrect >= 15) return 5.0;
+        if (normalizedCorrect >= 13) return 4.5;
+        if (normalizedCorrect >= 10) return 4.0;
+        if (normalizedCorrect >= 8) return 3.5;
+        if (normalizedCorrect >= 6) return 3.0;
+        return 2.5;
+    }
+
+    function executeSubmit(isReviewMode = false) {
+        document.getElementById('confirmOverlay').style.display = 'none';
+        isSubmitted = true;
+        clearInterval(timerInterval);
+        document.querySelectorAll('input, select').forEach(el => el.disabled = true);
+        
+        let score = 0;
+        let userAnswersDict = {}; 
+
+        for (let i = START_Q; i <= END_Q; i++) {
+            let userAns = "";
+            
+            if (i >= 35 && i <= 40) { // MCQs
+                let checked = document.querySelector(`input[name="mcq-${i}"]:checked`);
+                if (checked) userAns = checked.value;
+            } else { // Matching (Select)
+                let el = document.getElementById(`ans-${i}`);
+                if (el) userAns = el.value.trim().toUpperCase();
+            }
+
+            userAnswersDict['ans-'+i] = userAns;
+
+            let correctAnswer = correctAnswers[i];
+            let isCorrect = false;
+
+            if (Array.isArray(correctAnswer)) {
+                isCorrect = correctAnswer.includes(userAns);
+            } else {
+                isCorrect = (userAns === correctAnswer);
+            }
+
+            if (isCorrect) score++;
+
+            let fb = document.getElementById(`fb-${i}`);
+            let correctStr = Array.isArray(correctAnswer) ? correctAnswer.join(" / ") : correctAnswer;
+            if (fb) {
+                fb.innerText = isCorrect ? "✓" : `✗ (${correctStr})`;
+                fb.className = isCorrect ? "feedback correct" : "feedback wrong";
+            }
+
+            if(explanations[i]) {
+                let expData = explanations[i];
+                let htmlContent = `
+                    <div class="exp-box show">
+                        <div class="exp-title">
+                            💡 Giải thích Câu ${i}
+                            ${expData.colorClass ? `<button class="locate-btn" onclick="scrollToEvidence('${expData.colorClass}')">📍 Xem dẫn chứng</button>` : ''}
+                        </div>
+                        <div class="exp-section">
+                            <span class="exp-label">👉 Dịch nghĩa:</span> 
+                            <div class="exp-translate">${expData.translation}</div>
+                        </div>
+                        ${expData.keywords ? `
+                        <div class="exp-section">
+                            <span class="exp-label">🔑 Từ khóa:</span> 
+                            <div class="exp-keywords">${expData.keywords}</div>
+                        </div>` : ''}
+                        <div class="exp-section">
+                            <span class="exp-label">🧠 Phân tích:</span> 
+                            <div class="exp-detail">${expData.exp}</div>
+                        </div>
+                    </div>`;
+
+                let expContainer = document.getElementById(`exp-${i}`);
+                if(expContainer) expContainer.innerHTML = htmlContent;
+            }
+        } 
+
+        document.getElementById('scoreDisplay').innerText = score + "/" + TOTAL_QUESTIONS;
+        let bandScore = window.calculateIeltsBand(score, TOTAL_QUESTIONS);
+        document.getElementById('bandDisplay').innerText = "Band: " + (Number.isInteger(bandScore) ? bandScore + ".0" : bandScore);
+        document.getElementById('resultOverlay').style.display = 'flex';
+
+        if (!isReviewMode && window.luuDiemLenFirebase) {
+            let initialTime = (currentMode === 'mock') ? 20 * 60 : parseInt(document.getElementById('timeInput').value) * 60;
+            let timeTakenMinutes = Math.round((initialTime - testDuration) / 60);
+            window.luuDiemLenFirebase(score, timeTakenMinutes, userAnswersDict);
+        }
+    }
+
+    // HÀM XEM LẠI LỊCH SỬ
+    window.xemLaiLichSu = function(docId) {
+        let attempt = window.historyDataList.find(d => d.id === docId);
+        if(!attempt) return;
+        
+        document.getElementById('setupOverlay').style.display = 'none';
+        
+        let ans = attempt.userAnswers || {};
+        for(let i = START_Q; i <= END_Q; i++) {
+            let val = ans['ans-'+i] || '';
+            
+            if (i >= 35 && i <= 40) {
+                let radios = document.querySelectorAll(`input[name="mcq-${i}"]`);
+                radios.forEach(r => {
+                    if(r.value.toUpperCase() === val.toUpperCase()) r.checked = true;
+                });
+            } else {
+                let el = document.getElementById(`ans-${i}`);
+                if (el) el.value = val;
+            }
+        }
+
+        executeSubmit(true);
+    }
+        
+    function scrollToEvidence(id) {
+        const evElement = document.getElementById(id);
+        if(evElement) {
+            setTimeout(() => {
+                evElement.scrollIntoView({behavior: "smooth", block: "center"});
+                evElement.classList.remove("focus-blink");
+                void evElement.offsetWidth;
+                evElement.classList.add("focus-blink");
+                setTimeout(() => evElement.classList.remove("focus-blink"), 1500);
+            }, 100);
+        }
+    }
+
+    // --- HIGHLIGHT SYSTEM ---
+    const container = document.getElementById("mainContainer");
+    const menu = document.getElementById("ctxMenu");
+    let targetEl = null; let selectedRange = null;
+
+    container.addEventListener("contextmenu", (e) => {
+        if (!e.target.closest('.pane')) return;
+        e.preventDefault();
+        targetEl = null; selectedRange = null; menu.style.display = "none";
+        
+        if (e.target.classList.contains("highlight")) {
+            targetEl = e.target;
+            showMenu(e.pageX, e.pageY, "remove"); return;
+        }
+
+        let sel = window.getSelection();
+        if (sel.toString().trim().length > 0 && container.contains(sel.anchorNode)) {
+            selectedRange = sel.getRangeAt(0).cloneRange();
+            showMenu(e.pageX, e.pageY, "add");
+        }
+    });
+
+    document.addEventListener("click", (e) => { if (!menu.contains(e.target)) menu.style.display = "none"; });
+
+    function showMenu(x, y, mode) {
+        menu.style.display = "block";
+        let mw = menu.offsetWidth; let mh = menu.offsetHeight;
+        menu.style.left = (x + mw > window.innerWidth ? window.innerWidth - mw - 10 : x) + "px";
+        menu.style.top = (y + mh > window.innerHeight ? window.innerHeight - mh - 10 : y) + "px";
+        menu.children[0].style.display = (mode === "add") ? "block" : "none";
+        menu.children[1].style.display = (mode === "remove") ? "block" : "none";
+    }
+
+   function doHighlight() {
+        if (selectedRange && !selectedRange.collapsed) {
+            let span = document.createElement("span"); 
+            span.className = "highlight";
+            try { 
+                selectedRange.surroundContents(span); 
+            } catch(e) {
+                span.appendChild(selectedRange.extractContents());
+                selectedRange.insertNode(span);
+            }
+            window.getSelection().removeAllRanges();
+        }
+        menu.style.display = "none";
+    }
+
+    function removeHighlight() {
+        if (targetEl) {
+            let text = document.createTextNode(targetEl.textContent);
+            targetEl.parentNode.replaceChild(text, targetEl);
+            container.normalize();
+        }
+        menu.style.display = "none";
+    }
+</script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, collection, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+        authDomain: "snapenglish-cb6e2.firebaseapp.com",
+        projectId: "snapenglish-cb6e2",
+        storageBucket: "snapenglish-cb6e2.firebasestorage.app",
+        messagingSenderId: "373152038413",
+        appId: "1:373152038413:web:19284622571390f8585f44"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            window.currentUserUid = user.uid;
+            window.currentUserEmail = user.email;
+        }
+    });
+
+   window.luuDiemLenFirebase = async function(diemSo, timeTakenMinutes, userAnswersDict) {
+        if (!window.currentUserUid) return;
+        
+        let bandScore = window.calculateIeltsBand ? window.calculateIeltsBand(diemSo, 14) : 0;
+        let timestamp = Date.now();
+        let idLuotThi = window.currentUserUid + "_ielts_R_T5_P3_" + timestamp;
+
+        try {
+            await setDoc(doc(db, "user_ielts_scores", idLuotThi), {
+                email: window.currentUserEmail,
+                skill: "Reading",
+                testName: "Test 5",
+                partName: "Passage 3",
+                timeTaken: timeTakenMinutes.toString(),
+                correctQ: diemSo,
+                totalQ: 14,
+                bandScore: bandScore,
+                userAnswers: userAnswersDict,
+                date: new Date().toLocaleDateString("vi-VN"),
+                timestamp: timestamp
+            });
+        } catch(e) {
+            console.error("Lỗi khi lưu điểm: ", e);
+        }
+    }
+
+    // TẢI LỊCH SỬ
+    window.taiLichSuIELTS = async function() {
+        const tbody = document.getElementById("historyBody");
+        const loading = document.getElementById("historyLoading");
+
+        if (!window.currentUserUid) {
+            tbody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Vui lòng đăng nhập hệ thống để xem lịch sử.</td></tr>";
+            loading.style.display = "none";
+            return;
+        }
+
+        loading.style.display = "block";
+        tbody.innerHTML = "";
+
+        try {
+            const q = query(
+                collection(db, "user_ielts_scores"),
+                where("email", "==", window.currentUserEmail),
+                where("skill", "==", "Reading"),
+                where("testName", "==", "Test 5"),
+                where("partName", "==", "Passage 3")
+            );
+
+            const querySnapshot = await getDocs(q);
+            let html = "";
+            
+            if (querySnapshot.empty) {
+                html = "<tr><td colspan='4' style='text-align:center;'>Bạn chưa làm bài test này.</td></tr>";
+            } else {
+                window.historyDataList = [];
+                querySnapshot.forEach((doc) => { 
+                    let data = doc.data();
+                    data.id = doc.id; 
+                    window.historyDataList.push(data); 
+                });
+                
+                window.historyDataList.sort((a, b) => b.timestamp - a.timestamp);
+
+                window.historyDataList.forEach((data) => {
+                    let dateObj = new Date(data.timestamp);
+                    let dateString = dateObj.toLocaleDateString("vi-VN") + " " + dateObj.getHours() + ":" + (dateObj.getMinutes() < 10 ? '0':'') + dateObj.getMinutes();
+
+                   html += `
+                        <tr>
+                            <td>${dateString}</td>
+                            <td><strong>${data.correctQ} / ${data.totalQ || 14}</strong></td>
+                            <td><strong style="color: var(--primary-dark); font-size: 1.1em;">${data.bandScore}</strong></td>
+                            <td>
+                                <div style="display: flex; gap: 8px;">
+                                    <button onclick="xemLaiLichSu('${data.id}')" class="btn-confirm" style="padding: 6px 12px; background: #e0f2fe; color: #0284c7; box-shadow: none;">Xem lại</button>
+                                    <button onclick="xoaLichSu('${data.id}', this)" class="btn-cancel" style="padding: 6px 12px; border-color: #fca5a5; color: #dc2626;">Xóa</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            tbody.innerHTML = html;
+        } catch (error) {
+            console.error("Lỗi fetch lịch sử: ", error);
+            tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; color: var(--danger);'>Đã xảy ra lỗi tải dữ liệu.</td></tr>";
+        } finally {
+            loading.style.display = "none";
+        }
+    }
+
+    let itemToDeleteId = null;
+    let itemToDeleteBtn = null;
+
+    window.xoaLichSu = function(docId, btnElement) {
+        itemToDeleteId = docId;
+        itemToDeleteBtn = btnElement;
+        document.getElementById('deleteConfirmOverlay').style.display = 'flex';
+    }
+
+    window.closeDeleteModal = function() {
+        document.getElementById('deleteConfirmOverlay').style.display = 'none';
+        itemToDeleteId = null;
+        itemToDeleteBtn = null;
+    }
+
+    window.executeDelete = async function() {
+        if (!itemToDeleteId || !itemToDeleteBtn) return;
+        
+        let docId = itemToDeleteId;
+        let btnElement = itemToDeleteBtn;
+        closeDeleteModal();
+
+        let originalText = btnElement.innerText;
+        btnElement.innerText = "...";
+        btnElement.disabled = true;
+
+        try {
+            await deleteDoc(doc(db, "user_ielts_scores", docId));
+            window.taiLichSuIELTS(); 
+        } catch (error) {
+            console.error("Lỗi khi xóa lịch sử: ", error);
+            btnElement.innerText = "Lỗi!";
+            setTimeout(() => {
+                btnElement.innerText = originalText;
+                btnElement.disabled = false;
+            }, 2000);
+        }
+    }
+</script>
+</body>
+</html>
