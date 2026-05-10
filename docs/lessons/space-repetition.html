@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SnapEnglish | Trạm Từ Vựng Toàn Diện</title>
+    <title> Trạm Từ Vựng Toàn Diện | SnapEnglish</title>
+     <link rel="icon" type="image/png" href="ảnh.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -222,33 +223,90 @@
             document.getElementById(id).style.display = 'none';
         }
 
-        // --- 4. DICTIONARY LOGIC ---
-        function handleSearch() {
-            const query = document.getElementById('search-input').value.toLowerCase().trim();
-            const resultsBox = document.getElementById('search-results');
-            resultsBox.innerHTML = '';
+        // --- 4. REAL DICTIONARY API LOGIC ---
 
-            if (query.length < 2) {
-                resultsBox.style.display = 'none';
-                return;
-            }
+// Hàm gọi API Dịch (Sử dụng endpoint miễn phí của Google Translate cho Demo)
+async function fetchTranslation(word, targetLang) {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(word)}`;
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        return data[0][0][0]; // Lấy chuỗi kết quả dịch
+    } catch (error) {
+        return "Không có bản dịch";
+    }
+}
 
-            // Mocking API delay
-            const results = Object.values(mockDictionaryData).filter(w => w.word.includes(query));
-            
-            if (results.length > 0) {
-                results.forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = 'result-item';
-                    div.innerHTML = `<span class="result-word">${item.word}</span> <span class="result-vi">${item.vi}</span>`;
-                    div.onclick = () => showWordDetail(item);
-                    resultsBox.appendChild(div);
-                });
-                resultsBox.style.display = 'block';
-            } else {
-                resultsBox.style.display = 'none';
-            }
+// Hàm tìm kiếm chính
+async function handleSearch() {
+    const searchInput = document.getElementById('search-input');
+    const query = searchInput.value.toLowerCase().trim();
+    const resultsBox = document.getElementById('search-results');
+    
+    if (query.length < 2) {
+        resultsBox.style.display = 'none';
+        return;
+    }
+
+    // Hiển thị trạng thái đang tải (Chuyên nghiệp hơn)
+    resultsBox.innerHTML = '<div class="result-item" style="color: var(--text-muted); justify-content: center;">Đang tra cứu từ điển máy chủ... <i class="fa-solid fa-spinner fa-spin" style="margin-left: 8px;"></i></div>';
+    resultsBox.style.display = 'block';
+
+    try {
+        // 1. Gọi Free Dictionary API để lấy dữ liệu gốc tiếng Anh
+        const engRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${query}`);
+        
+        if (!engRes.ok) {
+            resultsBox.innerHTML = '<div class="result-item" style="color: var(--danger); justify-content: center;">Không tìm thấy từ này trong từ điển!</div>';
+            return;
         }
+
+        const engData = await engRes.json();
+        const firstEntry = engData[0];
+        const firstMeaning = firstEntry.meanings[0];
+        const firstDefinition = firstMeaning.definitions[0];
+
+        // Lấy IPA (ưu tiên lấy IPA có sẵn trong mảng phonetics)
+        let ipaText = "N/A";
+        const phoneticObj = firstEntry.phonetics.find(p => p.text);
+        if (phoneticObj) ipaText = phoneticObj.text;
+        else if (firstEntry.phonetic) ipaText = firstEntry.phonetic;
+
+        // 2. Song song gọi API dịch sang Tiếng Việt và Tiếng Trung
+        const [viTranslate, zhTranslate] = await Promise.all([
+            fetchTranslation(query, 'vi'),
+            fetchTranslation(query, 'zh-CN')
+        ]);
+
+        // 3. Đóng gói dữ liệu chuẩn hoá
+        const realWordData = {
+            word: firstEntry.word,
+            ipa: ipaText,
+            pos: firstMeaning.partOfSpeech,
+            en: firstDefinition.definition,
+            vi: viTranslate,
+            zh: zhTranslate,
+            ex: firstDefinition.example || "Không có ví dụ cho từ này."
+        };
+
+        // 4. Render kết quả ra màn hình
+        resultsBox.innerHTML = '';
+        const div = document.createElement('div');
+        div.className = 'result-item';
+        div.innerHTML = `
+            <div>
+                <span class="result-word">${realWordData.word}</span> 
+                <span style="font-size: 13px; color: var(--primary); margin-left: 8px;">${realWordData.pos}</span>
+            </div>
+            <span class="result-vi">${realWordData.vi}</span>
+        `;
+        div.onclick = () => showWordDetail(realWordData);
+        resultsBox.appendChild(div);
+
+    } catch (error) {
+        resultsBox.innerHTML = '<div class="result-item" style="color: var(--danger); justify-content: center;">Lỗi kết nối máy chủ. Vui lòng thử lại!</div>';
+    }
+}
 
         function showWordDetail(wordData) {
             currentViewingWord = wordData;
