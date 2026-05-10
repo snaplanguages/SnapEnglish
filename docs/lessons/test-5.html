@@ -893,7 +893,16 @@
         <button class="btn-confirm" style="width: 100%;" onclick="closeResultModal()">Xem giải thích chi tiết</button>
     </div>
 </div>
-
+<div id="deleteConfirmOverlay" class="custom-overlay" style="display:none;">
+    <div class="custom-modal">
+        <h2>Xác nhận xóa</h2>
+        <p style="font-size: 15px; color: #475569; margin-bottom: 20px;">Bạn có chắc chắn muốn xóa bài làm này khỏi lịch sử không? Hành động này không thể hoàn tác.</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeDeleteModal()">Quay lại</button>
+            <button class="btn-confirm" style="background: var(--wrong); box-shadow: 0 4px 0 #b91c1c;" onclick="executeDelete()">Xóa</button>
+        </div>
+    </div>
+</div>
 <div id="ctxMenu">
     <button onclick="doHighlight()">🖍 Highlight</button>
     <button onclick="removeHighlight()" class="delete">🗑 Xóa Highlight</button>
@@ -1434,21 +1443,41 @@
         }
     }
 
-    // XÓA LỊCH SỬ
-    window.xoaLichSu = async function(docId, btnElement) {
+    // Tạo 2 biến toàn cục để lưu tạm thông tin bài cần xóa
+    let itemToDeleteId = null;
+    let itemToDeleteBtn = null;
+
+    // 1. Hàm mở Popup khi bấm nút Xóa ở bảng
+    window.xoaLichSu = function(docId, btnElement) {
+        itemToDeleteId = docId;
+        itemToDeleteBtn = btnElement;
+        document.getElementById('deleteConfirmOverlay').style.display = 'flex';
+    }
+
+    // 2. Hàm đóng Popup
+    window.closeDeleteModal = function() {
+        document.getElementById('deleteConfirmOverlay').style.display = 'none';
+        itemToDeleteId = null;
+        itemToDeleteBtn = null;
+    }
+
+    // 3. Hàm thực thi việc xóa (khi bấm nút "Xóa" màu đỏ trong Popup)
+    window.executeDelete = async function() {
+        if (!itemToDeleteId || !itemToDeleteBtn) return;
+        
+        let docId = itemToDeleteId;
+        let btnElement = itemToDeleteBtn;
+        
+        // Tắt popup ngay lập tức
+        closeDeleteModal();
+
         let originalText = btnElement.innerText;
         btnElement.innerText = "...";
         btnElement.disabled = true;
 
-        if(!confirm("Bạn có chắc chắn muốn xóa bài làm này khỏi lịch sử không?")) {
-            btnElement.innerText = originalText;
-            btnElement.disabled = false;
-            return;
-        }
-
         try {
             await deleteDoc(doc(db, "user_ielts_scores", docId));
-            window.taiLichSuIELTS();
+            window.taiLichSuIELTS(); // Tải lại bảng lịch sử
         } catch (error) {
             console.error("Lỗi khi xóa lịch sử: ", error);
             btnElement.innerText = "Lỗi!";
