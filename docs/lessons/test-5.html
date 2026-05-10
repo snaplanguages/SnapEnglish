@@ -1183,18 +1183,32 @@
                         </div>
                     </div>`;
 
-                if (i >= 22 && i <= 26) {
-                    if(summaryExpContainer) summaryExpContainer.innerHTML += htmlContent;
-                } else {
-                    let expContainer = document.getElementById(`exp-${i}`);
-                    if(expContainer) expContainer.innerHTML = htmlContent;
+               if (i >= 22 && i <= 26) {
+                        if(summaryExpContainer) summaryExpContainer.innerHTML += htmlContent;
+                    } else {
+                        let expContainer = document.getElementById(`exp-${i}`);
+                        if(expContainer) expContainer.innerHTML = htmlContent;
+                    }
                 }
+            } // ĐÓNG VÒNG LẶP FOR (Bổ sung)
+
+            // --- BỔ SUNG ĐOẠN CODE TÍNH ĐIỂM & LƯU FIREBASE BỊ MẤT ---
+            document.getElementById('scoreDisplay').innerText = score + "/40";
+            let bandScore = window.calculateIeltsBand(score, 40);
+            document.getElementById('bandDisplay').innerText = "Band: " + (Number.isInteger(bandScore) ? bandScore + ".0" : bandScore);
+            document.getElementById('resultOverlay').style.display = 'flex'; // Hiện bảng điểm
+
+            // Chỉ lưu lên Firebase nếu làm bài thật (không phải đang xem lại)
+            if (!isReviewMode && window.luuDiemLenFirebase) {
+                let initialTime = (currentMode === 'mock') ? 60 * 60 : parseInt(document.getElementById('timeInput').value) * 60;
+                let timeTakenMinutes = Math.round((initialTime - testDuration) / 60);
+                window.luuDiemLenFirebase(score, timeTakenMinutes, userAnswersDict);
             }
+        } // ĐÓNG HÀM executeSubmit (Bổ sung)
+        // --- KẾT THÚC PHẦN BỔ SUNG ---
 
-        
-
-    // HÀM XEM LẠI LỊCH SỬ
-    window.xemLaiLichSu = function(docId) {
+        // HÀM XEM LẠI LỊCH SỬ
+        window.xemLaiLichSu = function(docId) {
         let attempt = window.historyDataList.find(d => d.id === docId);
         if(!attempt) return;
         
