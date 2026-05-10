@@ -414,6 +414,8 @@
                 document.getElementById('sync-text').innerText = "Đã đồng bộ Cloud";
                 document.getElementById('sync-dot').classList.add('online');
                 renderDecksView();
+                window.requestNotificationPermission(); // Xin quyền thông báo
+                setTimeout(window.checkAndNotifyDueCards, 5000); // Đợi 5s sau khi vào web thì check xem có từ nào cần ôn không
             } catch(e) {
                 console.error("Fetch error", e);
                 showToast("Lỗi tải dữ liệu", "error");
@@ -610,10 +612,20 @@ async function fetchChineseTranslation(word) {
                 });
 
                 const uniquePos = [...new Set(allPos)].join(", ");
+                // Tối ưu hóa việc lấy phiên âm tiếng Anh chuẩn xác hơn
                 let ipaText = "N/A";
-                const phoneticObj = firstEntry.phonetics.find(p => p.text);
-                if (phoneticObj) ipaText = phoneticObj.text;
-                else if (firstEntry.phonetic) ipaText = firstEntry.phonetic;
+                if (firstEntry.phonetic) {
+                    ipaText = firstEntry.phonetic;
+                } else if (firstEntry.phonetics && firstEntry.phonetics.length > 0) {
+                    // Ưu tiên tìm phiên âm có chứa dấu "/" (chuẩn IPA) hoặc UK/US
+                    const ukPhonetic = firstEntry.phonetics.find(p => p.text && p.audio && p.audio.includes('-uk'));
+                    const usPhonetic = firstEntry.phonetics.find(p => p.text && p.audio && p.audio.includes('-us'));
+                    const anyValid = firstEntry.phonetics.find(p => p.text && p.text.includes('/')) || firstEntry.phonetics.find(p => p.text);
+                    
+                    // Ưu tiên lấy US -> UK -> Bất kỳ cái nào hợp lệ
+                    const bestPhonetic = usPhonetic || ukPhonetic || anyValid;
+                    if (bestPhonetic) ipaText = bestPhonetic.text;
+                }
 
                const viTranslate = await fetchTranslation(query, 'vi');
                 const zhData = await fetchChineseTranslation(query); // Gọi hàm mới
@@ -1066,7 +1078,59 @@ window.deleteWordFromDeck = async function(event, deckId, wordId) {
             window.renderDecksView(); 
             await syncData(); // ĐỒNG BỘ LÊN CLOUD
         }
+// ==========================================
+        // HỆ THỐNG THÔNG BÁO NHẮC NHỞ HỌC TẬP 🔔
+        // ==========================================
+        
+        window.checkAndNotifyDueCards = function() {
+            if (!appData || !appData.decks) return;
 
+            let dueCount = 0;
+            const now = Date.now();
+            
+            // Đếm tổng số từ vựng đã đến giờ ôn (nextReview <= giờ hiện tại)
+            appData.decks.forEach(deck => {
+                const toReview = deck.words.filter(w => !w.nextReview || w.nextReview <= now);
+                dueCount += toReview.length;
+            });
+
+            if (dueCount > 0) {
+                // Nếu đã được cấp quyền, hiển thị thông báo hệ thống
+                if (Notification.permission === "granted") {
+                    const notif = new Notification("Đến giờ ôn tập rồi nè! 🧠", {
+                        body: `Bạn đang có ${dueCount} từ vựng mốc meo chờ bạn ôn lại đó. Vào học ngay thôi!!! ✨`,
+                        icon: "ảnh.png", // Thay bằng link ảnh logo của bạn nếu cần
+                        badge: "ảnh.png",
+                        requireInteraction: true // Giữ thông báo trên màn hình đến khi user tắt
+                    });
+
+                    // Bấm vào thông báo thì tự động mở tab Học
+                    notif.onclick = function(event) {
+                        event.preventDefault(); // Ngăn hành vi mặc định
+                        window.focus(); // Gọi tab web sáng lên
+                        window.switchTab('study-view', document.querySelectorAll('.nav-item')[2]);
+                        notif.close();
+                    };
+                }
+            }
+        }
+
+        // Xin quyền gửi thông báo khi user vừa vào web
+        window.requestNotificationPermission = async function() {
+            if (!("Notification" in window)) {
+                console.log("Trình duyệt này không hỗ trợ Notification API.");
+                return;
+            }
+            if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+                const permission = await Notification.requestPermission();
+                if (permission === "granted") {
+                    showToast("Đã bật thông báo nhắc nhở học tập! 🔔", "success");
+                }
+            }
+        }
+
+        // Cài đặt đồng hồ: Cứ mỗi 1 tiếng (3600000 mili-giây) sẽ check và nhắc nhở 1 lần
+        setInterval(window.checkAndNotifyDueCards, 3600000);
     </script>
 </body>
 </html>
