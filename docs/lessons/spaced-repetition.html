@@ -541,34 +541,55 @@
         }
 
         async function fetchTranslation(word, targetLang) {
-            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(word)}`;
+            // Thêm dt=bd để lấy từ điển chi tiết (các nghĩa theo từ loại)
+            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&dt=bd&q=${encodeURIComponent(word)}`;
             try {
                 const response = await fetch(url);
                 const data = await response.json();
-                return data[0][0][0]; 
+                
+                let mainText = data[0][0][0]; // Nghĩa chính phổ biến nhất
+                let dictData = [];
+                
+                // Bóc tách dữ liệu từ loại (nếu Google có cung cấp)
+                if (data[1]) {
+                    data[1].forEach(item => {
+                        let pos = item[0]; // Từ loại (noun, verb...)
+                        let meanings = item[1].slice(0, 4).join(', '); // Lấy tối đa 4 nghĩa cho gọn
+                        dictData.push({ pos: pos, meanings: meanings });
+                    });
+                }
+                return { text: mainText, dict: dictData }; 
             } catch (error) {
-                return "Không có bản dịch";
+                return { text: "Không có bản dịch", dict: [] };
             }
         }
-async function fetchChineseTranslation(word) {
-            // dt=t: lấy text dịch, dt=rm: lấy romanization (pinyin)
-            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&dt=rm&q=${encodeURIComponent(word)}`;
+
+        async function fetchChineseTranslation(word) {
+            // Thêm dt=bd vào đây luôn
+            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&dt=rm&dt=bd&q=${encodeURIComponent(word)}`;
             try {
                 const response = await fetch(url);
                 const data = await response.json();
-                let text = data[0][0][0];
+                
+                let mainText = data[0][0][0];
                 let pinyin = "";
                 
-               
                 if (data[0] && data[0].length > 1) {
                     const rmNode = data[0].find(item => item[0] === null);
-                    if (rmNode && (rmNode[2] || rmNode[3])) {
-                        pinyin = rmNode[2] || rmNode[3];
-                    }
+                    if (rmNode && (rmNode[2] || rmNode[3])) { pinyin = rmNode[2] || rmNode[3]; }
                 }
-                return { text, pinyin };
+
+                let dictData = [];
+                if (data[1]) {
+                    data[1].forEach(item => {
+                        let pos = item[0];
+                        let meanings = item[1].slice(0, 3).join(', ');
+                        dictData.push({ pos: pos, meanings: meanings });
+                    });
+                }
+                return { text: mainText, pinyin: pinyin, dict: dictData };
             } catch (error) {
-                return { text: "Không có bản dịch", pinyin: "" };
+                return { text: "Không có bản dịch", pinyin: "", dict: [] };
             }
         }
         window.handleSearch = async function() {
@@ -603,7 +624,7 @@ try {
                 }
 
                 // Dịch tiếng Việt & Trung
-                const viTranslate = await fetchTranslation(query, 'vi');
+                const viData = await fetchTranslation(query, 'vi');
                 const zhData = await fetchChineseTranslation(query);
 
                 const highlightRegex = new RegExp(`(${query})`, 'gi');
@@ -639,11 +660,12 @@ try {
                 const realWordData = {
                     word: firstEntry.word,
                     ipa: ipaText,
-                    vi: viTranslate,
+                    vi: viData.text,
+                    viDict: viData.dict, // Lưu mảng từ điển Tiếng Việt
                     zh: zhData.text,
+                    zhDict: zhData.dict, // Lưu mảng từ điển Tiếng Trung
                     pinyin: zhData.pinyin,
-                    meanings: allMeanings, // Mảng chứa toàn bộ từ loại
-                    // Giữ lại 3 biến này để lúc học Flashcard Anki vẫn hoạt động bình thường
+                    meanings: allMeanings,
                     pos: primaryPos, 
                     en: primaryEn,
                     ex: primaryEx 
@@ -690,8 +712,27 @@ try {
             // Điền thông tin cơ bản
             document.getElementById('md-word').innerText = wordData.word;
             document.getElementById('md-ipa').innerText = wordData.ipa;
-            document.getElementById('md-vi').innerText = wordData.vi;
-            document.getElementById('md-zh').innerText = wordData.zh;
+          // Xử lý hiển thị Tiếng Việt nhiều nghĩa
+            let viHtml = `<span style="font-size: 20px; font-weight: 800;">${wordData.vi}</span>`;
+            if (wordData.viDict && wordData.viDict.length > 0) {
+                viHtml += `<div style="margin-top: 10px; font-size: 15px; color: var(--text-dark); display: flex; flex-direction: column; gap: 6px;">`;
+                wordData.viDict.forEach(d => {
+                    viHtml += `<div><span style="display: inline-block; min-width: 65px; font-weight: 800; color: var(--text-muted); background: white; padding: 2px 8px; border-radius: 6px; font-size: 12px; margin-right: 8px; border: 1px solid var(--border); text-transform: uppercase; text-align: center;">${d.pos}</span>${d.meanings}</div>`;
+                });
+                viHtml += `</div>`;
+            }
+            document.getElementById('md-vi').innerHTML = viHtml;
+
+            // Xử lý hiển thị Tiếng Trung nhiều nghĩa
+            let zhHtml = `<span>${wordData.zh}</span>`;
+            if (wordData.zhDict && wordData.zhDict.length > 0) {
+                zhHtml += `<div style="margin-top: 10px; font-size: 15px; color: var(--text-dark); display: flex; flex-direction: column; gap: 6px;">`;
+                wordData.zhDict.forEach(d => {
+                    zhHtml += `<div><span style="display: inline-block; min-width: 65px; font-weight: 800; color: var(--text-muted); background: white; padding: 2px 8px; border-radius: 6px; font-size: 12px; margin-right: 8px; border: 1px solid var(--border); text-transform: uppercase; text-align: center;">${d.pos}</span>${d.meanings}</div>`;
+                });
+                zhHtml += `</div>`;
+            }
+            document.getElementById('md-zh').innerHTML = zhHtml;
             document.getElementById('md-pinyin').innerText = wordData.pinyin ? `(${wordData.pinyin})` : '';
 
             // Render động TẤT CẢ các từ loại và nghĩa
