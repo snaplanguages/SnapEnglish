@@ -312,31 +312,21 @@
                     <i class="fa-solid fa-volume-high" style="font-size: 20px;"></i>
                 </button>
             </div>
-            <div class="word-pos" id="md-pos">verb</div>
-            <div class="def-section">
-                <div class="def-lang">Anh (English)</div>
-                <div class="def-text" id="md-en">to leave a place, thing, or person forever</div>
-            </div>
-            <div class="def-section">
-                <div class="def-lang">Việt (Vietnamese)</div>
-                <div class="def-text" id="md-vi">từ bỏ, ruồng bỏ</div>
-            </div>
-            <div class="def-section" style="border: none;">
-                <div class="def-lang">
-                    Trung (Chinese)
-                    <button class="btn" id="btn-play-zh" style="background: transparent; color: var(--accent); padding: 4px; font-size: 18px; height: auto; width: auto;"><i class="fa-solid fa-volume-high"></i></button>
+           <div style="background: #FFF0F5; padding: 16px; border-radius: 16px; margin-bottom: 24px; border: 1px dashed var(--primary-light);">
+                <div style="margin-bottom: 12px;">
+                    <span class="def-lang" style="display: inline-block; margin-right: 10px; margin-bottom: 0;">VIỆT</span>
+                    <span class="def-text" id="md-vi" style="color: var(--primary);">từ bỏ, ruồng bỏ</span>
                 </div>
-                <div class="def-text">
-                    <span id="md-zh">放弃</span>
+                <div style="display: flex; align-items: center;">
+                    <span class="def-lang" style="display: inline-block; margin-right: 10px; margin-bottom: 0;">TRUNG</span>
+                    <span class="def-text" id="md-zh">放弃</span>
                     <span id="md-pinyin" style="color: var(--primary-light); font-size: 16px; margin-left: 8px; font-weight: 700;">(fàng qì)</span>
+                    <button class="btn" id="btn-play-zh" style="background: transparent; color: var(--accent); padding: 0 8px; font-size: 16px; height: auto; width: auto;"><i class="fa-solid fa-volume-high"></i></button>
                 </div>
             </div>
-            <div class="example-box" id="md-ex">"As a baby he was abandoned by his mother."</div>
-            <button class="btn" id="btn-toggle-others" style="background: var(--bg-body); color: var(--primary); font-size: 15px; padding: 10px; margin: 16px 0 8px 0; border: 2px solid var(--border); width: 100%;" onclick="toggleOtherMeanings()">
-                <i class="fa-solid fa-layer-group"></i> Xem các từ loại / nghĩa khác
-            </button>
-            
-            <div id="other-meanings-list" style="display: none; flex-direction: column; gap: 12px; margin-bottom: 20px; max-height: 250px; overflow-y: auto; padding-right: 5px;"></div>
+
+            <div id="md-meanings-container" style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+                </div>
             <button class="btn btn-primary" onclick="openSaveToDeckModal()" style="font-size: 18px; padding: 16px;"><i class="fa-solid fa-plus"></i> Thêm vào Bộ từ vựng</button>
             
         </div>
@@ -593,8 +583,7 @@ async function fetchChineseTranslation(word) {
 
             resultsBox.innerHTML = '<div class="result-item" style="color: var(--text-muted); justify-content: center; font-weight: 700;">Đang tra cứu từ điển máy chủ... <i class="fa-solid fa-spinner fa-spin" style="margin-left: 10px; color: var(--primary);"></i></div>';
             resultsBox.style.display = 'block';
-
-            try {
+try {
                 const engRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${query}`);
                 if (!engRes.ok) {
                     resultsBox.innerHTML = '<div class="result-item" style="color: var(--danger); justify-content: center;">Không tìm thấy từ này trong từ điển 🥲</div>';
@@ -603,68 +592,61 @@ async function fetchChineseTranslation(word) {
 
                 const engData = await engRes.json();
                 const firstEntry = engData[0];
-                let targetMeaning = firstEntry.meanings[0];
-                let targetDef = targetMeaning.definitions[0];
-                
-                for (let m of firstEntry.meanings) {
-                    let defWithExample = m.definitions.find(d => d.example);
-                    if (defWithExample) {
-                        targetMeaning = m;
-                        targetDef = defWithExample;
-                        break; // Tìm thấy cụm có ví dụ là chốt đơn luôn
-                    }
-                }
 
-                const exactPos = targetMeaning.partOfSpeech;
-                const exactDefinition = targetDef.definition;
-                const exampleText = targetDef.example || "Không có ví dụ cho từ này.";
-
-                // Tối ưu hóa việc lấy phiên âm tiếng Anh chuẩn xác hơn
+                // Lấy phiên âm
                 let ipaText = "N/A";
                 if (firstEntry.phonetic) {
                     ipaText = firstEntry.phonetic;
                 } else if (firstEntry.phonetics && firstEntry.phonetics.length > 0) {
-                    const ukPhonetic = firstEntry.phonetics.find(p => p.text && p.audio && p.audio.includes('-uk'));
-                    const usPhonetic = firstEntry.phonetics.find(p => p.text && p.audio && p.audio.includes('-us'));
-                    const anyValid = firstEntry.phonetics.find(p => p.text && p.text.includes('/')) || firstEntry.phonetics.find(p => p.text);
-                    const bestPhonetic = usPhonetic || ukPhonetic || anyValid;
-                    if (bestPhonetic) ipaText = bestPhonetic.text;
+                    const validPhonetic = firstEntry.phonetics.find(p => p.text);
+                    if (validPhonetic) ipaText = validPhonetic.text;
                 }
 
+                // Dịch tiếng Việt & Trung
                 const viTranslate = await fetchTranslation(query, 'vi');
                 const zhData = await fetchChineseTranslation(query);
 
                 const highlightRegex = new RegExp(`(${query})`, 'gi');
-                const highlightedEx = exampleText.replace(highlightRegex, `<span style="color: var(--primary); font-weight: 900;">$1</span>`);
 
-                // GOM LẠI CÁC NGHĨA PHỤ KHÁC
-                let otherMeanings = [];
-                firstEntry.meanings.forEach(m => {
-                    let pOS = m.partOfSpeech;
-                    m.definitions.forEach(d => {
-                        // Bỏ qua cái nghĩa chính mà mình đã lấy ở trên
-                        if (m === targetMeaning && d === targetDef) return;
-                        otherMeanings.push({
-                            pos: pOS,
-                            en: d.definition,
-                            ex: d.example ? d.example.replace(highlightRegex, `<span style="color: var(--primary); font-weight: 900;">$1</span>`) : ""
-                        });
+                // CHUYÊN NGHIỆP HÓA: Gom TẤT CẢ từ loại và nghĩa
+                let allMeanings = [];
+                let primaryPos = "word"; // Dùng để lưu thẻ flashcard
+                let primaryEn = "";
+                let primaryEx = "";
+
+                firstEntry.meanings.forEach((m, index) => {
+                    let pos = m.partOfSpeech;
+                    let defs = [];
+                    
+                    m.definitions.forEach((d, dIndex) => {
+                        // Lấy tối đa 3 nghĩa cho mỗi từ loại để không bị quá dài
+                        if (dIndex < 3) {
+                            let highlightedEx = d.example ? d.example.replace(highlightRegex, `<span style="color: var(--primary); font-weight: 900;">$1</span>`) : "";
+                            defs.push({ en: d.definition, ex: highlightedEx });
+                            
+                            // Lưu lại nghĩa đầu tiên làm nghĩa chính cho chế độ Học (Flashcard)
+                            if (index === 0 && dIndex === 0) {
+                                primaryPos = pos;
+                                primaryEn = d.definition;
+                                primaryEx = highlightedEx;
+                            }
+                        }
                     });
-                });
 
-                // Chỉ lấy tối đa 5 nghĩa phụ phổ biến nhất cho đỡ dài
-                otherMeanings = otherMeanings.slice(0, 5);
+                    allMeanings.push({ pos: pos, definitions: defs });
+                });
 
                 const realWordData = {
                     word: firstEntry.word,
                     ipa: ipaText,
-                    pos: exactPos, 
-                    en: exactDefinition, 
                     vi: viTranslate,
                     zh: zhData.text,
                     pinyin: zhData.pinyin,
-                    ex: highlightedEx,
-                    otherMeanings: otherMeanings // Lưu danh sách nghĩa phụ vào đây
+                    meanings: allMeanings, // Mảng chứa toàn bộ từ loại
+                    // Giữ lại 3 biến này để lúc học Flashcard Anki vẫn hoạt động bình thường
+                    pos: primaryPos, 
+                    en: primaryEn,
+                    ex: primaryEx 
                 };
 
                 resultsBox.innerHTML = '';
@@ -673,14 +655,16 @@ async function fetchChineseTranslation(word) {
                 div.innerHTML = `
                     <div>
                         <span class="result-word">${realWordData.word}</span> 
-                        <span style="font-size: 13px; color: var(--accent); margin-left: 10px; font-weight: 800;">${realWordData.pos}</span>
+                        <span style="font-size: 13px; color: var(--accent); margin-left: 10px; font-weight: 800; text-transform: uppercase;">${realWordData.meanings.map(m => m.pos).join(', ')}</span>
                     </div>
                     <span class="result-vi">${realWordData.vi}</span>
                 `;
                 div.onclick = () => window.showWordDetail(realWordData);
                 resultsBox.appendChild(div);
 
-            } catch (error) {
+            }
+
+         catch (error) {
                 resultsBox.innerHTML = '<div class="result-item" style="color: var(--danger); justify-content: center;">Lỗi kết nối máy chủ. Vui lòng thử lại!</div>';
             }
         }
@@ -703,37 +687,33 @@ async function fetchChineseTranslation(word) {
             document.getElementById('search-results').style.display = 'none';
             document.getElementById('search-input').value = '';
 
+            // Điền thông tin cơ bản
             document.getElementById('md-word').innerText = wordData.word;
             document.getElementById('md-ipa').innerText = wordData.ipa;
-            document.getElementById('md-pos').innerText = wordData.pos;
-            document.getElementById('md-en').innerText = wordData.en;
             document.getElementById('md-vi').innerText = wordData.vi;
             document.getElementById('md-zh').innerText = wordData.zh;
             document.getElementById('md-pinyin').innerText = wordData.pinyin ? `(${wordData.pinyin})` : '';
-            document.getElementById('md-ex').innerHTML = wordData.ex;
 
-            // XỬ LÝ GIAO DIỆN CÁC NGHĨA KHÁC
-            const otherList = document.getElementById('other-meanings-list');
-            const btnToggle = document.getElementById('btn-toggle-others');
-            
-            if (wordData.otherMeanings && wordData.otherMeanings.length > 0) {
-                btnToggle.style.display = 'block';
-                otherList.style.display = 'none'; // Mặc định ẩn
-                btnToggle.innerHTML = '<i class="fa-solid fa-layer-group"></i> Xem các từ loại / nghĩa khác';
-                
-                // Đổ dữ liệu HTML cho danh sách nghĩa phụ
-                otherList.innerHTML = wordData.otherMeanings.map(m => `
-                    <div style="background: #F8FAFC; padding: 14px; border-radius: 12px; border-left: 4px solid var(--primary-light);">
-                        <div style="font-size: 12px; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 6px;">${m.pos}</div>
-                        <div style="font-size: 16px; font-weight: 700; color: var(--text-dark);">${m.en}</div>
-                        ${m.ex ? `<div style="font-size: 15px; font-style: italic; color: var(--text-muted); margin-top: 8px;">"${m.ex}"</div>` : ''}
-                    </div>
-                `).join('');
-            } else {
-                btnToggle.style.display = 'none'; // Ẩn nút nếu không có nghĩa phụ
-                otherList.style.display = 'none';
-            }
+            // Render động TẤT CẢ các từ loại và nghĩa
+            const container = document.getElementById('md-meanings-container');
+            container.innerHTML = wordData.meanings.map(m => `
+                <div style="margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border);">
+                    <div class="word-pos" style="margin-bottom: 16px;">${m.pos}</div>
+                    <ul style="list-style: none; padding-left: 0; display: flex; flex-direction: column; gap: 16px;">
+                        ${m.definitions.map((d, i) => `
+                            <li style="display: flex; gap: 12px; align-items: flex-start;">
+                                <div style="background: var(--primary-light); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: 800; flex-shrink: 0; margin-top: 2px;">${i + 1}</div>
+                                <div>
+                                    <div style="font-size: 17px; font-weight: 600; color: var(--text-dark); line-height: 1.4;">${d.en}</div>
+                                    ${d.ex ? `<div class="example-box" style="margin-top: 10px; padding: 12px 16px; font-size: 15px; margin-bottom: 0;">${d.ex}</div>` : ''}
+                                </div>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `).join('');
 
+            // Xử lý Audio
             window.playNativeAudio(wordData.word, 'en-US'); 
             document.getElementById('btn-play-audio').onclick = () => window.playNativeAudio(wordData.word, 'en-US');
             document.getElementById('btn-play-zh').onclick = () => window.playNativeAudio(wordData.zh, 'zh-CN');
