@@ -326,7 +326,10 @@
                     Trung (Chinese)
                     <button class="btn" id="btn-play-zh" style="background: transparent; color: var(--accent); padding: 4px; font-size: 18px; height: auto; width: auto;"><i class="fa-solid fa-volume-high"></i></button>
                 </div>
-                <div class="def-text" id="md-zh">放弃</div>
+                <div class="def-text">
+                    <span id="md-zh">放弃</span>
+                    <span id="md-pinyin" style="color: var(--primary-light); font-size: 16px; margin-left: 8px; font-weight: 700;">(fàng qì)</span>
+                </div>
             </div>
             <div class="example-box" id="md-ex">"As a baby he was abandoned by his mother."</div>
             <button class="btn btn-primary" onclick="openSaveToDeckModal()" style="font-size: 18px; padding: 16px;"><i class="fa-solid fa-plus"></i> Thêm vào Bộ từ vựng</button>
@@ -549,7 +552,27 @@
                 return "Không có bản dịch";
             }
         }
-
+async function fetchChineseTranslation(word) {
+            // dt=t: lấy text dịch, dt=rm: lấy romanization (pinyin)
+            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&dt=rm&q=${encodeURIComponent(word)}`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                let text = data[0][0][0];
+                let pinyin = "";
+                
+                // Trích xuất Pinyin từ mảng trả về của Google
+                if (data[0] && data[0].length > 1) {
+                    const rmNode = data[0].find(item => item[0] === null);
+                    if (rmNode && (rmNode[2] || rmNode[3])) {
+                        pinyin = rmNode[2] || rmNode[3];
+                    }
+                }
+                return { text, pinyin };
+            } catch (error) {
+                return { text: "Không có bản dịch", pinyin: "" };
+            }
+        }
         window.handleSearch = async function() {
             const searchInput = document.getElementById('search-input');
             const query = searchInput.value.toLowerCase().trim();
@@ -592,10 +615,8 @@
                 if (phoneticObj) ipaText = phoneticObj.text;
                 else if (firstEntry.phonetic) ipaText = firstEntry.phonetic;
 
-                const [viTranslate, zhTranslate] = await Promise.all([
-                    fetchTranslation(query, 'vi'),
-                    fetchTranslation(query, 'zh-CN')
-                ]);
+               const viTranslate = await fetchTranslation(query, 'vi');
+                const zhData = await fetchChineseTranslation(query); // Gọi hàm mới
 
                 const highlightRegex = new RegExp(`(${query})`, 'gi');
                 const highlightedEx = exampleText.replace(highlightRegex, `<span style="color: var(--primary); font-weight: 900;">$1</span>`);
@@ -606,7 +627,8 @@
                     pos: uniquePos,
                     en: firstDefinitionText,
                     vi: viTranslate,
-                    zh: zhTranslate,
+                    zh: zhData.text,
+                    pinyin: zhData.pinyin, // Lưu pinyin vào data
                     ex: highlightedEx
                 };
 
@@ -652,6 +674,9 @@
             document.getElementById('md-en').innerText = wordData.en;
             document.getElementById('md-vi').innerText = wordData.vi;
             document.getElementById('md-zh').innerText = wordData.zh;
+            
+            // Hiện Pinyin nếu có
+            document.getElementById('md-pinyin').innerText = wordData.pinyin ? `(${wordData.pinyin})` : '';
             document.getElementById('md-ex').innerHTML = wordData.ex;
 
             window.playNativeAudio(wordData.word, 'en-US'); 
@@ -660,7 +685,6 @@
 
             document.getElementById('word-modal').style.display = 'flex';
         }
-
        window.playNativeAudio = function(text, lang = 'en-US') {
             if (!text) return;
             
@@ -740,7 +764,31 @@
                 showToast("Đã xóa bộ bài!", "error");
             }
         }
+window.deleteWordFromDeck = async function(event, deckId, wordId) {
+            event.stopPropagation(); // Ngăn sự kiện click lan ra ngoài
+            
+            // Sử dụng Dialog cute thay vì alert/confirm mặc định
+            const confirmDel = await window.showCuteDialog({
+                type: 'confirm',
+                title: 'Xóa từ vựng',
+                message: 'Bạn có chắc chắn muốn xóa từ này khỏi bộ bài không? Xóa xong là bay màu luôn đó nha 🥺',
+                icon: '🗑️'
+            });
 
+            if (confirmDel) {
+                const deck = appData.decks.find(d => d.id === deckId);
+                if (deck) {
+                    // Lọc bỏ từ vựng có ID tương ứng
+                    deck.words = deck.words.filter(w => w.id !== wordId);
+                    
+                    window.renderDeckWords(); // Render lại danh sách để mất từ vựng
+                    window.updateStats(); // Cập nhật lại 4 vòng tròn (số lượng sẽ tự động giảm)
+                    await syncData(); // Đồng bộ ngay lên Cloud để thiết bị khác cũng bị xóa theo
+                    
+                    showToast("Đã tiễn từ vựng đi xa thành công!", "success");
+                }
+            }
+        }
         window.openDeckDetail = function(deckId) {
             currentDetailDeckId = deckId;
             document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
@@ -771,14 +819,17 @@
                 return;
             }
 
-            displayWords.forEach(w => {
+         displayWords.forEach(w => {
                 list.innerHTML += `
                     <div style="background: white; padding: 20px; border-radius: 16px; border: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm);">
                         <div>
                             <strong style="font-size: 20px; color: var(--text-dark);">${w.word}</strong> <span style="font-size: 13px; color: var(--accent); margin-left: 8px; font-weight: 800; background: #FFF0F5; padding: 4px 8px; border-radius: 6px;">${w.pos}</span>
                             <div style="color: var(--text-muted); font-size: 15px; font-weight: 600; margin-top: 6px;">${w.vi}</div>
                         </div>
-                        <div style="font-size: 14px; background: var(--gradient-brand); color: white; padding: 6px 12px; border-radius: 8px; font-weight: 800; box-shadow: 0 2px 8px rgba(255,51,102,0.3);">Lv ${w.repetitions || 0}</div>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="font-size: 14px; background: var(--gradient-brand); color: white; padding: 6px 12px; border-radius: 8px; font-weight: 800; box-shadow: 0 2px 8px rgba(255,51,102,0.3);">Lv ${w.repetitions || 0}</div>
+                            <i class="fa-solid fa-trash" style="color: #FCA5A5; cursor: pointer; font-size: 18px; transition: 0.2s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='#FCA5A5'" onclick="deleteWordFromDeck(event, '${deck.id}', '${w.id}')"></i>
+                        </div>
                     </div>
                 `;
             });
