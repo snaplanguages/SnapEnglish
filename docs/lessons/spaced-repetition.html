@@ -563,7 +563,7 @@ async function fetchChineseTranslation(word) {
                 let text = data[0][0][0];
                 let pinyin = "";
                 
-                // Trích xuất Pinyin từ mảng trả về của Google
+               
                 if (data[0] && data[0].length > 1) {
                     const rmNode = data[0].find(item => item[0] === null);
                     if (rmNode && (rmNode[2] || rmNode[3])) {
@@ -597,51 +597,50 @@ async function fetchChineseTranslation(word) {
 
                 const engData = await engRes.json();
                 const firstEntry = engData[0];
-
-                let allPos = [];
-                let exampleText = "Không có ví dụ cho từ này.";
-                let firstDefinitionText = "";
-
-                firstEntry.meanings.forEach((meaning, index) => {
-                    allPos.push(meaning.partOfSpeech);
-                    if(index === 0) firstDefinitionText = meaning.definitions[0].definition;
-                    if (exampleText === "Không có ví dụ cho từ này.") {
-                        const defWithEx = meaning.definitions.find(d => d.example);
-                        if (defWithEx) exampleText = defWithEx.example;
+                let targetMeaning = firstEntry.meanings[0];
+                let targetDef = targetMeaning.definitions[0];
+                
+                for (let m of firstEntry.meanings) {
+                    let defWithExample = m.definitions.find(d => d.example);
+                    if (defWithExample) {
+                        targetMeaning = m;
+                        targetDef = defWithExample;
+                        break; // Tìm thấy cụm có ví dụ là chốt đơn luôn
                     }
-                });
+                }
 
-                const uniquePos = [...new Set(allPos)].join(", ");
+                const exactPos = targetMeaning.partOfSpeech;
+                const exactDefinition = targetDef.definition;
+                const exampleText = targetDef.example || "Không có ví dụ cho từ này.";
+
                 // Tối ưu hóa việc lấy phiên âm tiếng Anh chuẩn xác hơn
                 let ipaText = "N/A";
                 if (firstEntry.phonetic) {
                     ipaText = firstEntry.phonetic;
                 } else if (firstEntry.phonetics && firstEntry.phonetics.length > 0) {
-                    // Ưu tiên tìm phiên âm có chứa dấu "/" (chuẩn IPA) hoặc UK/US
                     const ukPhonetic = firstEntry.phonetics.find(p => p.text && p.audio && p.audio.includes('-uk'));
                     const usPhonetic = firstEntry.phonetics.find(p => p.text && p.audio && p.audio.includes('-us'));
                     const anyValid = firstEntry.phonetics.find(p => p.text && p.text.includes('/')) || firstEntry.phonetics.find(p => p.text);
-                    
-                    // Ưu tiên lấy US -> UK -> Bất kỳ cái nào hợp lệ
                     const bestPhonetic = usPhonetic || ukPhonetic || anyValid;
                     if (bestPhonetic) ipaText = bestPhonetic.text;
                 }
 
-               const viTranslate = await fetchTranslation(query, 'vi');
-                const zhData = await fetchChineseTranslation(query); // Gọi hàm mới
+                const viTranslate = await fetchTranslation(query, 'vi');
+                const zhData = await fetchChineseTranslation(query);
 
                 const highlightRegex = new RegExp(`(${query})`, 'gi');
                 const highlightedEx = exampleText.replace(highlightRegex, `<span style="color: var(--primary); font-weight: 900;">$1</span>`);
 
+               
                 const realWordData = {
                     word: firstEntry.word,
                     ipa: ipaText,
-                    pos: uniquePos,
-                    en: firstDefinitionText,
+                    pos: exactPos, // Lấy duy nhất 1 từ loại
+                    en: exactDefinition, // Định nghĩa chuẩn của từ loại đó
                     vi: viTranslate,
                     zh: zhData.text,
-                    pinyin: zhData.pinyin, // Lưu pinyin vào data
-                    ex: highlightedEx
+                    pinyin: zhData.pinyin,
+                    ex: highlightedEx // Ví dụ chuẩn của từ loại đó
                 };
 
                 resultsBox.innerHTML = '';
