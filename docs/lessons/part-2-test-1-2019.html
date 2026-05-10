@@ -794,7 +794,7 @@
         }
 
         questions.forEach((q, idx) => {
-            const isCorrect = userAnswers[idx] === q.correct;
+            const isCorrect = userAnswers[idx] === q.answer;
             if(isCorrect) correctCount++;
 
             const item = document.createElement('div');
@@ -827,39 +827,46 @@
     }
 
     function openDetail(idx) {
-        const q = questions[idx];
-        document.getElementById('modal-title').innerText = `Phân tích Câu ${q.id} (Đáp án đúng: ${q.correct})`;
-        document.getElementById('modal-audio').src = q.audio;
-        
-        document.getElementById('m-q-en').innerText = `Q: ${q.q_en}`;
-        document.getElementById('m-q-vi').innerText = `Dịch: ${q.q_vi}`;
-        document.getElementById('m-q-hint').innerHTML = `💡 <b>Mẹo giải:</b> ${q.hint}`;
+    const q = questions[idx];
+    document.getElementById('modal-title').innerText = `Phân tích Câu ${q.id} (Đáp án đúng: ${q.answer})`;
+    document.getElementById('modal-audio').src = q.audio;
+    
+    // Đổi tên biến cho khớp với data
+    document.getElementById('m-q-en').innerText = `Q: ${q.script_q_en}`;
+    document.getElementById('m-q-vi').innerText = `Dịch: ${q.script_q_vi}`;
+    document.getElementById('m-q-hint').innerHTML = `💡 <b>Mẹo giải:</b> ${q.general_explain}`;
 
-        const optionsArea = document.getElementById('modal-options-area');
-        optionsArea.innerHTML = '';
+    const optionsArea = document.getElementById('modal-options-area');
+    optionsArea.innerHTML = '';
+    
+    // Render từng lựa chọn dựa vào mảng explains
+    q.explains.forEach((explainObj, i) => {
+        const isCorr = explainObj.type === 'correct';
         
-        q.opts.forEach(opt => {
-            const isCorr = opt.type === 'correct';
-            const html = `
-                <div class="opt-block ${isCorr ? 'is-correct' : 'is-wrong'}">
-                    <div class="opt-header">
-                        <div class="opt-letter">(${opt.l})</div>
-                        <div class="opt-text-group">
-                            <div class="opt-en">${opt.en}</div>
-                            <div class="opt-vi">${opt.vi}</div>
-                        </div>
-                    </div>
-                    <div class="opt-body">
-                        ${opt.exp}
+        // Lấy text tiếng Anh và tiếng Việt tương ứng từ mảng script_opt (bỏ phần ký tự (A), (B), (C) ở đầu nếu cần)
+        const optEnText = q.script_opt_en[i]; 
+        const optViText = q.script_opt_vi[i];
+
+        const html = `
+            <div class="opt-block ${isCorr ? 'is-correct' : 'is-wrong'}">
+                <div class="opt-header">
+                    <div class="opt-letter">(${explainObj.opt})</div>
+                    <div class="opt-text-group">
+                        <div class="opt-en">${optEnText}</div>
+                        <div class="opt-vi">${optViText}</div>
                     </div>
                 </div>
-            `;
-            optionsArea.innerHTML += html;
-        });
+                <div class="opt-body">
+                    ${explainObj.text}
+                </div>
+            </div>
+        `;
+        optionsArea.innerHTML += html;
+    });
 
-        document.getElementById('m-vocab').innerHTML = q.vocab;
-        document.getElementById('modal-detail').style.display = 'flex';
-    }
+    document.getElementById('m-vocab').innerHTML = q.vocab.replace(/\n/g, '<br>'); // Thêm replace để xuống dòng từ vựng
+    document.getElementById('modal-detail').style.display = 'flex';
+}
 
     function closeModal() {
         document.getElementById('modal-detail').style.display = 'none';
