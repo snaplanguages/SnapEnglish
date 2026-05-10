@@ -141,10 +141,78 @@
         .toast.fade-out { animation: fadeOut 0.3s forwards; }
         @keyframes slideIn { to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { to { opacity: 0; transform: translateX(20px); } }
+        /* ==========================================
+           RESPONSIVE: ĐIỆN THOẠI & MÁY TÍNH BẢNG
+           ========================================== */
+        
+        /* Nút mở menu (ẩn trên Desktop) */
+        .menu-toggle {
+            display: none; 
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 99;
+            background: var(--white);
+            border: 2px solid var(--border);
+            color: var(--primary);
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: 0.2s;
+        }
+        .menu-toggle:active { transform: scale(0.9); }
+
+        /* Lớp phủ màn hình tối lại khi mở menu trên điện thoại */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(58, 12, 163, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 8;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        /* Khi màn hình nhỏ hơn 900px (Tablet & Điện thoại) */
+        @media (max-width: 900px) {
+            .menu-toggle { display: flex; align-items: center; justify-content: center; }
+            
+            /* Giấu sidebar sang bên trái */
+            .sidebar {
+                position: fixed;
+                top: 0; bottom: 0;
+                left: -300px; 
+                transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 10;
+                width: 280px;
+            }
+            
+            /* Class thêm vào bằng JS để hiện ra */
+            .sidebar.show { left: 0; }
+            .sidebar-overlay.show { display: block; opacity: 1; }
+
+            /* Đẩy nội dung chính xuống để không bị nút menu che mất */
+            .main-content { padding: 80px 20px 20px 20px; }
+            
+            /* Thu nhỏ lại một số thành phần cho vừa màn hình đt */
+            .stats-rings { justify-content: flex-start; gap: 20px; }
+            .search-input { padding: 16px 0; font-size: 16px; }
+            .word-title { font-size: 32px; }
+            #study-vi-prompt { font-size: 28px; }
+            #study-word { font-size: 36px; }
+            .decks-grid { grid-template-columns: 1fr; } /* Thẻ từ vựng xếp 1 cột dọc */
+        }
     </style>
 </head>
 <body>
-
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <button class="menu-toggle" id="menu-toggle" onclick="toggleSidebar()">
+        <i class="fa-solid fa-bars"></i>
+    </button>
     <aside class="sidebar">
         <div class="brand-container">
             <img src="ảnh.png" alt="logo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjRkYzMzY2IiBkPSJNMTYwIDk2Yzk2IDAgMTYwIDY0IDE2MCAxNjBzLTY0IDE2MC0xNjAgMTYwSDEyOEM4My44IDQxNiA0OCAzODAuMiA0OCAzMzZWMTc2YzAtNDQuMiAzNS44LTgwIDgwLTgwaDMyem0xOTIgMjk2bDk2LTI5NmM2LjktMjAuNiA0LjgtNDIuOC01LjQtNjEuNUM0MzIuMiAyMi4zIDQxMS41IDExIDM4OC41IDExSDEyOEM1Ny4zIDExIDAgNjguMyAwIDEzOXYyMzRjMCA3MC43IDU3LjMgMTI4IDEyOCAxMjhIMzUyYzIwLjcgMCA0MC04LjIgNTQuNi0yMi42czIyLjYtMzMuOSA0Mi42LTU0LjZ6Ii8+PC9zdmc+'"> 
@@ -337,7 +405,19 @@
         };
         let currentViewingWord = null;
         let selectedDeckId = null;
-
+// --- HÀM ẨN/HIỆN SIDEBAR CHO MOBILE ---
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('show');
+            document.getElementById('sidebar-overlay').classList.toggle('show');
+            
+            // Đổi icon từ vạch ngang (bars) sang dấu X (xmark)
+            const icon = document.querySelector('#menu-toggle i');
+            if (document.querySelector('.sidebar').classList.contains('show')) {
+                icon.className = 'fa-solid fa-xmark';
+            } else {
+                icon.className = 'fa-solid fa-bars';
+            }
+        }
         // --- Cập nhật UI Thống kê ---
         function updateStats() {
             let total = 0, newWords = 0, shortTerm = 0, longTerm = 0, mastered = 0;
@@ -417,7 +497,7 @@
             });
         }
 
-        function switchTab(tabId, el) {
+      function switchTab(tabId, el) {
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
 
@@ -425,7 +505,14 @@
             document.getElementById(tabId).classList.add('active');
 
             if(tabId === 'study-view') initStudySetup();
-            if(tabId === 'dict-view') updateStats(); // Cập nhật stat mỗi lần mở tab tra từ
+            if(tabId === 'dict-view') updateStats(); 
+
+            // THÊM ĐOẠN NÀY: Tự động đóng sidebar nếu đang dùng điện thoại
+            if(window.innerWidth <= 900) {
+                document.querySelector('.sidebar').classList.remove('show');
+                document.getElementById('sidebar-overlay').classList.remove('show');
+                document.querySelector('#menu-toggle i').className = 'fa-solid fa-bars';
+            }
         }
 
         function closeModal(id) {
