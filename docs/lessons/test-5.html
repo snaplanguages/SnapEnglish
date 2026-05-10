@@ -1097,7 +1097,7 @@
     function closeResultModal() { document.getElementById('resultOverlay').style.display = 'none'; }
 
 // Hàm tính Band điểm IELTS Reading
-    function calculateIeltsBand(correct, total) {
+   window.calculateIeltsBand = function(correct, total) {
         let normalizedCorrect = (correct / total) * 40;
         if (normalizedCorrect >= 39) return 9.0;
         if (normalizedCorrect >= 37) return 8.5;
@@ -1219,31 +1219,7 @@
         executeSubmit(true);
     }
 
-            let nav = document.getElementById(`nav-${i}`);
-            if(nav) {
-                nav.style.background = isCorrect ? "#dcfce7" : "#fef2f2";
-                nav.style.color = isCorrect ? "#16a34a" : "#dc2626";
-                nav.style.borderColor = isCorrect ? "#86efac" : "#fca5a5";
-            }
-        }
-
-        // Color ev-boxes in Passage
-        const pastelColors = ['#fde68a','#bfdbfe','#bbf7d0','#fbcfe8','#ddd6fe','#fed7aa','#e9d5ff','#a7f3d0','#fecaca'];
-        document.querySelectorAll('.ev-box').forEach((el, index) => {
-            el.style.backgroundColor = pastelColors[index % pastelColors.length];
-            el.style.color = "#0f172a";
-        });
-
-        let timeTaken = Math.round(((parseInt(document.getElementById('timeInput').value) * 60) - testDuration) / 60) || 1;
-        if(window.luuDiemLenFirebase) window.luuDiemLenFirebase(score, timeTaken);
-
-        document.getElementById('resultMessage').innerHTML = `
-            <strong style="font-size: 26px; color: var(--primary-dark); display: block; margin-bottom: 10px;">Số câu đúng: ${score}/40</strong>
-            <p style="font-size: 15px; color: #475569;">Điểm của bạn đã được tính toán và đồng bộ an toàn lên hệ thống IELTS Tracker!</p>
-        `;
-        setTimeout(() => { document.getElementById('resultOverlay').style.display = 'flex'; }, 500);
-    }
-
+        
     function scrollToEvidence(id) {
         const evElement = document.getElementById(id);
         if(evElement) {
@@ -1301,10 +1277,17 @@
         menu.children[1].style.display = (mode === "remove") ? "block" : "none";
     }
 
-    function doHighlight() {
-        if (selectedRange) {
-            let span = document.createElement("span"); span.className = "highlight";
-            try { selectedRange.surroundContents(span); } catch(e){}
+   function doHighlight() {
+        if (selectedRange && !selectedRange.collapsed) {
+            let span = document.createElement("span"); 
+            span.className = "highlight";
+            try { 
+                selectedRange.surroundContents(span); 
+            } catch(e) {
+                // Sửa lỗi khi bôi đen dính thẻ HTML: trích xuất nội dung và bọc lại
+                span.appendChild(selectedRange.extractContents());
+                selectedRange.insertNode(span);
+            }
             window.getSelection().removeAllRanges();
         }
         menu.style.display = "none";
