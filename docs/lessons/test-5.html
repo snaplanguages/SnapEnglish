@@ -887,9 +887,10 @@
 
 <div id="resultOverlay" class="custom-overlay" style="display:none;">
     <div class="custom-modal">
-        <h2>🎉 Tuyệt vời!</h2>
-        <div id="resultMessage" style="margin: 20px 0; line-height: 1.8;"></div>
-        <button class="btn-confirm" style="width: 100%; margin-top: 10px;" onclick="closeResultModal()">Xem giải thích chi tiết</button>
+        <h2 id="resultTitle">🎉 Kết Quả Bài Thi</h2>
+        <div style="font-size: 64px; font-weight: 800; color: var(--primary); margin: 20px 0; letter-spacing: -2px;" id="scoreDisplay">0/40</div>
+        <div style="font-size: 24px; font-weight: 800; color: var(--correct); margin-bottom: 25px; background: #ecfdf5; display: inline-block; padding: 12px 30px; border-radius: 20px; border: 2px solid #a7f3d0;" id="bandDisplay">Band: 0.0</div>
+        <button class="btn-confirm" style="width: 100%;" onclick="closeResultModal()">Xem giải thích chi tiết</button>
     </div>
 </div>
 
@@ -1095,7 +1096,27 @@
     function closeConfirmModal() { document.getElementById('confirmOverlay').style.display = 'none'; }
     function closeResultModal() { document.getElementById('resultOverlay').style.display = 'none'; }
 
-    function executeSubmit() {
+// Hàm tính Band điểm IELTS Reading
+    function calculateIeltsBand(correct, total) {
+        let normalizedCorrect = (correct / total) * 40;
+        if (normalizedCorrect >= 39) return 9.0;
+        if (normalizedCorrect >= 37) return 8.5;
+        if (normalizedCorrect >= 35) return 8.0;
+        if (normalizedCorrect >= 33) return 7.5;
+        if (normalizedCorrect >= 30) return 7.0;
+        if (normalizedCorrect >= 27) return 6.5;
+        if (normalizedCorrect >= 23) return 6.0;
+        if (normalizedCorrect >= 19) return 5.5;
+        if (normalizedCorrect >= 15) return 5.0;
+        if (normalizedCorrect >= 13) return 4.5;
+        if (normalizedCorrect >= 10) return 4.0;
+        if (normalizedCorrect >= 8) return 3.5;
+        if (normalizedCorrect >= 6) return 3.0;
+        return 2.5;
+    }
+
+    // Thêm tham số isReviewMode để biết là đang nộp bài thật hay đang xem lại lịch sử
+    function executeSubmit(isReviewMode = false) {
         document.getElementById('confirmOverlay').style.display = 'none';
         isSubmitted = true;
         clearInterval(timerInterval);
@@ -1103,19 +1124,23 @@
         
         let score = 0;
         let usedPool = []; 
+        let userAnswersDict = {}; // <-- TẠO BIẾN ĐỂ LƯU ĐÁP ÁN CỦA USER
         const summaryExpContainer = document.getElementById('fb-container-22-26');
         if(summaryExpContainer) summaryExpContainer.innerHTML = "";
 
         for (let i = 1; i <= 40; i++) {
             let userAns = "";
             
-            if (i >= 35 && i <= 40) { // MCQs
+            // Xác định MCQ từ câu 7-10 VÀ 35-40
+            if ((i >= 35 && i <= 40) || (i >= 7 && i <= 10)) { 
                 let checked = document.querySelector(`input[name="mcq-${i}"]:checked`);
                 if (checked) userAns = checked.value;
             } else {
                 let el = document.getElementById(`ans-${i}`);
                 if (el) userAns = el.value.trim().toUpperCase();
             }
+
+            userAnswersDict['ans-'+i] = userAns; // <-- LƯU VÀO DICT
 
             let correctAnswer = correctAnswers[i];
             let isCorrect = false;
@@ -1135,7 +1160,6 @@
                 fb.className = isCorrect ? "feedback correct" : "feedback wrong";
             }
 
-            // EXPLANATION RENDER
             if(explanations[i]) {
                 let expData = explanations[i];
                 let htmlContent = `
@@ -1166,6 +1190,63 @@
                     if(expContainer) expContainer.innerHTML = htmlContent;
                 }
             }
+
+            let nav = document.getElementById(`nav-${i}`);
+            if(nav) {
+                nav.style.background = isCorrect ? "#dcfce7" : "#fef2f2";
+                nav.style.color = isCorrect ? "#16a34a" : "#dc2626";
+                nav.style.borderColor = isCorrect ? "#86efac" : "#fca5a5";
+            }
+        }
+
+        const pastelColors = ['#fde68a','#bfdbfe','#bbf7d0','#fbcfe8','#ddd6fe','#fed7aa','#e9d5ff','#a7f3d0','#fecaca'];
+        document.querySelectorAll('.ev-box').forEach((el, index) => {
+            el.style.backgroundColor = pastelColors[index % pastelColors.length];
+            el.style.color = "#0f172a";
+        });
+
+        let bandScore = calculateIeltsBand(score, 40);
+
+        // NẾU LÀ THI THẬT THÌ LƯU FIREBASE, CÒN XEM LẠI THÌ KHÔNG LƯU NỮA
+        if (!isReviewMode && isReviewMode !== true) {
+            let timeTaken = Math.round(((parseInt(document.getElementById('timeInput').value) * 60) - testDuration) / 60) || 1;
+            if(window.luuDiemLenFirebase) window.luuDiemLenFirebase(score, timeTaken, userAnswersDict);
+            document.getElementById('resultTitle').innerText = "🎉 Kết Quả Bài Thi";
+        } else {
+            document.getElementById('resultTitle').innerText = "📖 Chế Độ Ôn Tập";
+        }
+
+        document.getElementById('scoreDisplay').innerText = score + "/40";
+        document.getElementById('bandDisplay').innerText = "Band: " + bandScore.toFixed(1);
+        
+        setTimeout(() => { document.getElementById('resultOverlay').style.display = 'flex'; }, 500);
+    }
+
+    // HÀM XEM LẠI LỊCH SỬ
+    window.xemLaiLichSu = function(docId) {
+        let attempt = window.historyDataList.find(d => d.id === docId);
+        if(!attempt) return;
+        
+        document.getElementById('setupOverlay').style.display = 'none';
+        
+        let ans = attempt.userAnswers || {};
+        for(let i=1; i<=40; i++) {
+            let val = ans['ans-'+i] || '';
+            
+            if ((i >= 35 && i <= 40) || (i >= 7 && i <= 10)) {
+                let radios = document.querySelectorAll(`input[name="mcq-${i}"]`);
+                radios.forEach(r => {
+                    if(r.value.toUpperCase() === val.toUpperCase()) r.checked = true;
+                });
+            } else {
+                let el = document.getElementById(`ans-${i}`);
+                if (el) el.value = val;
+            }
+        }
+
+        // Gọi executeSubmit ở chế độ Review (isReviewMode = true)
+        executeSubmit(true);
+    }
 
             let nav = document.getElementById(`nav-${i}`);
             if(nav) {
@@ -1293,28 +1374,12 @@
         }
     });
 
-    function calculateIeltsBand(correct, total) {
-        let normalizedCorrect = (correct / total) * 40;
-        if (normalizedCorrect >= 39) return 9.0;
-        if (normalizedCorrect >= 37) return 8.5;
-        if (normalizedCorrect >= 35) return 8.0;
-        if (normalizedCorrect >= 33) return 7.5;
-        if (normalizedCorrect >= 30) return 7.0;
-        if (normalizedCorrect >= 27) return 6.5;
-        if (normalizedCorrect >= 23) return 6.0;
-        if (normalizedCorrect >= 19) return 5.5;
-        if (normalizedCorrect >= 15) return 5.0;
-        if (normalizedCorrect >= 13) return 4.5;
-        if (normalizedCorrect >= 10) return 4.0;
-        if (normalizedCorrect >= 8) return 3.5;
-        if (normalizedCorrect >= 6) return 3.0;
-        return 2.5;
-    }
 
-    window.luuDiemLenFirebase = async function(diemSo, timeTakenMinutes) {
+   window.luuDiemLenFirebase = async function(diemSo, timeTakenMinutes, userAnswersDict) { // Nhận thêm userAnswersDict
         if (!window.currentUserUid) return;
         
-        let bandScore = calculateIeltsBand(diemSo, 40);
+        // Vì tính Band đã chuyển lên trên nên dùng trực tiếp giá trị
+        let bandScore = window.calculateIeltsBand ? window.calculateIeltsBand(diemSo, 40) : 0;
         let timestamp = Date.now();
         let idLuotThi = window.currentUserUid + "_ielts_R_T5_" + timestamp;
 
@@ -1328,6 +1393,7 @@
                 correctQ: diemSo,
                 totalQ: 40,
                 bandScore: bandScore,
+                userAnswers: userAnswersDict, // <-- LƯU ĐÁP ÁN LÊN FIREBASE ĐỂ XEM LẠI
                 date: new Date().toLocaleDateString("vi-VN"),
                 timestamp: timestamp
             });
@@ -1335,7 +1401,6 @@
             console.error("Lỗi khi lưu điểm: ", e);
         }
     }
-
     // TẢI LỊCH SỬ
     window.taiLichSuIELTS = async function() {
         const tbody = document.getElementById("historyBody");
@@ -1377,13 +1442,16 @@
                     let dateObj = new Date(data.timestamp);
                     let dateString = dateObj.toLocaleDateString("vi-VN") + " " + dateObj.getHours() + ":" + (dateObj.getMinutes() < 10 ? '0':'') + dateObj.getMinutes();
 
-                    html += `
+                   html += `
                         <tr>
                             <td>${dateString}</td>
                             <td><strong>${data.correctQ} / 40</strong></td>
                             <td><strong style="color: var(--primary-dark); font-size: 1.1em;">${data.bandScore}</strong></td>
                             <td>
-                                <button onclick="xoaLichSu('${data.id}', this)" class="btn-cancel" style="padding: 6px 12px; border-color: #fca5a5; color: #dc2626;">Xóa</button>
+                                <div style="display: flex; gap: 8px;">
+                                    <button onclick="xemLaiLichSu('${data.id}')" class="btn-confirm" style="padding: 6px 12px; background: #e0f2fe; color: #0284c7; box-shadow: none;">Xem lại</button>
+                                    <button onclick="xoaLichSu('${data.id}', this)" class="btn-cancel" style="padding: 6px 12px; border-color: #fca5a5; color: #dc2626;">Xóa</button>
+                                </div>
                             </td>
                         </tr>
                     `;
