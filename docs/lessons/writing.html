@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Writing | SnapEnglish</title>
+    <title> Writing | SnapEnglish</title>
      <link rel="icon" type="image/png" href="ảnh.png">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -84,6 +84,16 @@
             background: #fff;
         }
 
+        /* --- Tiêu đề từng phần (Mới thêm) --- */
+        .section-title {
+            max-width: 1100px;
+            margin: 0 auto 20px auto;
+            color: #6c5ce7;
+            font-size: 22px;
+            font-weight: 700;
+            padding-left: 5px;
+        }
+
         /* --- Grid --- */
         .container { 
             max-width: 1100px; 
@@ -91,7 +101,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 20px;
-            padding-bottom: 80px; /* Chừa chỗ cho nút liên hệ */
+            padding-bottom: 40px; /* Khoảng cách giữa các phần */
         }
 
         /* --- Card Unit --- */
@@ -210,14 +220,18 @@
 
     <div class="header-section">
         <h1>🎧 Snap<span class="brand-name">English</span></h1>
-        <p class="subtitle">Luyện viết thực chiến từ A1 đến C2</p>
+        <p class="subtitle">Thực chiến Viết & Dịch thuật từ A1 đến C2</p>
     </div>
     
     <div class="search-wrapper">
         <input type="text" id="searchInput" placeholder="Tìm tên bài, cấp độ (VD: Message, A1)...">
     </div>
 
-    <div class="container" id="unitContainer"></div>
+    <h2 class="section-title">✍️ Phần 1: Luyện Viết (Writing)</h2>
+    <div class="container" id="writingContainer"></div>
+
+    <h2 class="section-title">🌐 Phần 2: Luyện Dịch (Translation)</h2>
+    <div class="container" style="padding-bottom: 80px;" id="translateContainer"></div>
 
     <a href="contact.html" class="contact-floating-btn">
         💬 Liên hệ
@@ -225,9 +239,9 @@
 
     <script>
         /**
-         * DANH SÁCH BÀI HỌC (URL đã chuyển sang .html cục bộ)
+         * 1. DANH SÁCH BÀI LUYỆN VIẾT (Như code cũ)
          */
-        const unitsData = [
+        const writingData = [
             { 
                 title: "A message to say you're late", 
                 level: "A1", 
@@ -248,16 +262,42 @@
             }
         ];
 
-        const container = document.getElementById('unitContainer');
+        /**
+         * 2. DANH SÁCH BÀI LUYỆN DỊCH (Mới thêm)
+         * Bạn tự thay tên, level, icon và url ở đây nhé!
+         */
+        const translateData = [
+            { 
+                title: "Translate Practice 1", 
+                level: "A1", 
+                icon: "🇺🇸", 
+                url: "translate-1.html" 
+            },
+            { 
+                title: "Translate Practice 2", 
+                level: "A2", 
+                icon: "🌍", 
+                url: "translate-2.html" 
+            },
+            { 
+                title: "Translate Practice 3", 
+                level: "B1", 
+                icon: "📝", 
+                url: "translate-3.html" 
+            }
+        ];
+
+        const writingContainer = document.getElementById('writingContainer');
+        const translateContainer = document.getElementById('translateContainer');
         const searchInput = document.getElementById('searchInput');
 
-        function renderUnits() {
-            container.innerHTML = '';
-            unitsData.forEach((unit, index) => {
+        // Hàm render (tạo) thẻ dùng chung cho cả 2 danh sách
+        function renderCards(dataList, containerElement) {
+            containerElement.innerHTML = '';
+            dataList.forEach((unit, index) => {
                 const card = document.createElement('a');
                 card.className = 'unit-card';
                 card.href = unit.url;
-                // Bỏ card.target = "_blank" để mở trong cùng tab
                 card.setAttribute('data-search', `${unit.title} ${unit.level}`.toLowerCase());
                 card.style.animationDelay = `${index * 0.05}s`;
 
@@ -268,11 +308,11 @@
                         <h3 class="unit-title">${unit.title}</h3>
                     </div>
                 `;
-                container.appendChild(card);
+                containerElement.appendChild(card);
             });
         }
 
-        // Chức năng tìm kiếm
+        // Chức năng tìm kiếm áp dụng cho tất cả thẻ trên trang
         searchInput.addEventListener('input', function() {
             const filter = this.value.toLowerCase().trim();
             const cards = document.querySelectorAll('.unit-card');
@@ -283,8 +323,9 @@
             });
         });
 
-        // Khởi tạo hiển thị bài học
-        renderUnits();
+        // Khởi tạo hiển thị cả 2 danh sách bài học
+        renderCards(writingData, writingContainer);
+        renderCards(translateData, translateContainer);
     </script>
 
 </body>
