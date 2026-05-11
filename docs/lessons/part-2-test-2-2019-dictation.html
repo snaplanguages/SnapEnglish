@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 2 Test 2 | SnapEnglish</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* TÔNG MÀU MỚI: Sapphire Blue & Sunset Orange */
+        :root {
+            --primary: #2563EB;         /* Blue 600 */
+            --primary-hover: #1D4ED8;   /* Blue 800 */
+            --secondary: #DBEAFE;       /* Blue 100 */
+            --accent: #F59E0B;          /* Amber 500 */
+            --blue-pastel: #EFF6FF;     /* Blue 50 */
+            --blue-dark: #1E3A8A;       /* Blue 900 */
+            --text-dark: #1E293B;       
+            --text-light: #64748B;      
+            --bg-main: #F8FAFC;         
+            --white: #FFFFFF;
+            --brand-pink: #EA580C;      /* Orange 600 */
+            --brand-text: #0F172A;
+            --error-glow: #E11D48;      /* Rose 600 */
+            
+            --badge-q-bg: #EFF6FF; --badge-q-border: #BFDBFE; --badge-q-text: #2563EB;
+            --badge-opt-bg: #FFFBEB; --badge-opt-border: #FEF08A; --badge-opt-text: #B45309;
+            --badge-corr-bg: #F0FDF4; --badge-corr-border: #BBF7D0; --badge-corr-text: #166534;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Quicksand', sans-serif; }
+
+        body {
+            background: var(--bg-main);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .layout-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+        .brand-badge {
+            background-color: var(--brand-pink);
+            color: var(--white);
+            font-weight: 800;
+            font-size: 26px;
+            padding: 8px 20px;
+            border-radius: 15px;
+            letter-spacing: -0.5px;
+        }
+        .brand-title {
+            color: var(--brand-text);
+            font-weight: 800;
+            font-size: 30px;
+            letter-spacing: -0.5px;
+        }
+
+        .layout-container {
+            display: flex;
+            gap: 25px;
+            width: 100%;
+            height: 85vh;
+            min-height: 600px;
+        }
+
+        .sidebar {
+            flex: 1;
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .progress-section { text-align: center; }
+        .progress-circle {
+            width: 150px; height: 150px; border-radius: 50%;
+            background: conic-gradient(var(--primary) 0%, #eee 0);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px; position: relative; transition: background 0.5s;
+        }
+        .progress-circle::after { content: ""; position: absolute; width: 120px; height: 120px; background: var(--white); border-radius: 50%; }
+        .progress-text { position: relative; z-index: 1; font-size: 28px; font-weight: 700; color: var(--primary); }
+
+        .instructions { background: var(--blue-pastel); padding: 20px; border-radius: 15px; color: var(--blue-dark); }
+        .instructions h3 { margin-bottom: 15px; font-size: 18px; }
+        .instructions ul { list-style: none; }
+        .instructions li { margin-bottom: 12px; font-size: 14.5px; line-height: 1.5; }
+        kbd { background: var(--white); border: 1px solid #ccc; border-radius: 4px; padding: 3px 8px; font-family: monospace; font-size: 13px; font-weight: bold; box-shadow: 0 2px 0 #ccc; color: #333;}
+
+        .main-content {
+            flex: 3; background: var(--white); border-radius: 20px; padding: 35px;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.1); display: flex; flex-direction: column; position: relative;
+        }
+
+        .settings-bar { display: flex; justify-content: flex-end; gap: 15px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px dashed #eee; }
+        .setting-group { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text-light); }
+        select { padding: 6px 12px; border-radius: 8px; border: 1px solid #ddd; outline: none; cursor: pointer; font-family: 'Quicksand', sans-serif; font-weight: 600; color: var(--text-dark);}
+
+        .audio-section { text-align: center; margin-bottom: 30px; display: flex; flex-direction: column; align-items: center; gap: 15px;}
+        
+        .speaker-badge { display: inline-block; padding: 8px 25px; border-radius: 20px; font-weight: bold; font-size: 16px; }
+        .badge-question { background: var(--badge-q-bg); color: var(--badge-q-text); border: 1px solid var(--badge-q-border); }
+        .badge-option { background: var(--badge-opt-bg); color: var(--badge-opt-text); border: 1px solid var(--badge-opt-border); }
+        .badge-correct { background: var(--badge-corr-bg); color: var(--badge-corr-text); border: 1px solid var(--badge-corr-border); }
+
+        .btn-play { background: var(--primary); color: white; border: none; padding: 15px 35px; border-radius: 50px; font-size: 18px; cursor: pointer; transition: 0.3s; font-weight: 700; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);}
+        .btn-play:hover { background: var(--primary-hover); transform: translateY(-2px); }
+
+        .input-section { flex-grow: 1; display: flex; flex-direction: column; }
+        
+        .message { text-align: center; margin-bottom: 10px; min-height: 45px; }
+        .glow-error {
+            color: var(--error-glow);
+            text-shadow: 0 0 12px rgba(225, 29, 72, 0.6);
+            font-weight: 800;
+            background: #FFF1F2;
+            padding: 2px 6px;
+            border-radius: 6px;
+            border: 2px dashed var(--error-glow);
+            display: inline-block;
+            transform: scale(1.05);
+        }
+        
+        textarea { width: 100%; height: 120px; padding: 20px; border: 2px solid #e0e0e0; border-radius: 15px; font-size: 22px; outline: none; transition: 0.3s; resize: none; color: var(--text-dark); line-height: 1.6; }
+        textarea:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(37, 99, 235, 0.2); }
+
+        .actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+        .btn { padding: 12px 25px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; font-weight: 700; transition: 0.3s; }
+        .btn-enter { background: var(--blue-dark); color: var(--white); }
+        .btn-enter:hover { background: #0F172A; }
+        .btn-hint { background: var(--secondary); color: var(--primary-hover); }
+        .btn-hint:hover { background: #BFDBFE; }
+        .btn-nav { background: #E2E8F0; color: #334155; }
+        .btn-nav:hover { background: #CBD5E1; }
+
+        /* MODAL POPUP */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: white; width: 90%; max-width: 550px; padding: 35px;
+            border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: left; position: relative; max-height: 90vh; overflow-y: auto;
+        }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .modal-content h3 { color: #16A34A; font-size: 22px; margin-bottom: 15px; text-align: center; }
+        .modal-script { font-size: 20px; font-weight: 700; color: var(--primary); margin-bottom: 10px; text-align: center; padding-bottom: 15px; border-bottom: 2px dashed #eee;}
+        .modal-content p { margin-bottom: 10px; line-height: 1.6; font-size: 16px; }
+        .vocab-list { list-style-type: none; padding-left: 0; margin-top: 10px;}
+        .vocab-list li { margin-bottom: 8px; background: #f8fafc; padding: 8px 15px; border-radius: 8px; border-left: 4px solid var(--primary);}
+        .vocab-list li strong { color: var(--brand-pink); font-size: 16px;}
+        
+        .btn-next-modal { width: 100%; background: var(--primary); color: white; margin-top: 20px; padding: 15px; font-size: 18px; }
+        .btn-next-modal:hover { background: var(--primary-hover); }
+
+        /* END SCREEN */
+        .end-screen { display: none; text-align: center; padding-top: 20px;}
+        .transcript-box { text-align: left; background: #f8fafc; padding: 25px; border-radius: 15px; height: 350px; overflow-y: auto; margin: 25px 0; border: 1px solid #e2e8f0; line-height: 1.8; font-size: 16px;}
+
+        @media (max-width: 850px) {
+            .layout-container { flex-direction: column; height: auto; }
+            .sidebar { flex: none; width: 100%; order: 2; }
+            .main-content { flex: none; width: 100%; order: 1; min-height: 500px;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout-wrapper">
+    <div class="header-brand">
+        <div class="brand-badge">SnapEnglish</div>
+        <div class="brand-title">Part 2 Test 2</div>
+    </div>
+
+    <div class="layout-container" id="app">
+        <div class="sidebar">
+            <div class="progress-section">
+                <h2 style="color: var(--text-dark); margin-bottom: 25px; font-size: 22px;">Tiến độ bài học</h2>
+                <div class="progress-circle" id="progress-ring"><div class="progress-text"><span id="progress-percent">0</span>%</div></div>
+                <p style="color: var(--text-light); font-weight: 600; margin-top: 15px;">Câu: <span id="current-sentence-num">1</span> / <span id="total-sentences"></span></p>
+                <p style="font-size: 14px; color: #888; margin-top: 5px;">Số lần luyện tập: <span id="study-count">0</span></p>
+            </div>
+            <div class="instructions">
+                <h3>⌨️ Hướng dẫn phím tắt</h3>
+                <ul>
+                    <li><kbd>Ctrl</kbd> Lặp lại Audio.</li>
+                    <li><kbd>Tab</kbd> Gợi ý từ tiếp theo.</li>
+                    <li><kbd>Enter</kbd> Kiểm tra đáp án.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div id="learning-screen" style="display: flex; flex-direction: column; height: 100%;">
+                <div class="settings-bar">
+                    <div class="setting-group">
+                        <label>Tốc độ:</label>
+                        <select id="speed-setting">
+                            <option value="0.7">0.7x</option>
+                            <option value="0.9" selected>0.9x</option>
+                            <option value="1.0">1.0x</option>
+                            <option value="1.2">1.2x</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label>Lặp tự động:</label>
+                        <select id="repeat-setting">
+                            <option value="1" selected>1 lần</option>
+                            <option value="2">2 lần</option>
+                            <option value="3">3 lần</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="audio-section">
+                    <div id="sentence-label" class="speaker-badge badge-question">Question</div>
+                    <button class="btn-play" onclick="playAudio()">🔊 Nghe Audio (Ctrl)</button>
+                </div>
+                
+                <div class="message" id="system-message"></div>
+
+                <div class="input-section">
+                    <textarea id="user-input" placeholder="Lắng nghe hội thoại và gõ vào đây..." autofocus></textarea>
+                    
+                    <div class="actions">
+                        <button class="btn btn-nav" onclick="prevSentenceManual()">⬅️ Back</button>
+                        <button class="btn btn-enter" onclick="handleEnterAction()">Kiểm tra (Enter)</button>
+                        <button class="btn btn-hint" onclick="giveHint()">💡 Gợi ý (Tab)</button>
+                        <button class="btn btn-nav" onclick="nextSentenceManual()">Next ➡️</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="end-screen" class="end-screen">
+                <h2 style="color: var(--primary); font-size: 28px;">Tuyệt vời! Hoàn thành Test 🏆</h2>
+                <div class="transcript-box" id="full-transcript"></div>
+                <div class="actions">
+                    <button class="btn btn-enter" onclick="restartLesson()">🔄 Luyện tập lại</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="feedback-modal">
+    <div class="modal-content">
+        <h3>🎉 Chính xác!</h3>
+        <div class="modal-script" id="trans-en"></div>
+        <p><strong>🇻🇳 Nghĩa:</strong> <span id="trans-vi"></span></p>
+        <p id="grammar-container"><strong>📖 Giải thích:</strong> <span id="trans-grammar"></span></p>
+        <ul class="vocab-list" id="trans-vocab"></ul>
+        <button class="btn btn-next-modal" onclick="nextSentence()">Qua câu tiếp theo (Enter) ➔</button>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu trích xuất & làm giàu từ file Part 2 test 2.docx
+    const lessonData = [
+        // Question 7
+        { en: "Where did you leave the account files?", vi: "Bạn để những tập tin tài khoản ở đâu?", grammar: "Câu hỏi Where hỏi về nơi chốn, cụ thể là vị trí để những tập tin.", vocab: ["account files (tập tin tài khoản)", "leave (để lại, rời đi)"], label: "Question 7", type: "question" },
+        { en: "In your mailbox.", vi: "Trong hộp thư của bạn.", grammar: "Chỉ ra vị trí cụ thể ở hộp thư nên phù hợp nhất.", vocab: ["mailbox (hộp thư)"], label: "(A) - Đáp án đúng", type: "correct" },
+        { en: "To South America.", vi: "Tới Bắc Mỹ (Nam Mỹ).", grammar: "Đáp án sai. Chỉ một hướng đi / địa điểm lớn không phù hợp cho việc để tập tin.", vocab: ["South America (Nam Mỹ)"], label: "(B)", type: "option" },
+        { en: "No, I live nearby.", vi: "Không, tôi sống ở gần đây.", grammar: "Đáp án sai. Trả lời về chỗ ở và dùng Yes/No cho câu hỏi Wh-.", vocab: ["nearby (gần đây)"], label: "(C)", type: "option" },
+
+        // Question 8
+        { en: "Who should I call about the broken window?", vi: "Tôi nên gọi cho ai về cửa sổ bị vỡ?", grammar: "Câu hỏi Who dùng để hỏi về một ai đó nhằm giải quyết vấn đề.", vocab: ["broken window (cửa sổ bị vỡ)"], label: "Question 8", type: "question" },
+        { en: "The maintenance department.", vi: "Bộ phận bảo trì.", grammar: "Đưa ra câu trả lời là một bộ phận có thể giải quyết vấn đề, hoàn toàn phù hợp.", vocab: ["maintenance department (bộ phận bảo trì)"], label: "(A) - Đáp án đúng", type: "correct" },
+        { en: "Try not to leave it open.", vi: "Cố gắng đừng để nó mở.", grammar: "Đáp án sai.", vocab: [], label: "(B)", type: "option" },
+        { en: "Around nine o’clock.", vi: "Vào khoảng 9 giờ.", grammar: "Đáp án sai. Trả lời cho thời điểm (When).", vocab: [], label: "(C)", type: "option" },
+
+        // Question 9
+        { en: "You ordered more parts for the motor, right?", vi: "Bạn đã đặt thêm các bộ phận của động cơ, phải không?", grammar: "Câu hỏi dạng xác nhận lại sự việc.", vocab: ["order (đặt hàng)", "motor (động cơ)", "parts (bộ phận, phụ tùng)"], label: "Question 9", type: "question" },
+        { en: "I promoted him.", vi: "Tôi đã tiến cử anh ấy.", grammar: "Đáp án sai.", vocab: ["promote (thăng chức, tiến cử)"], label: "(A)", type: "option" },
+        { en: "Thanks, it’s a new model.", vi: "Cảm ơn, nó là mẫu mới.", grammar: "Đáp án sai.", vocab: ["model (mẫu mã)"], label: "(B)", type: "option" },
+        { en: "Yes, last week.", vi: "Vâng, tuần trước.", grammar: "Thể hiện rõ sự xác nhận và cung cấp thêm thời gian hợp lý ở quá khứ.", vocab: [], label: "(C) - Đáp án đúng", type: "correct" },
+
+        // Question 10
+        { en: "When is the rent due?", vi: "Khi nào hạn chót tiền thuê?", grammar: "Câu hỏi When dùng để hỏi về một mốc thời gian.", vocab: ["rent (tiền thuê)", "due (đến hạn)"], label: "Question 10", type: "question" },
+        { en: "Please send it by Friday.", vi: "Hãy gửi nó trước thứ 6.", grammar: "Nhắc đến thời hạn cụ thể (trước thứ 6).", vocab: [], label: "(A) - Đáp án đúng", type: "correct" },
+        { en: "I do have one.", vi: "Tôi có 1 cái.", grammar: "Đáp án sai.", vocab: [], label: "(B)", type: "option" },
+        { en: "The new apartment complex.", vi: "Tổ hợp chung cư mới.", grammar: "Đáp án sai. Trả lời cho câu hỏi Where.", vocab: ["apartment complex (tổ hợp chung cư)"], label: "(C)", type: "option" },
+
+        // Question 11
+        { en: "Why don’t we submit the supply request?", vi: "Sao chúng ta không nộp yêu cầu cung cấp?", grammar: "Đưa ra lời đề nghị/gợi ý làm một việc gì đó (Why don't we...).", vocab: ["submit (nộp)", "supply request (yêu cầu cung cấp vật tư)"], label: "Question 11", type: "question" },
+        { en: "OK, I’ll print it out.", vi: "Được rồi, tôi sẽ in nó ra.", grammar: "Chấp thuận đề nghị và bổ sung thông tin hành động hỗ trợ phù hợp.", vocab: ["print out (in ra)"], label: "(A) - Đáp án đúng", type: "correct" },
+        { en: "Yesterday morning.", vi: "Sáng hôm qua.", grammar: "Đáp án sai. Trả lời cho When.", vocab: [], label: "(B)", type: "option" },
+        { en: "Yes, we do.", vi: "Vâng, chúng ta có làm.", grammar: "Đáp án sai. Cấu trúc trả lời không hợp lý cho mẫu câu Why don't we.", vocab: [], label: "(C)", type: "option" },
+
+        // Question 12
+        { en: "Won’t you be at the panel discussion tomorrow?", vi: "Bạn sẽ không ở cuộc hội thảo nhóm ngày mai à?", grammar: "Câu hỏi phủ định dùng để xác nhận một kế hoạch/sự việc.", vocab: ["panel discussion (cuộc hội thảo nhóm, tọa đàm)"], label: "Question 12", type: "question" },
+        { en: "The presentation schedule.", vi: "Lịch thuyết trình.", grammar: "Đáp án sai.", vocab: ["presentation schedule (lịch thuyết trình)"], label: "(A)", type: "option" },
+        { en: "The brown panels look nice.", vi: "Những tấm ván màu nâu trông có vẻ ổn.", grammar: "Đáp án sai. Bẫy lặp từ (panel) mang nghĩa khác.", vocab: [], label: "(B)", type: "option" },
+        { en: "No, I’m leaving the conference tonight.", vi: "Không, tôi sẽ rời hội nghị tối nay.", grammar: "Xác nhận lại việc không tham gia và đưa thêm lý do (rời hội nghị sớm).", vocab: ["conference (hội nghị)"], label: "(C) - Đáp án đúng", type: "correct" },
+
+        // Question 13
+        { en: "When did Susan ask for a computer upgrade?", vi: "Susan đã yêu cầu nâng cấp máy tính vào lúc nào?", grammar: "Câu hỏi When ở thì quá khứ hỏi về mốc thời gian đã xảy ra.", vocab: ["ask for (yêu cầu)", "upgrade (sự nâng cấp)"], label: "Question 13", type: "question" },
+        { en: "About an hour.", vi: "Khoảng 1 tiếng.", grammar: "Đáp án sai. Trả lời cho câu hỏi How long.", vocab: [], label: "(A)", type: "option" },
+        { en: "Sometime last week.", vi: "Lúc nào đó tuần trước.", grammar: "Chỉ một mốc thời gian trong quá khứ.", vocab: ["sometime (một lúc nào đó)"], label: "(B) - Đáp án đúng", type: "correct" },
+        { en: "To business class.", vi: "Tới lớp kinh doanh (hạng thương gia).", grammar: "Đáp án sai. Không liên quan thời gian.", vocab: ["business class (hạng ghế thương gia)"], label: "(C)", type: "option" },
+
+        // Question 14
+        { en: "Do you work in marketing or public policy?", vi: "Bạn làm việc ở marketing hay chính sách cộng đồng?", grammar: "Câu hỏi lựa chọn giữa hai phương án.", vocab: ["public policy (chính sách cộng đồng)"], label: "Question 14", type: "question" },
+        { en: "It’s open to the public.", vi: "Nó mở công cộng.", grammar: "Đáp án sai. Bẫy lặp từ (public).", vocab: ["open to the public (mở cửa cho công chúng)"], label: "(A)", type: "option" },
+        { en: "I don’t like the new policies.", vi: "Tôi không thích các chính sách mới.", grammar: "Đáp án sai. Bẫy lặp từ (policy).", vocab: [], label: "(B)", type: "option" },
+        { en: "Neither, actually.", vi: "Thật ra là không cái nào trong 2 cái.", grammar: "Lời từ chối cả 2 lựa chọn (Neither).", vocab: ["neither (không cái nào cả)"], label: "(C) - Đáp án đúng", type: "correct" },
+
+        // Question 15
+        { en: "Are you available for an interview next Tuesday?", vi: "Bạn có rảnh cho buổi phòng vấn vào thứ 3 không?", grammar: "Hỏi về việc người trả lời có thời gian cho cuộc phỏng vấn không.", vocab: ["available (rảnh rỗi, có sẵn)", "interview (cuộc phỏng vấn)"], label: "Question 15", type: "question" },
+        { en: "Yes, I'd be happy to come in.", vi: "Vâng, tôi rất vui lòng được đến.", grammar: "Thể hiện sự chấp thuận và bày tỏ thái độ tích cực với lời đề nghị.", vocab: ["happy to come in (vui vẻ đến tham dự)"], label: "(A) - Đáp án đúng", type: "correct" },
+        { en: "A bit earlier next time.", vi: "Lần sau sớm hơn 1 chút.", grammar: "Đáp án sai.", vocab: [], label: "(B)", type: "option" },
+        { en: "Sure, let's go over the weekend.", vi: "Chắc chắn rồi, hãy đi suốt cuối tuần.", grammar: "Đáp án sai. Đi quá giới hạn thời gian hỏi.", vocab: [], label: "(C)", type: "option" },
+
+        // Question 16
+        { en: "How did you make this soup?", vi: "Bạn làm món súp này như thế nào?", grammar: "Hỏi về cách thức thực hiện (nấu súp).", vocab: ["soup (món súp)"], label: "Question 16", type: "question" },
+        { en: "Quite a long time.", vi: "Khá lâu.", grammar: "Đáp án sai. Trả lời về thời lượng (How long).", vocab: [], label: "(A)", type: "option" },
+        { en: "Here's a copy of the recipe.", vi: "Đây là 1 bản in của công thức.", grammar: "Đưa ra bản công thức nấu ăn, một cách trả lời gián tiếp rất hay.", vocab: ["recipe (công thức nấu ăn)"], label: "(B) - Đáp án đúng", type: "correct" },
+        { en: "For Saturday night.", vi: "Cho tối thứ 7.", grammar: "Đáp án sai.", vocab: [], label: "(C)", type: "option" },
+
+        // Question 17
+        { en: "Wasn't the office furniture shipped last month?", vi: "Không phải là các vật dụng văn phòng đã được chuyển đến tháng trước à?", grammar: "Câu hỏi phủ định để xác nhận lại thông tin bị trễ hoặc có vấn đề.", vocab: ["office furniture (nội thất/vật dụng văn phòng)", "ship (vận chuyển)"], label: "Question 17", type: "question" },
+        { en: "The delivery's been delayed.", vi: "Việc giao hàng đã bị trì hoãn.", grammar: "Đưa ra lời giải thích hợp lý vì sao hàng chưa đến.", vocab: ["delivery (sự giao hàng)", "delayed (bị trì hoãn)"], label: "(A) - Đáp án đúng", type: "correct" },
+        { en: "Ms. Martinez does.", vi: "Cô Martinez làm.", grammar: "Đáp án sai.", vocab: [], label: "(B)", type: "option" },
+        { en: "A more modern design.", vi: "1 thiết kế hiện đại hơn.", grammar: "Đáp án sai.", vocab: ["modern design (thiết kế hiện đại)"], label: "(C)", type: "option" },
+
+        // Question 18
+        { en: "Do you have some paper clips I can use?", vi: "Bạn có kẹp giấy tôi có thể dùng không?", grammar: "Câu hỏi vay mượn đồ vật.", vocab: ["paper clip (kẹp giấy)"], label: "Question 18", type: "question" },
+        { en: "The paper comes in several colors.", vi: "Tờ giấy có 1 vài màu.", grammar: "Đáp án sai. Bẫy lặp từ (paper).", vocab: [], label: "(A)", type: "option" },
+        { en: "I found it very useful.", vi: "Tôi thấy nó rất có tác dụng.", grammar: "Đáp án sai.", vocab: [], label: "(B)", type: "option" },
+        { en: "How many do you need?", vi: "Bạn cần bao nhiêu cái?", grammar: "Hỏi ngược lại để lấy thêm thông tin trước khi hỗ trợ.", vocab: [], label: "(C) - Đáp án đúng", type: "correct" },
+
+        // Question 19
+        { en: "How do I change my password?", vi: "Làm sao tôi có thể đổi mật khẩu?", grammar: "Hỏi về cách thức để thực hiện thay đổi.", vocab: ["password (mật khẩu)"], label: "Question 19", type: "question" },
+        { en: "I don't have any more.", vi: "Tôi không còn cái nào nữa.", grammar: "Đáp án sai.", vocab: [], label: "(A)", type: "option" },
+        { en: "You'd better ask Ms. Wang.", vi: "Bạn nên hỏi cô Wang.", grammar: "Chỉ dẫn sang một người khác có thể giúp trả lời câu hỏi.", vocab: ["had better (nên làm gì)"], label: "(B) - Đáp án đúng", type: "correct" },
+        { en: "Yes, you can log in now.", vi: "Vâng, bạn có thể đăng nhập vào bây giờ.", grammar: "Đáp án sai. Không dùng Yes/No cho câu hỏi Wh-.", vocab: [], label: "(C)", type: "option" },
+
+        // Question 20
+        { en: "You can't get us an earlier flight, can you?", vi: "Bạn không thể đặt cho chúng tôi chuyến bay sớm hơn phải không?", grammar: "Câu hỏi đuôi mang ý nhờ vả hoặc xác nhận hết cơ hội.", vocab: ["flight (chuyến bay)"], label: "Question 20", type: "question" },
+        { en: "It's a wonderful city.", vi: "Nó là 1 thành phố tuyệt vời.", grammar: "Đáp án sai.", vocab: [], label: "(A)", type: "option" },
+        { en: "I usually pack light.", vi: "Tôi thường xếp hành lý nhẹ.", grammar: "Đáp án sai.", vocab: ["pack light (xếp hành lý gọn nhẹ)"], label: "(B)", type: "option" },
+        { en: "No, they're all fully booked.", vi: "Không, chúng đều đã được đặt hết chỗ rồi.", grammar: "Xác nhận không được và giải thích vì hết chỗ.", vocab: ["fully booked (kín chỗ, hết vé)"], label: "(C) - Đáp án đúng", type: "correct" },
+
+        // Question 21
+        { en: "Why is the door locked?", vi: "Vì sao cửa bị khóa?", grammar: "Hỏi lý do sự việc diễn ra.", vocab: ["locked (bị khóa)"], label: "Question 21", type: "question" },
+        { en: "I'm sure security can open it.", vi: "Tôi chắc là bảo vệ có thể mở nó.", grammar: "Thay vì nói nguyên nhân thì trực tiếp đưa ra giải pháp giải quyết vấn đề cửa khóa.", vocab: ["security (bảo vệ, an ninh)"], label: "(A) - Đáp án đúng", type: "correct" },
+        { en: "Six o'clock every day.", vi: "6 giờ mỗi ngày.", grammar: "Đáp án sai. Trả lời When.", vocab: [], label: "(B)", type: "option" },
+        { en: "It's right around the corner.", vi: "Nó ở ngay góc.", grammar: "Đáp án sai. Trả lời Where.", vocab: [], label: "(C)", type: "option" },
+
+        // Question 22
+        { en: "Are you using the copier?", vi: "Bạn có đang xài máy in/photo không?", grammar: "Câu hỏi để kiểm tra xem thiết bị có đang rảnh hay không.", vocab: ["copier (máy photo)"], label: "Question 22", type: "question" },
+        { en: "Would you like some more?", vi: "Bạn có muốn thêm chút nữa không?", grammar: "Đáp án sai.", vocab: [], label: "(A)", type: "option" },
+        { en: "You go ahead.", vi: "Bạn sử dụng đi / Bạn cứ làm đi.", grammar: "Phản hồi nhường quyền sử dụng một cách lịch sự.", vocab: ["go ahead (cứ tự nhiên, làm đi)"], label: "(B) - Đáp án đúng", type: "correct" },
+        { en: "Mr. Tong's office.", vi: "Văn phòng ông Tong.", grammar: "Đáp án sai.", vocab: [], label: "(C)", type: "option" },
+
+        // Question 23
+        { en: "I really need the updated expense report.", vi: "Tôi thật sự cần báo cáo chi phí đã cập nhật.", grammar: "Một lời yêu cầu/thúc giục ngầm.", vocab: ["updated (được cập nhật)", "expense report (báo cáo chi phí)"], label: "Question 23", type: "question" },
+        { en: "The trip to London.", vi: "Chuyến đi tới Luân Đôn.", grammar: "Đáp án sai.", vocab: [], label: "(A)", type: "option" },
+        { en: "It wasn't that expensive.", vi: "Nó không đắt đến thế.", grammar: "Đáp án sai. Bẫy lặp từ (expensive - expense).", vocab: [], label: "(B)", type: "option" },
+        { en: "I'll send it as soon as possible.", vi: "Tôi sẽ gửi nó càng sớm càng tốt.", grammar: "Đưa ra lời hứa hẹn sẽ đáp ứng nhu cầu.", vocab: ["as soon as possible (càng sớm càng tốt)"], label: "(C) - Đáp án đúng", type: "correct" },
+
+        // Question 24
+        { en: "Who's leading the logo design project?", vi: "Ai là người dẫn đầu dự án thiết kế logo?", grammar: "Hỏi về người đảm nhận/phụ trách.", vocab: ["lead (dẫn dắt, phụ trách)"], label: "Question 24", type: "question" },
+        { en: "I can lead you there.", vi: "Tôi có thể dẫn bạn đến đó.", grammar: "Đáp án sai. Bẫy lặp từ (lead).", vocab: [], label: "(A)", type: "option" },
+        { en: "By the third of October.", vi: "Tới ngày 3 tháng 10.", grammar: "Đáp án sai.", vocab: [], label: "(B)", type: "option" },
+        { en: "We're still deciding.", vi: "Chúng tôi vẫn đang quyết định.", grammar: "Trả lời gián tiếp khi chưa có kết quả.", vocab: ["decide (quyết định)"], label: "(C) - Đáp án đúng", type: "correct" },
+
+        // Question 25
+        { en: "What happened at the workshop yesterday?", vi: "Chuyện gì đã xảy ra ở buổi hội thảo hôm qua vậy?", grammar: "Hỏi về thông tin hoặc sự kiện ở quá khứ.", vocab: ["workshop (buổi hội thảo)"], label: "Question 25", type: "question" },
+        { en: "It's been working fine.", vi: "Nó đã và đang hoạt động ổn.", grammar: "Đáp án sai. Bẫy lặp từ (work - workshop).", vocab: [], label: "(A)", type: "option" },
+        { en: "I missed it, too.", vi: "Tôi cũng bỏ lỡ nó.", grammar: "Người trả lời không rõ vì cũng không tham gia.", vocab: ["miss (bỏ lỡ)"], label: "(B) - Đáp án đúng", type: "correct" },
+        { en: "I like that shop.", vi: "Tôi thích cửa hàng đó.", grammar: "Đáp án sai. Bẫy âm (shop - workshop).", vocab: [], label: "(C)", type: "option" },
+
+        // Question 26
+        { en: "Is there a dressing room where I can try these sweaters on?", vi: "Có phòng thử đồ để tôi có thể thử những áo ấm này không?", grammar: "Hỏi về tiện ích phục vụ khách hàng.", vocab: ["dressing room (phòng thử đồ)", "try on (thử đồ)", "sweater (áo len/áo ấm)"], label: "Question 26", type: "question" },
+        { en: "The store opened at 10 A.M.", vi: "Cửa hàng đã mở lúc 10 giờ sáng.", grammar: "Đáp án sai.", vocab: [], label: "(A)", type: "option" },
+        { en: "How would you like to pay?", vi: "Bạn muốn trả tiền như thế nào?", grammar: "Đáp án sai.", vocab: [], label: "(B)", type: "option" },
+        { en: "They're all occupied right now.", vi: "Tất cả chúng đều có người dùng ngay lúc này.", grammar: "Báo cáo tình trạng hết phòng thử đồ.", vocab: ["occupied (đang có người, bị chiếm)"], label: "(C) - Đáp án đúng", type: "correct" },
+
+        // Question 27
+        { en: "The dinner with the clients is Wednesday.", vi: "Bữa ăn tối với các khách hàng là thứ 4.", grammar: "Câu trần thuật nhắc lịch trình.", vocab: ["client (khách hàng)"], label: "Question 27", type: "question" },
+        { en: "Four copies, please.", vi: "Hãy cho 4 bản sao.", grammar: "Đáp án sai.", vocab: [], label: "(A)", type: "option" },
+        { en: "I'm sure that he did.", vi: "Tôi chắc chắn là anh ấy đã làm.", grammar: "Đáp án sai.", vocab: [], label: "(B)", type: "option" },
+        { en: "That's not what I was told.", vi: "Đó không phải những gì tôi được nghe.", grammar: "Phản hồi lại thông tin khi người trả lời có một dữ kiện khác.", vocab: ["told (được bảo, được nghe kể)"], label: "(C) - Đáp án đúng", type: "correct" },
+
+        // Question 28
+        { en: "Why is the financial forecast still not finished?", vi: "Vì sao dự báo tài chính vẫn chưa hoàn thành?", grammar: "Hỏi lý do sự chậm trễ của bản báo cáo.", vocab: ["financial forecast (dự báo tài chính)"], label: "Question 28", type: "question" },
+        { en: "They're forecasting rain.", vi: "Họ đang dự báo mưa.", grammar: "Đáp án sai. Bẫy lặp từ (forecast).", vocab: [], label: "(A)", type: "option" },
+        { en: "In the finance department.", vi: "Ở phòng tài chính.", grammar: "Đáp án sai. Trả lời Where.", vocab: [], label: "(B)", type: "option" },
+        { en: "You didn't receive it?", vi: "Bạn chưa nhận được nó à?", grammar: "Hỏi ngược lại thể hiện sự bất ngờ vì tài liệu đáng lẽ đã hoàn thành/gửi rồi.", vocab: ["receive (nhận)"], label: "(C) - Đáp án đúng", type: "correct" },
+
+        // Question 29
+        { en: "What did you think about that presenter?", vi: "Bạn nghĩ gì về người thuyết trình đó?", grammar: "Hỏi ý kiến, cảm nhận.", vocab: ["presenter (người thuyết trình)"], label: "Question 29", type: "question" },
+        { en: "I wish he could train my team.", vi: "Tôi ước gì anh ấy có thể tập huấn cho nhóm của tôi.", grammar: "Thể hiện ý kiến đánh giá cao (muốn người đó đào tạo đội mình).", vocab: ["train (đào tạo, huấn luyện)"], label: "(A) - Đáp án đúng", type: "correct" },
+        { en: "Thanks, that's good to know.", vi: "Cảm ơn, thật tốt khi biết điều đó.", grammar: "Đáp án sai.", vocab: [], label: "(B)", type: "option" },
+        { en: "About three times a week.", vi: "Khoảng 3 lần 1 tuần.", grammar: "Đáp án sai.", vocab: [], label: "(C)", type: "option" },
+
+        // Question 30
+        { en: "Is our production line operating again?", vi: "Dây chuyền sản xuất của chúng ta hoạt động lại chưa?", grammar: "Câu hỏi Yes/No kiểm tra tình trạng máy móc.", vocab: ["production line (dây chuyền sản xuất)", "operate (hoạt động)"], label: "Question 30", type: "question" },
+        { en: "That's a high rating.", vi: "Đó là 1 điểm số cao đó.", grammar: "Đáp án sai.", vocab: [], label: "(A)", type: "option" },
+        { en: "Not quite, but almost.", vi: "Không hẳn, nhưng gần rồi.", grammar: "Đưa ra tình trạng máy chưa xong hẳn nhưng sắp xong.", vocab: ["not quite (chưa hẳn)"], label: "(B) - Đáp án đúng", type: "correct" },
+        { en: "Yes, I have.", vi: "Vâng, tôi có.", grammar: "Đáp án sai. Lệch chủ ngữ so với câu hỏi.", vocab: [], label: "(C)", type: "option" },
+
+        // Question 31
+        { en: "I'm going to put on my sweater.", vi: "Tôi sẽ mặc áo ấm.", grammar: "Đưa ra một thông báo phàn nàn nhẹ (vì lạnh).", vocab: ["put on (mặc vào)"], label: "Question 31", type: "question" },
+        { en: "The morning weather report.", vi: "Bản dự báo thời tiết buổi sáng.", grammar: "Đáp án sai.", vocab: [], label: "(A)", type: "option" },
+        { en: "I could turn the heat up.", vi: "Tôi có thể tăng nhiệt độ lên.", grammar: "Đưa ra một hành động giải quyết sự cố lạnh cho đối phương.", vocab: ["turn the heat up (tăng lò sưởi / nhiệt độ)"], label: "(B) - Đáp án đúng", type: "correct" },
+        { en: "I haven't decided yet.", vi: "Tôi vẫn chưa quyết định.", grammar: "Đáp án sai.", vocab: [], label: "(C)", type: "option" }
+    ];
+
+    window.currentIndex = 0;
+    let currentPlayCount = 0;
+    let playTimeout;
+    const synth = window.speechSynthesis;
+    let mainVoice = null;
+
+    const msgBox = document.getElementById("system-message");
+    const inputField = document.getElementById("user-input");
+    const modalOverlay = document.getElementById("feedback-modal");
+    const labelDisplay = document.getElementById("sentence-label");
+
+    function loadVoices() {
+        let voices = synth.getVoices();
+        if(voices.length === 0) return;
+        mainVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Male') || v.name.includes('Google US English'))) || voices.find(v => v.lang.startsWith('en'));
+    }
+
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    window.onload = () => {
+        loadVoices();
+        let count = localStorage.getItem('part2_test2_count') || 0;
+        document.getElementById('study-count').innerText = count;
+        document.getElementById('total-sentences').innerText = lessonData.length;
+        
+        let savedIndex = parseInt(localStorage.getItem('part2_test2_progress'));
+        if (!isNaN(savedIndex) && savedIndex < lessonData.length) {
+            window.currentIndex = savedIndex;
+        }
+
+        updateUI();
+    };
+
+    function updateUI() {
+        updateProgress();
+        document.getElementById('current-sentence-num').innerText = window.currentIndex + 1;
+        
+        const data = lessonData[window.currentIndex];
+        
+        labelDisplay.innerText = data.label;
+        if (data.type === "question") {
+            labelDisplay.className = "speaker-badge badge-question";
+        } else if (data.type === "correct") {
+            labelDisplay.className = "speaker-badge badge-correct";
+        } else {
+            labelDisplay.className = "speaker-badge badge-option";
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Control') {
+            e.preventDefault();
+            playAudio();
+        } else if (e.key === 'Tab') {
+            e.preventDefault();
+            giveHint();
+        } else if (e.key === 'Enter' && modalOverlay.style.display !== "flex") {
+            e.preventDefault();
+            handleEnterAction();
+        }
+    });
+
+    function handleEnterAction() {
+        if (modalOverlay.style.display === "flex") {
+            nextSentence();
+        } else {
+            checkAnswer();
+        }
+    }
+
+    function playAudio() {
+        currentPlayCount = 0;
+        clearTimeout(playTimeout);
+        triggerAudioLoop();
+    }
+
+    function triggerAudioLoop() {
+        if (synth.speaking) synth.cancel();
+        
+        const data = lessonData[window.currentIndex];
+        const utterThis = new SpeechSynthesisUtterance(data.en);
+        utterThis.lang = 'en-US';
+        utterThis.rate = parseFloat(document.getElementById('speed-setting').value);
+        
+        if (mainVoice) utterThis.voice = mainVoice;
+        
+        utterThis.onend = () => {
+            currentPlayCount++;
+            const maxRepeat = parseInt(document.getElementById('repeat-setting').value);
+            if (currentPlayCount < maxRepeat) {
+                playTimeout = setTimeout(triggerAudioLoop, 500);
+            }
+        };
+        
+        synth.speak(utterThis);
+        if (modalOverlay.style.display !== "flex") inputField.focus();
+    }
+
+    function normalizeText(text) { 
+        let standardText = text.replace(/[’‘`´]/g, "'"); 
+        return standardText.toLowerCase().replace(/[.,?!–\-:"]/g, '').trim(); 
+    }
+
+    function expandContractions(text) {
+        let lower = text.toLowerCase().replace(/[’‘`´]/g, "'");
+        const dict = {
+            "they're": "they are", "we're": "we are", "you're": "you are",
+            "he's": "he is", "she's": "she is", "it's": "it is", "that's": "that is", "there's": "there is", "who's": "who is", "what's": "what is",
+            "i'm": "i am",
+            "they'd": "they would", "we'd": "we would", "you'd": "you would", "he'd": "he would", "she'd": "she would", "i'd": "i would",
+            "they've": "they have", "we've": "we have", "you've": "you have", "i've": "i have",
+            "they'll": "they will", "we'll": "we will", "you'll": "you will", "he'll": "he will", "she'll": "she will", "it'll": "it will", "i'll": "i will",
+            "don't": "do not", "doesn't": "does not", "didn't": "did not",
+            "isn't": "is not", "aren't": "are not", "wasn't": "was not", "weren't": "were not",
+            "haven't": "have not", "hasn't": "has not", "hadn't": "had not",
+            "can't": "can not", "cannot": "can not", "won't": "will not", "wouldn't": "would not",
+            "shouldn't": "should not", "couldn't": "could not", "mustn't": "must not"
+        };
+        lower = lower.replace(/[.,?!–\-:"]/g, '');
+        return lower.split(/\s+/).map(w => dict[w] || w).join(' ').trim();
+    }
+
+    function normalizeSpelling(text) {
+        return text
+            .replace(/ise\b/g, 'ize')
+            .replace(/ised\b/g, 'ized')
+            .replace(/ising\b/g, 'izing')
+            .replace(/ises\b/g, 'izes')
+            .replace(/isation/g, 'ization')
+            .replace(/our\b/g, 'or')
+            .replace(/ours\b/g, 'ors')
+            .replace(/tre\b/g, 'ter')
+            .replace(/tres\b/g, 'ters')
+            .replace(/lling\b/g, 'ling')
+            .replace(/lled\b/g, 'led');
+    }
+
+    function checkAnswer() {
+        const rawUserInput = inputField.value;
+        const rawTargetText = lessonData[window.currentIndex].en;
+        
+        const userInputExpanded = normalizeSpelling(expandContractions(rawUserInput).replace(/'/g, ''));
+        const targetTextExpanded = normalizeSpelling(expandContractions(rawTargetText).replace(/'/g, ''));
+        
+        if (userInputExpanded === targetTextExpanded) {
+            msgBox.innerText = "";
+            showModal();
+            return;
+        }
+
+        if (targetTextExpanded.startsWith(userInputExpanded) && userInputExpanded.length > 0) {
+            msgBox.innerText = "Chưa hết câu, hãy nghe thêm và gõ tiếp nhé!";
+            return; 
+        }
+
+        const userInput = normalizeText(rawUserInput);
+        const targetText = normalizeText(rawTargetText);
+        
+        const userWordsNorm = userInput.split(' ').filter(w => w !== "");
+        const targetWordsNorm = targetText.split(' ');
+        
+        const rawWords = rawUserInput.trim().split(/\s+/);
+
+        if (userWordsNorm.length === 0) {
+            msgBox.innerText = "Bạn chưa gõ gì cả. Nhấn Ctrl để nghe nhé!";
+            return;
+        }
+
+        let wrongIndex = -1;
+        for (let i = 0; i < userWordsNorm.length; i++) {
+            if (userWordsNorm[i] !== targetWordsNorm[i]) {
+                wrongIndex = i;
+                break;
+            }
+        }
+
+        if (wrongIndex !== -1) {
+            let startPos = 0;
+            for (let k = 0; k < wrongIndex; k++) {
+                startPos += rawWords[k].length + 1; 
+            }
+            
+            const leadingSpaces = inputField.value.length - inputField.value.trimStart().length;
+            startPos += leadingSpaces;
+            let endPos = startPos + rawWords[wrongIndex].length;
+
+            inputField.focus();
+            inputField.setSelectionRange(startPos, endPos);
+
+            let displayHTML = rawWords.map((w, idx) => {
+                if (idx === wrongIndex) {
+                    return `<span class="glow-error">${w}</span>`;
+                }
+                return w;
+            }).join(' ');
+
+            msgBox.innerHTML = `Vị trí sai:<br><div style="margin-top:12px; font-size:19px; color:var(--text-dark); font-weight: 500;">${displayHTML}</div>`;
+            
+        } else if (userWordsNorm.length < targetWordsNorm.length) {
+            msgBox.innerText = "Chưa hết câu, hãy nghe thêm và gõ tiếp nhé!";
+            inputField.focus();
+            inputField.setSelectionRange(inputField.value.length, inputField.value.length);
+        } else {
+            msgBox.innerText = "Có lỗi sai chính tả nhỏ, hãy kiểm tra lại.";
+        }
+    }
+
+    function giveHint() {
+        if (modalOverlay.style.display === "flex") return;
+
+        const rawUserInput = inputField.value;
+        const userInput = normalizeText(rawUserInput);
+        const targetText = normalizeText(lessonData[window.currentIndex].en);
+        
+        const targetWordsRaw = lessonData[window.currentIndex].en.split(' ');
+        const targetWordsNorm = targetText.split(' ');
+        const userWords = userInput.split(' ').filter(w => w !== "");
+
+        let hintWord = targetWordsRaw[userWords.length];
+        for (let i = 0; i < userWords.length; i++) {
+            if (userWords[i] !== targetWordsNorm[i]) {
+                hintWord = targetWordsRaw[i];
+                inputField.value = targetWordsRaw.slice(0, i).join(' ') + (i > 0 ? " " : "");
+                break;
+            }
+        }
+
+        if (hintWord) {
+            inputField.value += (inputField.value.length > 0 && !inputField.value.endsWith(' ') ? ' ' : '') + hintWord + ' ';
+            msgBox.innerText = "Đã điền từ tiếp theo!";
+        }
+    }
+
+    function showModal() {
+        inputField.blur();
+        const data = lessonData[window.currentIndex];
+        
+        document.getElementById("trans-en").innerText = data.en;
+        document.getElementById("trans-vi").innerText = data.vi;
+        
+        const grammarContainer = document.getElementById("grammar-container");
+        if(data.grammar) {
+            grammarContainer.style.display = "block";
+            document.getElementById("trans-grammar").innerText = data.grammar;
+        } else {
+            grammarContainer.style.display = "none";
+        }
+        
+        const vocabList = document.getElementById("trans-vocab");
+        vocabList.innerHTML = "";
+        if(data.vocab && data.vocab.length > 0) {
+            data.vocab.forEach(v => {
+                let li = document.createElement("li");
+                let parts = v.split(" (");
+                if(parts.length > 1) {
+                    li.innerHTML = `<strong>${parts[0]}</strong> <span style="color:var(--text-light); font-size:15px;">(${parts[1]}</span>`;
+                } else {
+                    li.innerHTML = `<strong>${parts[0]}</strong>`;
+                }
+                vocabList.appendChild(li);
+            });
+        }
+        
+        modalOverlay.style.display = "flex";
+        document.querySelector('.btn-next-modal').focus();
+    }
+
+    function prevSentenceManual() {
+        if (window.currentIndex > 0) {
+            window.currentIndex--;
+            resetForNewSentence();
+        }
+    }
+
+    function nextSentenceManual() {
+        if (window.currentIndex < lessonData.length - 1) {
+            window.currentIndex++;
+            resetForNewSentence();
+        } else {
+            finishLesson();
+        }
+    }
+    
+    function resetForNewSentence() {
+        modalOverlay.style.display = "none";
+        inputField.value = "";
+        msgBox.innerHTML = "";
+        
+        localStorage.setItem('part2_test2_progress', window.currentIndex); 
+        if(window.saveProgressToCloud) window.saveProgressToCloud(window.currentIndex); 
+        
+        updateUI();
+        playAudio();
+    }
+
+    function nextSentence() {
+        modalOverlay.style.display = "none";
+        window.currentIndex++;
+        inputField.value = "";
+        msgBox.innerHTML = "";
+        
+        if (window.currentIndex < lessonData.length) {
+            localStorage.setItem('part2_test2_progress', window.currentIndex);
+            if(window.saveProgressToCloud) window.saveProgressToCloud(window.currentIndex);
+
+            updateUI();
+            playAudio();
+        } else {
+            finishLesson();
+        }
+    }
+
+    function updateProgress() {
+        const percent = Math.round((window.currentIndex / lessonData.length) * 100);
+        document.getElementById("progress-percent").innerText = percent;
+        document.getElementById("progress-ring").style.background = `conic-gradient(var(--primary) ${percent}%, #eee 0)`;
+    }
+
+    window.playEndScreenAudio = function(text) {
+        if (synth.speaking) synth.cancel();
+        const utterThis = new SpeechSynthesisUtterance(text);
+        utterThis.lang = 'en-US';
+        utterThis.rate = parseFloat(document.getElementById('speed-setting').value) || 1.0; 
+        if (window.mainVoice) utterThis.voice = window.mainVoice; 
+        synth.speak(utterThis);
+    };
+
+    function finishLesson() {
+        document.getElementById("learning-screen").style.display = "none";
+        document.getElementById("end-screen").style.display = "block";
+        
+        let count = parseInt(localStorage.getItem('part2_test2_count')) || 0;
+        count++;
+        localStorage.setItem('part2_test2_count', count);
+        document.getElementById('study-count').innerText = count;
+
+        localStorage.removeItem('part2_test2_progress');
+        if(window.saveProgressToCloud) window.saveProgressToCloud(0);
+
+        const transcriptBox = document.getElementById("full-transcript");
+        let htmlContent = "";
+
+        lessonData.forEach(d => {
+            const isQuestion = d.type === 'question';
+            const color = isQuestion ? 'var(--badge-q-text)' : (d.type === 'correct' ? 'var(--badge-corr-text)' : 'var(--badge-opt-text)');
+            const padding = isQuestion ? '0' : '25px';
+            
+            const playBtnHtml = `<button onclick="playEndScreenAudio(\`${d.en.replace(/`/g, "'")}\`)" style="background:none; border:none; cursor:pointer; font-size:18px; margin-left: 5px; transition: 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" title="Nghe lại câu này">🔊</button>`;
+
+            htmlContent += `<p style="margin-bottom:10px; padding-left: ${padding};">
+                <strong style="color:${color}">${d.label}:</strong> <span style="font-weight: 500;">${d.en}</span> ${playBtnHtml}<br>
+                <span style="color:var(--text-light); font-size: 14px;">${d.vi}</span>
+            </p>`;
+            
+            if (d.type === 'option' || d.type === 'correct') {
+                if (d.label.includes('(C)')) {
+                    htmlContent += `<hr style="border:1px dashed #eee; margin: 15px 0;">`;
+                }
+            }
+        });
+        transcriptBox.innerHTML = htmlContent;
+    }
+
+    function restartLesson() {
+        localStorage.setItem('part2_test2_progress', 0);
+        location.reload();
+    }
+</script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+        authDomain: "snapenglish-cb6e2.firebaseapp.com",
+        projectId: "snapenglish-cb6e2",
+        storageBucket: "snapenglish-cb6e2.firebasestorage.app",
+        messagingSenderId: "373152038413",
+        appId: "1:373152038413:web:19284622571390f8585f44"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.saveProgressToCloud = async (progressIndex) => {
+        if (window.currentUserUid) {
+            try {
+                await setDoc(doc(db, "userProgress", window.currentUserUid), {
+                    part2_test2_progress: progressIndex
+                }, { merge: true });
+            } catch (e) {
+                console.error("Lỗi khi lưu tiến độ:", e);
+            }
+        }
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            window.currentUserUid = user.uid;
+            window.currentUserEmail = user.email;
+            
+            try {
+                const docRef = doc(db, "userProgress", user.uid);
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    let cloudProgress = docSnap.data().part2_test2_progress;
+                    if (cloudProgress !== undefined) {
+                        window.currentIndex = cloudProgress; 
+                        window.updateUI();
+                    }
+                }
+            } catch (error) {
+                console.error("Lỗi khi tải tiến độ:", error);
+            }
+           
+        } else {
+            window.currentUserUid = null;
+            window.currentUserEmail = null;
+        }
+    });
+</script>
+</body>
+</html>
