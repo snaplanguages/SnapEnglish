@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Góc Nhỏ Của Tôi</title>
+    <link rel="icon" type="image/png" href="picture.jpg">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { 
+            --primary: #ff6b81; 
+            --secondary: #7bed9f; 
+            --accent1: #70a1ff; 
+            --accent2: #eccc68; 
+            --text-dark: #2f3542; 
+            --card-bg: rgba(255, 255, 255, 0.95); 
+            --danger: #ff4757; 
+            --success: #2ed573; 
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Be Vietnam Pro', sans-serif; }
+        
+        /* Hình nền Gradient đổi màu sinh động */
+        body { 
+            background: linear-gradient(45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb, #ffecd2, #fdcbf1);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-dark); 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hidden { display: none !important; }
+        
+        /* Nút bấm siêu màu mè */
+        .btn { 
+            padding: 12px 25px; border: none; border-radius: 25px; 
+            background: linear-gradient(to right, #ff758c 0%, #ff7eb3 100%); 
+            color: white; font-weight: 700; cursor: pointer; transition: 0.3s; 
+            box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4); 
+            font-size: 15px; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 20px rgba(255, 117, 140, 0.6); }
+        .btn-outline { background: white; border: 2px solid var(--primary); color: var(--primary); box-shadow: none; }
+        .btn-outline:hover { background: var(--primary); color: white; }
+        .btn-danger { background: linear-gradient(to right, #ff416c, #ff4b2b); box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4); }
+
+        #authScreen, #profileScreen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(15px); }
+        .auth-box { background: white; padding: 40px; border-radius: 30px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 90%; max-width: 400px; border: 3px solid rgba(255,255,255,0.5); }
+        .auth-box h2 { background: -webkit-linear-gradient(45deg, #ff6b81, #70a1ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; margin-bottom: 5px;}
+        .auth-box input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #e2e2e2; border-radius: 15px; outline: none; transition: 0.3s; font-size: 15px; background: #fafafa;}
+        .auth-box input:focus { border-color: var(--accent1); background: white; box-shadow: 0 0 10px rgba(112, 161, 255, 0.2); }
+        
+        .avatar-preview { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin: 15px auto; border: 5px solid var(--accent2); background: #eee; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1);}
+        
+        #appScreen { max-width: 800px; margin: 0 auto; padding: 20px; padding-bottom: 80px; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.9); padding: 15px 25px; border-radius: 25px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-bottom: 25px; backdrop-filter: blur(10px); border-bottom: 4px solid var(--accent1);}
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-info img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); }
+        .user-info h3 { font-weight: 800; color: #333;}
+        .streak-box { display: flex; align-items: center; gap: 5px; color: #ff7f50; font-weight: 800; font-size: 14px; background: #ffeaa7; padding: 3px 10px; border-radius: 12px; margin-top: 2px;}
+        
+        .post-area { background: rgba(255,255,255,0.95); padding: 25px; border-radius: 25px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); position: relative; border-top: 5px solid var(--primary); }
+        textarea { width: 100%; border: none; outline: none; resize: none; min-height: 120px; font-size: 16px; background: #f4f6f9; padding: 20px; border-radius: 20px; color: #2c3e50; line-height: 1.5; border: 1px solid #e1e8ed;}
+        textarea:focus { background: #fff; border-color: var(--primary); box-shadow: 0 0 10px rgba(255, 107, 129, 0.1); }
+        
+        .tools { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; flex-wrap: wrap; gap: 10px;}
+        .tool-icons i { font-size: 24px; color: var(--accent1); cursor: pointer; margin-right: 15px; transition: 0.3s; background: #eccc68; padding: 10px; border-radius: 50%; color: white;}
+        .tool-icons i.fa-image { background: #70a1ff; }
+        .tool-icons i.fa-camera { background: #ff6b81; }
+        .tool-icons i:hover { transform: translateY(-3px) rotate(10deg); box-shadow: 0 5px 15px rgba(0,0,0,0.15);}
+        
+        .mood-selector { display: flex; gap: 12px; margin-top: 15px; background: #f1f2f6; padding: 10px; border-radius: 20px; justify-content: center;}
+        .mood { font-size: 28px; cursor: pointer; filter: grayscale(100%) opacity(0.5); transition: 0.3s; }
+        .mood.active, .mood:hover { filter: grayscale(0%) opacity(1); transform: scale(1.3) translateY(-5px); }
+        
+        .image-preview-container { margin-top: 15px; position: relative; display: inline-block; }
+        #postImgPreview { max-width: 100%; border-radius: 15px; display: none; }
+        .remove-img { position: absolute; top: -10px; right: -10px; background: var(--danger); color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; display: none; box-shadow: 0 3px 10px rgba(0,0,0,0.2);}
+        
+        .frame-selector { display: none; gap: 10px; margin-top: 15px; background: #fff; padding: 10px; border-radius: 15px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);}
+        .frame-btn { padding: 8px 15px; border: 2px solid #eee; border-radius: 15px; cursor: pointer; background: white; font-size: 13px; font-weight: 600; color: #555;}
+        .frame-btn.active { border-color: var(--secondary); background: #e8f8f5; color: #1abc9c; }
+        
+        .frame-none { border: none; }
+        .frame-polaroid { padding: 15px 15px 50px 15px; background: white; box-shadow: 0 8px 20px rgba(0,0,0,0.15); border-radius: 5px; }
+        .frame-cute { border: 6px dashed var(--primary); border-radius: 25px; padding: 10px; }
+        
+        .feed { display: flex; flex-direction: column; gap: 25px; }
+        .entry-card { padding: 25px; border-radius: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.08); position: relative; animation: slideUp 0.5s ease; border-left: 8px solid var(--accent1); }
+        .entry-card:nth-child(even) { border-left-color: var(--primary); }
+        .entry-card:nth-child(3n) { border-left-color: var(--accent2); }
+        
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .entry-header { display: flex; justify-content: space-between; margin-bottom: 15px; color: #666; font-size: 14px; font-weight: 600; align-items: center;}
+        .entry-content { font-size: 16px; line-height: 1.7; white-space: pre-wrap; margin-bottom: 20px; color: #34495e;}
+        .entry-image { max-width: 100%; display: block; margin: 15px auto; border-radius: 15px;}
+        .entry-actions i { color: #dcdde1; cursor: pointer; transition: 0.3s; font-size: 18px;}
+        .entry-actions i:hover { color: var(--danger); transform: scale(1.2);}
+        
+        #cameraContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        video { width: 100%; max-height: 80vh; object-fit: cover; }
+        .camera-controls { position: absolute; bottom: 40px; display: flex; gap: 30px; align-items: center; }
+        .capture-btn { width: 80px; height: 80px; border-radius: 50%; background: white; border: 8px solid #ccc; cursor: pointer; transition: 0.2s;}
+        .capture-btn:active { transform: scale(0.9); }
+        .switch-cam-btn, .close-cam-btn { color: white; font-size: 35px; cursor: pointer; background: rgba(255,255,255,0.2); padding: 15px; border-radius: 50%;}
+        
+        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 2000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .popup-overlay.show { opacity: 1; pointer-events: auto; }
+        .popup-box { background: white; padding: 35px; border-radius: 30px; text-align: center; width: 90%; max-width: 380px; transform: scale(0.8); transition: 0.3s; box-shadow: 0 20px 50px rgba(0,0,0,0.2); border: 5px solid white;}
+        .popup-overlay.show .popup-box { transform: scale(1); }
+        .popup-icon { font-size: 60px; margin-bottom: 10px; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} }
+        .popup-title { font-size: 24px; margin-bottom: 15px; font-weight: 800; color: #2d3436; }
+        .popup-message { color: #636e72; margin-bottom: 25px; font-size: 15px; line-height: 1.5; }
+        .popup-buttons { display: flex; justify-content: center; gap: 15px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px; }
+        .stat-item { padding: 15px 10px; border-radius: 20px; text-align: center; font-weight: 700; color: #2d3436; box-shadow: 0 4px 10px rgba(0,0,0,0.05);}
+        .stat-item span { display: block; font-size: 28px; font-weight: 800; color: rgba(0,0,0,0.7); margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="authScreen">
+        <div class="auth-box">
+            <h2>✨ Góc Nhỏ Của Tôi ✨</h2>
+            <p style="margin-bottom: 25px; color: #7f8fa6; font-weight: 600;">Nơi cất giữ những điều bé nhỏ</p>
+            <input type="email" id="email" placeholder="📧 Email của bạn">
+            <input type="password" id="password" placeholder="🔒 Mật khẩu">
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 25px;">
+                <button class="btn" onclick="login()">Đăng Nhập Ngay</button>
+                <button class="btn btn-outline" onclick="register()">Tạo Tài Khoản Mới</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="profileScreen" class="hidden">
+        <div class="auth-box">
+            <h2>Bạn muốn được gọi là gì? 🥰</h2>
+            <img id="avatarPreview" class="avatar-preview" src="https://via.placeholder.com/150" onclick="document.getElementById('avatarInput').click()">
+            <input type="file" id="avatarInput" hidden accept="image/*" onchange="previewAvatar(event)">
+            <p style="font-size: 13px; color: #e17055; margin-bottom: 15px; font-weight: 600;">(Chạm vào ảnh để đổi Avatar nhé)</p>
+            <input type="text" id="userName" placeholder="Biệt danh đáng yêu của bạn">
+            <button class="btn" style="width: 100%; margin-top: 20px;" onclick="saveProfile()">Bắt đầu viết thôi 🚀</button>
+        </div>
+    </div>
+
+    <div id="appScreen" class="hidden">
+        <header>
+            <div class="user-info">
+                <img id="headerAvatar" src="" alt="Avatar">
+                <div>
+                    <h3 id="headerName">Tên User</h3>
+                    <div class="streak-box"><i class="fas fa-fire"></i> Chuỗi: <span id="streakCount">0</span> ngày</div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 20px; align-items: center;">
+                <i class="fas fa-chart-pie" style="font-size: 28px; color: var(--accent1); cursor: pointer;" onclick="showStats()" title="Thống kê"></i>
+                <i class="fas fa-sign-out-alt" style="font-size: 26px; color: #ff7675; cursor: pointer;" onclick="confirmLogout()" title="Đăng xuất"></i>
+            </div>
+        </header>
+
+        <div class="post-area">
+            <textarea id="postContent" placeholder="Hôm nay của bạn thế nào? Hãy cứ viết ra hết nhé, đây là không gian của riêng bạn... Mọi cảm xúc đều xứng đáng được lắng nghe 🌈✨"></textarea>
+            
+            <div class="mood-selector" id="moodList">
+                <span class="mood active" data-mood="😊" onclick="selectMood(this)">😊</span>
+                <span class="mood" data-mood="🥰" onclick="selectMood(this)">🥰</span>
+                <span class="mood" data-mood="😂" onclick="selectMood(this)">😂</span>
+                <span class="mood" data-mood="🥺" onclick="selectMood(this)">🥺</span>
+                <span class="mood" data-mood="😡" onclick="selectMood(this)">😡</span>
+                <span class="mood" data-mood="💔" onclick="selectMood(this)">💔</span>
+            </div>
+
+            <div class="image-preview-container">
+                <img id="postImgPreview" src="" class="frame-none">
+                <div class="remove-img" id="removeImgBtn" onclick="removeImage()"><i class="fas fa-times"></i></div>
+            </div>
+
+            <div class="frame-selector" id="frameSelector">
+                <span style="font-size: 14px; font-weight: 700; color: var(--primary); display: flex; align-items: center;">Trang trí ảnh:</span>
+                <button class="frame-btn active" data-frame="frame-none" onclick="selectFrame(this)">Gốc</button>
+                <button class="frame-btn" data-frame="frame-polaroid" onclick="selectFrame(this)">Polaroid</button>
+                <button class="frame-btn" data-frame="frame-cute" onclick="selectFrame(this)">Đứt Nét</button>
+            </div>
+
+            <div class="tools">
+                <div class="tool-icons">
+                    <i class="fas fa-image" title="Tải ảnh lên" onclick="document.getElementById('postImageInput').click()"></i>
+                    <i class="fas fa-camera" title="Chụp ảnh trực tiếp" onclick="openCamera()"></i>
+                    <input type="file" id="postImageInput" hidden accept="image/*" onchange="previewPostImage(event)">
+                </div>
+                <button class="btn" onclick="savePost()"><i class="fas fa-paper-plane" style="margin-right: 5px;"></i> Lưu Nhật Ký</button>
+            </div>
+        </div>
+
+        <div class="feed" id="diaryFeed"></div>
+    </div>
+
+    <div id="cameraContainer" class="hidden">
+        <video id="videoElement" autoplay playsinline></video>
+        <canvas id="canvasElement" class="hidden"></canvas>
+        <div class="camera-controls">
+            <i class="fas fa-times close-cam-btn" onclick="closeCamera()"></i>
+            <div class="capture-btn" onclick="takeSnapshot()"></div>
+            <i class="fas fa-sync-alt switch-cam-btn" onclick="switchCamera()"></i>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="customPopup">
+        <div class="popup-box">
+            <div class="popup-icon" id="popupIcon">✨</div>
+            <div class="popup-title" id="popupTitle">Thông báo</div>
+            <div class="popup-message" id="popupMessage">Nội dung</div>
+            <div class="popup-buttons" id="popupButtons"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, setDoc, getDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+            authDomain: "snapenglish-cb6e2.firebaseapp.com",
+            projectId: "snapenglish-cb6e2",
+            storageBucket: "snapenglish-cb6e2.firebasestorage.app",
+            messagingSenderId: "373152038413",
+            appId: "1:373152038413:web:19284622571390f8585f44"
+        };
+
+        const IMGBB_API_KEY = "f2a434e0f6597234a268d4a7d65a61c1";
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let currentMood = '😊';
+        let currentFrame = 'frame-none';
+        let base64ImageToUpload = null;
+        let allEntries = [];
+        
+        async function uploadImageToImgBB(base64Str) {
+            try {
+                const base64Data = base64Str.split(',')[1];
+                const formData = new FormData();
+                formData.append("image", base64Data);
+                
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: "POST",
+                    body: formData
+                });
+                
+                const data = await response.json();
+                if(data.success) {
+                    return data.data.url; 
+                } else {
+                    throw new Error("Lỗi upload ảnh: " + data.error.message);
+                }
+            } catch (error) {
+                console.error(error);
+                return null;
+            }
+        }
+
+        // Sửa lại hàm showPopup để nhận tham số isHTML (dùng cho thống kê)
+        window.showPopup = function(type, title, message, confirmCallback = null, isHTML = false) {
+            const popup = document.getElementById('customPopup');
+            const icon = document.getElementById('popupIcon');
+            document.getElementById('popupTitle').innerText = title;
+            
+            if(isHTML) {
+                document.getElementById('popupMessage').innerHTML = message;
+            } else {
+                document.getElementById('popupMessage').innerText = message;
+            }
+            
+            const btnContainer = document.getElementById('popupButtons');
+            btnContainer.innerHTML = '';
+
+            if (type === 'success') icon.innerText = '💖';
+            else if (type === 'error') icon.innerText = '🥺';
+            else if (type === 'warning') icon.innerText = '⚠️';
+            else if (type === 'loading') icon.innerText = '⏳'; 
+
+            if (confirmCallback) {
+                btnContainer.innerHTML = `
+                    <button class="btn btn-outline" onclick="closePopup()">Hủy</button>
+                    <button class="btn btn-danger" id="confirmActionBtn">Đồng ý</button>
+                `;
+                document.getElementById('confirmActionBtn').onclick = () => { confirmCallback(); closePopup(); };
+            } else {
+                btnContainer.innerHTML = `<button class="btn" onclick="closePopup()">Đã hiểu</button>`;
+            }
+            popup.classList.add('show');
+        }
+        
+        window.closePopup = () => document.getElementById('customPopup').classList.remove('show');
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('authScreen').classList.add('hidden');
+                
+                const profileRef = doc(db, "users", user.uid);
+                const profileSnap = await getDoc(profileRef);
+                
+                // LỖI UNDEFINED AVATAR: Kiểm tra xem có name và avatar chưa, nếu chưa bắt tạo profile
+                if (!profileSnap.exists() || !profileSnap.data().name) {
+                    document.getElementById('profileScreen').classList.remove('hidden');
+                } else {
+                    document.getElementById('profileScreen').classList.add('hidden');
+                    document.getElementById('appScreen').classList.remove('hidden');
+                    loadUserProfile(profileSnap.data());
+                    loadEntries();
+                }
+            } else {
+                currentUser = null;
+                document.getElementById('appScreen').classList.add('hidden');
+                document.getElementById('profileScreen').classList.add('hidden');
+                document.getElementById('authScreen').classList.remove('hidden');
+            }
+        });
+
+        // Logic xử lý đăng ký mượt mà hơn
+window.register = () => {
+    const e = document.getElementById('email').value, p = document.getElementById('password').value;
+    if(!e || !p) return showPopup('warning', 'Ối!', 'Điền email và mật khẩu để mình tạo nhà cho bạn nhé.');
+    
+    createUserWithEmailAndPassword(auth, e, p)
+    .then(() => {
+        showPopup('success', 'Chào mừng bạn!', 'Tài khoản đã sẵn sàng, hãy cho mình biết biệt danh của bạn nhé.');
+    })
+    .catch(err => {
+        if(err.code === 'auth/email-already-in-use') {
+            showPopup('warning', 'Tài khoản đã tồn tại', 'Email này đã có trong hệ thống SnapEnglish của bạn rồi. Bạn chỉ cần bấm "Đăng Nhập" là được nhé!');
+        } else {
+            showPopup('error', 'Lỗi đăng ký', 'Mật khẩu cần ít nhất 6 ký tự hoặc email không hợp lệ bạn ơi.');
+        }
+    });
+}
+        
+        window.login = () => {
+            const e = document.getElementById('email').value, p = document.getElementById('password').value;
+            if(!e || !p) return showPopup('warning', 'Ối!', 'Nhập email và mật khẩu để vào phòng nhé.');
+            signInWithEmailAndPassword(auth, e, p).catch(err => showPopup('error', 'Sai thông tin', 'Email hoặc mật khẩu chưa đúng đâu bạn ơi.'));
+        }
+        
+        window.confirmLogout = () => {
+            showPopup('warning', 'Tạm biệt', 'Bạn muốn khóa tủ nhật ký và thoát ra?', () => signOut(auth));
+        }
+
+        let profileAvatarBase64 = null;
+        window.previewAvatar = (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                profileAvatarBase64 = e.target.result;
+                document.getElementById('avatarPreview').src = profileAvatarBase64;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        window.saveProfile = async () => {
+            const name = document.getElementById('userName').value;
+            if(!name) return showPopup('warning', 'Chưa có tên', 'Cho mình biết bạn tên gì nhé!');
+            
+            showPopup('loading', 'Đang thiết lập...', 'Đợi chút xíu để mình xây nhà cho bạn nha...');
+
+            let avatarUrl = "https://via.placeholder.com/150";
+            if (profileAvatarBase64) {
+                const uploadedUrl = await uploadImageToImgBB(profileAvatarBase64);
+                if(uploadedUrl) avatarUrl = uploadedUrl;
+            }
+
+            // Lưu merge: true để không mất dữ liệu cũ nếu dùng chung DB
+            await setDoc(doc(db, "users", currentUser.uid), {
+                name: name, avatar: avatarUrl, streak: 0, lastPostDate: null
+            }, { merge: true });
+            
+            closePopup();
+            document.getElementById('profileScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.remove('hidden');
+            loadUserProfile({name, avatar: avatarUrl, streak: 0});
+            loadEntries();
+        }
+
+        function loadUserProfile(data) {
+            document.getElementById('headerName').innerText = data.name;
+            document.getElementById('headerAvatar').src = data.avatar || 'https://via.placeholder.com/150';
+            document.getElementById('streakCount').innerText = data.streak || 0;
+            
+            if(!localStorage.getItem('askedReminder')) {
+                setTimeout(() => {
+                    showPopup('success', 'Mẹo nhỏ cho bạn 🌟', 'Thiết lập báo thức nhắc nhở viết nhật ký mỗi ngày để duy trì chuỗi Locket lửa nhé!', () => {
+                        localStorage.setItem('askedReminder', 'true');
+                    });
+                }, 3000);
+            }
+        }
+
+        window.selectMood = (el) => {
+            document.querySelectorAll('.mood').forEach(m => m.classList.remove('active'));
+            el.classList.add('active');
+            currentMood = el.getAttribute('data-mood');
+        }
+        window.selectFrame = (el) => {
+            document.querySelectorAll('.frame-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            currentFrame = el.getAttribute('data-frame');
+            const previewImg = document.getElementById('postImgPreview');
+            previewImg.className = currentFrame; 
+        }
+
+        window.previewPostImage = (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                base64ImageToUpload = e.target.result;
+                document.getElementById('postImgPreview').src = base64ImageToUpload;
+                document.getElementById('postImgPreview').style.display = 'block';
+                document.getElementById('removeImgBtn').style.display = 'flex';
+                document.getElementById('frameSelector').style.display = 'flex';
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        window.removeImage = () => {
+            base64ImageToUpload = null;
+            document.getElementById('postImgPreview').src = '';
+            document.getElementById('postImgPreview').style.display = 'none';
+            document.getElementById('removeImgBtn').style.display = 'none';
+            document.getElementById('frameSelector').style.display = 'none';
+            document.getElementById('postImageInput').value = '';
+        }
+
+        const pastelColors = ['#fff5f5', '#f8f4ff', '#f0fbf0', '#fffcf0', '#f0f8ff', '#fdfbfb'];
+
+        window.savePost = async () => {
+            const content = document.getElementById('postContent').value;
+            if(!content.trim() && !base64ImageToUpload) return showPopup('warning', 'Chưa có gì', 'Bạn viết một chút gì đó hoặc up 1 bức ảnh nhé!');
+
+            document.querySelector('.post-area .btn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải lên...';
+            document.querySelector('.post-area .btn').disabled = true;
+
+            let imageUrl = null;
+            if(base64ImageToUpload) {
+                imageUrl = await uploadImageToImgBB(base64ImageToUpload);
+                if(!imageUrl) {
+                    showPopup('error', 'Lỗi', 'Không thể tải ảnh lên, bạn thử lại nhé!');
+                    document.querySelector('.post-area .btn').innerHTML = '<i class="fas fa-paper-plane"></i> Lưu Nhật Ký';
+                    document.querySelector('.post-area .btn').disabled = false;
+                    return;
+                }
+            }
+
+            const now = new Date();
+            const todayStr = now.toISOString().split('T')[0];
+            
+            const userRef = doc(db, "users", currentUser.uid);
+            const userSnap = await getDoc(userRef);
+            let currentStreak = userSnap.data().streak || 0;
+            let lastPostDate = userSnap.data().lastPostDate;
+
+            if (lastPostDate !== todayStr) {
+                let yesterday = new Date(now);
+                yesterday.setDate(now.getDate() - 1);
+                const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+                if (lastPostDate === yesterdayStr) {
+                    currentStreak += 1;
+                } else {
+                    currentStreak = 1;
+                }
+                await setDoc(userRef, { streak: currentStreak, lastPostDate: todayStr }, { merge: true });
+                document.getElementById('streakCount').innerText = currentStreak;
+            }
+
+            const color = pastelColors[Math.floor(Math.random() * pastelColors.length)];
+            await addDoc(collection(db, `users/${currentUser.uid}/entries`), {
+                content: content,
+                mood: currentMood,
+                imageUrl: imageUrl,
+                imageFrame: currentFrame,
+                bgColor: color,
+                createdAt: serverTimestamp(),
+                timestamp: Date.now()
+            });
+
+            document.getElementById('postContent').value = '';
+            removeImage();
+            document.querySelector('.post-area .btn').innerHTML = '<i class="fas fa-paper-plane"></i> Lưu Nhật Ký';
+            document.querySelector('.post-area .btn').disabled = false;
+        }
+
+        function loadEntries() {
+            const q = query(collection(db, `users/${currentUser.uid}/entries`), orderBy("createdAt", "desc"));
+            onSnapshot(q, (snapshot) => {
+                const feed = document.getElementById('diaryFeed');
+                feed.innerHTML = '';
+                allEntries = [];
+
+                if(snapshot.empty) {
+                    feed.innerHTML = '<div style="text-align:center; color:#999; padding: 30px; font-weight:600;">Bạn chưa có trang nhật ký nào. Bắt đầu ngay hôm nay nhé! 🌱</div>';
+                    return;
+                }
+
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    allEntries.push(data);
+                    const id = docSnap.id;
+                    const date = data.createdAt ? new Date(data.createdAt.toDate()).toLocaleString('vi-VN') : 'Vừa xong...';
+                    
+                    let imgHTML = '';
+                    if(data.imageUrl) {
+                        imgHTML = `<img src="${data.imageUrl}" class="entry-image ${data.imageFrame}">`;
+                    }
+
+                    feed.innerHTML += `
+                        <div class="entry-card" style="background: ${data.bgColor}">
+                            <div class="entry-header">
+                                <span style="display: flex; align-items: center; gap: 10px;"><span style="font-size:28px">${data.mood}</span> ${date}</span>
+                                <div class="entry-actions">
+                                    <i class="fas fa-trash-alt" onclick="confirmDelete('${id}')"></i>
+                                </div>
+                            </div>
+                            <div class="entry-content">${data.content}</div>
+                            ${imgHTML}
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        window.confirmDelete = (id) => {
+            showPopup('warning', 'Xóa ký ức?', 'Bạn có chắc chắn muốn xóa trang nhật ký này không? Sẽ không lấy lại được đâu nha!', async () => {
+                await deleteDoc(doc(db, `users/${currentUser.uid}/entries`, id));
+            });
+        }
+
+        let currentStream;
+        let useFrontCamera = true;
+        const video = document.getElementById('videoElement');
+        const canvas = document.getElementById('canvasElement');
+
+        window.openCamera = async () => {
+            document.getElementById('cameraContainer').classList.remove('hidden');
+            startCamera();
+        }
+        
+        async function startCamera() {
+            if (currentStream) { currentStream.getTracks().forEach(t => t.stop()); }
+            const constraints = { video: { facingMode: useFrontCamera ? "user" : "environment" } };
+            try {
+                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = currentStream;
+            } catch (err) {
+                closeCamera();
+                showPopup('error', 'Lỗi Camera', 'Không thể truy cập camera. Vui lòng cấp quyền nhé!');
+            }
+        }
+
+        window.switchCamera = () => { useFrontCamera = !useFrontCamera; startCamera(); }
+
+        window.takeSnapshot = () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            base64ImageToUpload = canvas.toDataURL('image/jpeg');
+            
+            document.getElementById('postImgPreview').src = base64ImageToUpload;
+            document.getElementById('postImgPreview').style.display = 'block';
+            document.getElementById('removeImgBtn').style.display = 'flex';
+            document.getElementById('frameSelector').style.display = 'flex';
+            
+            closeCamera();
+        }
+
+        window.closeCamera = () => {
+            if (currentStream) { currentStream.getTracks().forEach(t => t.stop()); }
+            document.getElementById('cameraContainer').classList.add('hidden');
+        }
+
+        window.showStats = () => {
+            const now = new Date();
+            let countWeek = 0, countMonth = 0, countYear = 0;
+
+            allEntries.forEach(entry => {
+                if(!entry.timestamp) return;
+                const d = new Date(entry.timestamp);
+                if (d.getFullYear() === now.getFullYear()) {
+                    countYear++;
+                    if (d.getMonth() === now.getMonth()) countMonth++;
+                }
+                const diffTime = Math.abs(now - d);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                if (diffDays <= 7) countWeek++;
+            });
+
+            // SỬA LỖI MẤT NỘI DUNG THỐNG KÊ (Truyền cờ isHTML = true)
+            const statsHTML = `
+                <div class="stats-grid">
+                    <div class="stat-item" style="background: #ffeaa7;">Tuần này<span>${countWeek}</span></div>
+                    <div class="stat-item" style="background: #81ecec;">Tháng này<span>${countMonth}</span></div>
+                    <div class="stat-item" style="background: #fab1a0;">Năm nay<span>${countYear}</span></div>
+                </div>
+                <div style="margin-top:20px; font-size:15px; color:#2d3436;">Bạn đã viết tổng cộng <b style="color:var(--primary); font-size: 18px;">${allEntries.length}</b> trang.<br>Tuyệt vời lắm! 🥰</div>
+            `;
+            
+            showPopup('success', 'Thống Kê Của Bạn', statsHTML, null, true);
+        }
+    </script>
+</body>
+</html>
