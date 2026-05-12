@@ -490,11 +490,11 @@
 
     window.onload = () => {
         loadVoices();
-        let count = localStorage.getItem('part1_test2_count') || 0;
+        let count = localStorage.getItem('part1_test2_2018_count') || 0;
         document.getElementById('study-count').innerText = count;
         document.getElementById('total-sentences').innerText = lessonData.length;
         
-        let savedIndex = parseInt(localStorage.getItem('part1_test2_progress'));
+        let savedIndex = parseInt(localStorage.getItem('part1_test2_2018_progress'));
         if (!isNaN(savedIndex) && savedIndex < lessonData.length) {
             window.currentIndex = savedIndex;
         }
@@ -785,7 +785,7 @@
     msgBox.innerHTML = "";
     
  
-    localStorage.setItem('part1_test2_progress', window.currentIndex); 
+    localStorage.setItem('part1_test2_2018_progress', window.currentIndex); 
     if(window.saveProgressToCloud) window.saveProgressToCloud(window.currentIndex); 
     
     updateUI();
@@ -800,11 +800,11 @@
         
         if (window.currentIndex === lessonData.length) {
             // Lưu Local và Cloud cho câu cuối cùng
-            localStorage.setItem('part1_test2_progress', window.currentIndex);
+            localStorage.setItem('part1_test2_2018_progress', window.currentIndex);
             if(window.saveProgressToCloud) window.saveProgressToCloud(window.currentIndex);
             updateUI(); // Dừng lại show 100%
         } else if (window.currentIndex < lessonData.length) {
-            localStorage.setItem('part1_test2_progress', window.currentIndex);
+            localStorage.setItem('part1_test2_2018_progress', window.currentIndex);
             if(window.saveProgressToCloud) window.saveProgressToCloud(window.currentIndex);
             updateUI();
             playAudio();
@@ -824,13 +824,13 @@
         document.getElementById("end-screen").style.display = "block";
         
         // CỘNG VÀ LƯU SỐ LẦN ĐÃ HỌC (Tiến trình lần 1, 2...)
-        let count = parseInt(localStorage.getItem('part1_test2_count')) || 0;
+        let count = parseInt(localStorage.getItem('part1_test2_2018_count')) || 0;
         count++;
-        localStorage.setItem('part1_test2_count', count);
+        localStorage.setItem('part1_test2_2018_count', count);
         document.getElementById('study-count').innerText = count;
 
         // Reset lại tiến trình câu hỏi về 0 để chuẩn bị cho lần học sau
-        localStorage.removeItem('part1_test2_progress');
+        localStorage.removeItem('part1_test2_2018_progress');
         if(window.saveProgressToCloud) window.saveProgressToCloud(0); 
 
         const transcriptBox = document.getElementById("full-transcript");
@@ -864,7 +864,7 @@
     };
 
     function restartLesson() {
-        localStorage.setItem('part1_test2_progress', 0);
+        localStorage.setItem('part1_test2_2018_progress', 0);
         location.reload();
     }
 </script>
@@ -890,7 +890,7 @@
         if (window.currentUserUid) {
             try {
                 await setDoc(doc(db, "userProgress", window.currentUserUid), {
-                    part1_test2_progress: progressIndex
+                    part1_test2_2018_progress: progressIndex
                 }, { merge: true });
             } catch (e) {
                 console.error("Lỗi khi lưu tiến độ:", e);
@@ -909,7 +909,7 @@
                 const docSnap = await getDoc(docRef);
                 
                 if (docSnap.exists()) {
-                    let cloudProgress = docSnap.data().part1_test2_progress;
+                    let cloudProgress = docSnap.data().part1_test2_2018_progress;
                     if (cloudProgress !== undefined) {
                         // Gắn tiến độ mới và cập nhật giao diện
                         window.currentIndex = cloudProgress; 
