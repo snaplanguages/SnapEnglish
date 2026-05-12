@@ -3007,7 +3007,8 @@ let checkInterval;
 
     function onPlayerStateChange(event) {
       if (event.data == YT.PlayerState.PLAYING) {
-        checkInterval = setInterval(updateHighlight, 200);
+        // TĂNG TỐC ĐỘ QUÉT lên 50ms để bắt thời gian chuẩn xác nhất (thay vì 200ms)
+        checkInterval = setInterval(updateHighlight, 50); 
       } else {
         clearInterval(checkInterval);
       }
@@ -3018,6 +3019,7 @@ let checkInterval;
       const time = player.getCurrentTime();
       let foundLine = -1;
 
+      // 1. Tìm câu đang khớp với thời gian video
       for (let i = 0; i < transcriptData.length; i++) {
         if (time >= transcriptData[i].start && time <= transcriptData[i].end) {
           foundLine = i;
@@ -3025,25 +3027,28 @@ let checkInterval;
         }
       }
 
-      // --- BẮT ĐẦU: LOGIC TỰ ĐỘNG DỪNG VÀ BẬT THU ÂM ---
-      // Nếu đang ở một câu và thời gian video vừa vượt qua thời gian kết thúc của câu đó
-      if (currentLineIndex !== -1 && time >= transcriptData[currentLineIndex].end) {
-        if (!autoPauseTriggered) {
-          autoPauseTriggered = true; // Đánh dấu đã xử lý để không bị lặp liên tục
-          player.pauseVideo();       // 1. Tự động dừng video
+      // 2. LOGIC TỰ ĐỘNG DỪNG VÀ KHÓA CÂU (Sửa lỗi chấm 0%)
+      if (currentLineIndex !== -1 && !autoPauseTriggered) {
+        // Bắt thời điểm sát nút kết thúc câu (trừ hao 0.1 giây để không bị lẹm sang câu sau)
+        if (time >= transcriptData[currentLineIndex].end - 0.1) {
+          autoPauseTriggered = true; // Đánh dấu đã kích hoạt auto-pause
+          player.pauseVideo();       // Dừng video ngay lập tức
+          
+          // CRITICAL FIX: Ép hệ thống giữ nguyên câu hiện tại (không cho nhảy sang câu tiếp theo lúc dừng)
+          foundLine = currentLineIndex; 
 
-          // 2. Delay 300ms để đảm bảo video đã dừng hẳn rồi mới bật Mic
+          // Bật mic thu âm sau 300ms để tránh tạp âm từ video
           setTimeout(() => {
             if (!isRecording) {
-              recordBtn.click(); // Tự động mô phỏng cú click vào nút "Click to Speak"
+              recordBtn.click();
             }
           }, 300);
         }
       }
-      // --- KẾT THÚC: LOGIC TỰ ĐỘNG ---
 
+      // 3. LOGIC ĐỔI MÀU VÀ CHUYỂN CÂU MỚI
       if (foundLine !== -1 && currentLineIndex !== foundLine) {
-        autoPauseTriggered = false; // Reset lại biến khi video nhảy sang một câu hoàn toàn mới
+        autoPauseTriggered = false; // Reset lại biến khi video nhảy sang một câu mới hoàn toàn
 
         if (currentLineIndex !== -1) {
           document.getElementById('line-' + currentLineIndex).classList.remove('active');
@@ -3051,13 +3056,14 @@ let checkInterval;
         const activeLine = document.getElementById('line-' + foundLine);
         activeLine.classList.add('active');
        
-        // Căn lề mượt mà, phân biệt theo kích thước màn hình
+        // Căn lề mượt mà
         if (window.innerWidth <= 992) {
           activeLine.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else {
           activeLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-        currentLineIndex = foundLine;
+        
+        currentLineIndex = foundLine; // Cập nhật câu hiện tại
       }
     }
 
