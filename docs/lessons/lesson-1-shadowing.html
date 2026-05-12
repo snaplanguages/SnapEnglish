@@ -2977,8 +2977,9 @@ Tạm biệt.
       div.appendChild(enDiv);
       div.appendChild(viDiv);
 
-      div.onclick = () => {
+     div.onclick = () => {
         if(player && player.seekTo && line.start !== null) {
+          autoPauseTriggered = false; // Reset trạng thái tự động dừng
           player.seekTo(line.start, true);
           player.playVideo();
         }
@@ -3000,9 +3001,9 @@ Tạm biệt.
         }
       });
     }
-
-    let checkInterval;
+let checkInterval;
     let currentLineIndex = -1;
+    let autoPauseTriggered = false; // Thêm biến theo dõi trạng thái tự động
 
     function onPlayerStateChange(event) {
       if (event.data == YT.PlayerState.PLAYING) {
@@ -3024,7 +3025,26 @@ Tạm biệt.
         }
       }
 
+      // --- BẮT ĐẦU: LOGIC TỰ ĐỘNG DỪNG VÀ BẬT THU ÂM ---
+      // Nếu đang ở một câu và thời gian video vừa vượt qua thời gian kết thúc của câu đó
+      if (currentLineIndex !== -1 && time >= transcriptData[currentLineIndex].end) {
+        if (!autoPauseTriggered) {
+          autoPauseTriggered = true; // Đánh dấu đã xử lý để không bị lặp liên tục
+          player.pauseVideo();       // 1. Tự động dừng video
+
+          // 2. Delay 300ms để đảm bảo video đã dừng hẳn rồi mới bật Mic
+          setTimeout(() => {
+            if (!isRecording) {
+              recordBtn.click(); // Tự động mô phỏng cú click vào nút "Click to Speak"
+            }
+          }, 300);
+        }
+      }
+      // --- KẾT THÚC: LOGIC TỰ ĐỘNG ---
+
       if (foundLine !== -1 && currentLineIndex !== foundLine) {
+        autoPauseTriggered = false; // Reset lại biến khi video nhảy sang một câu hoàn toàn mới
+
         if (currentLineIndex !== -1) {
           document.getElementById('line-' + currentLineIndex).classList.remove('active');
         }
@@ -3033,10 +3053,8 @@ Tạm biệt.
        
         // Căn lề mượt mà, phân biệt theo kích thước màn hình
         if (window.innerWidth <= 992) {
-          // Trên điện thoại: Cuộn dòng chữ lên sát mí trên cùng (start)
           activeLine.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else {
-          // Trên máy tính: Vẫn giữ nguyên cuộn ra giữa màn hình (center)
           activeLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
         currentLineIndex = foundLine;
