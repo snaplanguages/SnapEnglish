@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <title>Bài Tập: Số Đếm và Số Thứ Tự (数字)</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --pastel-pink: #FFF0F5;
+            --pastel-blue: #E0F7FA;
+            --pastel-green: #E8F5E9;
+            --pastel-yellow: #FFF9C4;
+            --pastel-peach: #FFE5B4;
+            --text-main: #4A4A4A;
+            --text-highlight: #D81B60;
+            --accent-color: #FF9AA2;
+            --brand-pink: #FF69B4;
+        }
+
+        body {
+            margin: 0;
+            padding: 60px 0 0 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #faf8f5;
+            color: var(--text-main);
+        }
+
+        /* Brand SnapChinese cố định */
+        .brand-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--pastel-pink);
+            border-bottom: 3px solid var(--text-highlight);
+            padding: 10px 0;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(216, 27, 96, 0.2);
+        }
+
+        .brand-header span {
+            display: inline-block;
+            border: 2px dashed var(--text-highlight);
+            padding: 5px 20px;
+            background-color: white;
+            color: var(--text-highlight);
+            font-weight: bold;
+            font-size: 1.5em;
+            border-radius: 8px;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto 40px auto; 
+            background-color: #ffffff;
+            border-radius: 24px;
+            padding: 30px 40px; 
+            box-shadow: 0 10px 30px rgba(255, 154, 162, 0.15);
+            line-height: 1.8;
+            position: relative;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-highlight);
+            font-size: 2.2em;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+
+        .question-block {
+            background-color: #fff;
+            border: 2px solid var(--pastel-pink);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+            transition: box-shadow 0.3s;
+        }
+
+        .question-block:hover {
+            box-shadow: 0 5px 15px rgba(255, 154, 162, 0.2);
+        }
+
+        .question-block h3 {
+            color: #C06C84;
+            margin-top: 0;
+            font-size: 1.3em;
+            border-bottom: 1px dashed #FFB7B2;
+            padding-bottom: 10px;
+        }
+
+        .option-label {
+            display: block;
+            background-color: var(--pastel-pink);
+            padding: 12px 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.1em;
+            border-left: 5px solid transparent;
+        }
+
+        .option-label:hover {
+            background-color: var(--pastel-peach);
+        }
+
+        .option-label input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        /* Trạng thái sau khi nộp bài */
+        .option-label.correct {
+            background-color: #E8F5E9;
+            border-left: 5px solid #4CAF50;
+            color: #2E7D32;
+            font-weight: bold;
+        }
+
+        .option-label.incorrect {
+            background-color: #FFEBEE;
+            border-left: 5px solid #F44336;
+            color: #C62828;
+        }
+
+        .explanation {
+            display: none;
+            background-color: var(--pastel-blue);
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            border-left: 5px solid #80DEEA;
+            font-size: 0.95em;
+        }
+
+        .explanation strong {
+            color: #00838F;
+        }
+
+        /* Nút Submit */
+        .btn-practice {
+            display: block;
+            width: fit-content;
+            margin: 30px auto 10px auto;
+            padding: 15px 50px;
+            background: linear-gradient(135deg, #FF9AA2, #FFB7B2);
+            color: white;
+            text-decoration: none;
+            font-size: 1.3em;
+            font-weight: bold;
+            border-radius: 50px;
+            box-shadow: 0 6px 15px rgba(255, 154, 162, 0.4);
+            transition: all 0.3s ease;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-practice:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 154, 162, 0.6);
+            color: white;
+        }
+
+        .btn-practice:disabled {
+            background: #ccc;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+
+        #result-display {
+            display: none;
+            text-align: center;
+            background: linear-gradient(135deg, #FFF9C4, #FFE082);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            font-size: 1.5em;
+            color: #E65100;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(255, 213, 79, 0.2);
+        }
+
+        .text-chinese {
+            color: var(--text-highlight);
+            font-weight: bold;
+        }
+
+        /* Lớp ẩn trích dẫn để không hiển thị ra màn hình */
+        .cite-hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="brand-header">
+        <span>SnapChinese</span>
+    </div>
+
+    <div class="container">
+        <h1>Bài Tập Luyện Tập</h1>
+        <div class="subtitle">Ngữ pháp: Số Đếm và Số Thứ Tự</div>
+
+        <div id="result-display"></div>
+
+        <form id="quizForm">
+            <div class="question-block" id="q1-block">
+                <h3>Câu 1: 这里有 五百零一 个人。(Zhè li yǒu ___ gè rén.) <span class="cite-hidden">[cite: 111]</span></h3>
+                <label class="option-label" id="lbl-q1-A">
+                    <input type="radio" name="q1" value="A" data-correct="true"> A. wǔbǎi líng yī <span class="cite-hidden">[cite: 112]</span>
+                </label>
+                <label class="option-label" id="lbl-q1-B">
+                    <input type="radio" name="q1" value="B"> B. liù qiān yī <span class="cite-hidden">[cite: 113]</span>
+                </label>
+                <label class="option-label" id="lbl-q1-C">
+                    <input type="radio" name="q1" value="C"> C. bā bǎi líng yī <span class="cite-hidden">[cite: 114]</span>
+                </label>
+                <label class="option-label" id="lbl-q1-D">
+                    <input type="radio" name="q1" value="D"> D. jiǔ wàn líng yī <span class="cite-hidden">[cite: 115]</span>
+                </label>
+                <div class="explanation" id="expl-q1">
+                    <span class="cite-hidden"></span>
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - <span class="text-chinese">这里有五百零一个人。</span> (Ở đây có 501 người.) <span class="cite-hidden">[cite: 117]</span><br>
+                    - Cách phát âm của "五百零一" (501) là "wǔbǎi líng yī", vì vậy đáp án A đúng. <span class="cite-hidden">[cite: 118]</span><br>
+                    - "liù qiān yī" là "六千一" (6001), "bā bǎi líng yī" là "八百零一" (801) và "jiǔ wàn líng yī" là "九万零一" (90001), do đó B, C và D đều sai. <span class="cite-hidden">[cite: 119]</span>
+                </div>
+            </div>
+
+            <div class="question-block" id="q2-block">
+                <h3>Câu 2: 这家公司有 96 个中国人。(Zhè jiā gōngsī yǒu ___ gè Zhōngguó rén.) <span class="cite-hidden">[cite: 120]</span></h3>
+                <label class="option-label" id="lbl-q2-A">
+                    <input type="radio" name="q2" value="A"> A. jiǔ liù <span class="cite-hidden">[cite: 121]</span>
+                </label>
+                <label class="option-label" id="lbl-q2-B">
+                    <input type="radio" name="q2" value="B" data-correct="true"> B. jiǔshí liù <span class="cite-hidden">[cite: 122]</span>
+                </label>
+                <label class="option-label" id="lbl-q2-C">
+                    <input type="radio" name="q2" value="C"> C. wǔshí jiǔ <span class="cite-hidden">[cite: 123]</span>
+                </label>
+                <label class="option-label" id="lbl-q2-D">
+                    <input type="radio" name="q2" value="D"> D. jiǔshí sì <span class="cite-hidden">[cite: 124]</span>
+                </label>
+                <div class="explanation" id="expl-q2">
+                    <span class="cite-hidden"></span>
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - <span class="text-chinese">这家公司有96个中国人。</span> (Công ty này có 96 người Trung Quốc.) <span class="cite-hidden">[cite: 126]</span><br>
+                    - "96" đọc là "jiǔshí liù" (九十六), không phải "jiǔ liù", vì vậy B đúng còn A sai. <span class="cite-hidden">[cite: 127]</span><br>
+                    - "wǔshí jiǔ" là "59" (五十九) và "jiǔshí sì" là "94" (九十四), do đó C và D không chính xác. <span class="cite-hidden">[cite: 128]</span>
+                </div>
+            </div>
+
+            <div class="question-block" id="q3-block">
+                <h3>Câu 3: 他是 ___ 个进来的人。（Tā shì ___ ge jìnlái de rén.) <span class="cite-hidden">[cite: 129]</span></h3>
+                <label class="option-label" id="lbl-q3-A">
+                    <input type="radio" name="q3" value="A" data-correct="true"> A. 第三 <span class="cite-hidden">[cite: 130]</span>
+                </label>
+                <label class="option-label" id="lbl-q3-B">
+                    <input type="radio" name="q3" value="B"> B. 五 <span class="cite-hidden">[cite: 131]</span>
+                </label>
+                <label class="option-label" id="lbl-q3-C">
+                    <input type="radio" name="q3" value="C"> C. 七号 <span class="cite-hidden">[cite: 132]</span>
+                </label>
+                <label class="option-label" id="lbl-q3-D">
+                    <input type="radio" name="q3" value="D"> D. 第两 <span class="cite-hidden">[cite: 133]</span>
+                </label>
+                <div class="explanation" id="expl-q3">
+                    <span class="cite-hidden"></span>
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - <span class="text-chinese">他是第三个进来的人。</span> (Anh ấy là người thứ ba bước vào đây.) <span class="cite-hidden">[cite: 135]</span><br>
+                    - "第三" (thứ ba) ở đây nhấn mạnh về trình tự của anh ấy, tạo nên ngữ nghĩa hợp lý cho câu. "他是第三个进来的人" là đúng, trong khi dùng "五" thì câu trở nên vô nghĩa. <span class="cite-hidden">[cite: 136]</span><br>
+                    - "号" và "个" đều đóng vai trò bổ nghĩa (lượng từ), chúng ta không dùng chúng cùng nhau, nên C sai. <span class="cite-hidden">[cite: 137]</span><br>
+                    - Khi dùng số thứ tự, ta dùng "二" thay vì "两", nên D cũng sai. <span class="cite-hidden">[cite: 138]</span>
+                </div>
+            </div>
+
+            <div class="question-block" id="q4-block">
+                <h3>Câu 4: 这有 5903 个苹果。(Zhè yǒu ___ ge píngguǒ.) <span class="cite-hidden">[cite: 139]</span></h3>
+                <label class="option-label" id="lbl-q4-A">
+                    <input type="radio" name="q4" value="A"> A. 五九三 <span class="cite-hidden">[cite: 140]</span>
+                </label>
+                <label class="option-label" id="lbl-q4-B">
+                    <input type="radio" name="q4" value="B"> B. 五十九百零三 <span class="cite-hidden">[cite: 141]</span>
+                </label>
+                <label class="option-label" id="lbl-q4-C">
+                    <input type="radio" name="q4" value="C"> C. 五千九三个 <span class="cite-hidden">[cite: 142]</span>
+                </label>
+                <label class="option-label" id="lbl-q4-D">
+                    <input type="radio" name="q4" value="D" data-correct="true"> D. 五千九百零三 <span class="cite-hidden">[cite: 143]</span>
+                </label>
+                <div class="explanation" id="expl-q4">
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - <span class="text-chinese">这有5903个苹果。</span> (Ở đây có 5903 quả táo.) <span class="cite-hidden">[cite: 145]</span><br>
+                    - "5903" trong tiếng Trung đọc là "五千九百零三" (wǔ qiān jiǔ bǎi líng sān), do đó D là đáp án chính xác. Các đáp án A, B và C đều sai cách đọc. <span class="cite-hidden">[cite: 146]</span>
+                </div>
+            </div>
+
+            <div class="question-block" id="q5-block">
+                <h3>Câu 5: 我的房间在 ___。(Wǒ de fángjiān zài ___.) - Phòng của tôi ở tầng 2.</h3>
+                <label class="option-label" id="lbl-q5-A">
+                    <input type="radio" name="q5" value="A"> A. 两楼
+                </label>
+                <label class="option-label" id="lbl-q5-B">
+                    <input type="radio" name="q5" value="B" data-correct="true"> B. 二楼
+                </label>
+                <label class="option-label" id="lbl-q5-C">
+                    <input type="radio" name="q5" value="C"> C. 第两楼
+                </label>
+                <label class="option-label" id="lbl-q5-D">
+                    <input type="radio" name="q5" value="D"> D. 楼二
+                </label>
+                <div class="explanation" id="expl-q5">
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - Đối với các trường hợp chỉ số thứ tự như tầng/lầu (楼 - lóu), chúng ta bắt buộc sử dụng "二" (èr), không bao giờ dùng "两" (liǎng).<br>
+                    - Vậy "tầng 2" được nói là <span class="text-chinese">二楼</span> (èr lóu).
+                </div>
+            </div>
+
+            <div class="question-block" id="q6-block">
+                <h3>Câu 6: Số 10,001 được đọc trong tiếng Trung là gì?</h3>
+                <label class="option-label" id="lbl-q6-A">
+                    <input type="radio" name="q6" value="A" data-correct="true"> A. 一万零一
+                </label>
+                <label class="option-label" id="lbl-q6-B">
+                    <input type="radio" name="q6" value="B"> B. 一万一
+                </label>
+                <label class="option-label" id="lbl-q6-C">
+                    <input type="radio" name="q6" value="C"> C. 十千零一
+                </label>
+                <label class="option-label" id="lbl-q6-D">
+                    <input type="radio" name="q6" value="D"> D. 一万一百
+                </label>
+                <div class="explanation" id="expl-q6">
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - Trong tiếng Trung, hệ đếm lớn bắt đầu phân cách ở hàng vạn (万 - 10.000).<br>
+                    - Quy tắc đọc số 0: Khi có nhiều số 0 nằm ở giữa, ta chỉ phát âm một chữ "零" (líng) duy nhất.<br>
+                    - Do đó, 10,001 được đọc là <span class="text-chinese">一万零一</span> (yí wàn líng yī).
+                </div>
+            </div>
+
+            <div class="question-block" id="q7-block">
+                <h3>Câu 7: Số 222 đọc chính xác là gì?</h3>
+                <label class="option-label" id="lbl-q7-A">
+                    <input type="radio" name="q7" value="A"> A. 两百两十二
+                </label>
+                <label class="option-label" id="lbl-q7-B">
+                    <input type="radio" name="q7" value="B"> B. 二百二十两
+                </label>
+                <label class="option-label" id="lbl-q7-C">
+                    <input type="radio" name="q7" value="C" data-correct="true"> C. 二百二十二
+                </label>
+                <label class="option-label" id="lbl-q7-D">
+                    <input type="radio" name="q7" value="D"> D. 两百二十两
+                </label>
+                <div class="explanation" id="expl-q7">
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - Ở hàng chục và hàng đơn vị: Bắt buộc dùng <span class="text-chinese">二</span>, tuyệt đối không dùng "两".<br>
+                    - Ở hàng trăm (百): Bạn có thể dùng 二 hay 两 đều được.<br>
+                    - Do đó, 222 đọc là <span class="text-chinese">二百二十二</span> (èr bǎi èr shí èr) hoặc 两百二十二 (liǎng bǎi èr shí èr).
+                </div>
+            </div>
+
+            <div class="question-block" id="q8-block">
+                <h3>Câu 8: Dân số thành phố này là 2,000,000 người (2 triệu người). Con số 2 triệu nói như thế nào?</h3>
+                <label class="option-label" id="lbl-q8-A">
+                    <input type="radio" name="q8" value="A" data-correct="true"> A. 两百万 (liǎng bǎi wàn)
+                </label>
+                <label class="option-label" id="lbl-q8-B">
+                    <input type="radio" name="q8" value="B"> B. 二百万 (èr bǎi wàn)
+                </label>
+                <label class="option-label" id="lbl-q8-C">
+                    <input type="radio" name="q8" value="C"> C. 两万万 (liǎng wàn wàn)
+                </label>
+                <label class="option-label" id="lbl-q8-D">
+                    <input type="radio" name="q8" value="D"> D. 二十万 (èr shí wàn)
+                </label>
+                <div class="explanation" id="expl-q8">
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - 2,000,000 = 200 Vạn.<br>
+                    - Số 200 đọc là 两百 (liǎng bǎi) hoặc 二百 (èr bǎi), nhưng trong cụm đếm số lớn, người bản xứ ưu tiên dùng 两 nhiều hơn.<br>
+                    - Vậy 2 triệu thường được nói là <span class="text-chinese">两百万</span> (liǎng bǎi wàn).
+                </div>
+            </div>
+
+            <div class="question-block" id="q9-block">
+                <h3>Câu 9: 这是我 ___ 次来中国。(Zhè shì wǒ ___ cì lái Zhōngguó.) - Đây là lần đầu tiên tôi đến Trung Quốc.</h3>
+                <label class="option-label" id="lbl-q9-A">
+                    <input type="radio" name="q9" value="A"> A. 一
+                </label>
+                <label class="option-label" id="lbl-q9-B">
+                    <input type="radio" name="q9" value="B" data-correct="true"> B. 第一
+                </label>
+                <label class="option-label" id="lbl-q9-C">
+                    <input type="radio" name="q9" value="C"> C. 第一个
+                </label>
+                <label class="option-label" id="lbl-q9-D">
+                    <input type="radio" name="q9" value="D"> D. 号一
+                </label>
+                <div class="explanation" id="expl-q9">
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - Để tạo thành số thứ tự, chúng ta thêm chữ "第" (dì) trước số đếm. "Lần đầu tiên" là <span class="text-chinese">第一次</span> (dì yī cì).<br>
+                    - Chữ 次 (cì) ở đây đóng vai trò là lượng từ chỉ số lần, nên không cần thêm lượng từ 个 (gè) vào nữa.
+                </div>
+            </div>
+
+            <div class="question-block" id="q10-block">
+                <h3>Câu 10: Số 一千零二十 (yī qiān líng èr shí) tương đương với con số nào?</h3>
+                <label class="option-label" id="lbl-q10-A">
+                    <input type="radio" name="q10" value="A"> A. 1200
+                </label>
+                <label class="option-label" id="lbl-q10-B">
+                    <input type="radio" name="q10" value="B" data-correct="true"> B. 1020
+                </label>
+                <label class="option-label" id="lbl-q10-C">
+                    <input type="radio" name="q10" value="C"> C. 1002
+                </label>
+                <label class="option-label" id="lbl-q10-D">
+                    <input type="radio" name="q10" value="D"> D. 120
+                </label>
+                <div class="explanation" id="expl-q10">
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - 一千 (1000) 零 (lẻ) 二十 (20). Ghép lại ta có số 1020.<br>
+                    - Phân biệt với các đáp án khác: 1200 là 一千二 (yī qiān èr), 1002 là 一千零二 (yī qiān líng èr), và 120 là 一百二 (yī bǎi èr).
+                </div>
+            </div>
+
+            <button type="button" id="submitBtn" class="btn-practice" onclick="submitQuiz()">
+                ✅ Nộp Bài & Xem Điểm
+            </button>
+            
+            <a href="javascript:location.reload()" id="retryBtn" class="btn-practice" style="display: none; background: linear-gradient(135deg, #81C784, #AED581);">
+                🔄 Làm Lại Từ Đầu
+            </a>
+            
+        </form>
+
+    </div>
+
+    <script>
+        function submitQuiz() {
+            let score = 0;
+            const totalQuestions = 10;
+            let allAnswered = true;
+
+            // Kiểm tra xem đã làm hết chưa
+            for (let i = 1; i <= totalQuestions; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (!selected) {
+                    allAnswered = false;
+                    break;
+                }
+            }
+
+            if (!allAnswered) {
+                alert("Vui lòng trả lời tất cả các câu hỏi trước khi nộp bài nhé!");
+                return;
+            }
+
+            // Chấm điểm & Hiển thị kết quả
+            for (let i = 1; i <= totalQuestions; i++) {
+                const options = document.querySelectorAll(`input[name="q${i}"]`);
+                const expl = document.getElementById(`expl-q${i}`);
+                
+                options.forEach(opt => {
+                    opt.disabled = true; // Khóa không cho chọn lại
+                    const label = document.getElementById(`lbl-q${i}-${opt.value}`);
+                    
+                    // Highlight đáp án đúng
+                    if (opt.getAttribute("data-correct") === "true") {
+                        label.classList.add("correct");
+                        // Nếu user chọn đúng
+                        if (opt.checked) {
+                            score++;
+                        }
+                    } 
+                    // Highlight đáp án sai nếu user lỡ chọn
+                    else if (opt.checked) {
+                        label.classList.add("incorrect");
+                    }
+                });
+
+                // Hiện giải thích
+                expl.style.display = "block";
+            }
+
+            // Báo điểm
+            const resultBox = document.getElementById("result-display");
+            resultBox.innerHTML = `🎉 Tuyệt vời! Bạn làm đúng ${score} / ${totalQuestions} câu.`;
+            resultBox.style.display = "block";
+
+            // Đổi nút bấm
+            document.getElementById("submitBtn").style.display = "none";
+            document.getElementById("retryBtn").style.display = "block";
+            
+            // Cuộn lên xem điểm
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+
+</body>
+</html>
