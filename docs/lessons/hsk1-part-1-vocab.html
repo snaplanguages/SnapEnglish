@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>HSK1 (3.0) Phần 1 - SnapChinese</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Bảng màu Hồng Pastel của SnapChinese */
+            --theme-color: #f48fb1; /* Hồng pastel chính */
+            --theme-dark: #c2185b;  /* Hồng đậm (cho viền/chữ nổi bật) */
+            --theme-bg: #fce4ec;    /* Hồng nền rất nhạt */
+            --theme-accent: #d81b60; /* Hồng nhấn mạnh */
+            --theme-light: #f8bbd0; /* Hồng sáng */
+            --shadow: 0 8px 25px rgba(194, 24, 91, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Quicksand', sans-serif;
+            background: var(--theme-bg);
+            /* Đơn giản hóa background thành dải màu pastel mềm mại */
+            background-image: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 100%);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+        }
+
+        #leaves-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .leaf {
+            position: absolute;
+            top: -10%;
+            pointer-events: none;
+            user-select: none;
+            animation: fall linear infinite, sway ease-in-out infinite alternate;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+        @keyframes fall {
+            0% { top: -10%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 110%; opacity: 0; }
+        }
+        @keyframes sway {
+            0% { transform: translateX(0px) rotate(0deg); }
+            100% { transform: translateX(40px) rotate(45deg); }
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--theme-color);
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-small {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--theme-dark);
+            text-decoration: none;
+        }
+        .nav-right {
+            display: flex;
+            gap: 8px;
+        }
+        .nav-btn {
+            background: #fff;
+            border: 1.5px solid var(--theme-color);
+            color: var(--theme-dark);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .nav-btn:hover {
+            background: var(--theme-color);
+            color: #fff;
+        }
+
+        .game-header {
+            padding: 15px 15px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 50;
+            flex-shrink: 0;
+        }
+        .top-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .title-dropdown {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .title-area {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid var(--theme-color);
+            padding: 8px 16px;
+            border-radius: 18px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .title-area:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+            border-color: var(--theme-dark);
+        }
+        .title-area h1 {
+            margin: 0;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.25rem;
+            color: var(--theme-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .title-area span.arrow {
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            background-color: white;
+            min-width: 220px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            z-index: 1000;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #eee;
+            animation: slideDown 0.3s ease-out;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .dropdown-content.show {
+            display: block;
+        }
+        .dropdown-content a {
+            color: #444;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border-bottom: 1px solid #f5f5f5;
+            transition: 0.2s;
+        }
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+        .dropdown-content a:hover {
+            background-color: #fff0f3;
+            color: var(--theme-dark);
+            padding-left: 22px;
+        }
+        .dropdown-content a.active {
+            background-color: var(--theme-color);
+            color: white;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .btn-action {
+            padding: 8px 14px;
+            border-radius: 12px;
+            border: none;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .btn-view {
+            background: #fff0f3;
+            color: #555;
+            border: 1px solid #ddd;
+        }
+        .btn-view.active {
+            background: var(--theme-color);
+            color: white;
+            border-color: var(--theme-light);
+        }
+        .btn-filter {
+            background: #fff0f3;
+            color: #d6336c;
+            border: 1px solid #ffc1cc;
+        }
+        .btn-filter.active {
+            background: #d6336c;
+            color: white;
+        }
+        .btn-reset {
+            background: #fff5f0;
+            color: #e17055;
+            border: 1px solid #ffccbc;
+        }
+
+        .progress-section {
+            position: relative;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .progress-container {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            height: 14px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid rgba(244, 143, 177, 0.4);
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(90deg, var(--theme-light), var(--theme-color), var(--theme-light));
+            background-size: 200% 100%;
+            animation: gradientMove 2s linear infinite;
+            position: relative;
+        }
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background-image: linear-gradient(
+                -45deg,
+                rgba(255,255,255,0.2) 25%, transparent 25%, transparent 50%,
+                rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.2) 75%, transparent 75%, transparent
+            );
+            background-size: 20px 20px;
+            animation: stripeMove 1s linear infinite;
+        }
+        @keyframes gradientMove {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+        @keyframes stripeMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 0; }
+        }
+        .progress-text {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--theme-dark);
+            text-shadow: 1px 1px 0px white;
+            white-space: nowrap;
+        }
+        .mistake-badge {
+            background: #ffebee;
+            color: #c62828;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            border: 1px solid #ffcdd2;
+            white-space: nowrap;
+        }
+
+        .table-area {
+            flex: 1;
+            overflow: auto;
+            width: 100%;
+            padding: 0 20px 20px;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+        .table-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: auto;
+            width: 100%;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        th {
+            background: rgba(194, 24, 91, 0.85); /* Tone hồng nhạt hơn chút cho mượt */
+            color: white;
+            padding: 12px 8px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.95rem;
+            text-align: left;
+            letter-spacing: 0.5px;
+        }
+        td {
+            padding: 12px 8px;
+            border-bottom: 1px solid rgba(244, 143, 177, 0.25);
+            vertical-align: middle;
+        }
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .col-hz {
+            font-family: 'KaiTi', 'STKaiti', serif;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #d6336c;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .col-py {
+            color: var(--theme-accent);
+            font-weight: 700;
+            font-size: 1.1rem;
+            white-space: nowrap;
+        }
+        .col-vi {
+            font-weight: 700;
+            color: #333;
+            font-size: 1rem;
+            white-space: normal;
+            word-break: break-word;
+        }
+        .col-ex-vi {
+            font-size: 0.95rem;
+            color: #444;
+            font-weight: 600;
+            line-height: 1.5;
+            word-break: break-word;
+            min-width: 160px;
+        }
+
+        .game-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.2s;
+            background: rgba(255,255,255,0.9);
+            box-sizing: border-box;
+        }
+        .inp-hz {
+            font-family: 'KaiTi', 'STKaiti', serif;
+            font-size: 1.4rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 8px 5px;
+        }
+        .game-input:focus {
+            border-color: var(--theme-color);
+            box-shadow: 0 0 0 3px rgba(244, 143, 177, 0.2);
+            background: #fff;
+        }
+        .game-input.correct {
+            background: var(--theme-color) !important;
+            color: white !important;
+            border-color: var(--theme-dark) !important;
+            font-weight: bold;
+        }
+        .game-input.wrong {
+            background: #ffebee !important;
+            color: #c62828 !important;
+            border-color: #e53935 !important;
+            animation: shake 0.3s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+
+        .hint-btn {
+            background: var(--theme-accent);
+            color: white;
+            border: none;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .hint-btn:hover {
+            background: #ad1457;
+        }
+        .hint-text {
+            display: none;
+            margin-top: 6px;
+            font-size: 0.9rem;
+            color: #856404;
+            background: #fff3cd;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: 'KaiTi', serif;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .hint-text.show {
+            display: block;
+        }
+        .blur {
+            filter: blur(5px);
+            opacity: 0.6;
+            transition: 0.2s;
+        }
+        .blur:hover {
+            filter: blur(0);
+            opacity: 1;
+        }
+        .hidden-row {
+            display: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.4);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--theme-color);
+            border-radius: 10px;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            border: 4px solid var(--theme-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .btn-next {
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            font-family: 'Nunito';
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 5px 10px;
+            }
+            .nav-btn span {
+                display: none;
+            }
+            .title-area h1 {
+                font-size: 0.95rem;
+            }
+            .dropdown-content {
+                min-width: 180px;
+            }
+            .btn-action {
+                padding: 6px 10px;
+                font-size: 0.75rem;
+            }
+            .table-area {
+                padding: 0 10px 15px;
+            }
+            .progress-text {
+                font-size: 0.7rem;
+            }
+            .mistake-badge {
+                font-size: 0.7rem;
+                padding: 3px 8px;
+            }
+            .col-hz {
+                font-size: 1.4rem;
+            }
+            .col-py, .col-vi {
+                font-size: 0.9rem;
+            }
+            .game-input {
+                padding: 6px 8px;
+                font-size: 0.85rem;
+            }
+            .inp-hz {
+                font-size: 1.2rem;
+            }
+            .hint-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+            }
+            th {
+                font-size: 0.8rem;
+                padding: 8px 4px;
+            }
+            td {
+                padding: 8px 4px;
+            }
+        }
+
+        .flex-input-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+        }
+        .flex-input-group .game-input {
+            flex: 1;
+            min-width: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div id="leaves-container"></div>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="index.html" class="logo-small">🌸 SnapChinese</a>
+    </div>
+    <div class="nav-right">
+        <a href="index.html" class="nav-btn">🏠 <span>Trang chủ</span></a>
+    </div>
+</nav>
+
+<div class="game-header">
+    <div class="top-info">
+        <div class="title-dropdown" id="titleDropdown">
+            <div class="title-area" onclick="toggleDropdown(event)">
+                <h1>📚 HSK1 (3.0) - Phần 1 <span class="arrow">▼</span></h1>
+            </div>
+            <div class="dropdown-content" id="dropdownMenu">
+                <a href="hsk1-part-1-vocab.html" class="active">📍 Phần 1 (Từ 1-100)</a>
+                <a href="hsk1-part-2-vocab.html">📖 Phần 2 (Từ 101-200)</a>
+                <a href="hsk1-part-3-vocab.html">📖 Phần 3 (Từ 201-300)</a>
+                <a href="hsk1-part-4-vocab.html">📖 Phần 4 (Từ 301-400)</a>
+                <a href="hsk1-part-5-vocab.html">📖 Phần 5 (Từ 401-500)</a>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <button class="btn-action btn-reset" onclick="openResetModal()">🔄 Làm lại</button>
+            <button class="btn-action btn-filter" id="btn-filter" onclick="toggleFilter()">🎯 Lọc từ sai</button>
+            <button class="btn-action btn-view active" id="btn-hz" onclick="toggleView('hz')">👁️ Hán tự</button>
+            <button class="btn-action btn-view active" id="btn-py" onclick="toggleView('py')">👁️ Pinyin</button>
+            <button class="btn-action btn-view active" id="btn-vi" onclick="toggleView('vi')">👁️ Nghĩa</button>
+        </div>
+    </div>
+    
+    <div class="progress-section">
+        <span class="progress-text" id="progress-text">0 / 200</span>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <span class="mistake-badge" id="mistake-badge">❌ 0 lỗi</span>
+    </div>
+</div>
+
+<div class="table-area">
+    <div class="table-card">
+        <table>
+            <thead>
+                <tr>
+                    <th style="min-width: 85px; text-align: center;">Hán tự</th>
+                    <th style="min-width: 100px;">Phiên âm</th>
+                    <th style="min-width: 120px;">Tiếng Việt</th>
+                    <th style="min-width: 100px; text-align: center;">Nhập Hán</th>
+                    <th style="min-width: 180px;">Câu ví dụ (Dịch nghĩa)</th>
+                    <th style="min-width: 250px;">Hoàn thành câu (Trung)</th>
+                </tr>
+            </thead>
+            <tbody id="game-body"></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal" id="modal-win">
+    <div class="modal-content">
+        <h2 style="color: var(--theme-dark); font-family: 'Nunito'; font-size: 2rem; margin-top:0;">🎀 Tuyệt vời!</h2>
+        <p style="font-size: 1.1rem; color: #555;">Bạn đã chinh phục thành công 100 từ vựng đầu tiên.</p>
+        <div id="stat-err" style="font-weight: 800; color: #d32f2f; margin: 15px 0; font-size: 1.2rem;"></div>
+        <button class="btn-next" onclick="goToPart2()">Chuyển sang Phần 2 ➔</button>
+        <button class="btn-action btn-view" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="document.getElementById('modal-win').style.display='none'">Đóng để ôn tập lại</button>
+    </div>
+</div>
+
+<div class="modal" id="modal-reset">
+    <div class="modal-content" style="border-color: #ffccbc;">
+        <h2 style="color: #e17055; font-family: 'Nunito'; font-size: 1.8rem; margin-top:0;">🔄 Làm lại từ đầu?</h2>
+        <p style="font-size: 1.1rem; color: #555;">Bạn có chắc chắn muốn xóa toàn bộ kết quả để luyện tập lại không?</p>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="btn-action btn-view" style="flex: 1; justify-content: center; font-size: 1rem; padding: 12px;" onclick="closeResetModal()">Hủy bỏ</button>
+            <button class="btn-action btn-filter" style="flex: 1; justify-content: center; background: #e17055; color: white; border: none; font-size: 1rem; padding: 12px;" onclick="confirmReset()">Đồng ý</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu 100 từ đầu tiên (đã kiểm tra chính tả, phù hợp HSK1)
+    const data = [
+        { hz: "爱", py: "ài", vi: "yêu, thích", exVi: "Tôi yêu mẹ.", exZh: "我爱妈妈。" },
+        { hz: "爱好", py: "àihào", vi: "sở thích", exVi: "Sở thích của bạn là gì?", exZh: "你的爱好是什么？" },
+        { hz: "八", py: "bā", vi: "số 8", exVi: "Bây giờ là tám giờ.", exZh: "现在八点。" },
+        { hz: "爸爸", py: "bàba", vi: "bố, ba, cha", exVi: "Bố tôi là bác sĩ.", exZh: "我爸爸是医生。" },
+        { hz: "吧", py: "ba", vi: "nào, nhé, chứ", exVi: "Chúng ta đi thôi!", exZh: "我们走吧！" },
+        { hz: "白", py: "bái", vi: "trắng", exVi: "Tôi thích màu trắng.", exZh: "我喜欢白色。" },
+        { hz: "白天", py: "báitiān", vi: "ban ngày", exVi: "Ban ngày tôi đi làm.", exZh: "白天我工作。" },
+        { hz: "百", py: "bǎi", vi: "một trăm", exVi: "Cái này một trăm tệ.", exZh: "这个一百块。" },
+        { hz: "班", py: "bān", vi: "lớp", exVi: "Lớp chúng tôi có 20 người.", exZh: "我们班有二十个人。" },
+        { hz: "半", py: "bàn", vi: "một nửa", exVi: "Bây giờ là 9 giờ rưỡi.", exZh: "现在九点半。" },
+        { hz: "半年", py: "bàn nián", vi: "nửa năm", exVi: "Tôi học tiếng Trung nửa năm rồi.", exZh: "我学汉语半年了。" },
+        { hz: "半天", py: "bàn tiān", vi: "nửa ngày", exVi: "Tôi đợi bạn nửa ngày rồi.", exZh: "我等你半天了。" },
+        { hz: "帮", py: "bāng", vi: "giúp đỡ", exVi: "Vui lòng giúp tôi một chút.", exZh: "请帮我一下。" },
+        { hz: "帮忙", py: "bāngmáng", vi: "giúp đỡ", exVi: "Bạn có thể giúp một tay không?", exZh: "你能帮个忙吗？" },
+        { hz: "包", py: "bāo", vi: "bao, túi", exVi: "Trong túi của tôi có sách.", exZh: "我的包里有书。" },
+        { hz: "包子", py: "bāozi", vi: "bánh bao", exVi: "Tôi ăn hai cái bánh bao.", exZh: "我吃两个包子。" },
+        { hz: "杯", py: "bēi", vi: "cốc, ly", exVi: "Tôi uống một cốc nước.", exZh: "我喝一杯水。" },
+        { hz: "杯子", py: "bēizi", vi: "cốc, chén, ly", exVi: "Cái cốc này là của ai?", exZh: "这个杯子是谁的？" },
+        { hz: "北", py: "běi", vi: "bắc", exVi: "Anh ấy đi phía Bắc.", exZh: "他去北边。" },
+        { hz: "北边", py: "běibiān", vi: "phía Bắc", exVi: "Trường học ở phía Bắc.", exZh: "学校在北边。" },
+        { hz: "北京", py: "Běijīng", vi: "Bắc Kinh", exVi: "Tôi rất thích Bắc Kinh.", exZh: "我很喜欢北京。" },
+        { hz: "本", py: "běn", vi: "cuốn, quyển, tập", exVi: "Tôi có ba quyển sách.", exZh: "我有三本书。" },
+        { hz: "本子", py: "běnzi", vi: "vở, cuốn vở", exVi: "Đây là vở của tôi.", exZh: "这是我的本子。" },
+        { hz: "比", py: "bǐ", vi: "so, so với", exVi: "Hôm nay lạnh hơn hôm qua.", exZh: "今天比昨天冷。" },
+        { hz: "别", py: "bié", vi: "đừng, không được", exVi: "Đừng nói chuyện nữa.", exZh: "别说话了。" },
+        { hz: "别的", py: "biéde", vi: "cái khác", exVi: "Tôi không muốn cái khác.", exZh: "我不要别的。" },
+        { hz: "别人", py: "biérén", vi: "người khác, người ta", exVi: "Đây là sách của người khác.", exZh: "这是别人的书。" },
+        { hz: "病", py: "bìng", vi: "bệnh", exVi: "Anh ấy bị ốm rồi.", exZh: "他病了。" },
+        { hz: "病人", py: "bìngrén", vi: "bệnh nhân", exVi: "Trong bệnh viện có rất nhiều bệnh nhân.", exZh: "医院里有很多病人。" },
+        { hz: "不大", py: "bú dà", vi: "nhỏ, không lớn", exVi: "Quả táo này không to lắm.", exZh: "这个苹果不大。" },
+        { hz: "不对", py: "búduì", vi: "không đúng", exVi: "Câu này không đúng.", exZh: "这句话不对。" },
+        { hz: "不客气", py: "bú kèqi", vi: "không có gì", exVi: "Cảm ơn! Không có gì.", exZh: "谢谢！不客气。" },
+        { hz: "不用", py: "búyòng", vi: "không cần", exVi: "Không cần cảm ơn.", exZh: "不用谢。" },
+        { hz: "不", py: "bù", vi: "không", exVi: "Tôi không phải giáo viên.", exZh: "我不是老师。" },
+        { hz: "菜", py: "cài", vi: "đồ ăn, món ăn", exVi: "Món ăn Trung Quốc rất ngon.", exZh: "中国菜很好吃。" },
+        { hz: "差", py: "chà", vi: "thiếu, kém", exVi: "Bây giờ là 10 giờ kém 5.", exZh: "现在差五分十点。" },
+        { hz: "茶", py: "chá", vi: "trà", exVi: "Mời uống trà.", exZh: "请喝茶。" },
+        { hz: "常", py: "cháng", vi: "thường", exVi: "Tôi thường ở nhà đọc sách.", exZh: "我常在家看书。" },
+        { hz: "常常", py: "chángcháng", vi: "thường thường", exVi: "Anh ấy thường đi xem phim.", exZh: "他常常去看电影。" },
+        { hz: "唱", py: "chàng", vi: "hát", exVi: "Cô ấy hát rất hay.", exZh: "她唱得很好。" },
+        { hz: "唱歌", py: "chànggē", vi: "hát, ca hát", exVi: "Chúng tôi thích ca hát.", exZh: "我们喜欢唱歌。" },
+        { hz: "车", py: "chē", vi: "xe", exVi: "Đây là xe của ai?", exZh: "这是谁的车？" },
+        { hz: "车票", py: "chēpiào", vi: "vé xe", exVi: "Tôi đã mua vé xe rồi.", exZh: "我买车票了。" },
+        { hz: "车上", py: "chē shang", vi: "trên xe", exVi: "Trên xe có rất nhiều người.", exZh: "车上很多人。" },
+        { hz: "车站", py: "chēzhàn", vi: "bến xe", exVi: "Tôi đi đến bến xe.", exZh: "我去车站。" },
+        { hz: "吃", py: "chī", vi: "ăn", exVi: "Bạn muốn ăn gì?", exZh: "你想吃什么？" },
+        { hz: "吃饭", py: "chīfàn", vi: "ăn cơm", exVi: "Chúng ta đi ăn cơm nhé.", exZh: "我们去吃饭吧。" },
+        { hz: "出", py: "chū", vi: "ra, xuất", exVi: "Mặt trời ra rồi.", exZh: "太阳出来了。" },
+        { hz: "出来", py: "chūlái", vi: "xuất hiện, đi ra", exVi: "Bạn mau ra đây đi.", exZh: "你快出来吧。" },
+        { hz: "出去", py: "chūqù", vi: "ra, ra ngoài", exVi: "Tôi muốn ra ngoài mua đồ.", exZh: "我想出去买东西。" },
+        { hz: "穿", py: "chuān", vi: "mặc", exVi: "Hôm nay cô ấy mặc áo đỏ.", exZh: "今天她穿红衣服。" },
+        { hz: "床", py: "chuáng", vi: "giường, đệm", exVi: "Con mèo ở dưới giường.", exZh: "小猫在床下。" },
+        { hz: "次", py: "cì", vi: "lần", exVi: "Tôi đã đi Trung Quốc hai lần.", exZh: "我去过两次中国。" },
+        { hz: "从", py: "cóng", vi: "từ, qua, theo", exVi: "Từ tám giờ đến mười giờ.", exZh: "从八点到十点。" },
+        { hz: "错", py: "cuò", vi: "sai", exVi: "Bạn viết sai rồi.", exZh: "你写错了。" },
+        { hz: "打", py: "dǎ", vi: "đánh, bắt", exVi: "Anh ấy đang gọi điện thoại.", exZh: "他在打电话。" },
+        { hz: "打车", py: "dǎchē", vi: "bắt xe", exVi: "Chúng ta gọi taxi đi.", exZh: "我们打车去吧。" },
+        { hz: "打电话", py: "dǎ diànhuà", vi: "gọi điện", exVi: "Tôi gọi điện cho mẹ.", exZh: "我给妈妈打电话。" },
+        { hz: "打开", py: "dǎkāi", vi: "mở, mở ra", exVi: "Mời mở sách ra.", exZh: "请打开书。" },
+        { hz: "打球", py: "dǎ qiú", vi: "chơi bóng", exVi: "Chiều nay chúng tôi đi chơi bóng.", exZh: "下午我们去打球。" },
+        { hz: "大", py: "dà", vi: "to, lớn", exVi: "Quả táo này rất to.", exZh: "这个苹果很大。" },
+        { hz: "大学", py: "dàxué", vi: "đại học", exVi: "Anh ấy học ở đại học Bắc Kinh.", exZh: "他在北京大学学习。" },
+        { hz: "大学生", py: "dàxuéshēng", vi: "sinh viên đại học", exVi: "Chị gái tôi là sinh viên.", exZh: "我姐姐是大学生。" },
+        { hz: "到", py: "dào", vi: "đến, tới", exVi: "Anh ấy đến Bắc Kinh rồi.", exZh: "他到北京了。" },
+        { hz: "得到", py: "dédào", vi: "đạt được, nhận được", exVi: "Tôi nhận được một quyển sách.", exZh: "我得到了一本书。" },
+        { hz: "地", py: "de", vi: "(biểu thị trạng ngữ)", exVi: "Cô ấy vui vẻ nói.", exZh: "她高兴地说。" },
+        { hz: "的", py: "de", vi: "của", exVi: "Đây là máy tính của tôi.", exZh: "这是我的电脑。" },
+        { hz: "等", py: "děng", vi: "đợi, chờ", exVi: "Xin đợi tôi một lát.", exZh: "请等我一下。" },
+        { hz: "地", py: "dì", vi: "đất", exVi: "Trên đất có nước.", exZh: "地上有水。" },
+        { hz: "地点", py: "dìdiǎn", vi: "địa điểm, nơi chốn", exVi: "Địa điểm ở đâu?", exZh: "地点在哪儿？" },
+        { hz: "地方", py: "dìfang", vi: "nơi, địa phương", exVi: "Nơi này rất đẹp.", exZh: "这个地方很漂亮。" },
+        { hz: "地上", py: "dìshang", vi: "trên mặt đất", exVi: "Trên đất có một bông hoa.", exZh: "地上有一朵花。" },
+        { hz: "地图", py: "dìtú", vi: "bản đồ", exVi: "Tôi mua một tấm bản đồ.", exZh: "我买了一张地图。" },
+        { hz: "弟弟", py: "dìdi", vi: "em trai", exVi: "Em trai tôi mười tuổi.", exZh: "我弟弟十岁。" },
+        { hz: "第", py: "dì", vi: "thứ ... (số thứ tự)", exVi: "Đây là bài thứ nhất.", exZh: "这是第一课。" },
+        { hz: "点", py: "diǎn", vi: "ít, chút, hơi", exVi: "Cho tôi một chút nước.", exZh: "给我一点水。" },
+        { hz: "电", py: "diàn", vi: "điện, pin", exVi: "Điện thoại hết pin rồi.", exZh: "手机没电了。" },
+        { hz: "电话", py: "diànhuà", vi: "điện thoại", exVi: "Số điện thoại của bạn là gì?", exZh: "你的电话号码是多少？" },
+        { hz: "电脑", py: "diànnǎo", vi: "máy tính", exVi: "Tôi muốn mua máy tính.", exZh: "我想买电脑。" },
+        { hz: "电视", py: "diànshì", vi: "truyền hình; TV", exVi: "Buổi tối tôi xem tivi.", exZh: "晚上我看电视。" },
+        { hz: "电视机", py: "diànshìjī", vi: "(chiếc) TV", exVi: "Nhà tôi có một chiếc tivi.", exZh: "我家有一台电视机。" },
+        { hz: "电影", py: "diànyǐng", vi: "điện ảnh, phim", exVi: "Bộ phim này rất hay.", exZh: "这个电影很好看。" },
+        { hz: "电影院", py: "diànyǐngyuàn", vi: "rạp chiếu phim", exVi: "Chúng ta đi rạp chiếu phim nhé.", exZh: "我们去电影院吧。" },
+        { hz: "东", py: "dōng", vi: "đông", exVi: "Mặt trời mọc ở hướng đông.", exZh: "太阳从东边出来。" },
+        { hz: "东边", py: "dōngbian", vi: "phía đông", exVi: "Cửa hàng ở phía đông.", exZh: "商店在东边。" },
+        { hz: "东西", py: "dōngxi", vi: "đồ đạc, đồ, vật", exVi: "Mẹ đi mua đồ rồi.", exZh: "妈妈去买东西了。" },
+        { hz: "动", py: "dòng", vi: "động, chạm", exVi: "Đừng chạm vào đồ của tôi.", exZh: "别动我的东西。" },
+        { hz: "动作", py: "dòngzuò", vi: "động tác, hoạt động", exVi: "Động tác này rất khó.", exZh: "这个动作很难。" },
+        { hz: "都", py: "dōu", vi: "đều", exVi: "Chúng tôi đều là học sinh.", exZh: "我们都是学生。" },
+        { hz: "读", py: "dú", vi: "đọc", exVi: "Chữ này đọc thế nào?", exZh: "这个字怎么读？" },
+        { hz: "读书", py: "dúshū", vi: "đọc sách", exVi: "Anh ấy thích đọc sách.", exZh: "他喜欢读书。" },
+        { hz: "对", py: "duì", vi: "đúng", exVi: "Bạn nói đúng rồi.", exZh: "你说的对。" },
+        { hz: "对不起", py: "duìbuqǐ", vi: "xin lỗi", exVi: "Xin lỗi, tôi đến muộn.", exZh: "对不起，我来晚了。" },
+        { hz: "多", py: "duō", vi: "nhiều", exVi: "Ở đây có rất nhiều người.", exZh: "这里有很多人。" },
+        { hz: "多少", py: "duōshao", vi: "bao nhiêu", exVi: "Cái này bao nhiêu tiền?", exZh: "这个多少钱？" },
+        { hz: "饿", py: "è", vi: "đói", exVi: "Tôi đói rồi.", exZh: "我饿了。" },
+        { hz: "儿子", py: "érzi", vi: "con trai", exVi: "Đây là con trai tôi.", exZh: "这是我的儿子。" },
+        { hz: "二", py: "èr", vi: "số 2", exVi: "Hôm nay là thứ ba.", exZh: "今天是星期二。" },
+        { hz: "饭", py: "fàn", vi: "cơm", exVi: "Mẹ đang nấu cơm.", exZh: "妈妈在做饭。" },
+        { hz: "饭店", py: "fàndiàn", vi: "quán ăn/ nhà hàng", exVi: "Nhà hàng này rất lớn.", exZh: "这个饭店很大。" }
+    ];
+
+    let mistakes = 0;
+    let filterActive = false;
+    let errorFlags = []; // mảng boolean đánh dấu ô đã từng sai (cùng index với inputs)
+    const STORE_KEY = "hsk1_30_p1_save_v3";
+
+    // --- Helper functions ---
+    function toggleDropdown(e) {
+        e.stopPropagation();
+        const menu = document.getElementById('dropdownMenu');
+        const arrow = document.querySelector('.arrow');
+        menu.classList.toggle('show');
+        arrow.style.transform = menu.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+
+    window.onclick = function(event) {
+        if (!event.target.closest('#titleDropdown')) {
+            const dropdowns = document.getElementsByClassName("dropdown-content");
+            for (let i = 0; i < dropdowns.length; i++) {
+                let openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
+                    const arrow = document.querySelector('.arrow');
+                    if (arrow) arrow.style.transform = 'rotate(0deg)';
+                }
+            }
+        }
+    }
+
+    function normalize(s) { return s.replace(/[\s\.,\?。，！？“”'"]/g, '').toLowerCase(); }
+
+    function playTingSound() {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(1320, audioCtx.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.3);
+        } catch(e) { console.log("audio error"); }
+    }
+
+    function render() {
+        const body = document.getElementById('game-body');
+        body.innerHTML = data.map((item, idx) => `
+            <tr id="row-${idx}">
+                <td class="col-hz js-hz">${item.hz}</td>
+                <td class="col-py js-py">${item.py}</td>
+                <td class="col-vi js-vi">${item.vi}</td>
+                <td><input type="text" class="game-input inp-hz" data-correct="${item.hz}" data-idx="${idx}" data-type="hz" placeholder=".." enterkeyhint="next"></td>
+                <td class="col-ex-vi">${item.exVi}</td>
+                <td>
+                    <div class="flex-input-group">
+                        <input type="text" class="game-input" data-correct="${item.exZh}" data-idx="${idx}" data-type="ex" placeholder="Nhập câu tiếng Trung..." enterkeyhint="next">
+                        <button class="hint-btn" onclick="this.nextElementSibling.classList.toggle('show')">💡</button>
+                        <div class="hint-text">${item.exZh}</div>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+        attachEvents();
+        load();
+    }
+
+    function attachEvents() {
+        document.querySelectorAll('.game-input').forEach(input => {
+            input.addEventListener('keydown', (e) => {
+                if(e.key === 'Enter') {
+                    e.preventDefault();
+                    const val = normalize(input.value);
+                    const correctValues = input.dataset.correct.split('/').map(v => normalize(v));
+                    const isCorrect = correctValues.includes(val);
+                    const idx = parseInt(input.dataset.idx) * 2 + (input.dataset.type === 'ex' ? 1 : 0);
+
+                    if(isCorrect) {
+                        if (!input.classList.contains('correct')) {
+                            input.classList.add('correct');
+                            input.classList.remove('wrong');
+                            playTingSound();
+                            save();
+                            updateProgress();
+                        }
+                        focusNext(input);
+                    } else {
+                        input.classList.remove('correct');
+                        input.classList.add('wrong');
+                        if(input.value.trim() !== '') {
+                            mistakes++;
+                            if (!errorFlags[idx]) {
+                                errorFlags[idx] = true;
+                            }
+                            updateMistakeBadge();
+                            save();
+                        }
+                    }
+                }
+            });
+
+            input.addEventListener('focus', (e) => {
+                if (input.classList.contains('wrong')) {
+                    input.select();
+                }
+            });
+        });
+    }
+
+    function focusNext(current) {
+        const all = Array.from(document.querySelectorAll('.game-input'));
+        let nextIndex = all.indexOf(current) + 1;
+        while(nextIndex < all.length) {
+            const next = all[nextIndex];
+            if (!next.classList.contains('correct') && !next.closest('tr').classList.contains('hidden-row')) {
+                next.focus();
+                break;
+            }
+            nextIndex++;
+        }
+    }
+
+    function updateProgress() {
+        const correct = document.querySelectorAll('.game-input.correct').length;
+        const total = data.length * 2;
+        document.getElementById('progress-text').innerText = `${correct} / ${total}`;
+        document.getElementById('progress-bar').style.width = (correct / total * 100) + '%';
+        if(correct === total) {
+            document.getElementById('stat-err').innerText = `⚠️ Tổng lỗi sai: ${mistakes} lần`;
+            setTimeout(() => document.getElementById('modal-win').style.display = 'flex', 600);
+        }
+        if(filterActive) applyFilter();
+    }
+
+    function updateMistakeBadge() {
+        document.getElementById('mistake-badge').innerText = `❌ ${mistakes} lỗi`;
+    }
+
+    function toggleView(type) {
+        const btn = document.getElementById('btn-' + type);
+        btn.classList.toggle('active');
+        document.querySelectorAll('.js-' + type).forEach(el => el.classList.toggle('blur'));
+    }
+
+    function toggleFilter() {
+        filterActive = !filterActive;
+        const btn = document.getElementById('btn-filter');
+        btn.classList.toggle('active');
+        btn.innerText = filterActive ? "🔙 Hiện tất cả" : "🎯 Lọc từ sai";
+        
+        if (filterActive) {
+            // Reset tất cả input trong các hàng có lỗi để luyện tập lại
+            data.forEach((_, idx) => {
+                const startIdx = idx * 2;
+                const hasError = errorFlags[startIdx] || errorFlags[startIdx + 1];
+                if (hasError) {
+                    const row = document.getElementById('row-' + idx);
+                    const rowInputs = row.querySelectorAll('.game-input');
+                    rowInputs.forEach(inp => {
+                        inp.value = '';
+                        inp.classList.remove('correct', 'wrong');
+                    });
+                }
+            });
+            // Lưu trạng thái mới (các ô đã xóa trắng)
+            save();
+            updateProgress();
+            updateMistakeBadge();
+        }
+        
+        applyFilter();
+    }
+
+    function applyFilter() {
+        data.forEach((_, idx) => {
+            const row = document.getElementById('row-' + idx);
+            const startIdx = idx * 2;
+            const hasError = errorFlags[startIdx] || errorFlags[startIdx + 1];
+            if(filterActive && !hasError) {
+                row.classList.add('hidden-row');
+            } else {
+                row.classList.remove('hidden-row');
+            }
+        });
+    }
+
+    function save() {
+        const states = Array.from(document.querySelectorAll('.game-input')).map(i => i.classList.contains('correct') ? i.value : null);
+        localStorage.setItem(STORE_KEY, JSON.stringify({states, mistakes, errorFlags}));
+    }
+
+    function load() {
+        const saved = localStorage.getItem(STORE_KEY);
+        if(!saved) return;
+        try {
+            const {states, mistakes: m, errorFlags: ef} = JSON.parse(saved);
+            mistakes = m || 0;
+            errorFlags = ef || new Array(data.length * 2).fill(false);
+            const inputs = document.querySelectorAll('.game-input');
+            states.forEach((val, idx) => {
+                if(val) {
+                    inputs[idx].classList.add('correct');
+                    inputs[idx].value = val;
+                }
+            });
+        } catch(e) {
+            console.warn("Lỗi load dữ liệu", e);
+        }
+        updateProgress();
+        updateMistakeBadge();
+    }
+
+    function openResetModal() {
+        document.getElementById('modal-reset').style.display = 'flex';
+    }
+    function closeResetModal() {
+        document.getElementById('modal-reset').style.display = 'none';
+    }
+    function confirmReset() {
+        document.getElementById('modal-reset').style.display = 'none';
+        localStorage.removeItem(STORE_KEY);
+        mistakes = 0;
+        errorFlags = new Array(data.length * 2).fill(false);
+        document.querySelectorAll('.game-input').forEach(input => {
+            input.value = '';
+            input.classList.remove('correct', 'wrong');
+        });
+        if(filterActive) {
+            filterActive = false;
+            const btn = document.getElementById('btn-filter');
+            btn.classList.remove('active');
+            btn.innerText = "🎯 Lọc từ sai";
+            applyFilter();
+        }
+        updateProgress();
+        updateMistakeBadge();
+    }
+
+    function goToPart2() {
+        window.location.href = 'hsk1-part-2-vocab.html';
+    }
+
+    function createLeaves() {
+        const container = document.getElementById('leaves-container');
+        // Đổi emoji lá sang hệ SnapChinese tông hồng đáng yêu
+        const icons = ['🌸', '🎀', '💖', '✨', '🌷'];
+        for(let i=0; i<15; i++) {
+            const leaf = document.createElement('div');
+            leaf.className = 'leaf';
+            leaf.innerText = icons[Math.floor(Math.random()*icons.length)];
+            leaf.style.left = Math.random()*100 + 'vw';
+            leaf.style.fontSize = (Math.random()*15 + 12) + 'px';
+            leaf.style.animationDuration = (Math.random()*7+8)+'s, ' + (Math.random()*3+3)+'s';
+            leaf.style.animationDelay = '-' + (Math.random()*10)+'s';
+            container.appendChild(leaf);
+        }
+    }
+
+    window.onload = () => { 
+        render(); 
+        createLeaves(); 
+    };
+</script>
+</body>
+</html>
