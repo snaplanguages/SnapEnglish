@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 4 - Test 3 - 2019 | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Tông màu mới: Royal Blue & Amber */
+        :root {
+            --primary: #4169E1;      /* Royal Blue */
+            --primary-dark: #27408B; 
+            --primary-light: #E8EEF9;
+            --secondary: #FFC107;    /* Amber */
+            --success: #00A86B;      
+            --success-light: #E6F7F0;
+            --danger: #E63946;       
+            --danger-light: #FDE8E9;
+            --text-dark: #1A1A24;
+            --text-gray: #6B7280;
+            --bg-color: #F8FAFC;
+            --white: #FFFFFF;
+            
+            /* Highlight Colors for Questions */
+            --hl-q1: #FFEAA7; 
+            --hl-q2: #FFB8B8; 
+            --hl-q3: #A0E8E8; 
+            
+            --shadow: 0 12px 35px rgba(65, 105, 225, 0.12);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
+        
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-dark); 
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container { 
+            background: var(--bg-color); 
+            width: 100vw; 
+            min-height: 100vh;
+            position: relative; 
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- BỐ CỤC 2 CỘT & THANH TRƯỢT (RESIZER) --- */
+        .two-col-layout, .script-split {
+            display: flex;
+            align-items: stretch;
+            gap: 0; 
+            max-width: 1200px;
+            margin: 0 auto 30px auto;
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border: 2px solid var(--primary-light);
+            overflow: hidden;
+        }
+
+        .left-col, .right-col, .script-col {
+            padding: 25px;
+            overflow-y: auto; 
+            max-height: 650px;
+        }
+
+        .left-col, .script-col:first-child { flex: 0 0 50%; }
+        .right-col, .script-col:last-child { flex: 1; background: #FAFBFC; }
+
+        /* Thanh trượt ở giữa */
+        .resizer {
+            width: 14px;
+            background-color: var(--primary-light);
+            cursor: col-resize;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.2s;
+            flex-shrink: 0;
+            z-index: 5;
+        }
+
+        .resizer:hover, .resizer.dragging { background-color: var(--primary); }
+        .resizer-handle { width: 4px; height: 40px; background-color: rgba(255,255,255,0.8); border-radius: 4px; }
+        .resizer:not(:hover):not(.dragging) .resizer-handle { background-color: var(--primary-dark); }
+
+        @media (max-width: 1000px) {
+            .two-col-layout, .script-split { flex-direction: column; }
+            .left-col, .script-col:first-child { flex: 0 0 auto; width: 100% !important; max-height: none;}
+            .resizer { display: none; }
+        }
+
+        .screen { display: none; padding: 30px 5%; flex-grow: 1; animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); overflow-y: auto; }
+        .screen.active { display: flex; flex-direction: column; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1, h2 { text-align: center; color: var(--primary-dark); margin-bottom: 15px; font-weight: 800; }
+        .desc { text-align: center; color: var(--text-gray); margin-bottom: 40px; font-size: 1.15rem; }
+
+        .btn { 
+            background: var(--primary); color: white; border: none; padding: 14px 32px; font-size: 1.05rem; 
+            font-weight: 700; border-radius: 16px; cursor: pointer; transition: all 0.3s ease; 
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 6px 15px rgba(65, 105, 225, 0.2);
+        }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(65, 105, 225, 0.3); background: var(--primary-dark); }
+        .btn-outline { background: transparent; color: var(--primary); border: 2.5px solid var(--primary); box-shadow: none; }
+        .btn-outline:hover { background: var(--primary-light); border-color: var(--primary-dark); color: var(--primary-dark); }
+        .btn-success { background: var(--success); box-shadow: 0 6px 15px rgba(0, 168, 107, 0.2); }
+        .btn-success:hover { background: #008A59; box-shadow: 0 10px 25px rgba(0, 168, 107, 0.3); }
+
+        /* Test Screen Styles */
+        .audio-wrapper {
+            background: var(--white); padding: 30px; border-radius: 24px; box-shadow: var(--shadow);
+            max-width: 900px; margin: 0 auto 30px auto; width: 100%; text-align: center; position: sticky; top: 20px; z-index: 10;
+            border: 2px dashed var(--primary-light);
+        }
+        .audio-player-custom { width: 100%; margin-top: 10px; border-radius: 50px; outline: none; }
+        
+        .mock-status {
+            display: none; color: var(--danger); font-weight: 800; margin-top: 15px; 
+            background: var(--danger-light); padding: 12px 25px; border-radius: 30px; 
+            justify-content: center; align-items: center; gap: 10px; font-size: 1.1rem;
+            border: 1px dashed var(--danger);
+        }
+        .pulse-dot { display:inline-block; width:12px; height:12px; background:var(--danger); border-radius:50%; animation: pulse 1.2s infinite; }
+
+        .questions-wrapper { max-width: 900px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 30px; }
+        .question-block { background: var(--white); padding: 30px; border-radius: 24px; box-shadow: 0 8px 25px rgba(0,0,0,0.03); border-top: 5px solid var(--primary); }
+        .q-title { font-size: 1.2rem; font-weight: 800; color: var(--text-dark); margin-bottom: 20px; }
+        
+        .options-grid { display: flex; flex-direction: column; gap: 12px; }
+        .option-label { 
+            display: flex; align-items: center; cursor: pointer; padding: 16px 20px; background: #FFFFFF;
+            border-radius: 16px; border: 2px solid #E2E8F0; transition: all 0.2s ease; font-weight: 600; font-size: 1.05rem; color: var(--text-dark);
+        }
+        .option-label:hover { border-color: var(--primary-light); background: #F8FAFC; transform: translateX(4px); }
+        .option-label input { display: none; }
+        .custom-radio { 
+            width: 24px; height: 24px; border: 2.5px solid #CBD5E1; border-radius: 50%; 
+            margin-right: 15px; position: relative; transition: all 0.3s; background: var(--white); flex-shrink: 0;
+        }
+        .option-label input:checked + .custom-radio { border-color: var(--primary); }
+        .option-label input:checked + .custom-radio::after { 
+            content: ""; width: 12px; height: 12px; background: var(--primary); 
+            border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+        }
+        .option-label input:checked ~ span { color: var(--primary-dark); font-weight: 700;}
+        .option-label.selected-ui { border-color: var(--primary); background: var(--primary-light); }
+
+        .graphic-box { margin-bottom: 20px; text-align: center; background: #FFFBF0; padding: 20px; border-radius: 16px; border: 2px dashed var(--secondary); }
+        .graphic-box table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; font-size: 0.95rem; margin-top: 10px;}
+        .graphic-box th, .graphic-box td { border: 1px solid #E2E8F0; padding: 10px; text-align: center; }
+        .graphic-box th { background: #F1F5F9; font-weight: 800; color: var(--primary-dark);}
+
+        .nav-footer { display: flex; justify-content: space-between; align-items: center; max-width: 900px; margin: 40px auto 20px auto; width: 100%; }
+
+        /* Results Screen */
+        .score-box { text-align: center; padding: 40px; background: var(--white); border-radius: 24px; box-shadow: var(--shadow); margin-bottom: 40px; border: 2px solid var(--primary-light); }
+        .score-number { font-size: 4.5rem; font-weight: 800; color: var(--primary-dark); margin: 10px 0; }
+        .result-list { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .result-passage-card { background: var(--white); padding: 25px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; border-left: 6px solid var(--primary);}
+        .result-passage-info h3 { color: var(--primary-dark); margin-bottom: 5px; font-weight: 800;}
+        .result-passage-info p { color: var(--text-gray); font-size: 0.95rem;}
+        
+        /* Modal Giải thích */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(26, 26, 36, 0.8); backdrop-filter: blur(8px); justify-content: center; align-items: center; padding: 20px;}
+        .modal-content { 
+            background: var(--bg-color); width: 100%; max-width: 1150px; max-height: 95vh; 
+            border-radius: 28px; padding: 40px; overflow-y: auto; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            scroll-behavior: smooth;
+        }
+        .close-modal { position: absolute; right: 30px; top: 30px; font-size: 40px; cursor: pointer; color: #9CA3AF; transition: 0.2s; line-height: 1; z-index: 10;}
+        .close-modal:hover { color: var(--danger); transform: rotate(90deg); }
+
+        /* Confirmation Modals */
+        .confirm-box {
+            background: var(--white); border-radius: 25px; padding: 40px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.2); animation: scaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes scaleUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .confirm-title { font-size: 24px; color: var(--primary-dark); margin-bottom: 15px; font-weight: 800; }
+        .confirm-desc { color: var(--text-gray); margin-bottom: 30px; font-size: 1.05rem; }
+        .confirm-actions { display: flex; justify-content: center; gap: 15px; }
+
+        /* History Modals */
+        .custom-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 99999; }
+        .custom-modal { background: white; padding: 35px; border-radius: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.2); width: 90%; max-width: 500px; text-align: center; border: 2px solid var(--primary-dark); animation: fadeUp 0.3s ease-out; }
+        #historyList { max-height: 350px; overflow-y: auto; text-align: left; margin-bottom: 20px; padding-right: 5px; }
+        #historyList::-webkit-scrollbar { width: 6px; }
+        #historyList::-webkit-scrollbar-thumb { background: var(--primary-light); border-radius: 3px; }
+        .history-item { background: #f8f9fa; border: 1px solid #e9ecef; padding: 16px; border-radius: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+        .history-item:hover { border-color: var(--primary-dark); background: white; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
+        .history-info { display: flex; flex-direction: column; gap: 6px; }
+        .history-date { font-weight: 700; color: var(--text-dark); font-size: 1rem; }
+        .history-score { color: var(--primary-dark); font-size: 0.95rem; font-weight: 600; }
+        .btn-review { background: var(--primary-light); color: var(--primary-dark); border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; font-family: inherit;}
+        .btn-review:hover { background: var(--primary-dark); color: white; }
+        .btn-delete-history { background: var(--danger-light); color: var(--danger); border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 1.1rem; }
+        .btn-delete-history:hover { background: var(--danger); color: white; }
+        .modal-actions { display: flex; gap: 15px; margin-top: 20px; justify-content: center;}
+
+        /* Highlight Classes */
+        .hl-q1 { background-color: var(--hl-q1); padding: 2px 4px; border-radius: 4px; font-weight: 700; color: #B38800; }
+        .hl-q2 { background-color: var(--hl-q2); padding: 2px 4px; border-radius: 4px; font-weight: 700; color: #C0392B; }
+        .hl-q3 { background-color: var(--hl-q3); padding: 2px 4px; border-radius: 4px; font-weight: 700; color: #008080; }
+        
+        .legend-box { background: white; padding: 15px 25px; border-radius: 12px; margin-bottom: 20px; display: inline-flex; gap: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-weight: 700;}
+
+        /* Split Script Layout */
+        .script-col { background: var(--white); padding: 25px; border-radius: 20px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.02); }
+        .script-col h3 { color: var(--primary-dark); margin-bottom: 15px; display: flex; align-items: center; gap: 8px;}
+        .script-text { font-size: 1.05rem; line-height: 1.8; color: var(--text-dark); white-space: pre-wrap;}
+        .script-en-col { border-left: 4px solid var(--primary); }
+        .script-vi-col { border-left: 4px solid var(--secondary); }
+        .script-vi-col h3 { color: #D97706; }
+        
+        .vocab-box { background: #FFFBF0; padding: 25px; border-radius: 20px; margin-bottom: 30px; border: 2px dashed var(--secondary); }
+        .vocab-box h4 { color: #D97706; font-size: 1.2rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .vocab-text { font-size: 1.05rem; line-height: 1.7; color: #92400E; white-space: pre-wrap;}
+
+        /* Explained Question Block */
+        .exp-q-block { background: var(--white); padding: 30px; border-radius: 20px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border-left: 6px solid #CBD5E1; }
+        .exp-q-block.color-q1 { border-left-color: var(--hl-q1); }
+        .exp-q-block.color-q2 { border-left-color: var(--hl-q2); }
+        .exp-q-block.color-q3 { border-left-color: var(--hl-q3); }
+
+        .exp-q-title { font-size: 1.2rem; font-weight: 800; color: var(--text-dark); margin-bottom: 5px;}
+        .exp-q-title-vi { font-size: 1.05rem; color: var(--text-gray); margin-bottom: 15px; font-style: italic;}
+        
+        .exp-options { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px; }
+        .exp-opt { padding: 12px 15px; border-radius: 12px; background: #F8FAFC; font-size: 1.05rem; display: flex; gap: 10px; align-items: flex-start;}
+        .exp-opt.correct { background: var(--success-light); border: 1px solid rgba(0, 168, 107, 0.3); color: #008A59; font-weight: 700;}
+        .exp-opt.wrong { opacity: 0.7; }
+        .opt-char { font-weight: 800; min-width: 25px; }
+
+        .exp-detail-box { background: var(--primary-light); padding: 20px; border-radius: 16px; border-left: 4px solid var(--primary); font-size: 1.05rem; line-height: 1.7; color: var(--primary-dark);}
+        .exp-detail-box strong { color: var(--primary-dark); }
+
+        @media (max-width: 900px) { 
+            .nav-footer { flex-direction: column; gap: 15px; }
+            .btn { width: 100%; }
+            .legend-box { flex-direction: column; gap: 10px;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="screen-welcome" class="screen active">
+        <div style="max-width: 800px; margin: auto; text-align: center; background: white; padding: 50px 30px; border-radius: 30px; box-shadow: var(--shadow); border: 2px solid var(--primary-light);">
+            <div style="font-size: 5rem; margin-bottom: 20px;">🎤</div>
+            <h1>TOEIC Part 4: Short Talks (ETS 2019 - Test 3)</h1>
+            <p class="desc">Luyện kỹ năng nghe bài nói ngắn từ Câu 71 đến Câu 100.<br>Đã nâng cấp Lịch sử làm bài, tính giờ và Lưu dữ liệu lên hệ thống.</p>
+            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                <button class="btn btn-outline" onclick="openHistoryModal()">🕒 Lịch sử</button>
+                <button class="btn btn-outline" onclick="promptStart('practice')">🌿 Luyện tập</button>
+                <button class="btn" onclick="promptStart('mock')">🔥 Thi thử </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-test" class="screen">
+        <div class="audio-wrapper">
+            <h2 id="passage-title" style="color: var(--primary-dark); margin-bottom: 5px;">Questions 71-73</h2>
+            <p style="color: var(--text-gray); font-size: 0.95rem;">Listen to the talk and answer the questions.</p>
+            <div id="audio-container">
+                <audio id="q-audio" class="audio-player-custom" controls controlsList="nodownload"></audio>
+            </div>
+            <div id="mock-msg" class="mock-status">
+                <span class="pulse-dot"></span> Audio đang phát (Chế độ thi thử)... Tự động chuyển đoạn!
+            </div>
+        </div>
+
+        <div class="questions-wrapper" id="questions-container"></div>
+
+        <div class="nav-footer">
+            <button id="btn-prev" class="btn btn-outline" onclick="changePassage(-1)">⬅ Đoạn trước</button>
+            <button id="btn-next" class="btn" onclick="changePassage(1)">Đoạn tiếp theo ➡</button>
+            <button id="btn-submit" class="btn btn-success" style="display:none;" onclick="promptSubmit()">Nộp bài ngay ✨</button>
+        </div>
+    </div>
+
+    <div id="screen-result" class="screen">
+        <div class="score-box">
+            <h2>Kết Quả Của Bạn 🏆</h2>
+            <div class="score-number" id="final-score">0/0</div>
+            <p style="color: var(--text-gray); font-size: 1.1rem;">Bấm vào từng đoạn để xem giải thích Tiếng Việt và Vị trí Highlight Đáp Án!</p>
+        </div>
+        
+        <div class="result-list" id="result-list"></div>
+
+        <div style="text-align: center; margin-top: 50px; margin-bottom: 50px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+            <button class="btn btn-outline" onclick="location.reload()">🏠 Về trang chủ</button>
+            <button class="btn" onclick="promptStart('practice')">🔄 Làm Lại Từ Đầu</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-start-confirm" class="modal" style="display: none; z-index: 2000;">
+    <div class="confirm-box">
+        <div class="confirm-title">Bắt đầu làm bài? 🚀</div>
+        <div class="confirm-desc">Bạn đã chuẩn bị sẵn sàng cho bài nghe Part 4 chưa?</div>
+        <div class="confirm-actions">
+            <button class="btn btn-outline" onclick="cancelStart()">Từ từ đã</button>
+            <button class="btn" onclick="confirmStart()">Chiến luôn!</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-submit-confirm" class="modal" style="display: none; z-index: 2000;">
+    <div class="confirm-box">
+        <div class="confirm-title">Nộp bài ngay? ✨</div>
+        <div class="confirm-desc">Bạn có chắc chắn muốn nộp bài? Kết quả của bạn sẽ được lưu lên hệ thống.</div>
+        <div class="confirm-actions">
+            <button class="btn btn-outline" onclick="cancelSubmit()">Kiểm tra lại</button>
+            <button class="btn btn-success" onclick="confirmSubmit()">Nộp luôn!</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-detail" class="modal">
+    <div class="modal-content" id="modal-content-area">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h2 id="modal-title" style="text-align: left; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 2px dashed var(--primary-light);">Phân tích chi tiết</h2>
+        
+        <div style="text-align: center; margin-bottom: 15px;">
+            <div class="legend-box">
+                <div><span class="hl-q1"> Câu 1 (Q1) </span></div>
+                <div><span class="hl-q2"> Câu 2 (Q2) </span></div>
+                <div><span class="hl-q3"> Câu 3 (Q3) </span></div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 25px; text-align: center;">
+            <audio id="modal-audio" class="audio-player-custom" style="max-width: 600px;" controls></audio>
+        </div>
+        
+        <div class="script-split" id="scriptSplit">
+            <div class="script-col script-en-col" id="scriptEnCol">
+                <h3>🇬🇧 English Script</h3>
+                <div class="script-text" id="m-script-en"></div>
+            </div>
+            
+            <div class="resizer" id="scriptResizer">
+                <div class="resizer-handle"></div>
+            </div>
+
+            <div class="script-col script-vi-col" id="scriptViCol">
+                <h3>🇻🇳 Bản dịch Tiếng Việt</h3>
+                <div class="script-text" id="m-script-vi"></div>
+            </div>
+        </div>
+
+        <div class="vocab-box" id="m-vocab-box">
+            <h4>📚 Từ vựng quan trọng</h4>
+            <div class="vocab-text" id="m-vocab"></div>
+        </div>
+
+        <h3 style="color: var(--text-dark); margin-bottom: 20px; font-weight: 800;">Phân tích câu hỏi:</h3>
+        <div id="modal-questions-explain"></div>
+    </div>
+</div>
+
+<div id="historyOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2 style="margin-bottom: 20px; color: var(--primary-dark);">🕒 Lịch sử làm bài</h2>
+        <div id="historyList">
+            <div style="text-align:center; color: var(--text-gray); padding: 20px;">Đang tải dữ liệu... 🐾</div>
+        </div>
+        <button class="btn btn-outline" style="width: 100%; margin-top: 15px;" onclick="closeHistoryModal()">Quay lại</button>
+    </div>
+</div>
+
+<div id="customConfirmDeleteOverlay" class="custom-overlay">
+    <div class="custom-modal">
+        <h2 style="color: var(--primary-dark);">Xác nhận xóa 🗑️</h2>
+        <p style="font-size: 1.1rem; color: var(--text-gray); margin-top: 15px; line-height: 1.5;">Cậu có chắc chắn muốn xóa bài làm này khỏi lịch sử không?</p>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeConfirmDelete()">Hủy</button>
+            <button class="btn btn-success" style="background: var(--danger); box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);" onclick="executeDelete()">Xóa nhé</button>
+        </div>
+    </div>
+</div>
+
+<script>
+      const passagesData = [
+        {
+            id: "71-73",
+            type: "Talk",
+            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-71-73-2.mp3",
+            graphic: null,
+            script_en: "W-Br: Good morning, everyone! We hope you've been enjoying the <span class='hl-q1'>conference on educational technology</span> this week. Tomorrow, in addition to our workshops and presentations, you'll have the option of leaving the convention center to go on one of the site visits we've arranged. There are two choices. <span class='hl-q2'>You can tour either a local high school or the public library's computer laboratory.</span> These tours are free, and we expect them to be very popular. We have limited seats on the buses, so <span class='hl-q3'>please make sure to sign up early at the desk by the entrance.</span>",
+            script_vi: "W-Br: Chào buổi sáng, mọi người! Chúng tôi hy vọng các vị đã tận hưởng trải nghiệm tại <span class='hl-q1'>hội nghị công nghệ giáo dục</span> tuần này. Ngày mai, ngoài các hội thảo và buổi thuyết trình, các vị có thể rời khỏi trung tâm hội nghị để đến một trong những địa điểm chúng tôi đã sắp xếp. Có hai sự lựa chọn. <span class='hl-q2'>Các vị có thể tham quan một trường trung học địa phương hoặc phòng thí nghiệm máy tính của thư viện công cộng.</span> Những chuyến tham quan này là miễn phí, và chúng tôi hy vọng chúng sẽ được ưa thích. Không có nhiều chỗ ngồi trên xe buýt, vì vậy <span class='hl-q3'>hãy đảm bảo là đăng ký sớm tại bàn cạnh lối vào.</span>",
+            questions: [
+                {
+                    id: 71,
+                    q_en: "At which event is the announcement being made?", q_vi: "Thông báo được đưa ra ở sự kiện nào?",
+                    opts: [
+                        { l: "A", text: "A book fair", text_vi: "Hội chợ sách", isCorrect: false },
+                        { l: "B", text: "A product launch", text_vi: "Buổi ra mắt sản phẩm", isCorrect: false },
+                        { l: "C", text: "A technology conference", text_vi: "Hội nghị công nghệ", isCorrect: true },
+                        { l: "D", text: "A charity fundraiser", text_vi: "Sự kiện gây quỹ từ thiện", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án C. Đây là một hội thảo công nghệ giáo dục (We hope you've been enjoying the conference on educational technology) nên câu C là đáp án đúng."
+                },
+                {
+                    id: 72,
+                    q_en: "According to the speaker, what can some listeners do tomorrow?", q_vi: "Theo như người nói, người nghe có thể làm gì vào ngày mai?",
+                    opts: [
+                        { l: "A", text: "Go on a tour", text_vi: "Đi tham quan", isCorrect: true },
+                        { l: "B", text: "Attend an opening ceremony", text_vi: "Tham dự lễ khai mạc", isCorrect: false },
+                        { l: "C", text: "Participate in a focus group", text_vi: "Tham gia vào một nhóm thảo luận", isCorrect: false },
+                        { l: "D", text: "Win a prize", text_vi: "Giành giải thưởng", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án A. Người nghe sẽ được đi tham quan trường trung học hoặc phòng thí nghiệm máy tính (You can tour either a local high school or the public library's computer laboratory) nên câu A là đáp án đúng."
+                },
+                {
+                    id: 73,
+                    q_en: "What are the listeners instructed to do?", q_vi: "Người nghe được hướng dẫn làm gì?",
+                    opts: [
+                        { l: "A", text: "Use an alternate entrance", text_vi: "Dùng lối vào khác", isCorrect: false },
+                        { l: "B", text: "Register in advance", text_vi: "Đăng kí trước", isCorrect: true },
+                        { l: "C", text: "Complete a survey", text_vi: "Hoàn thành khảo sát", isCorrect: false },
+                        { l: "D", text: "Meet at a designated location", text_vi: "Gặp tại địa điểm định sẵn", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án B. Câu B là đáp án đúng vì vị trí trên xe hạn chế do đó cần phải đăng kí trước (sign up early at the desk by the entrance), trong đó “sign up early” đồng nghĩa với “register in advance”."
+                }
+            ]
+        },
+        {
+            id: "74-76",
+            type: "Talk",
+            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-74-76-2.mp3",
+            graphic: null,
+            script_en: "M-Au: Today I want to focus our discussion on <span class='hl-q1'>Castillo, a clothing brand</span> we will start selling in our stores next month. As you know, our stores attract mainly younger shoppers. In thinking about fashion trends we want to feature, the marketing department has found that customers aged twelve to eighteen prefer styles that come in a lot of different colors. <span class='hl-q2'>We chose Castillo as a new vendor for this very reason. Just look at the color selection in these samples!</span> Now, the finances of carrying Castillo's line. <span class='hl-q3'>Hae-Rim will go over the anticipated costs and profit estimates.</span>",
+            script_vi: "M-Au: Hôm nay tôi muốn tập trung thảo luận về <span class='hl-q1'>Castillo, một thương hiệu quần áo</span> ta sẽ bắt đầu bày bán trong các cửa hàng của mình vào tháng tới. Như các bạn đã biết, cửa hàng của chúng ta thu hút chủ yếu là người trẻ tuổi. Khi nghĩ về xu hướng thời trang muốn giới thiệu, bộ phận tiếp thị đã phát hiện ra rằng khách hàng từ mười hai đến mười tám tuổi thích phong cách đa dạng về màu sắc. <span class='hl-q2'>Chúng tôi chọn Castillo làm nhà cung cấp mới cũng vì lý do này. Hãy cứ nhìn vào lựa chọn màu sắc trong các mẫu này!</span> Bây giờ là về vấn đề tài chính liên quan đến bày bán dòng sản phẩm Castillo. <span class='hl-q3'>Hae-Rim sẽ trình bày các dự toán chi phí và lợi nhuận ước đoán.</span>",
+            questions: [
+                {
+                    id: 74,
+                    q_en: "What product does Castillo manufacture?", q_vi: "Castillo sản xuất sản phẩm gì?",
+                    opts: [
+                        { l: "A", text: "Jewelry", text_vi: "Trang sức", isCorrect: false },
+                        { l: "B", text: "Clothing", text_vi: "Quần áo", isCorrect: true },
+                        { l: "C", text: "Art supplies", text_vi: "Đồ dùng nghệ thuật", isCorrect: false },
+                        { l: "D", text: "Backpacks", text_vi: "Ba lô", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án B. Sản phẩm Castillo là quần áo như được giới thiệu trong “Castillo, a clothing brand” với clothing brand là “hiệu quần áo” nên câu B là đáp án đúng."
+                },
+                {
+                    id: 75,
+                    q_en: "Why does the speaker say, \"Just look at the color selection in these samples\"?", q_vi: "Tại sao người nói lại bảo “Hãy cứ nhìn vào lựa chọn màu sắc trong các mẫu này”?",
+                    opts: [
+                        { l: "A", text: "To introduce a new manufacturing technique", text_vi: "Để giới thiệu một kỹ thuật sản xuất mới", isCorrect: false },
+                        { l: "B", text: "To assign a task", text_vi: "Để phân công một nhiệm vụ", isCorrect: false },
+                        { l: "C", text: "To express disappointment", text_vi: "Để bày tỏ sự thất vọng", isCorrect: false },
+                        { l: "D", text: "To support a decision", text_vi: "Để hỗ trợ một quyết định", isCorrect: true }
+                    ],
+                    explanation: "=> Chọn đáp án D. Trong phần trước người nói đưa ra lí do chọn Castillo là do sản phẩm có nhiều màu sắc, và câu nói trên dùng để giúp đưa ra dẫn chứng, hay để hỗ trợ cho quyết định đó (câu D)."
+                },
+                {
+                    id: 76,
+                    q_en: "What will Hae-Rim do?", q_vi: "Hae-Rim sẽ làm gì?",
+                    opts: [
+                        { l: "A", text: "Present financial information", text_vi: "Trình bày thông tin tài chính", isCorrect: true },
+                        { l: "B", text: "Share competitor data", text_vi: "Chia sẻ dữ liệu của công ty cạnh tranh", isCorrect: false },
+                        { l: "C", text: "Analyze survey results", text_vi: "Phân tích kết quả khảo sát", isCorrect: false },
+                        { l: "D", text: "Introduce advertising layouts", text_vi: "Giới thiệu bố cục quảng cáo", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án A. Cô ấy sẽ trình bày vấn đề tài chính liên quan đến việc bày bán hiệu quần áo mới như chi phí hay lợi nhuận (Hae-Rim will go over the anticipated costs and profit estimates) nên câu A là đáp án đúng."
+                }
+            ]
+        },
+        {
+            id: "77-79",
+            type: "Talk",
+            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-77-79-2.mp3",
+            graphic: null,
+            script_en: "M-Cn: <span class='hl-q1'>Before we open the café today, I want to tell you about some seasonal menu changes.</span> I just got word from corporate headquarters that <span class='hl-q2'>new coffee beverages will be on the menu starting next week.</span> One of the new drinks is called Winter Delight. I've got some samples of it here for everyone to try. Now, a number of different syrup flavors, such as vanilla or hazelnut, can be added to this drink. <span class='hl-q3'>So please be extra careful when you're preparing customers' orders.</span> We want to make sure they get exactly what they want.",
+            script_vi: "M-Cn: <span class='hl-q1'>Trước khi chúng ta mở cửa quán hôm nay, tôi muốn nói với các bạn về một số thay đổi thực đơn theo mùa.</span> Tôi vừa nhận được thông tin từ trụ sở công ty rằng <span class='hl-q2'>loại là phê mới sẽ được đưa vào thực đơn vào tuần tới.</span> Một trong những đồ uống mới được gọi là Winter Delight (Hân Hoan mùa Đông). Tôi đã có một số mẫu của món này ở đây cho mọi người thử. Bây giờ thì, một số hương vị xi-rô khác nhau, chẳng hạn như vani hoặc quả phỉ, đều có thể được thêm vào loại thức uống này. <span class='hl-q3'>Vì vậy, hãy cẩn thận hơn khi các bạn chuẩn bị đơn hàng cho khách.</span> Chúng ta muốn chắc chắn khách hàng có được chính xác những gì họ muốn.",
+            questions: [
+                {
+                    id: 77,
+                    q_en: "Who most likely is the speaker?", q_vi: "Người nói có thể là ai?",
+                    opts: [
+                        { l: "A", text: "An investment banker", text_vi: "Nhân viên ngân hàng đầu tư", isCorrect: false },
+                        { l: "B", text: "A city official", text_vi: "Quan chức thành phố", isCorrect: false },
+                        { l: "C", text: "A food scientist", text_vi: "Nhà khoa học thực phẩm", isCorrect: false },
+                        { l: "D", text: "A restaurant manager", text_vi: "Quản lý nhà hàng", isCorrect: true }
+                    ],
+                    explanation: "=> Chọn đáp án D. Câu D là đáp án hợp lí nhất vì thông qua các chi tiết như thông báo về thay đổi trong thực đơn (I want to tell you about some seasonal menu changes) thì ta có thể hiểu là người này làm việc tại một nhà hàng và có thể có chức vụ cao hơn những người nghe."
+                },
+                {
+                    id: 78,
+                    q_en: "According to the speaker, what will happen next week?", q_vi: "Theo như người nói thì điều gì sẽ xảy ra vào tuần sau?",
+                    opts: [
+                        { l: "A", text: "Some new equipment will be installed.", text_vi: "Một số thiết bị mới sẽ được lắp đặt.", isCorrect: false },
+                        { l: "B", text: "A corporate office will relocate.", text_vi: "Văn phòng công ty sẽ dời đi.", isCorrect: false },
+                        { l: "C", text: "New menu items will be available.", text_vi: "Các món mới trong thực đơn sẽ được phục vụ.", isCorrect: true },
+                        { l: "D", text: "Seasonal employees will begin work.", text_vi: "Nhân viên thời vụ sẽ bắt đầu làm việc.", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án C. Theo như người nói thì các món mới sẽ được đưa vào thực đơn kể từ tuần sau (I just got word from corporate headquarters that new coffee beverages will be on the menu starting next week) nên câu C là đáp án đúng."
+                },
+                {
+                    id: 79,
+                    q_en: "What does the speaker warn listeners about?", q_vi: "Người nói cảnh báo người nghe về điều gì?",
+                    opts: [
+                        { l: "A", text: "Preparing orders carefully", text_vi: "Chuẩn bị đơn hàng cẩn thận", isCorrect: true },
+                        { l: "B", text: "Wearing proper attire", text_vi: "Mặc trang phục phù hợp", isCorrect: false },
+                        { l: "C", text: "Recording hours accurately", text_vi: "Ghi lại giờ giấc chính xác", isCorrect: false },
+                        { l: "D", text: "Taking inventory daily", text_vi: "Lấy hàng trong kho ra mỗi ngày", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án A. Người nói khuyên người nghe nên chuẩn bị thức uống (loại café mới) cẩn thận vì có thể cho nhiều loại gia vị vào (So please be extra careful when you're preparing customers' orders) nên câu A là đáp án đúng."
+                }
+            ]
+        },
+        {
+            id: "80-82",
+            type: "Talk",
+            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-80-82-2.mp3",
+            graphic: null,
+            script_en: "W-Br: Hi Roberto, it's Amanda. <span class='hl-q1'>The company president wants J-1 Electronics to have a booth at the trade fair in New York in June, and he wants us to make the arrangements and come up with a display.</span> <span class='hl-q2'>I know I said we really need to focus on updating the client database this week, but this trip just came up —it wasn't my idea.</span> Anyway, I'll get the rest of the sales team together today, so we can brainstorm some ideas for the display. <span class='hl-q3'>But in the meantime, could you contact the fair organizers about getting a booth?</span> Thanks. And let me know if you have any questions.",
+            script_vi: "W-Br: Chào Roberto, Amanda đây. <span class='hl-q1'>Chủ tịch công ty muốn mẫu J-1 Electronics có một gian hàng tại hội chợ thương mại ở New York vào tháng 6, và ông ấy muốn chúng ta sắp xếp rồi nghĩ ra cách trưng bày.</span> <span class='hl-q2'>Tôi biết tôi đã nói rằng ta thực sự cần tập trung vào việc cập nhật cơ sở dữ liệu khách hàng trong tuần này, nhưng lại đột xuất ra chuyến đi này, và đó không phải là ý tưởng của tôi.</span> Dù sao thì, tôi sẽ tập hợp những thành viên còn lại của đội bán hàng trong hôm nay, nhờ đó ta có thể lên ý tưởng cho một số phương án trưng bày. <span class='hl-q3'>Nhưng trong lúc này, anh có thể liên hệ với các nhà tổ chức hội chợ để đặt một gian hàng không?</span> Cảm ơn. Và hãy cho tôi biết nếu anh có bất kỳ thắc mắc nào.",
+            questions: [
+                {
+                    id: 80,
+                    q_en: "Why is the speaker calling?", q_vi: "Tại sao người nói gọi?",
+                    opts: [
+                        { l: "A", text: "To register for a training session", text_vi: "Để đăng ký một buổi tập huấn", isCorrect: false },
+                        { l: "B", text: "To request help with a project", text_vi: "Yêu cầu trợ giúp với một dự án", isCorrect: true },
+                        { l: "C", text: "To book a meeting room", text_vi: "Đặt phòng họp", isCorrect: false },
+                        { l: "D", text: "To get updated customer information", text_vi: "Để cập nhật thông tin khách hàng", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án B. Người phụ nữ gọi đến để yêu cầu người nghe trợ giúp cho gian hàng trưng bày sản phẩm ở triển lãm (The company president wants J-1 Electronics to have a booth at the trade fair in New York in June, …arrangements and come up with a display) nên câu B là đáp án đúng."
+                },
+                {
+                    id: 81,
+                    q_en: "What does the speaker imply when she says, \"it wasn't my idea\"?", q_vi: "Người nói có ý gì khi bảo “và đó không phải là ý tưởng của tôi”?",
+                    opts: [
+                        { l: "A", text: "She knows a change is inconvenient.", text_vi: "Cô ấy biết rằng thay đổi thì bất tiện.", isCorrect: true },
+                        { l: "B", text: "She thinks a colleague deserves credit.", text_vi: "Cô ấy nghĩ rằng một đồng nghiệp xứng đáng được tin cậy.", isCorrect: false },
+                        { l: "C", text: "She would like the listener's opinion.", text_vi: "Cô ấy muốn ý kiến của người nghe.", isCorrect: false },
+                        { l: "D", text: "She is going to explain a new procedure.", text_vi: "Cô ấy sẽ giải thích quy trình mới.", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án A. Trước đó người nói bảo rằng là mục tiêu trước mắt là tập trung vào cập nhật dữ liệu khách hàng (I know I said we really need to focus on updating the client database this week) nhưng sau đó lại phải đổi mục tiêu sang lên ý tưởng cho gian hàng nên câu A là câu trả lời đúng nhất."
+                },
+                {
+                    id: 82,
+                    q_en: "What does the speaker ask the listener to do?", q_vi: "Người nói yêu cầu người nghe làm gì?",
+                    opts: [
+                        { l: "A", text: "Order business cards", text_vi: "Đặt danh thiếp", isCorrect: false },
+                        { l: "B", text: "Check a mailbox", text_vi: "Kiểm tra hòm thư", isCorrect: false },
+                        { l: "C", text: "Revise a report", text_vi: "Kiểm tra báo cáo", isCorrect: false },
+                        { l: "D", text: "Reserve a booth", text_vi: "Đặt trước gian hàng", isCorrect: true }
+                    ],
+                    explanation: "=> Chọn đáp án D. Người gọi yêu cầu người nghe liên lạc với ban tổ chức và hỏi về việc đặt gian hàng trưng bày (could you contact the fair organizers about getting a booth?) hay cách nói khác là đặt gian hàng (câu D)."
+                }
+            ]
+        },
+        {
+            id: "83-85",
+            type: "Talk",
+            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-83-85-2.mp3",
+            graphic: null,
+            script_en: "W-Am: You have reached customer service at Ocean Shipping— a leader in international shipping services. We're happy to announce that <span class='hl-q1'>starting June first, we'll begin offering shipping services to Brazil.</span> Note that <span class='hl-q2'>if you are planning to ship a vehicle to any location overseas, you must provide proof of ownership.</span> <span class='hl-q3'>Your call may be recorded, and the recording could be used for quality control or training purposes.</span> Thank you for calling Ocean Shipping.",
+            script_vi: "W-Am: Bạn đã gọi đến dịch vụ chăm sóc khách hàng tại Ocean Shipping - công ty hàng đầu về dịch vụ vận chuyển quốc tế. Chúng tôi vui mừng thông báo rằng <span class='hl-q1'>bắt đầu từ ngày Một tháng Sáu, chúng tôi sẽ bắt đầu cung cấp dịch vụ vận chuyển đến Brazil.</span> Lưu ý rằng <span class='hl-q2'>nếu quý khách dự định vận chuyển một phương tiện đi lại đến bất kỳ địa điểm nào ở nước ngoài, thì phải cung cấp bằng chứng quyền sở hữu.</span> <span class='hl-q3'>Cuộc gọi của quý khách có thể được ghi lại và ghi âm có thể được sử dụng cho mục đích kiểm soát chất lượng hoặc đào tạo.</span> Cảm ơn quý khách đã gọi cho Ocean Shipping.",
+            questions: [
+                {
+                    id: 83,
+                    q_en: "What will the company do beginning on June 1?", q_vi: "Công ty sẽ làm gì bắt đầu vào ngày 1 tháng 6?",
+                    opts: [
+                        { l: "A", text: "Accept reservations online", text_vi: "Cho phép đặt phòng trực tuyến", isCorrect: false },
+                        { l: "B", text: "Provide service to a new location", text_vi: "Cung cấp dịch vụ ở một địa điểm mới", isCorrect: true },
+                        { l: "C", text: "Offer a customer loyalty program", text_vi: "Tổ chức chương trình khách hàng thân thiết", isCorrect: false },
+                        { l: "D", text: "Lower its express shipping rates", text_vi: "Hạ giá cước vận chuyển nhanh", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án B. Từ ngày 1 tháng Sáu, công ty sẽ mở dịch vụ ở Brazil (starting June first, we'll begin offering shipping services to Brazil) nên câu B là đáp án đúng."
+                },
+                {
+                    id: 84,
+                    q_en: "According to the speaker, what must customers do in order to ship a vehicle?", q_vi: "Theo người nói, khách hàng phải làm gì để vận chuyển một chiếc xe?",
+                    opts: [
+                        { l: "A", text: "Show proof of ownership", text_vi: "Đưa bằng chứng về quyền sở hữu", isCorrect: true },
+                        { l: "B", text: "Provide an extra set of keys", text_vi: "Cung cấp thêm một bộ chìa khóa", isCorrect: false },
+                        { l: "C", text: "Purchase additional insurance", text_vi: "Mua bảo hiểm bổ sung", isCorrect: false },
+                        { l: "D", text: "Get a mechanical inspection", text_vi: "Kiểm tra nội bộ bên trong", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án A. Để vận chuyển phương tiện thì cần đưa ra bằng chứng sở hữu (if you are planning to ship a vehicle to any location overseas, you must provide proof of ownership) (câu A)."
+                },
+                {
+                    id: 85,
+                    q_en: "What does the speaker indicate about the call?", q_vi: "Người nói có thể chỉ ra điều gì về cuộc gọi?",
+                    opts: [
+                        { l: "A", text: "It will be redirected to a different department.", text_vi: "Sẽ được chuyển hướng đến một bộ phận khác.", isCorrect: false },
+                        { l: "B", text: "It will be answered in the order in which it was received.", text_vi: "Sẽ được trả lời theo thứ tự nhận được.", isCorrect: false },
+                        { l: "C", text: "It may be several minutes until a representative answers.", text_vi: "Có thể chờ vài phút cho đến khi một nhân viên tổng đài nhận cuộc gọi.", isCorrect: false },
+                        { l: "D", text: "It may be recorded for future use.", text_vi: "Có thể được ghi lại để sử dụng trong tương lai.", isCorrect: true }
+                    ],
+                    explanation: "=> Chọn đáp án D. Theo như trong nội dung người nói, cuộc gọi đến sẽ được thu lại (Your call may be recorded, and the recording could be used for quality control or training purposes) nên câu D là đáp án đúng."
+                }
+            ]
+        },
+        {
+            id: "86-88",
+            type: "Talk",
+            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-86-88-2.mp3",
+            graphic: null,
+            script_en: "M-Cn: Hello everyone and welcome to Markel' County Playhouse. <span class='hl-q1'>Thank you for volunteering to help make costumes</span> for our next production Changing Time. <span class='hl-q2'>Because this play has so many characters</span>, we'll have to work hard to get ready for opening night on April twelfth. Each character has about three different outfits, so that's a lot of sewing for all of us. <span class='hl-q3'>The dress rehearsal, in complete costume, is only five weeks away</span>, so we'll need everything done by then.",
+            script_vi: "M-Cn: Xin chào tất cả mọi người và chào mừng các bạn đến với Nhà Hát Hạt Markel. <span class='hl-q1'>Cảm ơn các bạn đã tình nguyện phụ giúp làm trang phục</span> cho tác phẩm tiếp theo của chúng tôi Thời gian thay đổi. <span class='hl-q2'>Vì vở kịch này có rất nhiều nhân vật</span>, chúng tôi sẽ phải nỗ lực để chuẩn bị cho đêm khai mạc vào ngày 12 tháng Tư. Mỗi nhân vật có khoảng ba bộ trang phục khác nhau, vì vậy đó là rất nhiều công việc may vá cho tất cả chúng ta. <span class='hl-q3'>Buổi dợt trong trang phục hoàn chỉnh, chỉ còn năm tuần nữa</span>, vì vậy chúng ta sẽ cần mọi thứ xong xuôi trước đó.",
+            questions: [
+                {
+                    id: 86,
+                    q_en: "Who is the intended audience for the talk?", q_vi: "Đối tượng dự định cho buổi nói chuyện là ai?",
+                    opts: [
+                        { l: "A", text: "Theater patrons", text_vi: "Khách của nhà hát", isCorrect: false },
+                        { l: "B", text: "Costume makers", text_vi: "Người sản xuất trang phục", isCorrect: true },
+                        { l: "C", text: "Ticket sellers", text_vi: "Người bán vé", isCorrect: false },
+                        { l: "D", text: "Stage musicians", text_vi: "Nhạc sĩ sân khấu", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án B. Người nghe là những người tình nguyện giúp làm trang phục cho nhà hát (Thank you for volunteering to help make costumes) nên câu B là đáp án đúng."
+                },
+                {
+                    id: 87,
+                    q_en: "What does the speaker mention about the play?", q_vi: "Người nói đề cập đến điều gì về vở kịch?",
+                    opts: [
+                        { l: "A", text: "It is very long.", text_vi: "Rất dài.", isCorrect: false },
+                        { l: "B", text: "It is set in the past.", text_vi: "Lấy bối cảnh trong quá khứ.", isCorrect: false },
+                        { l: "C", text: "There are many characters.", text_vi: "Có nhiều nhân vật.", isCorrect: true },
+                        { l: "D", text: "There is a waiting list for tickets.", text_vi: "Có một danh sách chờ để mua vé.", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án C. Theo như người nói thì đây là vở kịch có nhiều nhân vật (this play has so many characters) (câu C)"
+                },
+                {
+                    id: 88,
+                    q_en: "What will take place in five weeks?", q_vi: "Điều gì sẽ diễn ra trong năm tuần tới?",
+                    opts: [
+                        { l: "A", text: "A photography session", text_vi: "Buổi chụp ảnh", isCorrect: false },
+                        { l: "B", text: "A dinner reception", text_vi: "Tiệc chiêu đãi", isCorrect: false },
+                        { l: "C", text: "A fashion show", text_vi: "Buổi trình diễn thời trang", isCorrect: false },
+                        { l: "D", text: "A dress rehearsal", text_vi: "Buổi thử trang phục", isCorrect: true }
+                    ],
+                    explanation: "=> Chọn đáp án D. Buổi thử trang phục (câu D) là đáp án chính xác (The dress rehearsal, in complete costume, is only five weeks away)."
+                }
+            ]
+        },
+        {
+            id: "89-91",
+            type: "Talk",
+            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-89-91-2.mp3",
+            graphic: null,
+            script_en: "W-Am: Hi Pierre, this is Emma. <span class='hl-q1'>I know we were supposed to meet in the conference room at nine this morning to begin discussing the renovations to the lobby</span>, but I'm calling to let you know I'm having a problem with transportation. <span class='hl-q2'>I was at the train station when train service was suspended.</span> Now I'm going to find a taxi but it may take a while before I get to the office. <span class='hl-q3'>Why don't we go out to lunch today instead?</span> I hope this will work for you, because I have some ideas for the project that I'd like to talk about.",
+            script_vi: "W-Am: Chào Pierre, Emma đây. <span class='hl-q1'>Tôi biết là chúng ta đáng nhẽ ra phải gặp nhau ở phòng hội thảo lúc chín giờ sáng nay để bắt đầu thảo luận về việc sửa chữa sảnh</span>, nhưng tôi gọi để báo anh là tôi đang gặp vấn đề giao thông. <span class='hl-q2'>Tôi đang ở ga tàu thì xe lửa bị ngừng hoạt động.</span> Bây giờ thì tôi sẽ tìm một chiếc taxi nhưng có thể sẽ mất một lúc trước khi tôi đến văn phòng. <span class='hl-q3'>Tại sao hôm nay chúng ta không đi ăn trưa nhỉ?</span> Tôi hy vọng điều này thì ổn với anh, bởi vì tôi có một số ý tưởng cho dự án muốn bàn đến.",
+            questions: [
+                {
+                    id: 89,
+                    q_en: "What was the speaker supposed to do this morning?", q_vi: "Người nói đáng nhẽ ra phải làm gì sáng nay?",
+                    opts: [
+                        { l: "A", text: "Interview a job applicant", text_vi: "Phỏng vấn người xin việc", isCorrect: false },
+                        { l: "B", text: "Attend a meeting", text_vi: "Tham dự một cuộc họp", isCorrect: true },
+                        { l: "C", text: "Pick up a client", text_vi: "Đón khách", isCorrect: false },
+                        { l: "D", text: "Lead a tour group", text_vi: "Dẫn đầu một nhóm du lịch", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án B. Người nói đáng ra phải đến họp về việc sửa chữa sảnh (I know we were supposed to meet in the conference room at nine this morning to begin discussing…) (câu B)."
+                },
+                {
+                    id: 90,
+                    q_en: "What transportation problem does the speaker mention?", q_vi: "Người nói đề cập đến trục trặc giao thông gì?",
+                    opts: [
+                        { l: "A", text: "A road has been closed.", text_vi: "Con đường đã bị chặn", isCorrect: false },
+                        { l: "B", text: "A bridge is under construction.", text_vi: "Cây cầu đang được xây dựng.", isCorrect: false },
+                        { l: "C", text: "A train service is unavailable.", text_vi: "Dịch vụ xe lửa không dùng được", isCorrect: true },
+                        { l: "D", text: "A flight has been delayed.", text_vi: "Chuyến bay đã bị hoãn.", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án C. Câu C là đáp án đúng, theo như người nói: “I was at the train station when train service was suspended”. Như vậy, “train service was suspended” đồng nghĩa với “train service is unavailable”."
+                },
+                {
+                    id: 91,
+                    q_en: "What does the speaker suggest?", q_vi: "Người nói đề nghị gì?",
+                    opts: [
+                        { l: "A", text: "Inviting other colleagues", text_vi: "Mời đồng nghiệp khác", isCorrect: false },
+                        { l: "B", text: "Posting a notice", text_vi: "Đăng thông báo", isCorrect: false },
+                        { l: "C", text: "Holding a phone conference", text_vi: "Tổ chức họp qua điện thoại", isCorrect: false },
+                        { l: "D", text: "Having lunch together", text_vi: "Ăn trưa cùng nhau", isCorrect: true }
+                    ],
+                    explanation: "=> Chọn đáp án D. Người nói đề nghị ăn trưa cùng nhau để cô ấy nói về ý tưởng cho công việc (Why don't we go out to lunch today instead) nên câu D là đáp án đúng."
+                }
+            ]
+        },
+        {
+            id: "92-94",
+            type: "Talk",
+            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-92-94-2.mp3",
+            graphic: null,
+            script_en: "M-Au: Thanks for inviting me to your annual planning meeting. We're glad that you're considering us to meet the energy needs of your factory. <span class='hl-q1'>My company, Stillman Technology, is committed to providing renewable energy</span> to businesses like yours. <span class='hl-q2'>By choosing to install our solar panels, you can power all your facilities with affordable clean energy. And, hundreds of businesses have signed up.</span> I'm sure you have a lot of questions. But first, <span class='hl-q3'>I'd like to show a video of a speech our president gave when we received the Eco-Industry award</span> at a conference last year.",
+            script_vi: "M-Au: Cảm ơn đã mời tôi đến cuộc họp kế hoạch hàng năm của quý vị. Chúng tôi rất vui vì quý công ty đang xem xét chúng tôi cho vấn đề đáp ứng nhu cầu năng lượng nhà máy. <span class='hl-q1'>Công ty của tôi, Stillman Technology, cam kết cung cấp năng lượng tái tạo</span> cho các doanh nghiệp như của quý vị. <span class='hl-q2'>Bằng cách chọn lắp đặt các tấm pin mặt trời, quý công ty có thể cung cấp năng lượng cho tất cả các cơ sở của mình bằng năng lượng sạch với giá cả phải chăng. Và, hàng trăm doanh nghiệp đã đăng ký.</span> Tôi chắc rằng quý vị có rất nhiều câu hỏi. Nhưng trước tiên, <span class='hl-q3'>tôi muốn chiếu một video về bài phát biểu của chủ tịch công ty khi chúng tôi nhận được giải thưởng Công nghiệp - sinh thái</span> tại một hội nghị năm ngoái.",
+            questions: [
+                {
+                    id: 92,
+                    q_en: "What industry does the speaker work in?", q_vi: "Người nói làm việc trong ngành nào?",
+                    opts: [
+                        { l: "A", text: "Renewable energy", text_vi: "Năng lượng tái tạo", isCorrect: true },
+                        { l: "B", text: "Computer technology", text_vi: "Công nghệ máy tính", isCorrect: false },
+                        { l: "C", text: "Publishing", text_vi: "Xuất bản", isCorrect: false },
+                        { l: "D", text: "Real estate", text_vi: "Bất động sản", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án A. Câu A là đáp án đúng khi người nói tự giới thiệu công ty của mình (My company, Stillman Technology, is committed to providing renewable energy) do đó anh ta cũng phải làm việc trong lĩnh vực năng lượng."
+                },
+                {
+                    id: 93,
+                    q_en: "What does the speaker imply when he says, \"hundreds of businesses have signed up\"?", q_vi: "Người nói có ý gì khi nói, \"hàng trăm doanh nghiệp đã đăng ký\"?",
+                    opts: [
+                        { l: "A", text: "He is worried about meeting client demands.", text_vi: "Anh ấy lo lắng về việc đáp ứng nhu cầu của khách hàng.", isCorrect: false },
+                        { l: "B", text: "He expects an industry to start changing.", text_vi: "Ông hy vọng một ngành công nghiệp sẽ bắt đầu thay đổi.", isCorrect: false },
+                        { l: "C", text: "The listeners should choose his company.", text_vi: "Người nghe nên chọn công ty của anh ta.", isCorrect: true },
+                        { l: "D", text: "The listeners will receive a list of contacts", text_vi: "Người nghe sẽ nhận được một danh sách các liên hệ", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án C. Người nói đưa ra số lượng công ty đã đăng kí để thể hiện sự đáng tin cậy của công ty mình và làm dẫn chứng cho lợi ích việc kí kết “By choosing to install our solar panels, you can power all your facilities with affordable clean energy”, nên câu C là đáp án đúng"
+                },
+                {
+                    id: 94,
+                    q_en: "What will the listeners see in the video?", q_vi: "Người nghe sẽ thấy gì trong video?",
+                    opts: [
+                        { l: "A", text: "A virtual tour", text_vi: "Chuyến tham quan ảo", isCorrect: false },
+                        { l: "B", text: "An award-acceptance speech", text_vi: "Bài phát biểu nhận giải thưởng", isCorrect: true },
+                        { l: "C", text: "Product features", text_vi: "Tính năng sản phẩm", isCorrect: false },
+                        { l: "D", text: "Installation instructions", text_vi: "Hướng dẫn cài đặt", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án B. Người nghe sẽ thấy một bài phát biểu của chủ tịch công ty người nói tại một hội thảo (I'd like to show a video of a speech our president gave when we received the Eco-Industry award) nên câu B là đáp án đúng."
+                }
+            ]
+        },
+        {
+            id: "95-97",
+            type: "Talk",
+            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-95-97-2.mp3",
+            graphic: "<img src='https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-1-18.png' style='width:100%; border-radius:10px;'>",
+            script_en: "M-Cn: Hello, this is Fred Capo, from MemberRelations at Greenwood Gym. I just wanted to <span class='hl-q1'>thank you for participating in our member survey.</span> <span class='hl-q2'>Everyone who completed a survey will receive a five dollar voucher, which can be used for any class fees or in our café. I've already sent it to your e-mail.</span> Also, looking at your feedback, I see that you've given very high ratings overall for our gym. Thank you! <span class='hl-q3'>For the category that you gave five stars to, I'd like to ask you a few more questions.</span> If you have time, please give me a call back at 555-0184.",
+            script_vi: "M-Cn: Xin chào, tôi là Fred Capo, từ Bộ Phận Quan Hệ Thành Viên tại Phòng Tập Greenwood. Tôi chỉ muốn <span class='hl-q1'>cảm ơn bạn đã tham gia cuộc khảo sát thành viên của chúng tôi.</span> <span class='hl-q2'>Mọi người đã hoàn thành cuộc khảo sát sẽ nhận được một phiếu mua hàng năm đô la, có thể được sử dụng cho bất kỳ phí học hoặc tại quán cà phê của chúng tôi. Tôi đã gửi nó đến email của bạn.</span> Ngoài ra, theo phản hồi, tôi thấy rằng bạn đã xếp hạng rất cao cho phòng tập thể dục của chúng tôi. Cảm ơn bạn! <span class='hl-q3'>Đối với mục mà bạn đã đánh giá năm sao, tôi muốn hỏi bạn thêm một vài câu hỏi.</span> Nếu bạn có thời gian, xin vui lòng gọi lại cho tôi theo số 555-0184.",
+            questions: [
+                {
+                    id: 95,
+                    q_en: "Who is the message most likely for?", q_vi: "Thông điệp có khả năng dành cho ai nhất?",
+                    opts: [
+                        { l: "A", text: "A fitness instructor", text_vi: "Huấn luyện viên thể hình", isCorrect: false },
+                        { l: "B", text: "A data analyst", text_vi: "Nhà phân tích dữ liệu", isCorrect: false },
+                        { l: "C", text: "A gym member", text_vi: "Thành viên phòng tập thể hình", isCorrect: true },
+                        { l: "D", text: "A marketing expert", text_vi: "Chuyên gia tiếp thị", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án C. Người nói từ phòng quan hệ thành viên và người nghe lại là người tham gia khảo sát thành viên (thank you for participating in our member survey) nên câu C là đáp án đúng."
+                },
+                {
+                    id: 96,
+                    q_en: "What does the speaker say he has e-mailed the listener?", q_vi: "Người nói đã gửi gì qua e-mail cho người nghe?",
+                    opts: [
+                        { l: "A", text: "A discount voucher", text_vi: "Một phiếu giảm giá", isCorrect: true },
+                        { l: "B", text: "Driving directions", text_vi: "Hướng dẫn lái xe", isCorrect: false },
+                        { l: "C", text: "A fitness magazine", text_vi: "Một tạp chí thể dục", isCorrect: false },
+                        { l: "D", text: "Class schedules", text_vi: "Lịch học", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án A. Câu A là đáp án đúng vì người tham dự khảo sát sẽ nhận một phiếu giảm giá (Everyone who completed a survey will receive a five dollar voucher) và người nói đã gửi qua email."
+                },
+                {
+                    id: 97,
+                    q_en: "Look at the graphic. Which category does the speaker request more information about?", q_vi: "Nhìn hình minh họa. Mục nào được người nói yêu cầu thêm thông tin?",
+                    opts: [
+                        { l: "A", text: "Cleanliness", text_vi: "Độ sạch sẽ", isCorrect: false },
+                        { l: "B", text: "Location", text_vi: "Vị trí", isCorrect: false },
+                        { l: "C", text: "Staff friendliness", text_vi: "Độ thân thiện nhân viên", isCorrect: true },
+                        { l: "D", text: "Cost", text_vi: "Giá cả", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án C. Câu C là đáp án đúng vì độ thân thiện nhân viên được đánh giá năm sao mà người nói lại muốn hỏi về mục được đánh giá ở mức đó (For the category that you gave five stars to, I'd like to ask you a few more questions)."
+                }
+            ]
+        },
+        {
+            id: "98-100",
+            type: "Talk",
+            audio: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-98-100-2.mp3",
+            graphic: "<img src='https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-2-17.png' style='width:100%; border-radius:10px;'>",
+            script_en: "M-Au: <span class='hl-q1'>Welcome to today's class on small business start-ups.</span> We'll be talking about designing a logo that represents the company you're creating. It's how customers will identify you, so the first thing you should do is consider the message you want to communicate. Please take a look at the handout in front of you. We'll talk about each of the features, but <span class='hl-q2'>let's begin by looking at the phrase, \"Creative advertising at your fingertips”.</span> The function of this part of the logo is to tell customers what the company is all about. Now, <span class='hl-q3'>try to come up with phrases that might work for your own business—you'll find some paper and pens in your packets</span>",
+            script_vi: "M-Au: <span class='hl-q1'>Chào mừng đến với lớp học ngày hôm nay về khởi nghiệp kinh doanh quy mô nhỏ.</span> Chúng ta sẽ nói về việc thiết kế một logo đại diện cho công ty bạn đang xây dựng. Đó là cách khách hàng sẽ nhận ra các bạn, nên điều đầu tiên nên làm là cân nhắc thông điệp muốn truyền đạt. Hãy nhìn vào thông báo trước mặt. Chúng ta sẽ nói về từng tính năng, nhưng <span class='hl-q2'>hãy bắt đầu bằng việc xem cụm từ, \"Quảng cáo sáng tạo trong tầm tay”.</span> Chức năng của phần này của logo là cho khách hàng biết công ty làm gì. Bây giờ, <span class='hl-q3'>hãy thử đưa ra các cụm từ có thể phù hợp cho doanh nghiệp của chính mình. Các bạn sẽ tìm thấy giấy và bút trong gói được phát.</span>",
+            questions: [
+                {
+                    id: 98,
+                    q_en: "Where is the talk most likely taking place?", q_vi: "Cuộc nói chuyện có khả năng diễn ra ở đâu?",
+                    opts: [
+                        { l: "A", text: "At a business class", text_vi: "Tại một lớp học kinh doanh", isCorrect: true },
+                        { l: "B", text: "At a software training session", text_vi: "Tại một buổi tập huấn phần mềm", isCorrect: false },
+                        { l: "C", text: "At a department meeting", text_vi: "Tại một cuộc họp của bộ phận", isCorrect: false },
+                        { l: "D", text: "At a client presentation", text_vi: "Tại buổi thuyết trình cho khách hàng", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án A. Câu A là đáp án đúng vì người nói giới thiệu ngay phần đầu “Welcome to today's class on small business start-ups”"
+                },
+                {
+                    id: 99,
+                    q_en: "Look at the graphic. Which part of the logo does the speaker discuss first?", q_vi: "Nhìn hình minh họa. Phần nào được nói đến trước tiên?",
+                    opts: [
+                        { l: "A", text: "The name", text_vi: "Tên", isCorrect: false },
+                        { l: "B", text: "The background", text_vi: "Phần nền", isCorrect: false },
+                        { l: "C", text: "The image", text_vi: "Hình ảnh", isCorrect: false },
+                        { l: "D", text: "The tagline", text_vi: "Khẩu hiệu", isCorrect: true }
+                    ],
+                    explanation: "=> Chọn đáp án D. Ta nghe được cụm từ \", \"Creative advertising at your fingertips” của phần “tagline- khẩu hiệu” được bàn đến đầu tiên nên câu D là đáp án đúng."
+                },
+                {
+                    id: 100,
+                    q_en: "What will the listeners do next?", q_vi: "Người nghe sẽ làm gì tiếp theo?",
+                    opts: [
+                        { l: "A", text: "Break into small groups", text_vi: "Chia thành các nhóm nhỏ", isCorrect: false },
+                        { l: "B", text: "Write down some ideas", text_vi: "Viết ra một số ý tưởng", isCorrect: true },
+                        { l: "C", text: "Read an article", text_vi: "Đọc một bài báo", isCorrect: false },
+                        { l: "D", text: "Check a Web site", text_vi: "Kiểm tra một trang web", isCorrect: false }
+                    ],
+                    explanation: "=> Chọn đáp án B. Người nói yêu cầu người nghe nghĩ ra các cụm từ phù hợp với doanh nghiệp của mình và dùng giấy bút nên ta có thể hiểu là phải viết ra (try to come up with phrases that might work for your own business—you'll find some paper and pens in your packets) nên câu B là đáp án đúng."
+                }
+            ]
+        }
+    ];
+
+    let currentMode = '';
+    let passageIndex = 0;
+    let userAnswers = {}; 
+    let startTime = 0;
+    const LOCAL_HISTORY_KEY = "snapenglish_p4_test3_2019_history";
+    const audio = document.getElementById('q-audio');
+    let autoNextTimeout;
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if (!audio.paused) audio.pause();
+        window.scrollTo(0, 0); 
+    }
+
+    function promptStart(selectedMode) {
+        pendingMode = selectedMode;
+        document.getElementById('modal-start-confirm').style.display = 'flex';
+    }
+
+    function cancelStart() { document.getElementById('modal-start-confirm').style.display = 'none'; }
+    
+    function confirmStart() {
+        document.getElementById('modal-start-confirm').style.display = 'none';
+        currentMode = pendingMode;
+        passageIndex = 0;
+        userAnswers = {};
+        startTime = Date.now();
+        showScreen('screen-test');
+        renderPassage();
+    }
+
+    function renderPassage() {
+        // Tránh lỗi nếu chưa paste data
+        if (!passagesData || passagesData.length === 0) {
+            alert("⚠️ Vui lòng dán dữ liệu passagesData vào mã nguồn trước khi chạy!");
+            return;
+        }
+
+        const pData = passagesData[passageIndex];
+        document.getElementById('passage-title').innerText = `Questions ${pData.id}`;
+        audio.src = pData.audio;
+
+        const qContainer = document.getElementById('questions-container');
+        qContainer.innerHTML = '';
+
+        if (pData.graphic) {
+            const layoutWrap = document.createElement('div');
+            layoutWrap.className = 'two-col-layout';
+
+            const leftCol = document.createElement('div');
+            leftCol.className = 'left-col';
+            const gBox = document.createElement('div');
+            gBox.className = 'graphic-box';
+            gBox.innerHTML = pData.graphic;
+            leftCol.appendChild(gBox);
+            layoutWrap.appendChild(leftCol);
+
+            const resizer = document.createElement('div');
+            resizer.className = 'resizer';
+            resizer.innerHTML = '<div class="resizer-handle"></div>';
+            layoutWrap.appendChild(resizer);
+
+            const rightCol = document.createElement('div');
+            rightCol.className = 'right-col';
+            
+            pData.questions.forEach((q, index) => {
+                const qBlock = createQuestionBlock(q, index); 
+                rightCol.appendChild(qBlock);
+            });
+            layoutWrap.appendChild(rightCol);
+            
+            qContainer.appendChild(layoutWrap);
+
+            initResizer(resizer, leftCol, layoutWrap);
+            
+        } else {
+            pData.questions.forEach((q, index) => {
+                const qBlock = createQuestionBlock(q, index);
+                qContainer.appendChild(qBlock);
+            });
+        }
+
+        const isLast = passageIndex === passagesData.length - 1;
+        clearTimeout(autoNextTimeout);
+
+        if (currentMode === 'mock') {
+            document.getElementById('btn-prev').style.display = 'none';
+            document.getElementById('btn-next').style.display = 'none';
+            document.getElementById('btn-submit').style.display = isLast ? 'inline-flex' : 'none';
+            
+            document.getElementById('audio-container').style.display = 'none';
+            document.getElementById('mock-msg').style.display = 'flex';
+            
+            let playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(e => console.log("Browser prevented autoplay."));
+            }
+            
+            audio.onended = () => {
+                if (!isLast) {
+                    autoNextTimeout = setTimeout(() => changePassage(1), 3000); 
+                } else {
+                    document.getElementById('mock-msg').innerHTML = "Đã hết Audio bài thi! Hãy nộp bài.";
+                }
+            };
+        } else {
+            document.getElementById('btn-prev').style.display = (passageIndex === 0) ? 'none' : 'inline-flex';
+            document.getElementById('btn-next').style.display = isLast ? 'none' : 'inline-flex';
+            document.getElementById('btn-submit').style.display = isLast ? 'inline-flex' : 'none';
+
+            document.getElementById('audio-container').style.display = 'block';
+            document.getElementById('mock-msg').style.display = 'none';
+            audio.onended = null;
+        }
+    }
+
+    function createQuestionBlock(q, index) {
+        let optsHTML = '';
+        q.opts.forEach(o => {
+            const isChecked = userAnswers[q.id] === o.l ? 'checked' : '';
+            const selectedClass = isChecked ? 'selected-ui' : '';
+            optsHTML += `
+                <label class="option-label ${selectedClass}" onclick="handleOptClick(this, ${q.id}, '${o.l}')">
+                    <input type="radio" name="q_${q.id}" value="${o.l}" ${isChecked}>
+                    <div class="custom-radio"></div>
+                    <span>(${o.l}) ${o.text}</span>
+                </label>
+            `;
+        });
+
+        const highlightBorderClass = index === 0 ? "border-color: var(--hl-q1);" : (index === 1 ? "border-color: var(--hl-q2);" : "border-color: var(--hl-q3);");
+        const qBlock = document.createElement('div');
+        qBlock.className = 'question-block';
+        qBlock.style = highlightBorderClass;
+        qBlock.innerHTML = `<div class="q-title">Question ${q.id}: ${q.q_en}</div><div class="options-grid">${optsHTML}</div>`;
+        return qBlock;
+    }
+
+    function handleOptClick(labelEl, qId, val) {
+        userAnswers[qId] = val;
+        const parent = labelEl.closest('.options-grid');
+        parent.querySelectorAll('.option-label').forEach(lbl => lbl.classList.remove('selected-ui'));
+        labelEl.classList.add('selected-ui');
+    }
+
+    function changePassage(step) {
+        passageIndex += step;
+        renderPassage();
+        window.scrollTo(0, 0); 
+    }
+
+    function promptSubmit() { document.getElementById('modal-submit-confirm').style.display = 'flex'; }
+    function cancelSubmit() { document.getElementById('modal-submit-confirm').style.display = 'none'; }
+    function confirmSubmit() {
+        document.getElementById('modal-submit-confirm').style.display = 'none';
+        finishTest();
+    }
+
+    function finishTest(isRestoring = false) {
+        clearTimeout(autoNextTimeout);
+        showScreen('screen-result');
+        let totalCorrect = 0;
+        let totalQs = 0;
+        
+        const listDiv = document.getElementById('result-list');
+        listDiv.innerHTML = '';
+
+        let timeTakenStr = "--:--";
+        if (!isRestoring && startTime > 0) {
+            let diffSeconds = Math.floor((Date.now() - startTime) / 1000);
+            let m = Math.floor(diffSeconds / 60);
+            let s = diffSeconds % 60;
+            timeTakenStr = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        passagesData.forEach((p, idx) => {
+            let pCorrect = 0;
+            p.questions.forEach(q => {
+                totalQs++;
+                const uAns = userAnswers[q.id];
+                const rightOpt = q.opts.find(o => o.isCorrect).l;
+                if(uAns === rightOpt) { pCorrect++; totalCorrect++; }
+            });
+
+            const pCard = document.createElement('div');
+            pCard.className = 'result-passage-card';
+            pCard.innerHTML = `
+                <div class="result-passage-info">
+                    <h3>Đoạn hội thoại ${p.id}</h3>
+                    <p>Số câu đúng: <strong style="color:var(--primary); font-size:1.1rem;">${pCorrect}/3</strong></p>
+                </div>
+                <button class="btn btn-outline" style="padding: 10px 20px; font-size:0.95rem; border-radius:12px;" onclick="openDetail(${idx})">Xem giải thích ✨</button>
+            `;
+            listDiv.appendChild(pCard);
+        });
+
+        document.getElementById('final-score').innerText = `${totalCorrect}/${totalQs}`;
+
+        if (!isRestoring) {
+            saveLocalHistory(totalCorrect, totalQs, userAnswers, timeTakenStr);
+            if(window.luuDiemTOEICLenFirebase) {
+                window.luuDiemTOEICLenFirebase(totalQs, totalCorrect, "ETS 2019 - Test 3", "Listening", "Part 4", userAnswers, timeTakenStr);
+            }
+        }
+    }
+
+    function openDetail(idx) {
+        const p = passagesData[idx];
+        document.getElementById('modal-title').innerText = `Phân tích Câu ${p.id}`;
+        document.getElementById('modal-audio').src = p.audio;
+        
+        document.getElementById('m-script-en').innerHTML = p.script_en;
+        document.getElementById('m-script-vi').innerHTML = p.script_vi;
+        
+        const vBox = document.getElementById('m-vocab-box');
+        if(p.vocab) {
+            vBox.style.display = 'block';
+            let fmtVocab = p.vocab.replace(/([a-zA-Z\s-]+):/g, '<span style="color:var(--primary-dark); font-weight:800;">$1</span>:');
+            document.getElementById('m-vocab').innerHTML = fmtVocab;
+        } else {
+            vBox.style.display = 'none';
+        }
+
+        const expArea = document.getElementById('modal-questions-explain');
+        expArea.innerHTML = '';
+        
+        if(p.graphic_vi) {
+             expArea.innerHTML += `<div class="graphic-box">${p.graphic_vi}</div>`;
+        } else if(p.graphic) {
+             expArea.innerHTML += `<div class="graphic-box">${p.graphic}</div>`;
+        }
+
+        p.questions.forEach((q, index) => {
+            const rightOpt = q.opts.find(o => o.isCorrect).l;
+            const uAns = userAnswers[q.id] || "Trống";
+            const userIcon = uAns === rightOpt ? '✅' : '❌';
+            
+            let optsHTML = '';
+            q.opts.forEach(o => {
+                let cssCls = o.isCorrect ? 'correct' : 'wrong';
+                optsHTML += `
+                    <div class="exp-opt ${cssCls}">
+                        <div class="opt-char">(${o.l})</div>
+                        <div>
+                            <div style="font-weight: 700; margin-bottom: 2px;">${o.text}</div>
+                            <div style="font-size: 0.95rem; color: #555;">${o.text_vi}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const colorClass = index === 0 ? "color-q1" : (index === 1 ? "color-q2" : "color-q3");
+
+            const qBlock = document.createElement('div');
+            qBlock.className = `exp-q-block ${colorClass}`;
+            qBlock.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div class="exp-q-title">Question ${q.id}: ${q.q_en}</div>
+                    <div style="background:#f1f1f1; padding: 4px 10px; border-radius: 8px; font-size: 0.9rem; font-weight:700;">
+                        Bạn chọn: ${uAns} ${userIcon}
+                    </div>
+                </div>
+                <div class="exp-q-title-vi">Dịch: ${q.q_vi}</div>
+                
+                <div class="exp-options">
+                    ${optsHTML}
+                </div>
+                
+                <div class="exp-detail-box">
+                    ${q.explanation}
+                </div>
+            `;
+            expArea.appendChild(qBlock);
+        });
+
+        document.getElementById('modal-detail').style.display = 'flex';
+        document.getElementById('modal-content-area').scrollTop = 0;
+    }
+
+    function closeModal() {
+        document.getElementById('modal-detail').style.display = 'none';
+        document.getElementById('modal-audio').pause();
+    }
+
+    // --- LỊCH SỬ LOGIC ---
+    function saveLocalHistory(score, total, answersObj, timeTakenStr) {
+        let history = JSON.parse(localStorage.getItem(LOCAL_HISTORY_KEY)) || [];
+        let now = new Date();
+        history.unshift({
+            id: Date.now().toString(),
+            date: now.toLocaleDateString('vi-VN'),
+            time: now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+            score: score,
+            total: total,
+            answers: answersObj,
+            timeTaken: timeTakenStr
+        });
+        localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify(history));
+    }
+
+    function openHistoryModal() {
+        document.getElementById('historyOverlay').style.display = 'flex';
+        renderHistoryList();
+    }
+
+    function closeHistoryModal() { document.getElementById('historyOverlay').style.display = 'none'; }
+
+    function renderHistoryList() {
+        let listEl = document.getElementById("historyList");
+        if (window.currentUserUid && window.layLichSuTuFirebase) {
+            window.layLichSuTuFirebase().then(firebaseHistory => {
+                hienThiDanhSach(firebaseHistory, listEl, true);
+            });
+        } else {
+            let localHistory = JSON.parse(localStorage.getItem(LOCAL_HISTORY_KEY)) || [];
+            hienThiDanhSach(localHistory, listEl, false);
+        }
+    }
+
+    function hienThiDanhSach(historyArray, listEl, isCloud) {
+        if (!historyArray || historyArray.length === 0) {
+            listEl.innerHTML = `<div style="text-align:center; color:#888; padding: 20px;">Bạn chưa làm bài lần nào. ${isCloud ? '(Cloud)' : '(Thiết bị này)'} 🐾</div>`;
+            return;
+        }
+
+        listEl.innerHTML = historyArray.map((item, index) => {
+            let soCauDung = item.correctQ !== undefined ? item.correctQ : item.score;
+            let tongSoCau = item.totalQ !== undefined ? item.totalQ : item.total;
+            let diemQuyDoi = isCloud && item.score !== undefined && item.score > tongSoCau ? ` (Điểm TOEIC: ${item.score})` : '';
+
+            return `
+            <div class="history-item">
+                <div class="history-info">
+                    <span class="history-date">Lần ${historyArray.length - index}: ${item.time || ''} ${item.date}</span>
+                    <span class="history-score">Đúng: ${soCauDung}/${tongSoCau} câu${diemQuyDoi} ${isCloud ? '☁️' : '📱'}</span>
+                    <span style="color: var(--text-gray); font-size: 0.85rem;">⏱ Thời gian: ${item.timeTaken || '--:--'}</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-review" onclick='restoreAttempt(${JSON.stringify(item.answers || {})})'>Xem lại</button>
+                    <button class="btn-delete-history" onclick="deleteAttempt('${item.id}', ${isCloud})" title="Xóa">&times;</button>
+                </div>
+            </div>
+            `;
+        }).join("");
+    }
+
+    let pendingDelete = { id: null, isCloud: false };
+    function deleteAttempt(id, isCloud) {
+        pendingDelete = { id, isCloud };
+        document.getElementById('customConfirmDeleteOverlay').style.display = 'flex';
+    }
+    function closeConfirmDelete() {
+        pendingDelete = { id: null, isCloud: false };
+        document.getElementById('customConfirmDeleteOverlay').style.display = 'none';
+    }
+    function executeDelete() {
+        if (!pendingDelete.id) return;
+        if (pendingDelete.isCloud && window.xoaLichSuFirebase) {
+            window.xoaLichSuFirebase(pendingDelete.id).then(() => {
+                closeConfirmDelete();
+                renderHistoryList();
+            });
+        } else {
+            let history = JSON.parse(localStorage.getItem(LOCAL_HISTORY_KEY)) || [];
+            history = history.filter(h => h.id !== pendingDelete.id);
+            localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify(history));
+            closeConfirmDelete();
+            renderHistoryList();
+        }
+    }
+
+    function restoreAttempt(answersObj) {
+        if (!answersObj || Object.keys(answersObj).length === 0) return;
+        userAnswers = answersObj;
+        closeHistoryModal();
+        finishTest(true); 
+    }
+
+    // KÉO THẢ THANH TRƯỢT
+    function initResizer(resizer, leftElement, container) {
+        let isDragging = false;
+        resizer.addEventListener('mousedown', function(e) {
+            isDragging = true;
+            resizer.classList.add('dragging');
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none'; 
+        });
+        document.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            const containerRect = container.getBoundingClientRect();
+            let newWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+            if (newWidth < 20) newWidth = 20;
+            if (newWidth > 80) newWidth = 80;
+            leftElement.style.flex = `0 0 ${newWidth}%`;
+        });
+        document.addEventListener('mouseup', function() {
+            if (isDragging) {
+                isDragging = false;
+                resizer.classList.remove('dragging');
+                document.body.style.cursor = 'default';
+                document.body.style.userSelect = 'auto';
+            }
+        });
+    }
+
+    // Modal Kịch bản
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalResizer = document.getElementById('scriptResizer');
+        const modalLeftCol = document.getElementById('scriptEnCol');
+        const modalContainer = document.getElementById('scriptSplit');
+        if(modalResizer) initResizer(modalResizer, modalLeftCol, modalContainer);
+    });
+</script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, collection, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+        authDomain: "snapenglish-cb6e2.firebaseapp.com",
+        projectId: "snapenglish-cb6e2",
+        storageBucket: "snapenglish-cb6e2.firebasestorage.app",
+        messagingSenderId: "373152038413",
+        appId: "1:373152038413:web:19284622571390f8585f44"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    function showInGameToast(msg) {
+        let toast = document.createElement("div");
+        toast.innerText = msg;
+        toast.style.cssText = "position:fixed; bottom:20px; right:20px; background:var(--primary); color:white; padding:15px 20px; border-radius:12px; font-weight:bold; font-family:'Nunito',sans-serif; z-index:99999; box-shadow:0 10px 30px rgba(0,0,0,0.2); transform:translateY(100px); opacity:0; transition:all 0.4s ease;";
+        document.body.appendChild(toast);
+        
+        setTimeout(() => { toast.style.transform = "translateY(0)"; toast.style.opacity = "1"; }, 100);
+        setTimeout(() => { toast.style.transform = "translateY(100px)"; toast.style.opacity = "0"; }, 3500);
+        setTimeout(() => { toast.remove(); }, 4000);
+    }
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            window.currentUserUid = user.uid;
+            window.currentUserEmail = user.email;
+        } else {
+            showInGameToast("⚠️ Bạn đang học dưới dạng Khách, lịch sử sẽ chỉ lưu trên thiết bị này!");
+        }
+    });
+
+    function calculateToeicScore(skill, correct, total) {
+        let percentage = correct / total;
+        let maxScore = (skill === 'Listening' || skill === 'Reading') ? 495 : 200;
+        let step = (skill === 'Listening' || skill === 'Reading') ? 5 : 10;
+        let estimated = Math.round((percentage * maxScore) / step) * step;
+        if (estimated > maxScore) return maxScore;
+        if (estimated < 5 && (skill === 'Listening' || skill === 'Reading')) return 5;
+        if (estimated < 0) return 0;
+        return estimated;
+    }
+
+    window.luuDiemTOEICLenFirebase = async function(tongSoCau, soCauDung, tenBai, kyNang, tenPart, answersData, timeTakenStr) {
+        if (!window.currentUserUid) return; 
+
+        let diemQuyDoi = calculateToeicScore(kyNang, soCauDung, tongSoCau);
+        let timestamp = Date.now();
+        let docId = window.currentUserUid + "_toeic_" + timestamp;
+        
+        try {
+            await setDoc(doc(db, "user_toeic_scores", docId), {
+                email: window.currentUserEmail || "Khách",
+                skill: kyNang,           
+                testName: tenBai,        
+                partName: tenPart,       
+                totalQ: tongSoCau,
+                correctQ: soCauDung,
+                score: diemQuyDoi,       
+                date: new Date().toLocaleDateString('vi-VN'),
+                time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+                timestamp: timestamp,
+                answers: answersData || {},
+                timeTaken: timeTakenStr || "--"
+            });
+            showInGameToast("☁️ Đã đồng bộ điểm số lên Máy Chủ!");
+        } catch (error) {
+            console.error("Lỗi khi lưu điểm Firebase:", error);
+            showInGameToast("❌ Lỗi lưu điểm lên máy chủ!");
+        }
+    }
+
+    // Lấy lịch sử (Query cho ETS 2019 - Test 3 - Part 4)
+    window.layLichSuTuFirebase = async function() {
+        if (!window.currentUserEmail) return [];
+        try {
+            const q = query(
+                collection(db, "user_toeic_scores"),
+                where("email", "==", window.currentUserEmail),
+                where("testName", "==", "ETS 2019 - Test 3"),
+                where("partName", "==", "Part 4")
+            );
+            const querySnapshot = await getDocs(q);
+            let history = [];
+            querySnapshot.forEach((doc) => {
+                let data = doc.data();
+                data.id = doc.id; 
+                history.push(data);
+            });
+            history.sort((a, b) => b.timestamp - a.timestamp);
+            return history;
+        } catch (error) {
+            console.error("Lỗi tải lịch sử từ Firebase:", error);
+            showInGameToast("❌ Lỗi đồng bộ dữ liệu. Đang dùng tạm lịch sử trên máy.");
+            return [];
+        }
+    }
+
+    window.xoaLichSuFirebase = async function(docId) {
+        try {
+            await deleteDoc(doc(db, "user_toeic_scores", docId));
+            showInGameToast("🗑 Đã xóa bài làm khỏi Máy Chủ!");
+        } catch (error) {
+            console.error("Lỗi xóa trên Firebase:", error);
+        }
+    }
+</script>
+</body>
+</html>
