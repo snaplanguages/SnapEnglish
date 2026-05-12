@@ -312,18 +312,32 @@
                     <i class="fa-solid fa-volume-high" style="font-size: 20px;"></i>
                 </button>
             </div>
-           <div style="background: #FFF0F5; padding: 16px; border-radius: 16px; margin-bottom: 24px; border: 1px dashed var(--primary-light);">
-                <div style="margin-bottom: 12px;">
-                    <span class="def-lang" style="display: inline-block; margin-right: 10px; margin-bottom: 0;">VIỆT</span>
-                    <span class="def-text" id="md-vi" style="color: var(--primary);">từ bỏ, ruồng bỏ</span>
-                </div>
-                <div style="display: flex; align-items: center;">
-                    <span class="def-lang" style="display: inline-block; margin-right: 10px; margin-bottom: 0;">TRUNG</span>
-                    <span class="def-text" id="md-zh">放弃</span>
-                    <span id="md-pinyin" style="color: var(--primary-light); font-size: 16px; margin-left: 8px; font-weight: 700;">(fàng qì)</span>
-                    <button class="btn" id="btn-play-zh" style="background: transparent; color: var(--accent); padding: 0 8px; font-size: 16px; height: auto; width: auto;"><i class="fa-solid fa-volume-high"></i></button>
-                </div>
+           <div style="background: #FFF0F5; padding: 20px; border-radius: 16px; margin-bottom: 24px; border: 1px dashed var(--primary-light); display: flex; flex-direction: column; gap: 16px;">
+    
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span class="def-lang" style="margin: 0; background: var(--primary-light); color: white; padding: 4px 8px; border-radius: 6px;">VIỆT</span>
+            <span class="def-text" id="md-vi-main" style="color: var(--primary); font-size: 22px; font-weight: 800;"></span>
+        </div>
+        <div id="md-vi-dict" style="padding-left: 8px; border-left: 3px solid #FFC0CB; margin-left: 4px; display: flex; flex-direction: column; gap: 8px;">
             </div>
+    </div>
+
+    <div style="height: 1px; background: #FFC0CB; opacity: 0.5; width: 100%; border-radius: 2px;"></div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <span class="def-lang" style="margin: 0; background: #94A3B8; color: white; padding: 4px 8px; border-radius: 6px;">TRUNG</span>
+            <span class="def-text" id="md-zh-main" style="color: var(--text-dark); font-size: 22px; font-weight: 800;"></span>
+            <span id="md-pinyin" style="color: var(--primary-light); font-size: 16px; font-weight: 700;"></span>
+            <button class="btn" id="btn-play-zh" style="background: white; border: 1px solid var(--border); border-radius: 50%; width: 32px; height: 32px; padding: 0; display: flex; justify-content: center; align-items: center; color: var(--accent); box-shadow: var(--shadow-sm);">
+                <i class="fa-solid fa-volume-high" style="font-size: 14px;"></i>
+            </button>
+        </div>
+        <div id="md-zh-dict" style="padding-left: 8px; border-left: 3px solid #CBD5E1; margin-left: 4px; display: flex; flex-direction: column; gap: 8px;">
+            </div>
+    </div>
+</div>
 
             <div id="md-meanings-container" style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
                 </div>
@@ -712,29 +726,36 @@ try {
             // Điền thông tin cơ bản
             document.getElementById('md-word').innerText = wordData.word;
             document.getElementById('md-ipa').innerText = wordData.ipa;
-          // Xử lý hiển thị Tiếng Việt nhiều nghĩa
-            let viHtml = `<span style="font-size: 20px; font-weight: 800;">${wordData.vi}</span>`;
+          // Xử lý hiển thị Tiếng Việt
+            document.getElementById('md-vi-main').innerText = wordData.vi;
+            let viDictHtml = "";
             if (wordData.viDict && wordData.viDict.length > 0) {
-                viHtml += `<div style="margin-top: 10px; font-size: 15px; color: var(--text-dark); display: flex; flex-direction: column; gap: 6px;">`;
                 wordData.viDict.forEach(d => {
-                    viHtml += `<div><span style="display: inline-block; min-width: 65px; font-weight: 800; color: var(--text-muted); background: white; padding: 2px 8px; border-radius: 6px; font-size: 12px; margin-right: 8px; border: 1px solid var(--border); text-transform: uppercase; text-align: center;">${d.pos}</span>${d.meanings}</div>`;
+                    viDictHtml += `
+                        <div style="display: flex; align-items: flex-start; gap: 10px;">
+                            <span style="min-width: 80px; font-weight: 800; color: var(--text-muted); background: white; padding: 3px 6px; border-radius: 6px; font-size: 11px; border: 1px solid var(--border); text-transform: uppercase; text-align: center; margin-top: 2px;">${d.pos}</span>
+                            <span style="font-size: 15px; color: var(--text-dark); line-height: 1.5; flex: 1; font-weight: 600;">${d.meanings}</span>
+                        </div>`;
                 });
-                viHtml += `</div>`;
             }
-            document.getElementById('md-vi').innerHTML = viHtml;
+            document.getElementById('md-vi-dict').innerHTML = viDictHtml;
+            document.getElementById('md-vi-dict').style.display = viDictHtml ? 'flex' : 'none';
 
-            // Xử lý hiển thị Tiếng Trung nhiều nghĩa
-            let zhHtml = `<span>${wordData.zh}</span>`;
-            if (wordData.zhDict && wordData.zhDict.length > 0) {
-                zhHtml += `<div style="margin-top: 10px; font-size: 15px; color: var(--text-dark); display: flex; flex-direction: column; gap: 6px;">`;
-                wordData.zhDict.forEach(d => {
-                    zhHtml += `<div><span style="display: inline-block; min-width: 65px; font-weight: 800; color: var(--text-muted); background: white; padding: 2px 8px; border-radius: 6px; font-size: 12px; margin-right: 8px; border: 1px solid var(--border); text-transform: uppercase; text-align: center;">${d.pos}</span>${d.meanings}</div>`;
-                });
-                zhHtml += `</div>`;
-            }
-            document.getElementById('md-zh').innerHTML = zhHtml;
+            // Xử lý hiển thị Tiếng Trung
+            document.getElementById('md-zh-main').innerText = wordData.zh;
             document.getElementById('md-pinyin').innerText = wordData.pinyin ? `(${wordData.pinyin})` : '';
-
+            let zhDictHtml = "";
+            if (wordData.zhDict && wordData.zhDict.length > 0) {
+                wordData.zhDict.forEach(d => {
+                    zhDictHtml += `
+                        <div style="display: flex; align-items: flex-start; gap: 10px;">
+                            <span style="min-width: 80px; font-weight: 800; color: var(--text-muted); background: white; padding: 3px 6px; border-radius: 6px; font-size: 11px; border: 1px solid var(--border); text-transform: uppercase; text-align: center; margin-top: 2px;">${d.pos}</span>
+                            <span style="font-size: 15px; color: var(--text-dark); line-height: 1.5; flex: 1; font-weight: 600;">${d.meanings}</span>
+                        </div>`;
+                });
+            }
+            document.getElementById('md-zh-dict').innerHTML = zhDictHtml;
+            document.getElementById('md-zh-dict').style.display = zhDictHtml ? 'flex' : 'none';
             // Render động TẤT CẢ các từ loại và nghĩa
             const container = document.getElementById('md-meanings-container');
             container.innerHTML = wordData.meanings.map(m => `
