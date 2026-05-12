@@ -1014,8 +1014,9 @@ Tạm biệt.
       div.appendChild(enDiv);
       div.appendChild(viDiv);
 
-      div.onclick = () => {
+     div.onclick = () => {
         if(player && player.seekTo && line.start !== null) {
+          autoPauseTriggered = false; // Reset trạng thái tự động dừng
           player.seekTo(line.start, true);
           player.playVideo();
         }
@@ -1037,13 +1038,14 @@ Tạm biệt.
         }
       });
     }
-
-    let checkInterval;
+let checkInterval;
     let currentLineIndex = -1;
+    let autoPauseTriggered = false; // Thêm biến theo dõi trạng thái tự động
 
     function onPlayerStateChange(event) {
       if (event.data == YT.PlayerState.PLAYING) {
-        checkInterval = setInterval(updateHighlight, 200);
+        // TĂNG TỐC ĐỘ QUÉT lên 50ms để bắt thời gian chuẩn xác nhất (thay vì 200ms)
+        checkInterval = setInterval(updateHighlight, 50); 
       } else {
         clearInterval(checkInterval);
       }
@@ -1054,6 +1056,7 @@ Tạm biệt.
       const time = player.getCurrentTime();
       let foundLine = -1;
 
+      // 1. Tìm câu đang khớp với thời gian video
       for (let i = 0; i < transcriptData.length; i++) {
         if (time >= transcriptData[i].start && time <= transcriptData[i].end) {
           foundLine = i;
@@ -1061,22 +1064,43 @@ Tạm biệt.
         }
       }
 
+      // 2. LOGIC TỰ ĐỘNG DỪNG VÀ KHÓA CÂU (Sửa lỗi chấm 0%)
+      if (currentLineIndex !== -1 && !autoPauseTriggered) {
+        // Bắt thời điểm sát nút kết thúc câu (trừ hao 0.1 giây để không bị lẹm sang câu sau)
+        if (time >= transcriptData[currentLineIndex].end - 0.1) {
+          autoPauseTriggered = true; // Đánh dấu đã kích hoạt auto-pause
+          player.pauseVideo();       // Dừng video ngay lập tức
+          
+          // CRITICAL FIX: Ép hệ thống giữ nguyên câu hiện tại (không cho nhảy sang câu tiếp theo lúc dừng)
+          foundLine = currentLineIndex; 
+
+          // Bật mic thu âm sau 300ms để tránh tạp âm từ video
+          setTimeout(() => {
+            if (!isRecording) {
+              recordBtn.click();
+            }
+          }, 300);
+        }
+      }
+
+      // 3. LOGIC ĐỔI MÀU VÀ CHUYỂN CÂU MỚI
       if (foundLine !== -1 && currentLineIndex !== foundLine) {
+        autoPauseTriggered = false; // Reset lại biến khi video nhảy sang một câu mới hoàn toàn
+
         if (currentLineIndex !== -1) {
           document.getElementById('line-' + currentLineIndex).classList.remove('active');
         }
         const activeLine = document.getElementById('line-' + foundLine);
         activeLine.classList.add('active');
        
-        // Căn lề mượt mà, phân biệt theo kích thước màn hình
+        // Căn lề mượt mà
         if (window.innerWidth <= 992) {
-          // Trên điện thoại: Cuộn dòng chữ lên sát mí trên cùng (start)
           activeLine.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else {
-          // Trên máy tính: Vẫn giữ nguyên cuộn ra giữa màn hình (center)
           activeLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-        currentLineIndex = foundLine;
+        
+        currentLineIndex = foundLine; // Cập nhật câu hiện tại
       }
     }
 
