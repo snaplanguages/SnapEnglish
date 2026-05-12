@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <title>Bài Tập: Cách diễn đạt Tiền Tệ</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --pastel-pink: #FFF0F5;
+            --pastel-blue: #E0F7FA;
+            --pastel-green: #E8F5E9;
+            --pastel-yellow: #FFF9C4;
+            --pastel-peach: #FFE5B4;
+            --text-main: #4A4A4A;
+            --text-highlight: #D81B60;
+            --accent-color: #FF9AA2;
+            --brand-pink: #FF69B4;
+        }
+
+        body {
+            margin: 0;
+            padding: 60px 0 0 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #faf8f5;
+            color: var(--text-main);
+        }
+
+        /* Brand SnapChinese cố định */
+        .brand-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--pastel-pink);
+            border-bottom: 3px solid var(--text-highlight);
+            padding: 10px 0;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(216, 27, 96, 0.2);
+        }
+
+        .brand-header span {
+            display: inline-block;
+            border: 2px dashed var(--text-highlight);
+            padding: 5px 20px;
+            background-color: white;
+            color: var(--text-highlight);
+            font-weight: bold;
+            font-size: 1.5em;
+            border-radius: 8px;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto 40px auto; 
+            background-color: #ffffff;
+            border-radius: 24px;
+            padding: 30px 40px; 
+            box-shadow: 0 10px 30px rgba(255, 154, 162, 0.15);
+            line-height: 1.8;
+            position: relative;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-highlight);
+            font-size: 2.2em;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+
+        .question-block {
+            background-color: #fff;
+            border: 2px solid var(--pastel-pink);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+            transition: box-shadow 0.3s;
+        }
+
+        .question-block:hover {
+            box-shadow: 0 5px 15px rgba(255, 154, 162, 0.2);
+        }
+
+        .question-block h3 {
+            color: #C06C84;
+            margin-top: 0;
+            font-size: 1.3em;
+            border-bottom: 1px dashed #FFB7B2;
+            padding-bottom: 10px;
+        }
+
+        .option-label {
+            display: block;
+            background-color: var(--pastel-pink);
+            padding: 12px 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.1em;
+            border-left: 5px solid transparent;
+        }
+
+        .option-label:hover {
+            background-color: var(--pastel-peach);
+        }
+
+        .option-label input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        /* Trạng thái sau khi nộp bài */
+        .option-label.correct {
+            background-color: #E8F5E9;
+            border-left: 5px solid #4CAF50;
+            color: #2E7D32;
+            font-weight: bold;
+        }
+
+        .option-label.incorrect {
+            background-color: #FFEBEE;
+            border-left: 5px solid #F44336;
+            color: #C62828;
+        }
+
+        .explanation {
+            display: none;
+            background-color: var(--pastel-blue);
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            border-left: 5px solid #80DEEA;
+            font-size: 0.95em;
+        }
+
+        .explanation strong {
+            color: #00838F;
+        }
+
+        /* Nút Submit */
+        .btn-practice {
+            display: block;
+            width: fit-content;
+            margin: 30px auto 10px auto;
+            padding: 15px 50px;
+            background: linear-gradient(135deg, #FF9AA2, #FFB7B2);
+            color: white;
+            text-decoration: none;
+            font-size: 1.3em;
+            font-weight: bold;
+            border-radius: 50px;
+            box-shadow: 0 6px 15px rgba(255, 154, 162, 0.4);
+            transition: all 0.3s ease;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-practice:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 154, 162, 0.6);
+            color: white;
+        }
+
+        .btn-practice:disabled {
+            background: #ccc;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+
+        #result-display {
+            display: none;
+            text-align: center;
+            background: linear-gradient(135deg, #FFF9C4, #FFE082);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            font-size: 1.5em;
+            color: #E65100;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(255, 213, 79, 0.2);
+        }
+
+        .text-chinese {
+            color: var(--text-highlight);
+            font-weight: bold;
+        }
+
+        /* Lớp ẩn trích dẫn để không hiển thị ra màn hình */
+        .cite-hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="brand-header">
+        <span>SnapChinese</span>
+    </div>
+
+    <div class="container">
+        <h1>Bài Tập Luyện Tập</h1>
+        <div class="subtitle">Cách nói Giá Cả và Số Đếm trong Tiếng Trung</div>
+
+        <div id="result-display"></div>
+
+        <form id="quizForm">
+            <div class="question-block" id="q1-block">
+                <h3>Câu 1: 这条裤子十三块五。(Zhè tiáo kùzi shísān kuài wǔ.) <span class="cite-hidden">[cite: 111]</span></h3>
+                <label class="option-label" id="lbl-q1-A">
+                    <input type="radio" name="q1" value="A" data-correct="true"> A. 13.5块 <span class="cite-hidden">[cite: 112]</span>
+                </label>
+                <label class="option-label" id="lbl-q1-B">
+                    <input type="radio" name="q1" value="B"> B. 13.05块 <span class="cite-hidden">[cite: 113]</span>
+                </label>
+                <label class="option-label" id="lbl-q1-C">
+                    <input type="radio" name="q1" value="C"> C. 135元 <span class="cite-hidden">[cite: 114]</span>
+                </label>
+                <label class="option-label" id="lbl-q1-D">
+                    <input type="radio" name="q1" value="D"> D. 1035角 <span class="cite-hidden">[cite: 115]</span>
+                </label>
+                <div class="explanation" id="expl-q1">
+                    <span class="cite-hidden">[cite: 117]</span>
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - <span class="text-chinese">这条裤子十三块五。</span> (Chiếc quần này giá 13.5 đồng.) <br>
+                    - "十三块五" (shísān kuài wǔ) được viết dưới dạng số là 13.5块, vì vậy đáp án A là đúng. <span class="cite-hidden">[cite: 118]</span><br>
+                    - B là "十三块零五(分)", C là "一百三十五块", và D là "一千零三十五角", tất cả đều sai. <span class="cite-hidden">[cite: 119]</span>
+                </div>
+            </div>
+
+            <div class="question-block" id="q2-block">
+                <h3>Câu 2: 他的手机要 1999元。(Tā de shǒujī yào ___.) <span class="cite-hidden">[cite: 120]</span></h3>
+                <label class="option-label" id="lbl-q2-A">
+                    <input type="radio" name="q2" value="A"> A. shíjiǔbǎi jiǔshí jiǔ yuan <span class="cite-hidden">[cite: 121]</span>
+                </label>
+                <label class="option-label" id="lbl-q2-B">
+                    <input type="radio" name="q2" value="B"> B. yìqiān yuán jiǔbǎi jiǔshí jiǔ kuai <span class="cite-hidden">[cite: 122]</span>
+                </label>
+                <label class="option-label" id="lbl-q2-C">
+                    <input type="radio" name="q2" value="C"> C. yìbǎi jiǔshí jiǔ jiǔ kuai <span class="cite-hidden">[cite: 123]</span>
+                </label>
+                <label class="option-label" id="lbl-q2-D">
+                    <input type="radio" name="q2" value="D" data-correct="true"> D. yìqiān jiǔbǎi jiǔshí jiǔ yuan <span class="cite-hidden">[cite: 124]</span>
+                </label>
+                <div class="explanation" id="expl-q2">
+                    <span class="cite-hidden">[cite: 126]</span>
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - <span class="text-chinese">他的手机要 1999元。</span> (Điện thoại của anh ấy cần 1999 tệ.) <br>
+                    - Cách phát âm của "1999元" là "yìqiān jiǔbǎi jiǔshí jiǔ yuán" (Một ngàn chín trăm chín mươi chín tệ). Vì vậy, D là đúng. <span class="cite-hidden">[cite: 127]</span><br>
+                    - Tiếng Trung không có cách diễn đạt tiền tệ như các câu A, B và C, nên chúng đều sai. <span class="cite-hidden">[cite: 128]</span>
+                </div>
+            </div>
+
+            <div class="question-block" id="q3-block">
+                <h3>Câu 3: 这些东西一共 134.07元。(Zhèxiē dōngxi yígòng ___.) <span class="cite-hidden">[cite: 130]</span></h3>
+                <label class="option-label" id="lbl-q3-A">
+                    <input type="radio" name="q3" value="A"> A. 一百三十四元七 <span class="cite-hidden">[cite: 131]</span>
+                </label>
+                <label class="option-label" id="lbl-q3-B">
+                    <input type="radio" name="q3" value="B" data-correct="true"> B. 一百三十四元零七 <span class="cite-hidden">[cite: 132]</span>
+                </label>
+                <label class="option-label" id="lbl-q3-C">
+                    <input type="radio" name="q3" value="C"> C. 一百三十四元七零分 <span class="cite-hidden">[cite: 133]</span>
+                </label>
+                <label class="option-label" id="lbl-q3-D">
+                    <input type="radio" name="q3" value="D"> D. 一百三十四元七角 <span class="cite-hidden">[cite: 134]</span>
+                </label>
+                <div class="explanation" id="expl-q3">
+                    <span class="cite-hidden">[cite: 136]</span>
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - <span class="text-chinese">这些东西一共134.07元。</span> (Những món đồ này tổng cộng là 134.07 tệ.) <br>
+                    - "134.07元" đọc là "一百三十四元零七(分)" (Một trăm ba mươi tư tệ không hào bảy xu), vì vậy B là đúng. Cụm "一百三十四元七" và "一百三十四元七角" đều dùng cho mức giá "134.7元", nên A và D sai. <span class="cite-hidden">[cite: 137]</span><br>
+                    - Tiếng Trung không dùng cách nói "一百三十四元七零分", nên C sai. <span class="cite-hidden">[cite: 138]</span>
+                </div>
+            </div>
+
+            <div class="question-block" id="q4-block">
+                <h3>Câu 4: Mức giá 2.5 RMB trong khẩu ngữ thường nói thế nào?</h3>
+                <label class="option-label" id="lbl-q4-A">
+                    <input type="radio" name="q4" value="A" data-correct="true"> A. 两块五(毛)
+                </label>
+                <label class="option-label" id="lbl-q4-B">
+                    <input type="radio" name="q4" value="B"> B. 二块五
+                </label>
+                <label class="option-label" id="lbl-q4-C">
+                    <input type="radio" name="q4" value="C"> C. 两块零五
+                </label>
+                <label class="option-label" id="lbl-q4-D">
+                    <input type="radio" name="q4" value="D"> D. 二元五
+                </label>
+                <div class="explanation" id="expl-q4">
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - Mức giá 2.5 đồng trong khẩu ngữ người Trung Quốc thường nói là <span class="text-chinese">两块五毛</span> (liǎng kuài wǔ máo) hoặc đọc tắt là <span class="text-chinese">两块五</span> (liǎng kuài wǔ).<br>
+                    - Lưu ý: "块" là lượng từ, khi đi với số lượng 2 ta dùng "两" (liǎng), không dùng "二" (èr). Vậy nên B sai.
+                </div>
+            </div>
+
+            <div class="question-block" id="q5-block">
+                <h3>Câu 5: 这个苹果 ___ (0.8 RMB)。</h3>
+                <label class="option-label" id="lbl-q5-A">
+                    <input type="radio" name="q5" value="A"> A. 八块
+                </label>
+                <label class="option-label" id="lbl-q5-B">
+                    <input type="radio" name="q5" value="B" data-correct="true"> B. 八毛
+                </label>
+                <label class="option-label" id="lbl-q5-C">
+                    <input type="radio" name="q5" value="C"> C. 零点八块
+                </label>
+                <label class="option-label" id="lbl-q5-D">
+                    <input type="radio" name="q5" value="D"> D. 八分
+                </label>
+                <div class="explanation" id="expl-q5">
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - 0.8 Nhân dân tệ tương đương với 8 hào. <br>
+                    - Trong văn nói (khẩu ngữ), "hào" được gọi là <span class="text-chinese">毛</span> (máo), còn trong văn viết gọi là 角 (jiǎo). Do đó, 0.8 tệ được đọc là <span class="text-chinese">八毛</span>.
+                </div>
+            </div>
+
+            <div class="question-block" id="q6-block">
+                <h3>Câu 6: 这件衣服 ___ (105 RMB)。</h3>
+                <label class="option-label" id="lbl-q6-A">
+                    <input type="radio" name="q6" value="A"> A. 一百五块
+                </label>
+                <label class="option-label" id="lbl-q6-B">
+                    <input type="radio" name="q6" value="B" data-correct="true"> B. 一百零五块
+                </label>
+                <label class="option-label" id="lbl-q6-C">
+                    <input type="radio" name="q6" value="C"> C. 一百五
+                </label>
+                <label class="option-label" id="lbl-q6-D">
+                    <input type="radio" name="q6" value="D"> D. 十五块
+                </label>
+                <div class="explanation" id="expl-q6">
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - Giá 105 RMB đọc chuẩn xác là <span class="text-chinese">一百零五块</span> (Một trăm lẻ năm đồng). Chú ý số 0 ở giữa phải được đọc lên là "零" (líng).<br>
+                    - Nếu bạn đọc là "一百五" (yībǎi wǔ) như đáp án A hoặc C, người bản xứ sẽ mặc định hiểu là mức giá 150 RMB.
+                </div>
+            </div>
+
+            <div class="question-block" id="q7-block">
+                <h3>Câu 7: 那个包 ___ (150 RMB)。</h3>
+                <label class="option-label" id="lbl-q7-A">
+                    <input type="radio" name="q7" value="A"> A. 一百零五块
+                </label>
+                <label class="option-label" id="lbl-q7-B">
+                    <input type="radio" name="q7" value="B"> B. 一千五百块
+                </label>
+                <label class="option-label" id="lbl-q7-C">
+                    <input type="radio" name="q7" value="C" data-correct="true"> C. 一百五十块
+                </label>
+                <label class="option-label" id="lbl-q7-D">
+                    <input type="radio" name="q7" value="D"> D. 一百五毛
+                </label>
+                <div class="explanation" id="expl-q7">
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - Mức giá 150 RMB đọc đầy đủ là <span class="text-chinese">一百五十块</span> (yībǎi wǔshí kuài), hoặc có thể đọc tắt nhanh là 一百五 (yībǎi wǔ).<br>
+                    - Đáp án A (105) và B (1500) là không chính xác.
+                </div>
+            </div>
+
+            <div class="question-block" id="q8-block">
+                <h3>Câu 8: 他的鞋子是 ___ (250 RMB)买的。</h3>
+                <label class="option-label" id="lbl-q8-A">
+                    <input type="radio" name="q8" value="A" data-correct="true"> A. 二百五
+                </label>
+                <label class="option-label" id="lbl-q8-B">
+                    <input type="radio" name="q8" value="B"> B. 两百零五
+                </label>
+                <label class="option-label" id="lbl-q8-C">
+                    <input type="radio" name="q8" value="C"> C. 二十五
+                </label>
+                <label class="option-label" id="lbl-q8-D">
+                    <input type="radio" name="q8" value="D"> D. 两千五
+                </label>
+                <div class="explanation" id="expl-q8">
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - 250 RMB có thể đọc là <span class="text-chinese">二百五</span> hoặc 两百五十. Mặc dù "二百五" còn là tiếng lóng chỉ đồ ngốc nghếch, nhưng trong trường hợp đếm tiền hoặc giá cả, nó vẫn mang ý nghĩa chính xác là 250.<br>
+                    - B là 205 (Hai trăm lẻ năm), C là 25, D là 2500.
+                </div>
+            </div>
+
+            <div class="question-block" id="q9-block">
+                <h3>Câu 9: 这台电脑 ___ (10,000 RMB)。</h3>
+                <label class="option-label" id="lbl-q9-A">
+                    <input type="radio" name="q9" value="A"> A. 十千
+                </label>
+                <label class="option-label" id="lbl-q9-B">
+                    <input type="radio" name="q9" value="B" data-correct="true"> B. 一万
+                </label>
+                <label class="option-label" id="lbl-q9-C">
+                    <input type="radio" name="q9" value="C"> C. 一千零
+                </label>
+                <label class="option-label" id="lbl-q9-D">
+                    <input type="radio" name="q9" value="D"> D. 百千
+                </label>
+                <div class="explanation" id="expl-q9">
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - Hệ thống số đếm của Trung Quốc phân cách theo 4 số không (hàng Vạn - 万). Do đó 10,000 RMB phải đọc là <span class="text-chinese">一万</span> (yí wàn).<br>
+                    - Tiếng Trung không có khái niệm nói "mười nghìn" (十千) như trong tiếng Việt hay tiếng Anh.
+                </div>
+            </div>
+
+            <div class="question-block" id="q10-block">
+                <h3>Câu 10: Trong tiếng Trung, đơn vị tiền tệ nào thường được dùng thay cho "元" (yuán) trong khẩu ngữ hàng ngày?</h3>
+                <label class="option-label" id="lbl-q10-A">
+                    <input type="radio" name="q10" value="A"> A. 角 (jiǎo)
+                </label>
+                <label class="option-label" id="lbl-q10-B">
+                    <input type="radio" name="q10" value="B"> B. 分 (fēn)
+                </label>
+                <label class="option-label" id="lbl-q10-C">
+                    <input type="radio" name="q10" value="C" data-correct="true"> C. 块 (kuài)
+                </label>
+                <label class="option-label" id="lbl-q10-D">
+                    <input type="radio" name="q10" value="D"> D. 毛 (máo)
+                </label>
+                <div class="explanation" id="expl-q10">
+                    <strong>💡 Giải thích chi tiết:</strong><br>
+                    - <span class="text-chinese">元</span> (yuán) là đơn vị chính thức trong văn viết hoặc trên báo chí, truyền hình. <br>
+                    - Còn <span class="text-chinese">块</span> (kuài) là đơn vị tương đương được dùng cực kỳ phổ biến trong giao tiếp hàng ngày (văn nói). 1 元 = 1 块.
+                </div>
+            </div>
+
+            <button type="button" id="submitBtn" class="btn-practice" onclick="submitQuiz()">
+                ✅ Nộp Bài & Xem Điểm
+            </button>
+            
+            <a href="javascript:location.reload()" id="retryBtn" class="btn-practice" style="display: none; background: linear-gradient(135deg, #81C784, #AED581);">
+                🔄 Làm Lại Từ Đầu
+            </a>
+            
+        </form>
+
+    </div>
+
+    <script>
+        function submitQuiz() {
+            let score = 0;
+            const totalQuestions = 10;
+            let allAnswered = true;
+
+            // Kiểm tra xem đã làm hết chưa
+            for (let i = 1; i <= totalQuestions; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (!selected) {
+                    allAnswered = false;
+                    break;
+                }
+            }
+
+            if (!allAnswered) {
+                alert("Vui lòng trả lời tất cả các câu hỏi trước khi nộp bài nhé!");
+                return;
+            }
+
+            // Chấm điểm & Hiển thị kết quả
+            for (let i = 1; i <= totalQuestions; i++) {
+                const options = document.querySelectorAll(`input[name="q${i}"]`);
+                const expl = document.getElementById(`expl-q${i}`);
+                
+                options.forEach(opt => {
+                    opt.disabled = true; // Khóa không cho chọn lại
+                    const label = document.getElementById(`lbl-q${i}-${opt.value}`);
+                    
+                    // Highlight đáp án đúng
+                    if (opt.getAttribute("data-correct") === "true") {
+                        label.classList.add("correct");
+                        // Nếu user chọn đúng
+                        if (opt.checked) {
+                            score++;
+                        }
+                    } 
+                    // Highlight đáp án sai nếu user lỡ chọn
+                    else if (opt.checked) {
+                        label.classList.add("incorrect");
+                    }
+                });
+
+                // Hiện giải thích
+                expl.style.display = "block";
+            }
+
+            // Báo điểm
+            const resultBox = document.getElementById("result-display");
+            resultBox.innerHTML = `🎉 Tuyệt vời! Bạn làm đúng ${score} / ${totalQuestions} câu.`;
+            resultBox.style.display = "block";
+
+            // Đổi nút bấm
+            document.getElementById("submitBtn").style.display = "none";
+            document.getElementById("retryBtn").style.display = "block";
+            
+            // Cuộn lên xem điểm
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+
+</body>
+</html>
