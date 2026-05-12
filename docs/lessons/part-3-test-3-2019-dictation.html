@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 3 Test 3 (2019) | SnapEnglish</title>
+    <link rel="icon" type="image/png" href="ảnh.png">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* TÔNG MÀU MỚI: Navy Blue & Amber */
+        :root {
+            --primary: #0F3460;         /* Deep Navy */
+            --primary-hover: #1A4B84;   /* Navy Lighter */
+            --secondary: #FFF6E5;       /* Light Amber / Cream */
+            --accent: #F9A826;          /* Bright Amber / Orange */
+            --blue-pastel: #EAEFF5;     /* Very Light Blue-Gray */
+            --blue-dark: #16213E;       /* Very Dark Navy */
+            --text-dark: #111827;       /* Gray 900 */
+            --text-light: #4B5563;      /* Gray 600 */
+            --bg-main: #F3F4F6;         /* Gray 100 */
+            --white: #FFFFFF;
+            --brand-pink: #E94560;      /* Crimson/Pink cho Logo SnapEnglish */
+            --brand-text: #111827;
+            --error-glow: #EF4444;      /* Red 500 (Đỏ báo lỗi) */
+            
+            /* Màu huy hiệu cho Part 3 (Hội thoại) */
+            --badge-male-bg: #DBEAFE; --badge-male-border: #BFDBFE; --badge-male-text: #1E3A8A;
+            --badge-female-bg: #FCE7F3; --badge-female-border: #FBCFE8; --badge-female-text: #9D174D;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Quicksand', sans-serif; }
+
+        body {
+            background: var(--bg-main);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Bố cục full màn hình (Gỡ bỏ max-width) */
+        .layout-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+        .brand-badge {
+            background-color: var(--brand-pink);
+            color: var(--white);
+            font-weight: 800;
+            font-size: 26px;
+            padding: 8px 20px;
+            border-radius: 15px;
+            letter-spacing: -0.5px;
+        }
+        .brand-title {
+            color: var(--brand-text);
+            font-weight: 800;
+            font-size: 30px;
+            letter-spacing: -0.5px;
+        }
+
+        .layout-container {
+            display: flex;
+            gap: 25px;
+            width: 100%;
+            height: 85vh;
+            min-height: 600px;
+        }
+
+        /* LEFT PANEL */
+        .sidebar {
+            flex: 1;
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(15, 52, 96, 0.08);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid #E5E7EB;
+        }
+
+        .progress-section { text-align: center; }
+        .progress-circle {
+            width: 150px; height: 150px; border-radius: 50%;
+            background: conic-gradient(var(--primary) 0%, #eee 0);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px; position: relative; transition: background 0.5s;
+        }
+        .progress-circle::after { content: ""; position: absolute; width: 120px; height: 120px; background: var(--white); border-radius: 50%; }
+        .progress-text { position: relative; z-index: 1; font-size: 28px; font-weight: 700; color: var(--primary); }
+
+        .instructions { background: var(--blue-pastel); padding: 20px; border-radius: 15px; color: var(--blue-dark); border: 1px solid #D1D5DB;}
+        .instructions h3 { margin-bottom: 15px; font-size: 18px; }
+        .instructions ul { list-style: none; }
+        .instructions li { margin-bottom: 12px; font-size: 14.5px; line-height: 1.5; }
+        kbd { background: var(--white); border: 1px solid #9CA3AF; border-radius: 4px; padding: 3px 8px; font-family: monospace; font-size: 13px; font-weight: bold; box-shadow: 0 2px 0 #9CA3AF; color: #333;}
+
+        /* RIGHT PANEL */
+        .main-content {
+            flex: 3; background: var(--white); border-radius: 20px; padding: 35px;
+            box-shadow: 0 10px 30px rgba(15, 52, 96, 0.08); display: flex; flex-direction: column; position: relative;
+            border: 1px solid #E5E7EB;
+        }
+
+        .settings-bar { display: flex; justify-content: flex-end; gap: 15px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px dashed #E5E7EB; }
+        .setting-group { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text-light); }
+        select { padding: 6px 12px; border-radius: 8px; border: 1px solid #D1D5DB; outline: none; cursor: pointer; font-family: 'Quicksand', sans-serif; font-weight: 600; color: var(--text-dark);}
+
+        /* Khung hiển thị ảnh */
+        .image-section { text-align: center; margin-bottom: 15px; display: none; }
+        .part1-image { 
+            max-height: 250px; 
+            max-width: 100%; 
+            height: auto; 
+            object-fit: contain; 
+            border-radius: 10px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+            border: 2px solid #eee;
+        }
+
+        .audio-section { text-align: center; margin-bottom: 20px; display: flex; justify-content: center; align-items: center; flex-direction: column; gap: 15px;}
+        
+        .speaker-badge { display: inline-block; padding: 8px 30px; border-radius: 20px; font-weight: bold; font-size: 16px; }
+        .speaker-male { background: var(--badge-male-bg); color: var(--badge-male-text); border: 1px solid var(--badge-male-border); }
+        .speaker-female { background: var(--badge-female-bg); color: var(--badge-female-text); border: 1px solid var(--badge-female-border); }
+
+        .btn-play { background: var(--primary); color: white; border: none; padding: 15px 35px; border-radius: 50px; font-size: 18px; cursor: pointer; transition: 0.3s; font-weight: 700; box-shadow: 0 4px 15px rgba(15, 52, 96, 0.3);}
+        .btn-play:hover { background: var(--primary-hover); transform: translateY(-2px); }
+
+        .input-section { flex-grow: 1; display: flex; flex-direction: column; }
+        
+        /* Hiệu ứng báo lỗi phát sáng */
+        .message { text-align: center; margin-bottom: 10px; min-height: 45px; }
+        .glow-error {
+            color: var(--error-glow);
+            text-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+            font-weight: 800;
+            background: #FEF2F2;
+            padding: 2px 6px;
+            border-radius: 6px;
+            border: 2px dashed var(--error-glow);
+            display: inline-block;
+            transform: scale(1.05);
+        }
+        
+        textarea { width: 100%; height: 120px; padding: 20px; border: 2px solid #D1D5DB; border-radius: 15px; font-size: 22px; outline: none; transition: 0.3s; resize: none; color: var(--text-dark); line-height: 1.6; }
+        textarea:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(249, 168, 38, 0.2); }
+
+        .actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 15px; }
+        .btn { padding: 12px 25px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; font-weight: 700; transition: 0.3s; }
+        .btn-enter { background: var(--blue-dark); color: var(--white); }
+        .btn-enter:hover { background: #000000; }
+        .btn-hint { background: var(--secondary); color: #B45309; border: 1px solid #FDE68A; }
+        .btn-hint:hover { background: #FEF3C7; }
+        .btn-nav { background: #F9FAFB; color: #4B5563; border: 1px solid #E5E7EB;}
+        .btn-nav:hover { background: #F3F4F6; }
+
+        /* MODAL POPUP */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(4px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: white; width: 90%; max-width: 550px; padding: 35px;
+            border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: left; position: relative; max-height: 90vh; overflow-y: auto;
+        }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .modal-content h3 { color: var(--accent); font-size: 22px; margin-bottom: 15px; text-align: center; }
+        .modal-script { font-size: 20px; font-weight: 700; color: var(--primary); margin-bottom: 10px; text-align: center; padding-bottom: 15px; border-bottom: 2px dashed #E5E7EB;}
+        .modal-content p { margin-bottom: 10px; line-height: 1.6; font-size: 16px; }
+        
+        .btn-next-modal { width: 100%; background: var(--primary); color: white; margin-top: 20px; padding: 15px; font-size: 18px; }
+        .btn-next-modal:hover { background: var(--primary-hover); }
+
+        /* END SCREEN */
+        .end-screen { display: none; text-align: center; padding-top: 20px;}
+        .transcript-box { text-align: left; background: #F9FAFB; padding: 25px; border-radius: 15px; height: 350px; overflow-y: auto; margin: 25px 0; border: 1px solid #E5E7EB; line-height: 1.8; font-size: 16px;}
+
+        @media (max-width: 850px) {
+            .layout-container { flex-direction: column; height: auto; }
+            .sidebar { flex: none; width: 100%; order: 2; }
+            .main-content { flex: none; width: 100%; order: 1; min-height: 500px;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout-wrapper">
+    <div class="header-brand">
+        <div class="brand-badge">SnapEnglish</div>
+        <div class="brand-title">Part 3 Test 3 (2019)</div>
+    </div>
+
+    <div class="layout-container" id="app">
+        <div class="sidebar">
+            <div class="progress-section">
+                <h2 style="color: var(--text-dark); margin-bottom: 25px; font-size: 22px;">Tiến độ bài học</h2>
+                <div class="progress-circle" id="progress-ring"><div class="progress-text"><span id="progress-percent">0</span>%</div></div>
+                <p style="color: var(--text-light); font-weight: 600; margin-top: 15px;">Câu: <span id="current-sentence-num">1</span> / <span id="total-sentences"></span></p>
+                <p style="font-size: 14px; color: #888; margin-top: 5px;">Số lần luyện tập: <span id="study-count">0</span></p>
+            </div>
+            <div class="instructions">
+                <h3>⌨️ Hướng dẫn phím tắt</h3>
+                <ul>
+                    <li><kbd>Ctrl</kbd> Lặp lại Audio.</li>
+                    <li><kbd>Tab</kbd> Gợi ý từ tiếp theo.</li>
+                    <li><kbd>Enter</kbd> Kiểm tra đáp án / Chuyển câu.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div id="learning-screen" style="display: flex; flex-direction: column; height: 100%;">
+                <div class="settings-bar">
+                    <div class="setting-group">
+                        <label>Tốc độ:</label>
+                        <select id="speed-setting">
+                            <option value="0.7">0.7x</option>
+                            <option value="0.9" selected>0.9x</option>
+                            <option value="1.0">1.0x</option>
+                            <option value="1.2">1.2x</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label>Lặp tự động:</label>
+                        <select id="repeat-setting">
+                            <option value="1" selected>1 lần</option>
+                            <option value="2">2 lần</option>
+                            <option value="3">3 lần</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="image-section" id="image-section">
+                    <img id="question-image" class="part1-image" src="" alt="Part 3 Graphic">
+                </div>
+
+                <div class="audio-section">
+                    <div id="speaker-label" class="speaker-badge speaker-male">👨 Man</div>
+                    <button class="btn-play" onclick="playAudio()">🔊 Nghe Audio (Ctrl)</button>
+                </div>
+                
+                <div class="message" id="system-message"></div>
+
+                <div class="input-section">
+                    <textarea id="user-input" placeholder="Lắng nghe hội thoại và gõ vào đây..." autofocus></textarea>
+                    
+                    <div class="actions">
+                        <button class="btn btn-nav" onclick="prevSentenceManual()">⬅️ Back</button>
+                        <button class="btn btn-enter" onclick="handleEnterAction()">Kiểm tra (Enter)</button>
+                        <button class="btn btn-hint" onclick="giveHint()">💡 Gợi ý (Tab)</button>
+                        <button class="btn btn-nav" onclick="nextSentenceManual()">Next ➡️</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="end-screen" class="end-screen">
+                <h2 style="color: var(--primary); font-size: 28px;">Tuyệt vời! Hoàn thành Test 🏆</h2>
+                <div class="transcript-box" id="full-transcript"></div>
+                <div class="actions">
+                    <button class="btn btn-enter" onclick="restartLesson()">🔄 Luyện tập lại</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="feedback-modal">
+    <div class="modal-content">
+        <h3>🎉 Chính xác!</h3>
+        <div class="modal-script" id="trans-en"></div>
+        <p><strong>🇻🇳 Nghĩa:</strong> <span id="trans-vi"></span></p>
+        <button class="btn btn-next-modal" onclick="nextSentence()">Qua câu tiếp theo (Enter) ➔</button>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu nội dung Part 3 Test 3 2019
+    const lessonData = [
+        // Conversation 1 (32-34)
+        { en: "Welcome to Metropolitan TV! My name's Naomi and I'm in charge of your new employee orientation here at the television studio. I'll show you around and then introduce you to your manager.", vi: "Chào mừng đến với đài truyền hình Metropolitan! Tên chị là Naomi và chị chịu trách nhiệm định hướng nhân viên mới như em tại đài truyền hình này. Chị sẽ dẫn em tham quan một vòng rồi giới thiệu em với quản lý.", speaker: "Woman", gender: "female" },
+        { en: "Thanks. I'm excited to work in the entertainment industry. This is a whole new aspect of accounting for me.", vi: "Cám ơn chị. Em rất hứng thú với việc được làm trong ngành giải trí. Đây là một khía cạnh hoàn toàn mới của việc kế toán với em.", speaker: "Man", gender: "male" },
+        { en: "Great! Now, this is where you'll be working. All of the other accountants work in offices in this hall, too, as do the directors of the shows.", vi: "Tuyệt! Giờ thì, đây là nơi mà em sẽ làm việc. Tất cả các kế toán khác cũng làm việc trong những văn phòng trong sảnh này, và các đạo diễn cũng thế.", speaker: "Woman", gender: "female" },
+        { en: "I like this area. It's not noisy at all.", vi: "Em thích chỗ này. Không hề ồn ào tí nào.", speaker: "Man", gender: "male" },
+        { en: "Yes, we try to keep this part of the building quiet so the people with offices here can focus on their work.", vi: "Đúng vậy, bọn chị cố gắn giữ khu vực này của tòa nhà được yên lặng để những người trong các văn phòng ở đây có thể tập trung vào việc của họ.", speaker: "Woman", gender: "female" },
+
+        // Conversation 2 (35-37)
+        { en: "Hello, welcome to the Klineston Hotel. How can I help you?", vi: "Xin chào, chào mừng đến với khách sạn Klineston. Tôi giúp gì được cho các bạn?", speaker: "Woman", gender: "female" },
+        { en: "Hi, I'm Kris Wattana from Trouville Development Corporation. I reserved your large meeting room for this afternoon. My colleague and I want to get everything in order before the three o'clock start time.", vi: "Chào, tôi là Kris Wattana từ Tập đoàn Phát triển Trouville. Tôi đã đặt phòng họp lớn của khách sạn chiều nay. Đồng nghiệp của tôi và tôi muốn đảm bảo mọi thứ đúng vị trí trước giờ họp là ba giờ đúng.", speaker: "Man", gender: "male" },
+        { en: "Ah yes. I see your name right here. I’ll just need to see some identification, please.", vi: "À vâng, tôi thấy tên bạn ngay đây rồi. Tôi chỉ cần xem giấy tờ tùy thân của bạn nữa thôi, xin phép nhé.", speaker: "Woman", gender: "female" },
+        { en: "All right ... here's my ID. Is that all?", vi: "Được thôi… đây là chứng minh thư của tôi. Vậy đủ rồi chứ?", speaker: "Man", gender: "male" },
+        { en: "Wait, Kris. Don't forget that we reserved fifty chairs, but we're going to need more.", vi: "Khoan đã Kris. Đừng quên là mình đặt 50 ghế, nhưng chúng ta sẽ cần thêm đấy.", speaker: "Woman", gender: "female" },
+        { en: "Thanks for the reminder. Would it be possible to have fifteen more chairs brought to the meeting room?", vi: "Cám ơn vì đã nhắc. Liệu có thể cho thêm mười lăm ghế vào phòng họp được không?", speaker: "Man", gender: "male" },
+        { en: "Absolutely. I’ll call maintenance and ask them to deliver the chairs right away.", vi: "Dĩ nhiên. Tôi sẽ gọi bên hậu cần và nhờ họ mang ghế lên ngay.", speaker: "Woman", gender: "female" },
+
+        // Conversation 3 (38-40)
+        { en: "Wow, look at all these people! Is this train always so crowded?", vi: "Ô, nhìn toàn bộ đám đông này xem! Chuyến tàu này lúc nào cũng đông vậy à?", speaker: "Man", gender: "male" },
+        { en: "Not usually. The football championship is this afternoon... Let's walk to the back of the train... should be a lot of empty seats there.", vi: "Không thường xuyên đâu. Giải vô địch bóng đá diễn ra chiều nay… Đi về phía cuối tàu thôi… chắc sẽ còn nhiều chỗ ngồi trống phía đó.", speaker: "Woman", gender: "female" },
+        { en: "Thanks for coming with me, by the way. I need to buy a new suit and shirt for a lecture I'm giving and I'm not very good at shopping for clothes ... especially in the city.", vi: "Sẵn tiện, cám ơn vì đã đi với tớ. Tớ cần mua một bộ com lê với áo mới cho bài diễn thuyết tớ sắp nói và tớ không giỏi khoản mua quần áo… nhất là ở thành phố.", speaker: "Man", gender: "male" },
+        { en: "Don't worry, I know some great stores downtown.", vi: "Đừng lo, tớ biết vài cửa hiệu tốt ở phố dưới.", speaker: "Woman", gender: "female" },
+
+        // Conversation 4 (41-43)
+        { en: "Hi, Ms. Chen. I'm calling from Industry Ovens Incorporated. I apologize, but the oven you had ordered was accidentally left off of this morning's delivery schedule. We caught the oversight after the trucks had departed on their routes.", vi: "Xin chào chị Chen. Tôi gọi tới từ Công ty Bếp Lò Công Nghiệp. Tôi rất xin lỗi, nhưng cái lò chị đặt hàng đã bị sơ suất bỏ ngoài lịch trình giao hàng sáng nay. Chúng tôi phát hiện sơ suất này sau khi mấy chuyến xe tải đã rời đi theo lịch trình.", speaker: "Man", gender: "male" },
+        { en: "This is not good news. Two days from now, on Friday, my bakery's going to be visited by a safety inspector. The new oven must be installed in time, so that the bakery can pass inspection.", vi: "Đây là tin không tốt chút nào. Hai ngày nữa, vào thứ sáu, tiệm bánh của tôi sẽ có một thanh tra vệ sinh an toàn thực phẩm ghé kiểm tra. Cái lò phải được lắp kịp lúc, thì tiệm bánh mới qua được đợt kiểm tra.", speaker: "Woman", gender: "female" },
+        { en: "Hmmm... That doesn't leave us with much time. Please give me a second - I'm going to connect you with my supervisor. I'm sure she'll be able to help you meet your deadline.", vi: "Hừm… Điều đó khiến chúng ta không có nhiều thời gian. Chị vui lòng chờ một chút – tôi đang nối máy chị với trưởng bộ phận của em. Tôi chắc chị ấy sẽ giúp được chị đúng hạn.", speaker: "Man", gender: "male" },
+
+        // Conversation 5 (44-46)
+        { en: "Fatima, do you remember the survey our health clinic sent out last month?", vi: "Fatima, cô có nhớ bảng khảo sát phòng khám sức khỏe của chúng ta phát ra tháng trước không?", speaker: "Man", gender: "male" },
+        { en: "Oh, yes, the one asking patients to rate their experiences here? What were the results?", vi: "Ồ, nhớ chứ, cái mà yêu cầu bệnh nhân đánh giá trải nghiệm ở đây ấy à? Kết quả thế nào?", speaker: "Woman", gender: "female" },
+        { en: "Well, almost everyone wanted more time to talk to the doctors and nurses during their visits. Right now, doctors and nurses spend about ten minutes with each patient. Do you think we can increase it to fifteen minutes per patient?", vi: "Ừ thì, hầu hết mọi người đều muốn có thêm thời gian trò chuyện với bác sĩ và y tá trong thời gian khám bệnh. Hiện tại, các bác sĩ và y tá dành khoảng mười phút cho mỗi bệnh nhân. Cô nghĩ mình có thể tăng lên mười lăm phút mỗi bệnh nhân không?", speaker: "Man", gender: "male" },
+        { en: "That would require significant revisions to our scheduling process. It'll be up to the members of the board to decide.", vi: "Điều đó sẽ cần rất nhiều chỉnh sửa trong lịch trình tiến độ của chúng ta. Nó sẽ phải tùy vào các thành viên hội đồng quản trị quyết định thôi.", speaker: "Woman", gender: "female" },
+
+        // Conversation 6 (47-49)
+        { en: "Antonio, were you at yesterday's all-staff meeting? It was during, uh, I was on the phone with an important client and couldn't make it.", vi: "Antonio, anh có dự buổi họp toàn nhân viên hôm qua chứ? Đó là lúc, ừm, tôi vốn đang điện thoại với một khách hàng quan trọng và không thể tới được.", speaker: "Woman", gender: "female" },
+        { en: "Mhm. You got a copy of the meeting minutes?", vi: "Ừm. Cô có bản sao của biên bản cuộc họp chứ?", speaker: "Man", gender: "male" },
+        { en: "Yeah, but the part about how to get reimbursed for travel expenses was really confusing. Do you know if there's more documentation on that?", vi: "Có, nhưng cái phần về làm sao để được hoàn trả chi phí đi lại thật khó hiểu quá. Anh có biết có tài liệu nào nói thêm về việc đó không?", speaker: "Woman", gender: "female" },
+        { en: "Oh, you printed out the minutes? If you look at them electronically, you'll see there's a link to our internal Web site where you can find more details on reimbursement procedures.", vi: "Ồ, cô đã in biên bản đó ra à? Nếu cô xem phiên bản điện tử, cô sẽ thấy một cái đường dẫn tới trang Web nội bộ mà cô có thể tìm thêm chi tiết về các thủ tục hoàn trả.", speaker: "Man", gender: "male" },
+
+        // Conversation 7 (50-52)
+        { en: "Our next guest on today's show is part of our Healthy Cooking series. I'd like to welcome nutritionist Emelia Vigo. Emelia, what have you got for us today?", vi: "Khách mời tiếp theo của chúng ta ngày hôm nay trong chương trình Nấu ăn Lành mạnh. Tôi xin được chào mừng chuyên gia dinh dưỡng Emelia Vigo. Emelia, cô đem đến điều gì cho chúng tôi hôm nay?", speaker: "Man", gender: "male" },
+        { en: "I'd like to tell you about some simple tricks for making nutritious meals at home by substituting healthier ingredients for less healthy ones in your favorite recipes.", vi: "Tôi muốn chia sẻ với các bạn vài mẹo đơn giản cho những bữa ăn lành mạnh tại gia bằng cách thay thế các nguyên liệu ít lành mạnh bằng các nguyên liệu lành mạnh hơn cho thực đơn ưa thích của bạn.", speaker: "Woman", gender: "female" },
+        { en: "Now, you said this was simple. I'm no cook - do you think I can do it?", vi: "Nào, cô đã bảo rằng nó đơn giản mà. Tôi không hề nấu ăn – cô nghĩ liệu tôi có làm được không?", speaker: "Man", gender: "male" },
+        { en: "Absolutely! Let's take an old classic like potato soup, for example. You can use sweet potatoes as a more nutritious substitute for white potatoes. That recipe, and more, are in my new book, Healthy Family Cooking.", vi: "Đương nhiên! Lấy ví dụ món súp khoai tây quen thuộc cổ điển. Các bạn có thể dùng khoai lang như một nguyên liệu giàu dinh dưỡng hơn khoai tây. Công thức ấy, cùng nhiều nữa, ở trong cuốn sách mới của tôi, Nấu ăn Lành mạnh cho Gia đình.", speaker: "Woman", gender: "female" },
+
+        // Conversation 8 (53-55)
+        { en: "To sum up, Jamal, you've had another very good year here with us. You're a valuable member of the team, which is why you consistently receive outstanding performance reviews from other staff members.", vi: "Tóm lại, Jamal, bạn đã có một năm rất tốt ở đây cùng chúng tôi. Bạn là một thành viên năng nổ của nhóm, đó là lý do bạn liên tục nhận được đánh giá hoàn thành xuất sắc từ các nhân viên khác.", speaker: "Woman", gender: "female" },
+        { en: "I've certainly enjoyed the opportunities that I've had while working here.", vi: "Tôi thật sự rất vui mừng với những cơ hội mà tôi đã có khi làm việc ở đây.", speaker: "Man", gender: "male" },
+        { en: "Which is great to hear, because we'd like you to take on more responsibility. We're opening an office in Denver in a few months, and we'd like you to manage it.", vi: "Thật tốt khi nghe điều đó, vì chúng tôi muốn bạn đảm nhận nhiều trách nhiệm hơn nữa. Chúng tôi sẽ mở một văn phòng ở Denver trong vài tháng tới và chúng tôi muốn bạn quản lý ở đó.", speaker: "Woman", gender: "female" },
+        { en: "Wow, that's exciting! But ... can I have some time to consider it?", vi: "Ồ, thật tuyệt! Nhưng ... tôi có thể có chút thời gian để xem xét việc này không?", speaker: "Man", gender: "male" },
+        { en: "Of course. Why don't we get together next week to discuss your decision?", vi: "Dĩ nhiên rồi. Tại sao chúng ta không gặp nhau vào tuần tới để thảo luận về quyết định của bạn nhỉ?", speaker: "Woman", gender: "female" },
+
+        // Conversation 9 (56-58)
+        { en: "Hi, Tricia. Hi, Allison. How are the training materials for the summer interns coming along? They'll be starting in two weeks, so I'd like to see the materials by Friday.", vi: "Xin chào, Tricia. Xin chào, Allison. Tài liệu đào tạo cho các thực tập sinh mùa hè ra sao rồi? Họ sẽ bắt đầu sau hai tuần nữa, vì vậy tôi muốn được xem các tài liệu vào thứ Sáu.", speaker: "Man", gender: "male" },
+        { en: "Sure, no problem. By the way, Allison revised the section about the interns' work hours so it's easier for the interns to understand.", vi: "Chắc rồi, không vấn đề gì. Nhân tiện, Allison đã sửa lại phần về giờ làm việc của thực tập sinh để người thực tập dễ hiểu hơn.", speaker: "Woman", gender: "female" },
+        { en: "Thanks, Allison. There were some questions last year about interns' schedules. It'll be good to have everything stated clearly this time.", vi: "Cảm ơn, Allison. Có một số thắc mắc trong năm ngoái về lịch trình của thực tập sinh. Thật tốt khi lần này mọi thứ sẽ được đưa ra rõ ràng.", speaker: "Man", gender: "male" },
+        { en: "Yes, and I also added more information explaining the kinds of software products the interns will be working on.", vi: "Vâng, và tôi cũng đã thêm thông tin giải thích các loại phần mềm mà thực tập sinh sẽ làm việc.", speaker: "Woman", gender: "female" },
+        { en: "Terrific. We've got some great projects planned, and I'm glad you prepared everything so carefully.", vi: "Tốt lắm. Chúng ta đã lên kế hoạch cho một số dự án tuyệt vời và tôi rất vui vì các bạn đã chuẩn bị mọi thứ rất cẩn thận.", speaker: "Man", gender: "male" },
+
+        // Conversation 10 (59-61)
+        { en: "Hello, Ms. Lee. I understand you'd like my agency to design a new advertising campaign for your moving company.", vi: "Xin chào, cô Lee. Tôi hiểu rằng cô muốn đại lý chúng tôi thiết kế một chiến dịch quảng cáo mới cho công ty vận chuyển của cô.", speaker: "Man", gender: "male" },
+        { en: "Yes. We're concerned because another moving company just opened nearby, and we're starting to feel the effects of the competition. Business hasn't been as good since then.", vi: "Đúng vậy. Chúng tôi khá lo vì một công ty vận chuyển khác vừa mở gần đây và chúng tôi bắt đầu cảm thấy những ảnh hưởng của sự cạnh tranh. Kinh doanh thật sự không tốt lắm kể từ lúc đó.", speaker: "Woman", gender: "female" },
+        { en: "I see. It would help if I got a better sense of what customers like about your company. That's something we can emphasize throughout the campaign.", vi: "Tôi hiểu rồi. Sẽ rất có ích nếu tôi hiểu rõ hơn về những gì khách hàng thích về công ty của cô. Đó là điều chúng tôi có thể nhấn mạnh trong suốt chiến dịch.", speaker: "Man", gender: "male" },
+        { en: "Well, people say they appreciate our topnotch customer service and the effort we make to meet customers' expectations. I'm sure no other moving service in the area can claim that.", vi: "Chà, mọi người thường nói rằng họ đánh giá cao dịch vụ khách hàng chuẩn mực của chúng tôi cùng những nỗ lực mà chúng tôi tạo ra để đáp ứng mong đợi của khách hàng. Tôi chắc rằng không có dịch vụ vận chuyển nào khác trong khu vực dám nhận những lời khen đó về mình đâu.", speaker: "Woman", gender: "female" },
+
+        // Conversation 11 (62-64)
+        { en: "Hi, Haruto, have you picked the caterer for the shareholders' meeting? We want everything to go smoothly.", vi: "Xin chào, Haruto , anh đã chọn nơi đặt tiệc cho cuộc họp cổ đông chưa? Chúng tôi muốn mọi thứ diễn ra suôn sẻ.", speaker: "Woman", gender: "female", image: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-1.jpg" },
+        { en: "I haven't decided yet, but I've got quotes from a few local caterers. Our budget's pretty tight so I'm leaning toward Star Restaurant. They have the least expensive lunch service.", vi: "Tôi chưa quyết định nữa, nhưng tôi đã nhận được báo giá từ một vài nhà tổ chức tiệc địa phương. Ngân sách của chúng ta khá eo hẹp nên tôi đang nghiêng về Star Restaurant. Họ có dịch vụ ăn trưa ít tốn kém nhất.", speaker: "Man", gender: "male", image: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-1.jpg" },
+        { en: "You know.. . I've had problems with Star Restaurant. I hired them to cater a meal for a management meeting last month, and they delivered the food an hour late. I just don't want a delay like that to happen during this meeting. You can spend a little more money if you need to.", vi: "Anh biết không... Tôi đã gặp vấn đề với Star Restaurant. Tôi đã thuê họ để phục vụ bữa ăn cho một cuộc họp ban quản lý vào tháng trước, và họ đã giao đồ ăn trễ một giờ đồng hồ. Tôi chỉ không muốn một sự chậm trễ như thế xảy ra trong cuộc họp này. Anh có thể duyệt chi thêm một ít tiền nếu anh thấy cần.", speaker: "Woman", gender: "female", image: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-1.jpg" },
+        { en: "Oh, I'm so glad you told me. Then let's go with Golden Eagle.", vi: "Ôi, thật vui vì cô nói tôi biết. Vậy thì, hãy chọn Golden Eagle thôi.", speaker: "Man", gender: "male", image: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-1.jpg" },
+
+        // Conversation 12 (65-67)
+        { en: "Welcome to the Peterson Art Museum. Can I help you?", vi: "Chào mừng đến với Bảo tàng Nghệ thuật Peterson. Tôi có thể giúp gì cho anh?", speaker: "Woman", gender: "female", image: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-2-1.jpg" },
+        { en: "I'm supposed to meet some friends in the nineteenth-century painting gallery. Can you tell me where it's located?", vi: "Tôi hẹn gặp một số người bạn trong phòng tranh thế kỷ XIX. Cô có thể cho tôi biết nó nằm ở đâu không?", speaker: "Man", gender: "male", image: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-2-1.jpg" },
+        { en: "Here - this pamphlet will help. There's a map of the museum in it, with details for finding our painting exhibits. Anything else?", vi: "Đây - cuốn sách nhỏ này sẽ có ích. Có một bản đồ của bảo tàng trong đó, với các hướng dẫn để tìm triển lãm tranh của chúng tôi. Còn gì khác không ạ?", speaker: "Woman", gender: "female", image: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-2-1.jpg" },
+        { en: "Yes. I heard there's a workshop on watercolor painting this summer.", vi: "Còn một thứ nữa. Tôi nghe nói có một buổi chuyên đề về vẽ tranh màu nước mùa hè này.", speaker: "Man", gender: "male", image: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-2-1.jpg" },
+        { en: "Yes - you can register for the workshop right here if you'd like.", vi: "Đúng vậy - anh có thể đăng ký cho buổi chuyên đề ngay tại đây nếu anh muốn.", speaker: "Woman", gender: "female", image: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-2-1.jpg" },
+        { en: "I'd better come back to do that - my friends are waiting for me.", vi: "Tốt hơn tôi nên quay lại sau để làm điều đó -bạn tôi hẳn đang đợi tôi.", speaker: "Man", gender: "male", image: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-2-1.jpg" },
+        { en: "Of course. Oh, and I'd recommend taking the stairs at the back of the museum. There are always so many people using the main stairs by the front entrance.", vi: "Tất nhiên rồi. Ồ, và tôi khuyên anh nên đi cầu thang ở phía sau bảo tàng. Luôn có rất nhiều người sử dụng cầu thang chính ở lối vào phía trước.", speaker: "Woman", gender: "female", image: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-2-1.jpg" },
+
+        // Conversation 13 (68-70)
+        { en: "Next, let's discuss our spring hiring plan. In the past we've been successful by recruiting at university career fairs. But, I’d like to do something different this time.", vi: "Tiếp theo, hãy thảo luận về kế hoạch tuyển dụng mùa xuân của chúng ta. Trước đây, chúng ta đã thành công bằng cách tuyển dụng tại các ngày hội việc làm ở các trường đại học. Nhưng lần này, tôi muốn làm gì đó khác biệt hơn.", speaker: "Woman", gender: "female", image: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-3-1.jpg" },
+        { en: "Really? Why's that?", vi: "Thật à? Sao lại thế?", speaker: "Man", gender: "male", image: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-3-1.jpg" },
+        { en: "Well, our employees spend so much time traveling to different universities that they fall behind on other important projects.", vi: "Ừ thì, nhân viên của chúng ta dành rất nhiều thời gian để đi đến các trường đại học khác nhau khiến họ bị tụt lại phía sau trong các dự án quan trọng khác.", speaker: "Woman", gender: "female", image: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-3-1.jpg" },
+        { en: "Good point. We could put more of our resources into our second most effective recruiting method. Actually, more than a quarter of our employees were recruited that way.", vi: "Có lý đấy. Chúng ta có thể dồn nhiều nguồn lực của mình vào phương thức tuyển dụng hiệu quả thứ hai. Thực ra thì, hơn một phần tư nhân viên của chúng ta được tuyển dụng theo cách đó đấy.", speaker: "Man", gender: "male", image: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-3-1.jpg" },
+        { en: "That's exactly what I was thinking. Would you set up a meeting with Yukiko in public relations and explore possibilities for expanding last year's campaign?", vi: "Tôi cũng đang nghĩ y như thế. Anh có thể triệu tập một cuộc họp với Yukiko bên quan hệ công chúng và tìm hiểu về các khả năng nhằm mở rộng chiến dịch năm ngoái không?", speaker: "Woman", gender: "female", image: "https://zenlishtoeic.vn/wp-content/uploads/2023/01/zenlish-3-1.jpg" }
+    ];
+
+    let currentIndex = 0;
+    let currentPlayCount = 0;
+    let playTimeout;
+    const synth = window.speechSynthesis;
+    let maleVoice = null;
+    let femaleVoice = null;
+
+    const msgBox = document.getElementById("system-message");
+    const inputField = document.getElementById("user-input");
+    const modalOverlay = document.getElementById("feedback-modal");
+    const labelDisplay = document.getElementById("speaker-label");
+    const imageSection = document.getElementById("image-section");
+    const imageDisplay = document.getElementById("question-image");
+
+    function loadVoices() {
+        let voices = synth.getVoices();
+        if(voices.length === 0) return;
+        maleVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Male') || v.name.includes('David') || v.name.includes('Google UK English Male'))) || voices.find(v => v.lang.startsWith('en'));
+        femaleVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Zira') || v.name.includes('Google US English'))) || voices.find(v => v.lang.startsWith('en'));
+    }
+
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    window.onload = () => {
+        loadVoices();
+        let count = localStorage.getItem('part3_test3_2019_count') || 0;
+        document.getElementById('study-count').innerText = count;
+        document.getElementById('total-sentences').innerText = lessonData.length;
+        
+        let savedIndex = parseInt(localStorage.getItem('part3_test3_2019_progress'));
+        if (!isNaN(savedIndex) && savedIndex < lessonData.length) {
+            currentIndex = savedIndex;
+        }
+
+        updateUI();
+    };
+
+    function updateUI() {
+        updateProgress();
+        document.getElementById('current-sentence-num').innerText = currentIndex + 1;
+        
+        const data = lessonData[currentIndex];
+        
+        if (data.gender === "male") {
+            labelDisplay.innerText = "👨 " + data.speaker;
+            labelDisplay.className = "speaker-badge speaker-male";
+        } else {
+            labelDisplay.innerText = "👩 " + data.speaker;
+            labelDisplay.className = "speaker-badge speaker-female";
+        }
+
+        // Logic hiển thị ảnh dành riêng cho Part 3
+        if(data.image) {
+            imageDisplay.src = data.image;
+            imageSection.style.display = "block";
+        } else {
+            imageSection.style.display = "none";
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Control') {
+            e.preventDefault();
+            playAudio();
+        } else if (e.key === 'Tab') {
+            e.preventDefault();
+            giveHint();
+        } else if (e.key === 'Enter' && modalOverlay.style.display !== "flex") {
+            e.preventDefault();
+            handleEnterAction();
+        }
+    });
+
+    function handleEnterAction() {
+        if (modalOverlay.style.display === "flex") {
+            nextSentence();
+        } else {
+            checkAnswer();
+        }
+    }
+
+    function playAudio() {
+        currentPlayCount = 0;
+        clearTimeout(playTimeout);
+        triggerAudioLoop();
+    }
+
+    function triggerAudioLoop() {
+        if (synth.speaking) synth.cancel();
+        
+        const data = lessonData[currentIndex];
+        const utterThis = new SpeechSynthesisUtterance(data.en);
+        utterThis.lang = 'en-US';
+        utterThis.rate = parseFloat(document.getElementById('speed-setting').value);
+        
+        if (data.gender === 'female' && femaleVoice) utterThis.voice = femaleVoice;
+        else if (data.gender === 'male' && maleVoice) utterThis.voice = maleVoice;
+        
+        utterThis.onend = () => {
+            currentPlayCount++;
+            const maxRepeat = parseInt(document.getElementById('repeat-setting').value);
+            if (currentPlayCount < maxRepeat) {
+                playTimeout = setTimeout(triggerAudioLoop, 500);
+            }
+        };
+        
+        synth.speak(utterThis);
+        if (modalOverlay.style.display !== "flex") inputField.focus();
+    }
+
+    function normalizeText(text) { return text.toLowerCase().replace(/[.,?!–\-:;"]/g, '').trim(); }
+
+    function checkAnswer() {
+        const rawUserInput = inputField.value;
+        const userInput = normalizeText(rawUserInput);
+        const targetText = normalizeText(lessonData[currentIndex].en);
+        
+        if (userInput === targetText) {
+            msgBox.innerText = "";
+            showModal();
+        } else {
+            const userWordsNorm = userInput.split(' ').filter(w => w !== "");
+            const targetWordsNorm = targetText.split(' ');
+            const rawWords = rawUserInput.trim().split(/\s+/);
+
+            if (userWordsNorm.length === 0) {
+                msgBox.innerText = "Bạn chưa gõ gì cả. Nhấn Ctrl để nghe nhé!";
+                return;
+            }
+
+            let wrongIndex = -1;
+            for (let i = 0; i < userWordsNorm.length; i++) {
+                if (userWordsNorm[i] !== targetWordsNorm[i]) {
+                    wrongIndex = i;
+                    break;
+                }
+            }
+
+            if (wrongIndex !== -1) {
+                let startPos = 0;
+                for (let k = 0; k < wrongIndex; k++) {
+                    startPos += rawWords[k].length + 1;
+                }
+                
+                const leadingSpaces = inputField.value.length - inputField.value.trimStart().length;
+                startPos += leadingSpaces;
+                let endPos = startPos + rawWords[wrongIndex].length;
+
+                inputField.focus();
+                inputField.setSelectionRange(startPos, endPos);
+
+                let displayHTML = rawWords.map((w, idx) => {
+                    if (idx === wrongIndex) {
+                        return `<span class="glow-error">${w}</span>`;
+                    }
+                    return w;
+                }).join(' ');
+
+                msgBox.innerHTML = `Vị trí sai:<br><div style="margin-top:12px; font-size:19px; color:var(--text-dark); font-weight: 500;">${displayHTML}</div>`;
+                
+            } else if (userWordsNorm.length < targetWordsNorm.length) {
+                msgBox.innerText = "Chưa hết câu, hãy nghe thêm và gõ tiếp nhé!";
+                inputField.focus();
+                inputField.setSelectionRange(inputField.value.length, inputField.value.length);
+            } else {
+                msgBox.innerText = "Có lỗi sai chính tả nhỏ, hãy kiểm tra lại.";
+            }
+        }
+    }
+
+    function giveHint() {
+        if (modalOverlay.style.display === "flex") return;
+
+        const rawUserInput = inputField.value;
+        const userInput = normalizeText(rawUserInput);
+        const targetText = normalizeText(lessonData[currentIndex].en);
+        
+        const targetWordsRaw = lessonData[currentIndex].en.split(' ');
+        const targetWordsNorm = targetText.split(' ');
+        const userWords = userInput.split(' ').filter(w => w !== "");
+
+        let hintWord = targetWordsRaw[userWords.length];
+        for (let i = 0; i < userWords.length; i++) {
+            if (userWords[i] !== targetWordsNorm[i]) {
+                hintWord = targetWordsRaw[i];
+                inputField.value = targetWordsRaw.slice(0, i).join(' ') + (i > 0 ? " " : "");
+                break;
+            }
+        }
+
+        if (hintWord) {
+            inputField.value += (inputField.value.length > 0 && !inputField.value.endsWith(' ') ? ' ' : '') + hintWord + ' ';
+            msgBox.innerText = "Đã điền từ tiếp theo!";
+        }
+    }
+
+    function showModal() {
+        inputField.blur();
+        const data = lessonData[currentIndex];
+        
+        document.getElementById("trans-en").innerText = data.en;
+        document.getElementById("trans-vi").innerText = data.vi;
+        
+        modalOverlay.style.display = "flex";
+        document.querySelector('.btn-next-modal').focus();
+    }
+
+    function prevSentenceManual() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            resetForNewSentence();
+        }
+    }
+
+    function nextSentenceManual() {
+        if (currentIndex < lessonData.length - 1) {
+            currentIndex++;
+            resetForNewSentence();
+        } else {
+            finishLesson();
+        }
+    }
+    
+    function resetForNewSentence() {
+        modalOverlay.style.display = "none";
+        inputField.value = "";
+        msgBox.innerHTML = "";
+        localStorage.setItem('part3_test3_2019_progress', currentIndex);
+        updateUI();
+        playAudio();
+    }
+
+    function nextSentence() {
+        modalOverlay.style.display = "none";
+        currentIndex++;
+        inputField.value = "";
+        msgBox.innerHTML = "";
+        
+        if (currentIndex < lessonData.length) {
+            localStorage.setItem('part3_test3_2019_progress', currentIndex);
+            updateUI();
+            playAudio();
+        } else {
+            finishLesson();
+        }
+    }
+
+    function updateProgress() {
+        const percent = Math.round((currentIndex / lessonData.length) * 100);
+        document.getElementById("progress-percent").innerText = percent;
+        document.getElementById("progress-ring").style.background = `conic-gradient(var(--primary) ${percent}%, #eee 0)`;
+    }
+
+    function finishLesson() {
+        document.getElementById("learning-screen").style.display = "none";
+        document.getElementById("end-screen").style.display = "block";
+        
+        let count = parseInt(localStorage.getItem('part3_test3_2019_count')) || 0;
+        count++;
+        localStorage.setItem('part3_test3_2019_count', count);
+        document.getElementById('study-count').innerText = count;
+
+        localStorage.removeItem('part3_test3_2019_progress');
+
+        const transcriptBox = document.getElementById("full-transcript");
+        let lastImage = "";
+        let htmlContent = "";
+
+        lessonData.forEach(d => {
+            if(d.image && d.image !== lastImage) {
+                htmlContent += `<div style="text-align:center; margin: 20px 0 10px;">
+                    <img src="${d.image}" style="max-height: 150px; max-width: 100%; height: auto; object-fit: contain; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.05); border: 1px solid #E5E7EB;">
+                </div>`;
+                lastImage = d.image;
+            }
+
+            const color = d.gender === 'male' ? '#1D4ED8' : '#B45309';
+            htmlContent += `<p style="margin-bottom:12px; padding-left: 10px;">
+                <strong style="color:${color}">${d.speaker}:</strong> <span style="font-weight: 500;">${d.en}</span><br>
+                <span style="color:var(--text-light); font-size: 14px;">${d.vi}</span>
+            </p>`;
+        });
+        transcriptBox.innerHTML = htmlContent;
+    }
+
+    function restartLesson() {
+        localStorage.setItem('part3_test3_2019_progress', 0);
+        location.reload();
+    }
+</script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlTU4B563sSsTVbLai_je29l6eC8T-cm0",
+        authDomain: "snapenglish-cb6e2.firebaseapp.com",
+        projectId: "snapenglish-cb6e2",
+        storageBucket: "snapenglish-cb6e2.firebasestorage.app",
+        messagingSenderId: "373152038413",
+        appId: "1:373152038413:web:19284622571390f8585f44"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            window.currentUserUid = user.uid;
+            window.currentUserEmail = user.email;
+            console.log("Đã đồng bộ ngầm tài khoản:", user.email);
+        }
+    });
+</script>
+
+</body>
+</html>
