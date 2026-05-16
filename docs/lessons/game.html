@@ -71,6 +71,10 @@
         .item-icon {
             font-size: 3.5rem;
             margin-bottom: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 56px;
         }
 
         .item-name {
@@ -157,43 +161,43 @@
 <body>
 
     <h1>Let's Pack My Magic Bag! 🎒</h1>
-    <div class="subtitle">Click on the clothes to put them in the bag. Listen and repeat!</div>
+    <div class="subtitle">Click on the clothes to put them in the bag. Click again to take them out!</div>
 
-    <!-- Khu vực đồ vật bên ngoài -->
     <div class="items-container" id="wardrobe">
-        <div class="item" onclick="packItem(this, 'boots')">
+        <div class="item" onclick="toggleItem(this, 'boots')">
             <span class="item-icon">👢</span>
             <span class="item-name">Boots</span>
         </div>
-        <div class="item" onclick="packItem(this, 'umbrella')">
+        <div class="item" onclick="toggleItem(this, 'umbrella')">
             <span class="item-icon">☂️</span>
             <span class="item-name">Umbrella</span>
         </div>
-        <div class="item" onclick="packItem(this, 'scarf')">
+        <div class="item" onclick="toggleItem(this, 'scarf')">
             <span class="item-icon">🧣</span>
             <span class="item-name">Scarf</span>
         </div>
-        <div class="item" onclick="packItem(this, 'coat')">
+        <div class="item" onclick="toggleItem(this, 'coat')">
             <span class="item-icon">🧥</span>
             <span class="item-name">Coat</span>
         </div>
-        <div class="item" onclick="packItem(this, 'shorts')">
+        <div class="item" onclick="toggleItem(this, 'shorts')">
             <span class="item-icon">
-                <img src="https://cdn-icons-png.flaticon.com/512/2806/2806026.png" alt="shorts" style="width: 56px; height: 56px; object-fit: contain;">
+                <svg width="50" height="50" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 18 L50 18 L54 52 L36 52 L32 36 L28 52 L10 52 Z" fill="#48dbfb" stroke="#2e86de" stroke-width="3" stroke-linejoin="round"/>
+                    <rect x="12" y="14" width="40" height="6" rx="2" fill="#2e86de" />
+                    <line x1="32" y1="18" x2="32" y2="36" stroke="#2e86de" stroke-width="3" stroke-linecap="round"/>
+                </svg>
             </span>
             <span class="item-name">Shorts</span>
         </div>
     </div>
 
-    <!-- Chiếc túi -->
     <div class="bag-wrapper">
         <div class="bag-handle"></div>
         <div class="bag" id="myBag">
-            <!-- Đồ vật sẽ được chuyển vào đây -->
-        </div>
+            </div>
     </div>
 
-    <!-- Lời nhắn khi bé hoàn thành -->
     <div class="message" id="successMessage">
         <h2>Great Job! 🌟</h2>
         <p>Mỗi món đồ là một người bạn bảo vệ con khỏi nắng mưa. Con đã chuẩn bị rất tốt, sẵn sàng cho những chuyến phiêu lưu tuyệt vời rồi đấy!</p>
@@ -203,37 +207,43 @@
         let itemsPacked = 0;
         const totalItems = 5;
 
-        function packItem(element, wordName) {
-            // 1. Phát âm tiếng Anh để bé nghe và học
-            const msg = new SpeechSynthesisUtterance();
-            msg.text = wordName;
-            msg.lang = 'en-US'; // Giọng Mỹ chuẩn
-            msg.rate = 0.9;     // Tốc độ chậm lại một chút cho bé dễ nghe
+        function toggleItem(element, wordName) {
+            // 1. Phát âm tiếng Anh để bé nghe mỗi khi bấm vào đồ vật
+            const msg = new SpeechSynthesisUtterance(wordName);
+            msg.lang = 'en-US'; 
+            msg.rate = 0.9;     
             window.speechSynthesis.speak(msg);
 
-            // 2. Chuyển đồ vật vào trong chiếc túi
             const bag = document.getElementById('myBag');
+            const wardrobe = document.getElementById('wardrobe');
+            const successMessage = document.getElementById('successMessage');
             
-            // Xoá sự kiện click để không bấm lại được nữa
-            element.onclick = null;
-            element.style.cursor = 'default';
-            
-            // Thêm class để tạo hiệu ứng bay vào túi
-            element.classList.add('in-bag');
-            
-            // Di chuyển phần tử HTML từ tủ đồ (wardrobe) sang túi (myBag)
-            bag.appendChild(element);
+            // 2. Kiểm tra xem món đồ đang ở ĐÂU để quyết định chuyển đi
+            // Nếu đồ chưa vào túi (chưa có class 'in-bag')
+            if (!element.classList.contains('in-bag')) {
+                element.classList.add('in-bag');
+                bag.appendChild(element); // Cất vào túi
+                itemsPacked++;
+            } 
+            // Nếu đồ đã ở trong túi
+            else {
+                element.classList.remove('in-bag');
+                wardrobe.appendChild(element); // Bỏ ra lại ngoài tủ
+                itemsPacked--;
+            }
 
-            // 3. Kiểm tra xem bé đã cất hết đồ chưa
-            itemsPacked++;
+            // 3. Kiểm tra ẩn/hiện lời nhắn chúc mừng
             if (itemsPacked === totalItems) {
                 setTimeout(() => {
-                    document.getElementById('successMessage').style.display = 'block';
+                    successMessage.style.display = 'block';
                     // Đọc một câu khen ngợi
                     const praiseMsg = new SpeechSynthesisUtterance("Great job! You are ready!");
                     praiseMsg.lang = 'en-US';
                     window.speechSynthesis.speak(praiseMsg);
                 }, 800);
+            } else {
+                // Nếu lấy đồ ra thì ẩn câu chúc mừng đi
+                successMessage.style.display = 'none';
             }
         }
     </script>
